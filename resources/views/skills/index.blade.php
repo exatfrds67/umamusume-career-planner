@@ -385,11 +385,11 @@
 {{-- JS extracted to resources/js/pages/skills/index.js --}}
 @push('scripts')
     {{-- Inject data for JavaScript --}}
-    <script>
-        window.skillsData = {
-            isAdmin: @json($isAdmin ?? false),
-            preSelectedCharacterId: '{{ $preSelectedCharacterId ?? '' }}'
-        };
+    <script id="skills-data" type="application/json">
+        {!! json_encode([
+            'isAdmin' => $isAdmin ?? false,
+            'preSelectedCharacterId' => $preSelectedCharacterId ?? ''
+        ]) !!}
     </script>
     @vite('resources/js/pages/skills/index.js')
 @endpush

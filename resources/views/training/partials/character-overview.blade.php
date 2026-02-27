@@ -1,11 +1,11 @@
 {{-- WF-004: Character Overview with Stats, Facility Levels, Support Cards --}}
 @php
     $statColors = [
-        'speed' => 'text-blue-600 dark:text-blue-400',
-        'stamina' => 'text-emerald-600 dark:text-emerald-400',
-        'power' => 'text-red-600 dark:text-red-400',
-        'guts' => 'text-orange-600 dark:text-orange-400',
-        'wit' => 'text-purple-600 dark:text-purple-400',
+        'speed' => 'text-stat-speed-600 dark:text-stat-speed-400',
+        'stamina' => 'text-stat-stamina-600 dark:text-stat-stamina-400',
+        'power' => 'text-stat-power-600 dark:text-stat-power-400',
+        'guts' => 'text-stat-guts-600 dark:text-stat-guts-400',
+        'wit' => 'text-stat-wit-600 dark:text-stat-wit-400',
     ];
     $getGrade = function ($value) {
         if ($value >= 1200) {
@@ -66,8 +66,10 @@
                                 class="text-sm font-semibold text-gray-900 dark:text-white {{ $isOverCap ? 'text-yellow-600 dark:text-yellow-400' : '' }}">
                                 {{ $statValue }}
                                 @if ($isOverCap)
-                                    <span class="text-xs text-yellow-600"
-                                        title="Above soft cap - gains reduced to +50 max">⚠️</span>
+                                    <span class="text-xs text-yellow-600 inline-flex items-center"
+                                        title="Above soft cap - gains reduced to +50 max">
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                    </span>
                                 @endif
                             </span>
                             <span
@@ -158,7 +160,7 @@
                 @endphp
                 @if ($rainbowCount > 0)
                     <div class="flex items-center gap-2">
-                        <span class="text-yellow-500">💛</span>
+                        <svg class="w-5 h-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" /></svg>
                         <span class="text-sm text-gray-700 dark:text-gray-300">
                             {{ $rainbowCount }} at friendship (80%+)
                         </span>

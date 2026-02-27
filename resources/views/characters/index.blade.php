@@ -133,23 +133,23 @@
                                     x-text="character.name"></h3>
                                 <div class="mt-1 grid grid-cols-5 gap-1 text-xs">
                                     <div class="text-center">
-                                        <div class="text-blue-600 dark:text-blue-400 font-bold"
+                                        <div class="text-stat-speed-600 dark:text-stat-speed-400 font-bold"
                                             x-text="character.current_stats?.speed || 0"></div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-green-600 dark:text-green-400 font-bold"
+                                        <div class="text-stat-stamina-600 dark:text-stat-stamina-400 font-bold"
                                             x-text="character.current_stats?.stamina || 0"></div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-orange-600 dark:text-orange-400 font-bold"
+                                        <div class="text-stat-power-600 dark:text-stat-power-400 font-bold"
                                             x-text="character.current_stats?.power || 0"></div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-red-600 dark:text-red-400 font-bold"
+                                        <div class="text-stat-guts-600 dark:text-stat-guts-400 font-bold"
                                             x-text="character.current_stats?.guts || 0"></div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-purple-600 dark:text-purple-400 font-bold"
+                                        <div class="text-stat-wit-600 dark:text-stat-wit-400 font-bold"
                                             x-text="character.current_stats?.wit || 0"></div>
                                     </div>
                                 </div>
@@ -186,9 +186,8 @@
 
 {{-- JS extracted to resources/js/pages/characters/index.js --}}
 @push('scripts')
-    <script>
-        // Inject characters data from server
-        window.charactersData = @json($characters);
+    <script id="characters-data" type="application/json">
+        {!! json_encode($characters) !!}
     </script>
     @vite('resources/js/pages/characters/index.js')
 @endpush

@@ -1251,15 +1251,14 @@
 
 @push('scripts')
 {{-- Extracted: JS logic moved to resources/js/pages/settings/index.js --}}
-<script>
-    window.pageData = window.pageData || {};
-    window.pageData.settings = {
-        user: @json($user->only(['name', 'email'])),
-        prefs: @json($prefs),
-        accessSettings: @json($accessSettings),
-        notifPrefs: @json($notifPrefs),
-        aiSettings: @json($aiSettings),
-    };
+<script id="settings-data" type="application/json">
+    {!! json_encode([
+        'user' => $user->only(['name', 'email']),
+        'prefs' => $prefs,
+        'accessSettings' => $accessSettings,
+        'notifPrefs' => $notifPrefs,
+        'aiSettings' => $aiSettings,
+    ]) !!}
 </script>
 @vite('resources/js/pages/settings/index.js')
 @endpush

@@ -35,8 +35,9 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
                     <div class="flex flex-wrap gap-2">
                         <button @click="filterByType(null)"
                             :class="!activeTypeFilter ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' :
-                                'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'"
-                            class="px-3 py-2 rounded-lg text-sm font-medium transition-colors text-gray-900 dark:text-white">
+                            'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'"
+                            class="px-3 py-2 rounded-lg text-sm font-medium transition-colors text-gray-900 dark:text-white"
+                            :aria-pressed="!activeTypeFilter">
                             All
                         </button>
                         <template x-for="type in raceTypes" :key="type">
@@ -44,7 +45,8 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
                                 :class="activeTypeFilter === type ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' :
                                     'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'"
                                 class="px-3 py-2 rounded-lg text-sm font-medium transition-colors text-gray-900 dark:text-white capitalize"
-                                x-text="type">
+                                x-text="type"
+                                :aria-pressed="activeTypeFilter === type">
                             </button>
                         </template>
                     </div>
@@ -72,14 +74,14 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
                         <span
                             class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm">
                             <span x-text="`Type: ${activeTypeFilter}`"></span>
-                            <button @click="filterByType(null)" class="hover:opacity-70">✕</button>
+                            <button @click="filterByType(null)" class="hover:opacity-70" aria-label="Clear race type filter">✕</button>
                         </span>
                     </template>
                     <template x-if="activeMonthFilter">
                         <span
                             class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm">
                             <span x-text="`Month: ${getMonthName(activeMonthFilter)}`"></span>
-                            <button @click="filterByMonth('')" class="hover:opacity-70">✕</button>
+                            <button @click="filterByMonth('')" class="hover:opacity-70" aria-label="Clear month filter">✕</button>
                         </span>
                     </template>
                 </div>
@@ -125,22 +127,22 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
                 <div class="p-6 space-y-6">
                     <template x-if="currentRace">
                         {{-- Key Stats Grid --}}
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 sm:p-4">
                                 <span class="text-xs text-gray-600 dark:text-gray-400 block mb-1">Distance</span>
-                                <span class="text-lg font-bold text-gray-900 dark:text-white"
+                                <span class="text-base sm:text-lg font-bold text-gray-900 dark:text-white"
                                     x-text="currentRace.distance + 'm'">
                                 </span>
                             </div>
-                            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 sm:p-4">
                                 <span class="text-xs text-gray-600 dark:text-gray-400 block mb-1">Grade</span>
-                                <span class="text-lg font-bold text-gray-900 dark:text-white"
+                                <span class="text-base sm:text-lg font-bold text-gray-900 dark:text-white"
                                     x-text="currentRace.grade">
                                 </span>
                             </div>
-                            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 sm:p-4 col-span-2 sm:col-span-1">
                                 <span class="text-xs text-gray-600 dark:text-gray-400 block mb-1">Fans</span>
-                                <span class="text-lg font-bold text-gray-900 dark:text-white"
+                                <span class="text-base sm:text-lg font-bold text-gray-900 dark:text-white"
                                     x-text="(currentRace.fanCount / 1000).toFixed(1) + 'K'">
                                 </span>
                             </div>
@@ -183,7 +185,7 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
                         </template>
 
                         {{-- Action Buttons --}}
-                        <div class="grid grid-cols-2 gap-3 pt-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
                             <button @click="selectRace(currentRace.id)"
                                 class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
                                 Select Race
@@ -246,10 +248,10 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
 </div>
 
 {{-- Inject race data for JavaScript --}}
-<script>
-    window.raceCalendarData = {
-        races: @json($races ?? [])
-    };
+<script id="race-calendar-data" type="application/json">
+    {!! json_encode([
+        'races' => $races ?? []
+    ]) !!}
 </script>
 
 @vite(['resources/js/pages/races/calendar.js'])

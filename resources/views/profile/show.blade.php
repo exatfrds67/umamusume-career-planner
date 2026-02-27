@@ -175,12 +175,13 @@
 
     {{-- JS extracted to resources/js/pages/profile/show.js --}}
     @push('scripts')
-        <script>
-            window.pageData = window.pageData || {};
-            window.pageData.routes = {
-                avatarUpload: '{{ route('profile.avatar') }}',
-                avatarDelete: '{{ route('profile.avatar.delete') }}'
-            };
+        <script id="profile-data" type="application/json">
+            {!! json_encode([
+                'routes' => [
+                    'avatarUpload' => route('profile.avatar'),
+                    'avatarDelete' => route('profile.avatar.delete')
+                ]
+            ]) !!}
         </script>
         @vite('resources/js/pages/profile/show.js')
     @endpush

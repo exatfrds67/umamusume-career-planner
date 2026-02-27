@@ -477,10 +477,10 @@
     </div>
 
     {{-- Inject data for JavaScript --}}
-    <script>
-        window.apmDashboardData = {
-            lastUpdated: '{{ now()->format('H:i:s') }}'
-        };
+    <script id="apm-dashboard-data" type="application/json">
+        {!! json_encode([
+            'lastUpdated' => now()->format('H:i:s')
+        ]) !!}
     </script>
 
     @vite(['resources/js/pages/performance/dashboard.js'])

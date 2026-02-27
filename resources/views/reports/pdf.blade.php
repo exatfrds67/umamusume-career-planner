@@ -106,28 +106,4 @@
         </div>
     </div>
 
-    @push('styles')
-        <style>
-            @media print {
-                body {
-                    background: white !important;
-                    color: black !important;
-                }
-
-                .dark\:bg-gray-800 {
-                    background: white !important;
-                }
-
-                .dark\:text-white,
-                .dark\:text-gray-300,
-                .dark\:text-gray-400 {
-                    color: black !important;
-                }
-
-                .dark\:bg-gray-700\/50 {
-                    background: #f3f4f6 !important;
-                }
-            }
-        </style>
-    @endpush
 @endsection

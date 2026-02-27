@@ -108,10 +108,8 @@
 </div>
 
 {{-- Data injection for skill list form --}}
-<script>
-    window.pageData = {
-        initialSkillCount: {{ count($data['skills'] ?? []) }}
-    };
+<script id="skill-list-form-data" type="application/json">
+    {!! json_encode(['initialSkillCount' => count($data['skills'] ?? [])]) !!}
 </script>
 @vite(['resources/js/pages/ocr/partials/skill-list-form.js'])
 

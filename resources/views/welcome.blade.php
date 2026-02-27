@@ -336,14 +336,18 @@
                         </h2>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="text-center p-4 glass-card-inner rounded-lg">
-                                <div class="text-3xl mb-2">🎯</div>
+                                <svg class="w-8 h-8 mx-auto mb-2 text-primary-600 dark:text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                </svg>
                                 <div class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Skill Evolution</div>
                                 <div class="text-xs text-gray-700 dark:text-gray-300">Track evolution chains and upgrade
                                     paths
                                 </div>
                             </div>
                             <div class="text-center p-4 glass-card-inner rounded-lg">
-                                <div class="text-3xl mb-2">💡</div>
+                                <svg class="w-8 h-8 mx-auto mb-2 text-secondary-600 dark:text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                </svg>
                                 <div class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Hint Optimization
                                 </div>
                                 <div class="text-xs text-gray-700 dark:text-gray-300">20% SP reduction per duplicate (40%
@@ -351,14 +355,18 @@
                                 </div>
                             </div>
                             <div class="text-center p-4 glass-card-inner rounded-lg">
-                                <div class="text-3xl mb-2">🌤️</div>
+                                <svg class="w-8 h-8 mx-auto mb-2 text-sky-500 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                                </svg>
                                 <div class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Weather System</div>
                                 <div class="text-xs text-gray-700 dark:text-gray-300">Condition-based performance
                                     optimization
                                 </div>
                             </div>
                             <div class="text-center p-4 glass-card-inner rounded-lg">
-                                <div class="text-3xl mb-2">⏱️</div>
+                                <svg class="w-8 h-8 mx-auto mb-2 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                                 <div class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Turn Economy</div>
                                 <div class="text-xs text-gray-700 dark:text-gray-300">Optimize 60-70 turn career
                                     progression

@@ -28,12 +28,12 @@
     @endphp
 
     {{-- Pass data to window for the deck builder component --}}
-    <script>
-        window.deckBuilderData = {
-            deck: @json($deckData),
-            availableCards: @json($availableCardsData),
-            characterId: {{ $character->id }}
-        };
+    <script id="deck-builder-data" type="application/json">
+        {!! json_encode([
+            'deck' => $deckData,
+            'availableCards' => $availableCardsData,
+            'characterId' => $character->id
+        ]) !!}
     </script>
 
     {{-- Load Assets --}}

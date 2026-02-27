@@ -6,42 +6,7 @@
 
             <!-- Background grid -->
             <defs>
-                <style>
-                    .grid-line {
-                        stroke: currentColor;
-                        stroke-width: 0.5;
-                        opacity: 0.2;
-                        fill: none;
-                    }
 
-                    .grid-label {
-                        fill: currentColor;
-                        opacity: 0.5;
-                        font-size: {{ $size === 'sm' ? '3px' : ($size === 'lg' ? '9px' : '6px') }};
-                        font-weight: 500;
-                        text-anchor: middle;
-                    }
-
-                    .radar-fill {
-                        opacity: 0.3;
-
-                        @if ($animated)
-                            animation: radarFill 1.2s ease-out forwards;
-                        @endif
-                    }
-
-                    @if ($animated)
-                        @keyframes radarFill {
-                            from {
-                                opacity: 0;
-                            }
-
-                            to {
-                                opacity: 0.3;
-                            }
-                        }
-                    @endif
-                </style>
             </defs>
 
             <!-- Grid circles/pentagons -->
@@ -65,6 +30,7 @@
                     $labelY = $centerY - $radius - $labelOffset;
                 @endphp
                 <text x="{{ $centerX }}" y="{{ $labelY }}"
+                    style="font-size: {{ $size === 'sm' ? '3px' : ($size === 'lg' ? '9px' : '6px') }};"
                     class="grid-label dark:fill-gray-400">{{ $value }}</text>
             @endforeach
 
@@ -88,7 +54,7 @@
 
             <!-- Data polygon -->
             <polygon points="{{ implode(' ', $calculatePoints()) }}"
-                class="radar-fill {{ match ($stats['speed'] ?? 0) {default => 'fill-blue-400/30'} }} dark:fill-blue-500/20"
+                class="radar-fill {{ $animated ? 'radar-fill-animated' : '' }} {{ match ($stats['speed'] ?? 0) {default => 'fill-blue-400/30'} }} dark:fill-blue-500/20"
                 style="fill: url(#radarGradient);" />
 
             <!-- Gradient for radar fill -->

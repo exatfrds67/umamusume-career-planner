@@ -16,7 +16,7 @@
                             };
                         @endphp
                         <div class="h-full transition-all duration-300 {{ $energyColor }}"
-                            style="width: {{ $character->energy_level }}%"></div>
+                            style="width: {{ $character->energy_level }}%;"></div>
                     </div>
                     <span
                         class="text-sm font-semibold text-gray-900 dark:text-white">{{ $character->energy_level }}/100</span>
@@ -29,27 +29,27 @@
                 <span class="text-sm font-semibold text-gray-900 dark:text-white capitalize flex items-center gap-1">
                     @switch($character->mood_status)
                         @case('great')
-                            <span class="text-green-500">😊</span> Great <span class="text-xs text-green-600">(+4%)</span>
+                            <svg class="w-5 h-5 inline-block text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Great <span class="text-xs text-green-600">(+4%)</span>
                         @break
 
                         @case('good')
-                            <span class="text-blue-500">🙂</span> Good <span class="text-xs text-blue-600">(+2%)</span>
+                            <svg class="w-5 h-5 inline-block text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Good <span class="text-xs text-blue-600">(+2%)</span>
                         @break
 
                         @case('normal')
-                            <span class="text-gray-500">😐</span> Normal
+                            <svg class="w-5 h-5 inline-block text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14h6m-6-4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Normal
                         @break
 
                         @case('bad')
-                            <span class="text-orange-500">🙁</span> Bad <span class="text-xs text-orange-600">(-2%)</span>
+                            <svg class="w-5 h-5 inline-block text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Bad <span class="text-xs text-orange-600">(-2%)</span>
                         @break
 
                         @case('awful')
-                            <span class="text-red-500">😞</span> Awful <span class="text-xs text-red-600">(-4%)</span>
+                            <svg class="w-5 h-5 inline-block text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Awful <span class="text-xs text-red-600">(-4%)</span>
                         @break
 
                         @default
-                            <span class="text-gray-500">😐</span> {{ $character->mood_status }}
+                            <svg class="w-5 h-5 inline-block text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14h6m-6-4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> {{ $character->mood_status }}
                     @endswitch
                 </span>
             </div>

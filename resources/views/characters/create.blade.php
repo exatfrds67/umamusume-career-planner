@@ -721,9 +721,6 @@
             'externalPrefill' => $externalPrefill ?? null
         ]) !!}
     </script>
-    <script>
-        // Parse page data for Alpine.js component without triggering VS Code JS linter errors
-        window.pageData = JSON.parse(document.getElementById('page-data').textContent);
-    </script>
+
     @vite(['resources/js/pages/characters/create.js'])
 @endsection
