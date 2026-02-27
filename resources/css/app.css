@@ -12,8 +12,12 @@
 @import "./components/stat-bar.css";
 @import "./components/support-card.css";
 @import "./components/turn-counter.css";
+@import "./components/stat-radar-chart.css";
 @import "./components/ai/critical-alert-badge.css";
 @import "./components/ai/recommendation-card.css";
+
+/* Page Styles */
+@import "./pages/reports-pdf.css";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -2431,23 +2435,43 @@ input[type="range"]::-moz-range-thumb:hover {
 
 /* Stat bar fills for dark mode - brighter for visibility */
 .dark .stat-bar-fill-speed {
-    background: linear-gradient(90deg, var(--color-stat-speed-400), var(--color-stat-speed-500));
+    background: linear-gradient(
+        90deg,
+        var(--color-stat-speed-400),
+        var(--color-stat-speed-500)
+    );
 }
 
 .dark .stat-bar-fill-stamina {
-    background: linear-gradient(90deg, var(--color-stat-stamina-400), var(--color-stat-stamina-500));
+    background: linear-gradient(
+        90deg,
+        var(--color-stat-stamina-400),
+        var(--color-stat-stamina-500)
+    );
 }
 
 .dark .stat-bar-fill-power {
-    background: linear-gradient(90deg, var(--color-stat-power-400), var(--color-stat-power-500));
+    background: linear-gradient(
+        90deg,
+        var(--color-stat-power-400),
+        var(--color-stat-power-500)
+    );
 }
 
 .dark .stat-bar-fill-guts {
-    background: linear-gradient(90deg, var(--color-stat-guts-400), var(--color-stat-guts-500));
+    background: linear-gradient(
+        90deg,
+        var(--color-stat-guts-400),
+        var(--color-stat-guts-500)
+    );
 }
 
 .dark .stat-bar-fill-wit {
-    background: linear-gradient(90deg, var(--color-stat-wit-400), var(--color-stat-wit-500));
+    background: linear-gradient(
+        90deg,
+        var(--color-stat-wit-400),
+        var(--color-stat-wit-500)
+    );
 }
 
 /* Chart.js canvas dark mode background */
