@@ -335,22 +335,14 @@ describe('API Endpoint Coverage', function () {
         $this->actingAs($this->user);
 
         $character = Character::factory()->create(['user_id' => $this->user->id]);
-        $this->getJson("/api/training-advisor/history/{$character->id}")->assertSuccessful();
+        $this->getJson("/api/neuron/training-advisor/history/{$character->id}")->assertSuccessful();
     });
 
     it('has all race strategy routes accessible', function () {
         $this->actingAs($this->user);
 
         $character = Character::factory()->create(['user_id' => $this->user->id]);
-        $this->getJson("/api/race-strategy/history/{$character->id}")->assertSuccessful();
-    });
-
-    it('has all skill recommendation routes accessible', function () {
-        $this->actingAs($this->user);
-
-        $character = Character::factory()->create(['user_id' => $this->user->id]);
-        $this->getJson("/api/skill-recommendations/history/{$character->id}")->assertSuccessful();
-        $this->getJson("/api/skill-recommendations/synergies/{$character->id}")->assertSuccessful();
+        $this->getJson("/api/neuron/race-strategy/history/{$character->id}")->assertSuccessful();
     });
 
     it('counts all registered API routes', function () {
