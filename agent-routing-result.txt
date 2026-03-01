@@ -1,0 +1,21 @@
+
+   PASS  Tests\Unit\Services\MCP\AgentRoutingServiceTest
+  Γ£ô Complexity Detection ΓåÆ it detects moderate requests correctly        1.29s  
+  Γ£ô Complexity Detection ΓåÆ it detects simple requests correctly          0.10s  
+  Γ£ô Complexity Detection ΓåÆ it detects complex requests correctly         0.09s  
+  Γ£ô Complexity Detection ΓåÆ it detects specialized requests correctly     0.08s  
+  Γ£ô Provider Selection ΓåÆ it selects agent for specialized requests       0.08s  
+  Γ£ô Execution with Fallback ΓåÆ it falls back to Bedrock nova-lite when OΓÇª 0.11s  
+  Γ£ô Token Estimation ΓåÆ it estimates token count correctly                0.09s  
+  Γ£ô Routing Analytics ΓåÆ it returns empty analytics when no data exists   0.08s  
+  Γ£ô Performance Thresholds ΓåÆ it checks performance acceptability correcΓÇª 0.08s  
+  Γ£ô Provider Selection ΓåÆ it selects Bedrock for complex requests         0.08s  
+  Γ£ô Provider Selection ΓåÆ it falls back to Ollama when budget is exceedeΓÇª 0.08s  
+  Γ£ô Route Caching ΓåÆ it caches routing decisions                          0.08s  
+  Γ£ô Execution with Fallback ΓåÆ it falls back to Ollama on provider failuΓÇª 0.06s  
+  Γ£ô Provider Selection ΓåÆ it selects Ollama for simple requests when avaΓÇª 0.07s  
+  Γ£ô Execution with Fallback ΓåÆ it executes request successfully with priΓÇª 0.08s  
+
+  Tests:    15 passed (36 assertions)
+  Duration: 2.94s
+
