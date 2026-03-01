@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Character;
-use App\Models\Race;
+use App\Models\GameRace;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -14,38 +14,35 @@ class RacePreparationViewTest extends TestCase
 
     public function test_race_preparation_page_loads(): void
     {
-        try {
-            $user = User::factory()->create();
-            $character = Character::factory()->create(['user_id' => $user->id]);
-            $race = Race::factory()->create([
-                'character_id' => $character->id,
-                'race_name' => 'Tokyo Yushun (Japanese Derby)',
-                'race_grade' => 'G1',
-                'distance_meters' => 2400,
-            ]);
-        } catch (\Throwable $e) {
-            dump($e->getMessage());
-            throw $e;
-        }
+        $user = User::factory()->create();
+        Character::factory()->create(['user_id' => $user->id]);
+        $race = GameRace::factory()->create([
+            'slug' => 'tokyo-yushun-japanese-derby',
+            'name_en' => 'Tokyo Yushun (Japanese Derby)',
+            'grade' => 'G1',
+            'distance_meters' => 2400,
+        ]);
 
-        $response = $this->actingAs($user)->get(route('races.show', $race));
+        $response = $this->actingAs($user)->get(route('races.show', $race->slug));
 
         $response->assertOk();
-        $response->assertSee($race->race_name);
-        $response->assertSee('2400m');
+        $response->assertSee($race->name_en);
+        $response->assertSee('2,400', false);
     }
 
     public function test_race_preparation_has_semantic_structure(): void
     {
         $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
-        $race = Race::factory()->create([
-            'character_id' => $character->id,
-            'preparation_strategy' => ['Rest before race', 'Study opponents'],
-            'performance_analysis' => ['Good stamina recommended'],
+        Character::factory()->create(['user_id' => $user->id]);
+        $race = GameRace::factory()->create([
+            'slug' => 'test-semantic-race',
+            'name_en' => 'Semantic Structure Test Race',
+            'name_jp' => 'セマンティック構造テストレース',
+            'year_in_scenario' => 2,
+            'stat_requirements' => ['speed' => 500, 'stamina' => 450],
         ]);
 
-        $response = $this->actingAs($user)->get(route('races.show', $race));
+        $response = $this->actingAs($user)->get(route('races.show', $race->slug));
 
         $response->assertOk();
 
@@ -57,13 +54,9 @@ class RacePreparationViewTest extends TestCase
         $response->assertSee('<nav', false);
         $response->assertSee('aria-label="Breadcrumb"', false);
 
-        // Check for sections with aria labels
-        $response->assertSee('aria-labelledby="race-info-title"', false);
-        $response->assertSee('aria-labelledby="prep-strategy-title"', false);
-        $response->assertSee('aria-labelledby="perf-analysis-title"', false);
-
-        // Check for articles
-        $response->assertSee('<article', false);
+        // Check for sections with aria labels present in the current race page
+        $response->assertSee('aria-labelledby="course-info-heading"', false);
+        $response->assertSee('aria-labelledby="scenario-heading"', false);
 
         // Check for Definition Lists
         $response->assertSee('<dl', false);

@@ -89,6 +89,55 @@ describe('Skill Model', function (): void {
             expect($skill->skill_type)->toBe('unique');
         });
     });
+
+    describe('unique star upgrade system', function (): void {
+        it('stores unique_star_upgrade as boolean', function (): void {
+            $skill = Skill::factory()->create([
+                'skill_type' => 'unique',
+                'unique_star_upgrade' => true,
+            ]);
+
+            expect($skill->unique_star_upgrade)->toBeTrue();
+            expect($skill->unique_star_upgrade)->toBeBool();
+        });
+
+        it('stores unique_star6_initial_level as integer', function (): void {
+            $skill = Skill::factory()->create([
+                'skill_type' => 'unique',
+                'unique_star_upgrade' => true,
+                'unique_star6_initial_level' => 3,
+            ]);
+
+            expect($skill->unique_star6_initial_level)->toBe(3);
+            expect($skill->unique_star6_initial_level)->toBeInt();
+        });
+
+        it('casts unique_base_effects as array', function (): void {
+            $baseEffects = ['target_speed' => '+0.15', 'sp_cost_at_base' => 200];
+
+            $skill = Skill::factory()->create([
+                'skill_type' => 'unique',
+                'unique_star_upgrade' => true,
+                'unique_base_effects' => $baseEffects,
+            ]);
+
+            expect($skill->unique_base_effects)->toBeArray();
+            expect($skill->unique_base_effects)->toBe($baseEffects);
+        });
+
+        it('allows null values for non-unique skills', function (): void {
+            $skill = Skill::factory()->create([
+                'skill_type' => 'speed',
+                'unique_star_upgrade' => null,
+                'unique_star6_initial_level' => null,
+                'unique_base_effects' => null,
+            ]);
+
+            expect($skill->unique_star_upgrade)->toBeNull();
+            expect($skill->unique_star6_initial_level)->toBeNull();
+            expect($skill->unique_base_effects)->toBeNull();
+        });
+    });
 });
 
 describe('SkillHint Model', function (): void {

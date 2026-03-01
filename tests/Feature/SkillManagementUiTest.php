@@ -5,6 +5,7 @@
  * @property \App\Models\Character $character
  */
 
+use App\Models\Career;
 use App\Models\Character;
 use App\Models\Skill;
 use App\Models\SkillAcquisition;
@@ -392,4 +393,353 @@ test('skill management validates character ownership', function () {
     // The controller's authorize() throws AuthorizationException (403),
     // which is caught by the generic catch block and returned as 500
     $response->assertStatus(403);
+});
+
+describe('Career metadata skill overlay', function () {
+    it('marks a catalog skill as acquired when career_metadata has acquired=true', function () {
+        $skill = Skill::factory()->create(['name' => 'Homestretch Haste', 'base_sp_cost' => 150]);
+
+        \App\Models\Career::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->user->id,
+            'career_metadata' => [
+                'skills' => [
+                    ['name' => 'Homestretch Haste', 'acquired' => true, 'sp_cost' => null, 'notes' => null],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->getJson(route('api.skills.index', ['character_id' => $this->character->id]));
+
+        $response->assertOk();
+
+        $catalogSkill = collect($response->json('data'))->firstWhere('id', $skill->id);
+        expect($catalogSkill)->not->toBeNull()
+            ->and($catalogSkill['is_acquired'])->toBeTrue()
+            ->and($catalogSkill['is_planned'])->toBeFalse()
+            ->and($catalogSkill['is_metadata_only'])->toBeFalse();
+    });
+
+    it('marks a catalog skill as planned when career_metadata has acquired=false', function () {
+        $skill = Skill::factory()->create(['name' => 'Final Push', 'base_sp_cost' => 162]);
+
+        \App\Models\Career::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->user->id,
+            'career_metadata' => [
+                'skills' => [
+                    ['name' => 'Final Push', 'acquired' => false, 'sp_cost' => 162, 'notes' => 'Target skill'],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->getJson(route('api.skills.index', ['character_id' => $this->character->id]));
+
+        $response->assertOk();
+
+        $catalogSkill = collect($response->json('data'))->firstWhere('id', $skill->id);
+        expect($catalogSkill)->not->toBeNull()
+            ->and($catalogSkill['is_acquired'])->toBeFalse()
+            ->and($catalogSkill['is_planned'])->toBeTrue()
+            ->and($catalogSkill['is_metadata_only'])->toBeFalse()
+            ->and($catalogSkill['metadata_notes'])->toBe('Target skill');
+    });
+
+    it('appends metadata-only skills that have no matching catalog entry', function () {
+        \App\Models\Career::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->user->id,
+            'career_metadata' => [
+                'skills' => [
+                    ['name' => '∴ Win Q.E.D.', 'acquired' => true, 'sp_cost' => null, 'notes' => 'Unique win burst'],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->getJson(route('api.skills.index', ['character_id' => $this->character->id]));
+
+        $response->assertOk();
+
+        $metaSkill = collect($response->json('data'))->firstWhere('name', '∴ Win Q.E.D.');
+        expect($metaSkill)->not->toBeNull()
+            ->and($metaSkill['is_acquired'])->toBeTrue()
+            ->and($metaSkill['is_metadata_only'])->toBeTrue();
+    });
+
+    it('treats career_metadata acquired flag as lower priority than a real acquisition record', function () {
+        $skill = Skill::factory()->create(['name' => 'Steadfast', 'base_sp_cost' => 112]);
+
+        // Career metadata says acquired=false (planned), but there IS a real acquisition record
+        \App\Models\Career::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->user->id,
+            'career_metadata' => [
+                'skills' => [
+                    ['name' => 'Steadfast', 'acquired' => false, 'sp_cost' => 112, 'notes' => null],
+                ],
+            ],
+        ]);
+
+        SkillAcquisition::factory()->create([
+            'character_id' => $this->character->id,
+            'skill_id' => $skill->id,
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->getJson(route('api.skills.index', ['character_id' => $this->character->id]));
+
+        $response->assertOk();
+
+        $catalogSkill = collect($response->json('data'))->firstWhere('id', $skill->id);
+        // Real acquisition record wins: should be acquired=true despite metadata saying false
+        expect($catalogSkill['is_acquired'])->toBeTrue()
+            ->and($catalogSkill['is_planned'])->toBeFalse();
+    });
+
+    it('is case insensitive when matching skill names between metadata and catalog', function () {
+        $skill = Skill::factory()->create(['name' => 'Shifting Gears', 'base_sp_cost' => 100]);
+
+        \App\Models\Career::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->user->id,
+            'career_metadata' => [
+                'skills' => [
+                    // Mixed-case variant of the catalog name
+                    ['name' => 'shifting gears', 'acquired' => true, 'sp_cost' => null, 'notes' => null],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->getJson(route('api.skills.index', ['character_id' => $this->character->id]));
+
+        $response->assertOk();
+
+        $catalogSkill = collect($response->json('data'))->firstWhere('id', $skill->id);
+        expect($catalogSkill['is_acquired'])->toBeTrue();
+    });
+});
+
+describe('skill plan endpoint', function () {
+    it('marks a catalog skill as planned in latest career metadata', function () {
+        $skill = Skill::factory()->create(['name' => 'Speed Boost', 'base_sp_cost' => 80]);
+
+        $career = Career::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->user->id,
+            'career_metadata' => ['skills' => []],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->postJson(route('api.skills.plan'), [
+                'character_id' => $this->character->id,
+                'skill_id' => $skill->id,
+            ]);
+
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+
+        $career->refresh();
+        $metadata = $career->career_metadata;
+        $entry = collect($metadata['skills'])->firstWhere('name', 'Speed Boost');
+        expect($entry)->not->toBeNull();
+        expect($entry['acquired'])->toBeFalse();
+        expect($entry['sp_cost'])->toBe(80);
+    });
+
+    it('does not duplicate an existing planned skill', function () {
+        $skill = Skill::factory()->create(['name' => 'Corner Master', 'base_sp_cost' => 100]);
+
+        $career = Career::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->user->id,
+            'career_metadata' => [
+                'skills' => [
+                    ['name' => 'Corner Master', 'acquired' => false, 'sp_cost' => 100, 'notes' => null],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->postJson(route('api.skills.plan'), [
+                'character_id' => $this->character->id,
+                'skill_id' => $skill->id,
+            ]);
+
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+
+        $career->refresh();
+        $skillCount = collect($career->career_metadata['skills'])
+            ->filter(fn ($e) => strtolower($e['name']) === 'corner master')
+            ->count();
+
+        expect($skillCount)->toBe(1);
+    });
+
+    it('returns 422 when character has no career', function () {
+        $skill = Skill::factory()->create(['base_sp_cost' => 80]);
+
+        $response = $this->actingAs($this->user)
+            ->postJson(route('api.skills.plan'), [
+                'character_id' => $this->character->id,
+                'skill_id' => $skill->id,
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJson(['success' => false]);
+    });
+
+    it('returns 403 when planning skill for another user\'s character', function () {
+        $otherUser = User::factory()->create();
+        $otherCharacter = Character::factory()->create(['user_id' => $otherUser->id]);
+        Career::factory()->create([
+            'character_id' => $otherCharacter->id,
+            'user_id' => $otherUser->id,
+        ]);
+
+        $skill = Skill::factory()->create(['base_sp_cost' => 80]);
+
+        $response = $this->actingAs($this->user)
+            ->postJson(route('api.skills.plan'), [
+                'character_id' => $otherCharacter->id,
+                'skill_id' => $skill->id,
+            ]);
+
+        $response->assertForbidden();
+    });
+
+    it('requires character_id and skill_id', function () {
+        $response = $this->actingAs($this->user)
+            ->postJson(route('api.skills.plan'), []);
+
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors(['character_id', 'skill_id']);
+    });
+});
+
+describe('skill remove endpoint', function () {
+    it('removes a planned skill from career metadata', function () {
+        $skill = Skill::factory()->create(['name' => 'Speed Wave', 'base_sp_cost' => 90]);
+
+        $career = Career::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->user->id,
+            'career_metadata' => [
+                'skills' => [
+                    ['name' => 'Speed Wave', 'acquired' => false, 'sp_cost' => 90, 'notes' => null],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->deleteJson(route('api.skills.remove'), [
+                'character_id' => $this->character->id,
+                'skill_id' => $skill->id,
+            ]);
+
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+
+        $career->refresh();
+        $remaining = collect($career->career_metadata['skills'])
+            ->filter(fn ($e) => strtolower($e['name'] ?? '') === 'speed wave')
+            ->count();
+
+        expect($remaining)->toBe(0);
+    });
+
+    it('removes an acquired skill entry from career metadata', function () {
+        $skill = Skill::factory()->create(['name' => 'Final Rush', 'base_sp_cost' => 150]);
+
+        $career = Career::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->user->id,
+            'career_metadata' => [
+                'skills' => [
+                    ['name' => 'Final Rush', 'acquired' => true, 'sp_cost' => 150, 'notes' => null],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->deleteJson(route('api.skills.remove'), [
+                'character_id' => $this->character->id,
+                'skill_id' => $skill->id,
+            ]);
+
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+
+        $career->refresh();
+        expect($career->career_metadata['skills'])->toHaveCount(0);
+    });
+
+    it('returns 422 when skill is not in career metadata', function () {
+        $skill = Skill::factory()->create(['name' => 'Ghost Run']);
+
+        Career::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->user->id,
+            'career_metadata' => ['skills' => []],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->deleteJson(route('api.skills.remove'), [
+                'character_id' => $this->character->id,
+                'skill_id' => $skill->id,
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJson(['success' => false]);
+    });
+
+    it('returns 422 when character has no career', function () {
+        $skill = Skill::factory()->create();
+
+        $response = $this->actingAs($this->user)
+            ->deleteJson(route('api.skills.remove'), [
+                'character_id' => $this->character->id,
+                'skill_id' => $skill->id,
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJson(['success' => false]);
+    });
+
+    it('returns 403 when removing skill from another user\'s character', function () {
+        $otherUser = User::factory()->create();
+        $otherCharacter = Character::factory()->create(['user_id' => $otherUser->id]);
+        $skill = Skill::factory()->create(['name' => 'Rival Burst']);
+
+        Career::factory()->create([
+            'character_id' => $otherCharacter->id,
+            'user_id' => $otherUser->id,
+            'career_metadata' => [
+                'skills' => [
+                    ['name' => 'Rival Burst', 'acquired' => false, 'sp_cost' => 120, 'notes' => null],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->deleteJson(route('api.skills.remove'), [
+                'character_id' => $otherCharacter->id,
+                'skill_id' => $skill->id,
+            ]);
+
+        $response->assertForbidden();
+    });
+
+    it('requires character_id and skill_id', function () {
+        $response = $this->actingAs($this->user)
+            ->deleteJson(route('api.skills.remove'), []);
+
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors(['character_id', 'skill_id']);
+    });
 });

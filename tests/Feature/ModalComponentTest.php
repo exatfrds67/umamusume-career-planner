@@ -111,6 +111,6 @@ describe('Modal Component', function () {
         expect($html)
             ->toContain('fixed inset-0 z-50')
             ->toContain('bg-gray-900/50')
-            ->toContain('backdrop-blur-sm');
+            ->toContain('backdrop-blur-xs');
     });
 });

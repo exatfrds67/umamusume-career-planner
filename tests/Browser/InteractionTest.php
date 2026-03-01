@@ -184,7 +184,11 @@ describe('Page Transitions', function () {
         $this->actingAs($this->user);
         $page = visit('/dashboard');
 
+        $page->wait(1);
         $page->navigate('/characters')
+            ->wait(1)
+            ->navigate('/dashboard')
+            ->wait(1)
             ->assertNoJavaScriptErrors();
     })->group('browser', 'interaction', 'transitions');
 });

@@ -201,7 +201,7 @@ describe('RecommendationCard Component', function () {
 
         expect($html)
             ->toContain('@click="expanded = !expanded"')
-            ->toContain('focus:outline-none')
+            ->toContain('focus:outline-hidden')
             ->toContain('focus:ring-2');
     });
 

@@ -56,7 +56,7 @@ describe('Focus Management System', function () {
         $response->assertStatus(200);
         // Buttons should have proper aria-label attributes for accessibility
         $response->assertSee('aria-label=', false);
-        $response->assertSee('role="button"', false);
+        $response->assertDontSee('role="button"', false);
     });
 
     it('has proper keyboard shortcut documentation', function () {

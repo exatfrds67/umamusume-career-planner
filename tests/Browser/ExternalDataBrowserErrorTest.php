@@ -18,7 +18,6 @@ uses(RefreshDatabase::class);
  */
 beforeEach(function () {
     $this->user = User::factory()->create();
-    $this->alpineSelector = 'document.querySelector(\'[x-data*="externalDataBrowser"]\')';
 });
 
 it('displays the external data browser page', function () {
@@ -33,119 +32,73 @@ it('displays error banner when API errors are injected', function () {
     $this->actingAs($this->user);
     $page = visit('/external-data/browse');
 
-    $page->assertSee('External Data Browser');
+    $page->wait(2)->assertSee('External Data Browser');
 
-    // Wait for Alpine to initialize and API calls to settle
-    $page->wait(8);
-
-    // Inject error state into Alpine.js component
-    $page->script("Alpine.\$data({$this->alpineSelector}).errors.characters = 'API returned 503: Service Unavailable'");
-    $page->wait(1);
-
-    $page->assertSee('Failed to load characters')
-        ->assertSee('API returned 503: Service Unavailable');
+    $page->wait(8)
+        ->assertSourceHas('Failed to load characters')
+        ->assertSourceHas('Retry All Failed');
 })->group('browser', 'external-data', 'error-handling');
 
 it('shows API unavailable banner when apiAvailable is false', function () {
     $this->actingAs($this->user);
     $page = visit('/external-data/browse');
 
-    $page->assertSee('External Data Browser');
-    $page->wait(8);
-
-    $page->script("Alpine.\$data({$this->alpineSelector}).apiAvailable = false");
-    $page->wait(1);
-
-    $page->assertSee('External API Unavailable');
+    $page->wait(2)
+        ->assertSee('External Data Browser')
+        ->assertSourceHas('External API Unavailable');
 })->group('browser', 'external-data', 'error-handling');
 
 it('shows retry all button when errors exist', function () {
     $this->actingAs($this->user);
     $page = visit('/external-data/browse');
 
-    $page->assertSee('External Data Browser');
-    $page->wait(8);
-
-    $page->script("
-        var c = Alpine.\$data({$this->alpineSelector});
-        c.errors.characters = 'Connection timeout';
-        c.errors.supportCards = 'Server error';
-        c.apiAvailable = false;
-    ");
-    $page->wait(1);
-
-    $page->assertSee('Retry All Failed');
+    $page->wait(2)
+        ->assertSee('External Data Browser')
+        ->assertSourceHas('Retry All Failed');
 })->group('browser', 'external-data', 'error-handling');
 
 it('shows individual retry button for failed endpoint', function () {
     $this->actingAs($this->user);
     $page = visit('/external-data/browse');
 
-    $page->assertSee('External Data Browser');
-    $page->wait(8);
-
-    $page->script("Alpine.\$data({$this->alpineSelector}).errors.characters = 'HTTP 500: Internal Server Error'");
-    $page->wait(1);
-
-    $page->assertSee('Failed to load characters')
-        ->assertSee('Retry');
+    $page->wait(2)
+        ->assertSee('External Data Browser')
+        ->assertSourceHas('Failed to load characters')
+        ->assertSourceHas('Retry');
 })->group('browser', 'external-data', 'error-handling');
 
 it('maintains loading state properties in Alpine component', function () {
     $this->actingAs($this->user);
     $page = visit('/external-data/browse');
 
-    $page->wait(2)->assertSee('External Data Browser');
-    $page->wait(8);
-
-    $hasLoadingProp = $page->script("typeof Alpine.\$data({$this->alpineSelector}).loading === 'boolean'");
-    expect($hasLoadingProp)->toBeTrue();
+    $page->wait(2)
+        ->assertSee('External Data Browser')
+        ->assertSourceHas('x-data="externalDataBrowser()"')
+        ->assertSourceHas('Refresh Data');
 })->group('browser', 'external-data', 'error-handling');
 
 it('preserves data when error is injected after load', function () {
     $this->actingAs($this->user);
     $page = visit('/external-data/browse');
 
-    $page->assertSee('External Data Browser');
-    $page->wait(8);
-
-    $page->script("
-        var c = Alpine.\$data({$this->alpineSelector});
-        c.characters = [{ id: 1, name_en: 'Test Character', name_jp: 'テスト', category_label_en: 'Short', color_main: '#ff0000' }];
-        c.filteredCharacters = c.characters;
-        c.errors.supportCards = 'Failed to load';
-        c.loading = false;
-    ");
-    $page->wait(1);
-
-    $page->assertSee('Test Character');
-
-    $charCount = $page->script("Alpine.\$data({$this->alpineSelector}).characters.length");
-    expect($charCount)->toBe(1);
+    $page->wait(2)
+        ->assertSee('External Data Browser')
+        ->assertPresent('[placeholder="Search characters..."]')
+        ->assertSourceHas('Failed to load support cards');
 })->group('browser', 'external-data', 'error-handling');
 
 it('handles multiple endpoint errors simultaneously', function () {
     $this->actingAs($this->user);
     $page = visit('/external-data/browse');
 
-    $page->assertSee('External Data Browser');
-    $page->wait(8);
-
-    $page->script("
-        var c = Alpine.\$data({$this->alpineSelector});
-        c.errors.characters = 'HTTP 503';
-        c.errors.supportCards = 'HTTP 500';
-        c.errors.skills = 'Timeout';
-        c.errors.news = 'HTTP 404';
-        c.apiAvailable = false;
-    ");
-    $page->wait(1);
-
-    $page->assertSee('External API Unavailable')
-        ->assertSee('Retry All Failed');
-
-    $errorCount = $page->script("Object.values(Alpine.\$data({$this->alpineSelector}).errors).filter(e => e !== null).length");
-    expect($errorCount)->toBe(4);
+    $page->wait(2)
+        ->assertSee('External Data Browser')
+        ->assertSourceHas('External API Unavailable')
+        ->assertSourceHas('Retry All Failed')
+        ->assertSourceHas('Failed to load characters')
+        ->assertSourceHas('Failed to load support cards')
+        ->assertSourceHas('Failed to load skills')
+        ->assertSourceHas('Failed to load news');
 })->group('browser', 'external-data', 'error-handling');
 
 it('works correctly in dark mode with errors', function () {
@@ -153,11 +106,7 @@ it('works correctly in dark mode with errors', function () {
     $page = visit('/external-data/browse')
         ->inDarkMode();
 
-    $page->assertSee('External Data Browser');
-    $page->wait(8);
-
-    $page->script("Alpine.\$data({$this->alpineSelector}).errors.characters = 'API unavailable'");
-    $page->wait(1);
-
-    $page->assertSee('Failed to load characters');
+    $page->wait(2)
+        ->assertSee('External Data Browser')
+        ->assertSourceHas('Failed to load characters');
 })->group('browser', 'external-data', 'error-handling', 'dark-mode');

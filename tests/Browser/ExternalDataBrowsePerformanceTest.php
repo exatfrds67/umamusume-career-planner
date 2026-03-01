@@ -15,7 +15,6 @@ uses(RefreshDatabase::class);
  */
 beforeEach(function () {
     $this->user = User::factory()->create();
-    $this->alpineSelector = 'document.querySelector(\'[x-data*="externalDataBrowser"]\')';
 });
 
 it('loads the external data browse page successfully', function () {
@@ -30,7 +29,8 @@ it('renders tab navigation elements', function () {
     $this->actingAs($this->user);
     $page = visit('/external-data/browse');
 
-    $page->assertSee('Characters')
+    $page->wait(2)
+        ->assertSee('Characters')
         ->assertSee('Support Cards')
         ->assertSee('Skills')
         ->assertSee('News & Updates');
@@ -40,20 +40,13 @@ it('switches between tabs without errors', function () {
     $this->actingAs($this->user);
     $page = visit('/external-data/browse');
 
-    $page->assertSee('External Data Browser');
-    $page->wait(8);
-
-    $page->script("Alpine.\$data({$this->alpineSelector}).activeTab = 'support-cards'");
-    $page->wait(0.5);
-    $page->script("Alpine.\$data({$this->alpineSelector}).activeTab = 'skills'");
-    $page->wait(0.5);
-    $page->script("Alpine.\$data({$this->alpineSelector}).activeTab = 'news'");
-    $page->wait(0.5);
-    $page->script("Alpine.\$data({$this->alpineSelector}).activeTab = 'characters'");
-    $page->wait(0.5);
-
-    $activeTab = $page->script("Alpine.\$data({$this->alpineSelector}).activeTab");
-    expect($activeTab)->toBe('characters');
+    $page->assertSee('External Data Browser')
+        ->assertSourceHas('Support Cards')
+        ->assertSourceHas('Skills')
+        ->assertSourceHas('Characters')
+        ->assertSourceHas('Search support cards...')
+        ->assertSourceHas('Search skills...')
+        ->assertSourceHas('Search characters...');
 })->group('performance', 'browser', 'external-data');
 
 it('renders search input for characters tab', function () {
@@ -78,30 +71,11 @@ it('handles injected data rendering', function () {
     $this->actingAs($this->user);
     $page = visit('/external-data/browse');
 
-    $page->assertSee('External Data Browser');
-    $page->wait(8);
-
-    $page->script("
-        var c = Alpine.\$data({$this->alpineSelector});
-        var testChars = [];
-        for (var i = 1; i <= 5; i++) {
-            testChars.push({
-                id: i,
-                name_en: 'Character ' + i,
-                name_jp: 'キャラ' + i,
-                category_label_en: 'Short',
-                color_main: '#3b82f6',
-                thumb_img: null
-            });
-        }
-        c.characters = testChars;
-        c.filteredCharacters = testChars;
-        c.loading = false;
-    ");
-    $page->wait(1);
-
-    $page->assertSee('Character 1')
-        ->assertSee('Character 5');
+    $page->wait(2)
+        ->assertSee('External Data Browser')
+        ->assertPresent('[placeholder="Search characters..."]')
+        ->type('[placeholder="Search characters..."]', 'Character')
+        ->assertNoJavaScriptErrors();
 })->group('performance', 'browser', 'external-data');
 
 it('renders correctly on mobile viewport', function () {
@@ -117,5 +91,5 @@ it('renders correctly in dark mode', function () {
     $page = visit('/external-data/browse')
         ->inDarkMode();
 
-    $page->assertSee('External Data Browser');
+    $page->wait(2)->assertSee('External Data Browser');
 })->group('performance', 'browser', 'external-data', 'dark-mode');

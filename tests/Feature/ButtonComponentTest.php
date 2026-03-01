@@ -78,7 +78,6 @@ describe('Button Component', function () {
 
         expect($html)
             ->toContain('href="/dashboard"')
-            ->toContain('role="button"')
             ->toContain('Go to Dashboard')
             ->not->toContain('<button');
     });

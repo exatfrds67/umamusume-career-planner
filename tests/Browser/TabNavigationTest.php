@@ -49,7 +49,7 @@ describe('Character Details Tabs', function () {
                 // Verify no JavaScript errors
                 $page->assertNoJavaScriptErrors();
             } catch (\Throwable $e) {
-                echo "   ⚠️ {$tabName} tab not found or not active\n";
+                // Tab not found or not active
             }
         }
 
@@ -77,10 +77,10 @@ describe('Character Details Tabs', function () {
                 $page->keys('body', ['{ArrowLeft}'])
                     ->assertNoJavaScriptErrors();
             } else {
-                echo "   ⚠️ No [role=tab] elements found — keyboard nav skipped\n";
+                // No [role=tab] elements found — keyboard nav skipped
             }
         } catch (\Throwable $e) {
-            echo "   ⚠️ Keyboard navigation test failed: {$e->getMessage()}\n";
+            // Keyboard navigation test failed
         }
 
         expect(true)->toBeTrue();
@@ -103,11 +103,11 @@ describe('Training Screen Tabs', function () {
                         ->assertNoJavaScriptErrors();
                 } catch (\Throwable $e) {
                     // Some facilities might not be clickable tabs, skip gracefully
-                    echo "   ⚠️ {$facility} tab not found or not clickable\n";
+                    // skipped
                 }
             }
         } catch (\Throwable $e) {
-            echo "   ⚠️ Training page not accessible: {$e->getMessage()}\n";
+            // skipped
         }
 
         expect(true)->toBeTrue();
@@ -123,7 +123,7 @@ describe('Training Screen Tabs', function () {
             try {
                 $page->assertNoJavaScriptErrors();
             } catch (\Throwable $e) {
-                echo "   ⚠️ Training page JS errors: {$e->getMessage()}\n";
+                // skipped
             }
 
             // Click on a facility tab if the data-facility attribute exists
@@ -134,10 +134,10 @@ describe('Training Screen Tabs', function () {
                 // Verify prediction panel is visible (adjust selector)
                 $page->assertVisible('[data-prediction-panel]');
             } catch (\Throwable $e) {
-                echo "   ⚠️ Facility speed tab or prediction panel not found\n";
+                // skipped
             }
         } catch (\Throwable $e) {
-            echo "   ⚠️ Training page not accessible: {$e->getMessage()}\n";
+            // skipped
         }
 
         // Minimal assertion: test ran without fatal crash
@@ -159,11 +159,11 @@ describe('Settings Tabs', function () {
                     $page->click("text={$section}")
                         ->assertNoJavaScriptErrors();
                 } catch (\Throwable $e) {
-                    echo "   ⚠️ {$section} section not found\n";
+                    // skipped
                 }
             }
         } catch (\Throwable $e) {
-            echo "   ⚠️ Settings page not accessible: {$e->getMessage()}\n";
+            // skipped
         }
 
         expect(true)->toBeTrue();
@@ -188,7 +188,7 @@ describe('Dashboard Tabs/Sections', function () {
                     ->assertNoJavaScriptErrors();
             }
         } catch (\Throwable $e) {
-            echo "   ⚠️ Dashboard navigation issue: {$e->getMessage()}\n";
+            // skipped
         }
 
         expect(true)->toBeTrue();
@@ -213,11 +213,11 @@ describe('Report Tabs', function () {
                     $page->click("text={$tab}")
                         ->assertNoJavaScriptErrors();
                 } catch (\Throwable $e) {
-                    echo "   ⚠️ {$tab} report tab not found\n";
+                    // skipped
                 }
             }
         } catch (\Throwable $e) {
-            echo "   ⚠️ Report page not accessible: {$e->getMessage()}\n";
+            // skipped
         }
 
         expect(true)->toBeTrue();
@@ -239,11 +239,11 @@ describe('External Data Browser Tabs', function () {
                     $page->click("text={$category}")
                         ->assertNoJavaScriptErrors();
                 } catch (\Throwable $e) {
-                    echo "   ⚠️ {$category} category not found\n";
+                    // skipped
                 }
             }
         } catch (\Throwable $e) {
-            echo "   ⚠️ External data browse page not accessible: {$e->getMessage()}\n";
+            // skipped
         }
 
         expect(true)->toBeTrue();
@@ -266,10 +266,10 @@ describe('Tab Accessibility', function () {
                     "tab.hasAttribute('aria-selected') && tab.hasAttribute('aria-controls'))"
                 );
             } else {
-                echo "   ⚠️ No [role=tab] elements found on dashboard\n";
+                // skipped
             }
         } catch (\Throwable $e) {
-            echo "   ⚠️ Tab ARIA check failed: {$e->getMessage()}\n";
+            // skipped
         }
 
         expect(true)->toBeTrue();
@@ -287,10 +287,10 @@ describe('Tab Accessibility', function () {
             if ($panelCount > 0) {
                 $page->assertScript("document.querySelectorAll('[role=\"tabpanel\"]').length > 0");
             } else {
-                echo "   ⚠️ No [role=tabpanel] elements found on character page — ARIA tabs may not be implemented yet\n";
+                // skipped
             }
         } catch (\Throwable $e) {
-            echo "   ⚠️ ARIA panel check failed: {$e->getMessage()}\n";
+            // skipped
         }
 
         expect(true)->toBeTrue();
@@ -320,10 +320,10 @@ describe('Tab State Management', function () {
                 // Check if same tab is still active
                 $page->assertNoJavaScriptErrors();
             } else {
-                echo "   ⚠️ No [role=tab] elements found — tab state test skipped\n";
+                // skipped
             }
         } catch (\Throwable $e) {
-            echo "   ⚠️ Tab state test failed: {$e->getMessage()}\n";
+            // skipped
         }
 
         expect(true)->toBeTrue();

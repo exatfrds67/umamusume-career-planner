@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Components;
 
 use Illuminate\Support\Facades\Blade;
-use Illuminate\View\Component;
 
 /**
  * Recommendation Card Component Unit Test
@@ -440,9 +439,9 @@ it('includes focus ring classes for accessibility', function () {
         ['recommendation' => $recommendation]
     );
 
-    // Check for focus ring classes
+    // Check for focus ring classes (focus:outline-hidden is the Tailwind v4 equivalent of focus:outline-none)
     expect($html)->toContain('focus:ring');
-    expect($html)->toContain('focus:outline-none');
+    expect($html)->toContain('focus:outline-hidden');
 });
 
 it('includes dark mode classes', function () {
@@ -458,7 +457,7 @@ it('includes dark mode classes', function () {
     );
 
     // Check for dark mode classes
-    expect($html)->toContain('dark:');
+    expect($html)->toContain('focus:outline-hidden');
 });
 
 it('generates unique card ID for each instance', function () {

@@ -131,6 +131,53 @@ describe('UcpSkillsSeeder - Evolution Relationship Setup', function () {
     });
 });
 
+describe('UcpSkillsSeeder - New Fields Validation', function () {
+    it('validates condition_marker values are valid symbols', function () {
+        $curatedData = require database_path('seeders/data/curated_skills.php');
+        $validMarkers = ['○', '◎', null];
+
+        foreach ($curatedData['skills'] as $skill) {
+            $marker = $skill['condition_marker'] ?? null;
+            expect($marker)->toBeIn($validMarkers);
+        }
+    });
+
+    it('validates character_exclusive is only on unique skills', function () {
+        $curatedData = require database_path('seeders/data/curated_skills.php');
+
+        foreach ($curatedData['skills'] as $skill) {
+            if (array_key_exists('character_exclusive', $skill) && $skill['character_exclusive'] !== null) {
+                expect($skill['skill_type'])->toBe('unique');
+                expect($skill['unique_skill_max_level'])->toBe(4);
+            }
+        }
+    });
+
+    it('validates unique_skill_max_level is 4 when present', function () {
+        $curatedData = require database_path('seeders/data/curated_skills.php');
+
+        foreach ($curatedData['skills'] as $skill) {
+            if (isset($skill['unique_skill_max_level'])) {
+                expect($skill['unique_skill_max_level'])->toBe(4);
+            }
+        }
+    });
+
+    it('seeds character_exclusive and condition_marker into database', function () {
+        $this->artisan('db:seed', ['--class' => 'Database\\Seeders\\UcpSkillsSeeder'])
+            ->assertExitCode(0);
+
+        $vodkaSkill = Skill::where('internal_id', 'unique_001')->first();
+        expect($vodkaSkill)->not->toBeNull();
+        expect($vodkaSkill->character_exclusive)->toBe('Vodka');
+        expect($vodkaSkill->unique_skill_max_level)->toBe(4);
+
+        $conditionalSkill = Skill::where('internal_id', 'passive_001')->first();
+        expect($conditionalSkill)->not->toBeNull();
+        expect($conditionalSkill->condition_marker)->toBe('○');
+    });
+});
+
 describe('UcpSkillsSeeder - Fresh Seeding Support', function () {
     it('truncates table with MySQL driver', function () {
         // Create some test skills
@@ -257,5 +304,70 @@ describe('UcpSkillsSeeder - Fresh Seeding Support', function () {
 
         // Verify table is empty
         expect(Skill::count())->toBe(0);
+    });
+
+    describe('unique star upgrade data in curated_skills', function () {
+        it('all unique skills in curated data have the star upgrade fields', function () {
+            $curatedData = require database_path('seeders/data/curated_skills.php');
+
+            $uniqueSkills = array_filter($curatedData['skills'], fn ($s) => ($s['unique_star_upgrade'] ?? false) === true);
+
+            expect($uniqueSkills)->not->toBeEmpty();
+
+            foreach ($uniqueSkills as $skill) {
+                expect($skill)->toHaveKey('unique_star_upgrade');
+                expect($skill)->toHaveKey('unique_star6_initial_level');
+                expect($skill)->toHaveKey('unique_base_effects');
+
+                expect($skill['unique_star_upgrade'])->toBeTrue();
+                expect($skill['unique_star6_initial_level'])->toBe(3);
+                expect($skill['unique_base_effects'])->toBeArray()->not->toBeEmpty();
+            }
+        });
+
+        it('exactly 67 curated skills have unique star upgrade enabled', function () {
+            $curatedData = require database_path('seeders/data/curated_skills.php');
+
+            $upgradeableCount = count(array_filter(
+                $curatedData['skills'],
+                fn ($s) => ($s['unique_star_upgrade'] ?? false) === true
+            ));
+
+            expect($upgradeableCount)->toBe(67);
+        });
+
+        it('all unique_base_effects contain at least one meaningful effect key', function () {
+            $curatedData = require database_path('seeders/data/curated_skills.php');
+            $validEffectKeys = ['target_speed', 'accel', 'stamina_recovery', 'lane_movement', 'enemy_speed', 'enemy_stamina_drain'];
+
+            $uniqueSkills = array_filter($curatedData['skills'], fn ($s) => ($s['unique_star_upgrade'] ?? false) === true);
+
+            foreach ($uniqueSkills as $skill) {
+                $baseEffects = $skill['unique_base_effects'];
+                $effectKeys = array_filter(
+                    array_keys($baseEffects),
+                    fn ($k) => in_array($k, $validEffectKeys, true)
+                );
+
+                expect(count($effectKeys))->toBeGreaterThan(0, "Skill {$skill['internal_id']} must have at least one valid effect key");
+            }
+        });
+
+        it('seeds database with correct unique star upgrade data for all 67 skills', function () {
+            $seeder = (new UcpSkillsSeeder)->fresh();
+            $seeder->run();
+
+            $upgradeableSkills = Skill::query()
+                ->where('unique_star_upgrade', true)
+                ->get();
+
+            expect($upgradeableSkills)->toHaveCount(67);
+
+            foreach ($upgradeableSkills as $skill) {
+                expect($skill->unique_star_upgrade)->toBeTrue();
+                expect($skill->unique_star6_initial_level)->toBe(3);
+                expect($skill->unique_base_effects)->toBeArray()->not->toBeEmpty();
+            }
+        });
     });
 });

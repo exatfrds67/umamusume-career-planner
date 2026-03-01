@@ -194,4 +194,73 @@ describe('Career Model', function (): void {
                 ->and($career->character_id)->toBe($character->id);
         });
     });
+
+    describe('star level', function (): void {
+        it('defaults to 3 stars when not specified', function (): void {
+            $user = User::factory()->create();
+            $character = Character::factory()->create(['user_id' => $user->id]);
+            $career = Career::factory()->create([
+                'character_id' => $character->id,
+                'star_level' => 3,
+            ]);
+
+            expect($career->star_level)->toBe(3);
+        });
+
+        it('stores star level between 1 and 5', function (int $starLevel): void {
+            $user = User::factory()->create();
+            $character = Character::factory()->create(['user_id' => $user->id]);
+            $career = Career::factory()->create([
+                'character_id' => $character->id,
+                'star_level' => $starLevel,
+            ]);
+
+            expect($career->star_level)->toBe($starLevel)
+                ->and($career->star_level)->toBeGreaterThanOrEqual(1)
+                ->and($career->star_level)->toBeLessThanOrEqual(5);
+        })->with([1, 2, 3, 4, 5]);
+
+        it('casts star level to integer', function (): void {
+            $user = User::factory()->create();
+            $character = Character::factory()->create(['user_id' => $user->id]);
+            $career = Career::factory()->create([
+                'character_id' => $character->id,
+                'star_level' => 4,
+            ]);
+
+            expect($career->star_level)->toBeInt();
+        });
+
+        it('is included in fillable attributes', function (): void {
+            $career = new Career;
+
+            expect($career->getFillable())->toContain('star_level');
+        });
+
+        it('uses factory withStarLevel state', function (): void {
+            $user = User::factory()->create();
+            $character = Character::factory()->create(['user_id' => $user->id]);
+            $career = Career::factory()
+                ->withStarLevel(5)
+                ->create(['character_id' => $character->id]);
+
+            expect($career->star_level)->toBe(5);
+        });
+
+        it('clamps star level in factory withStarLevel state', function (): void {
+            $user = User::factory()->create();
+            $character = Character::factory()->create(['user_id' => $user->id]);
+
+            $careerHigh = Career::factory()
+                ->withStarLevel(10)
+                ->create(['character_id' => $character->id]);
+
+            $careerLow = Career::factory()
+                ->withStarLevel(0)
+                ->create(['character_id' => $character->id]);
+
+            expect($careerHigh->star_level)->toBe(5)
+                ->and($careerLow->star_level)->toBe(1);
+        });
+    });
 });

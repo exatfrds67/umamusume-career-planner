@@ -13,10 +13,10 @@ use App\Services\AI\BedrockService;
 use App\Services\MCP\AgentRoutingService;
 use App\Services\MCP\CostManagementService;
 use App\Services\MCP\MCPClientService;
+use Cloudstudio\Ollama\Facades\Ollama;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Mockery;
 
 /** @param array<mixed> $args */
 function callProtectedMethod(object $service, string $method, array $args = []): mixed
@@ -254,15 +254,13 @@ describe('Execution with Fallback', function () {
             'localhost:11434/api/tags' => Http::response(['models' => []], 200),
         ]);
 
-        // Mock Ollama facade
-        $ollamaMock = Mockery::mock('alias:CloudStudio\Ollama\Facades\Ollama');
         $agentMock = Mockery::mock();
         $agentMock->shouldReceive('model')->andReturnSelf();
         $agentMock->shouldReceive('prompt')->andReturnSelf();
         $agentMock->shouldReceive('options')->andReturnSelf();
         $agentMock->shouldReceive('ask')->andReturn('Test response');
 
-        $ollamaMock->shouldReceive('agent')->andReturn($agentMock);
+        Ollama::shouldReceive('agent')->once()->andReturn($agentMock);
 
         $result = $this->service->executeWithFallback($request);
 
