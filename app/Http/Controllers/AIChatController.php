@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Character;
+use App\Models\ConversationMessage;
 use App\Services\MCP\AgentRoutingService;
 use App\Services\MCP\RealTimeMonitoringService;
 use Illuminate\Http\JsonResponse;
@@ -48,7 +49,9 @@ class AIChatController extends Controller
      */
     public function sendMessage(Request $request): JsonResponse
     {
-        set_time_limit(0);
+        if (! app()->runningUnitTests()) {
+            set_time_limit(120);
+        }
 
         $validated = $this->validateChatRequest($request);
 
@@ -120,7 +123,9 @@ class AIChatController extends Controller
      */
     public function sendMessageStreaming(Request $request): StreamedResponse
     {
-        set_time_limit(0);
+        if (! app()->runningUnitTests()) {
+            set_time_limit(120);
+        }
 
         $validated = $this->validateChatRequest($request);
 
@@ -682,6 +687,15 @@ class AIChatController extends Controller
         $userId = Auth::id();
         if (! is_int($userId)) {
             return response()->json(['success' => false, 'error' => 'Authentication required.'], 401);
+        }
+
+        $isPositive = in_array($validated['rating'], ['up', '1', 'positive']);
+
+        $message = ConversationMessage::find((int) $validated['message_id'], ['*']);
+        if ($message instanceof ConversationMessage) {
+            $message->quality_rating = $isPositive ? 1 : -1;
+            $message->is_helpful = $isPositive;
+            $message->save();
         }
 
         Log::info('[AI] Message rated', [

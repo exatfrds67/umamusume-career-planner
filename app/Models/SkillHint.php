@@ -110,10 +110,9 @@ class SkillHint extends Model
      */
     public function markAsUsed(): void
     {
-        $this->update([
-            'is_used' => true,
-            'used_at' => now(),
-        ]);
+        $this->is_used = true;
+        $this->used_at = now();
+        $this->save();
     }
 
     /**

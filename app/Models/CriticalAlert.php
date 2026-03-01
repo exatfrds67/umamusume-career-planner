@@ -182,10 +182,10 @@ class CriticalAlert extends Model
      */
     public function dismiss(): bool
     {
-        return $this->update([
-            'was_dismissed' => true,
-            'dismissed_at' => now(),
-        ]);
+        $this->was_dismissed = true;
+        $this->dismissed_at = now();
+
+        return $this->save();
     }
 
     /**
@@ -193,10 +193,10 @@ class CriticalAlert extends Model
      */
     public function reactivate(): bool
     {
-        return $this->update([
-            'was_dismissed' => false,
-            'dismissed_at' => null,
-        ]);
+        $this->was_dismissed = false;
+        $this->dismissed_at = null;
+
+        return $this->save();
     }
 
     /**

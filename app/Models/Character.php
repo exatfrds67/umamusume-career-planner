@@ -381,7 +381,8 @@ class Character extends Model
             }
         } else {
             // For user-created characters, update the field directly
-            $this->update(['is_pinned' => true]);
+            $this->is_pinned = true;
+            $this->save();
         }
     }
 
@@ -400,7 +401,8 @@ class Character extends Model
             }
         } else {
             // For user-created characters, update the field directly
-            $this->update(['is_pinned' => false]);
+            $this->is_pinned = false;
+            $this->save();
         }
     }
 

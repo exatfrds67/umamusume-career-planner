@@ -62,7 +62,9 @@ class OllamaService
 
         try {
             // Enforce execution timeout for this request (applies to the blocking HTTP call to Ollama)
-            set_time_limit($timeout);
+            if (! app()->runningUnitTests()) {
+                set_time_limit($timeout);
+            }
 
             // Build full prompt with context
             $fullPrompt = $this->buildPromptWithContext($prompt, $context);

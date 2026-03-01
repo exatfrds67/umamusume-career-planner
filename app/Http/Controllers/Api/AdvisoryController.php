@@ -18,7 +18,6 @@ use App\ValueObjects\Recommendation;
 use App\ValueObjects\TrainingContext;
 use App\ValueObjects\TrainingOutcome;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -176,15 +175,15 @@ class AdvisoryController extends Controller
                 'ai_provider' => $aiProvider,
             ]);
         } catch (\Exception $e) {
+            report($e);
             Log::error('[AdvisoryController] Failed to generate training recommendations', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate training recommendations',
-                'error' => $e->getMessage(),
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }
@@ -378,15 +377,15 @@ class AdvisoryController extends Controller
                 'ai_provider' => $aiProvider,
             ]);
         } catch (\Exception $e) {
+            report($e);
             Log::error('[AdvisoryController] Failed to generate skill purchase advice', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate skill purchase advice',
-                'error' => $e->getMessage(),
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }
@@ -662,15 +661,15 @@ class AdvisoryController extends Controller
                 'ai_provider' => 'rule-based',
             ]);
         } catch (\Exception $e) {
+            report($e);
             Log::error('[AdvisoryController] Failed to generate race strategy', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate race strategy',
-                'error' => $e->getMessage(),
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }
@@ -1197,15 +1196,15 @@ class AdvisoryController extends Controller
                 'response_time_ms' => $responseTimeMs,
             ]);
         } catch (\Exception $e) {
+            report($e);
             Log::error('[AdvisoryController] Failed to detect critical situations', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to detect critical situations',
-                'error' => $e->getMessage(),
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }
@@ -1392,15 +1391,15 @@ class AdvisoryController extends Controller
                 ],
             ], 201);
         } catch (\Exception $e) {
+            report($e);
             Log::error('[AdvisoryController] Failed to record training outcome', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to record training outcome',
-                'error' => $e->getMessage(),
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }
@@ -1575,15 +1574,15 @@ class AdvisoryController extends Controller
                 ],
             ], 201);
         } catch (\Exception $e) {
+            report($e);
             Log::error('[AdvisoryController] Failed to record race outcome', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to record race outcome',
-                'error' => $e->getMessage(),
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }

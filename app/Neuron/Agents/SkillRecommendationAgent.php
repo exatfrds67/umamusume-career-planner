@@ -8,8 +8,6 @@ use App\Neuron\Agents\Tools\CharacterStatsTool;
 use App\Neuron\Agents\Tools\SkillDataTool;
 use NeuronAI\Chat\History\ChatHistoryInterface;
 use NeuronAI\Chat\History\EloquentChatHistory;
-use NeuronAI\Laravel\Facades\AIProvider;
-use NeuronAI\Providers\AIProviderInterface;
 use NeuronAI\SystemPrompt;
 
 /**
@@ -33,19 +31,6 @@ class SkillRecommendationAgent extends BaseAgent
         private int $userId,
         private ?int $characterId = null
     ) {}
-
-    /**
-     * Get the AI provider instance.
-     *
-     * Uses Anthropic Claude as the primary provider for skill recommendations.
-     */
-    protected function provider(): AIProviderInterface
-    {
-        /** @var AIProviderInterface $provider */
-        $provider = AIProvider::driver('anthropic');
-
-        return $provider;
-    }
 
     /**
      * Get the agent's system instructions.

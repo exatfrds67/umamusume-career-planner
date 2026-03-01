@@ -201,7 +201,9 @@ class AdvisoryRecommendation extends Model
      */
     public function markAsFollowed(): bool
     {
-        return $this->update(['was_followed' => true]);
+        $this->was_followed = true;
+
+        return $this->save();
     }
 
     /**
@@ -209,7 +211,9 @@ class AdvisoryRecommendation extends Model
      */
     public function markAsNotFollowed(): bool
     {
-        return $this->update(['was_followed' => false]);
+        $this->was_followed = false;
+
+        return $this->save();
     }
 
     /**

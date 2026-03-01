@@ -37,11 +37,10 @@ class AgentFeedbackService
     ): void {
         try {
             // Update message with feedback
-            $message->update([
-                'quality_rating' => $rating,
-                'user_feedback' => $feedback,
-                'is_helpful' => $rating >= 4,
-            ]);
+            $message->quality_rating = $rating;
+            $message->user_feedback = $feedback;
+            $message->is_helpful = $rating >= 4;
+            $message->save();
 
             // Store feedback for agent learning
             if ($message->agent_id) {

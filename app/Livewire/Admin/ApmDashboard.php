@@ -6,7 +6,8 @@ namespace App\Livewire\Admin;
 
 use App\Services\ApmService;
 use App\Services\PerformanceAlertingService;
-use Illuminate\Contracts\View\View;
+use Illuminate\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 /**
@@ -15,7 +16,7 @@ use Livewire\Component;
  * Displays real-time performance metrics including request throughput,
  * error rates, response times, cache hit rates, and active alerts.
  *
- * @see Requirements: NFR-O-01, NFR-O-04
+ * @see \Requirements: NFR-O-01, NFR-O-04
  */
 class ApmDashboard extends Component
 {
@@ -49,6 +50,8 @@ class ApmDashboard extends Component
 
     public function mount(): void
     {
+        abort_unless(auth()->user()?->is_admin === true, 403, 'Admin access required.');
+
         $refreshConfig = config('apm.dashboard.refresh_interval', 30);
         $this->refreshInterval = is_numeric($refreshConfig) ? (int) $refreshConfig : 30;
         $this->loadThresholds();
@@ -65,15 +68,32 @@ class ApmDashboard extends Component
 
         $this->healthScore = $apmService->calculateHealthScore();
         $this->overviewMetrics = $apmService->getOverviewMetrics();
-        $this->databaseMetrics = $apmService->getDatabaseMetrics();
         $this->cacheMetrics = $apmService->getCacheMetrics();
-        $this->systemMetrics = $apmService->getSystemMetrics();
+
+        // Transform getDatabaseMetrics() to match view's expected keys.
+        $rawDatabaseMetrics = $apmService->getDatabaseMetrics();
+        $this->databaseMetrics = array_merge($rawDatabaseMetrics, [
+            'active_connections' => $rawDatabaseMetrics['connection_count'] ?? 0,
+            'avg_query_time' => $rawDatabaseMetrics['avg_query_time_ms'] ?? 0.0,
+        ]);
+
+        // Transform getSystemMetrics() nested structure to flat keys expected by the view.
+        $rawSystemMetrics = $apmService->getSystemMetrics();
+        $this->systemMetrics = [
+            'memory_usage_percent' => $rawSystemMetrics['memory']['usage_percent'] ?? 0.0,
+            'memory_used' => number_format((float) ($rawSystemMetrics['memory']['current_mb'] ?? 0), 1).'MB',
+            'php_version' => $rawSystemMetrics['php']['version'] ?? 'Unknown',
+            'uptime_hours' => $this->overviewMetrics['uptime_hours'] ?? 0.0,
+        ];
+
         $this->alertStatistics = $alertingService->getAlertStatistics();
         $this->recentAlerts = $alertingService->getAlerts(20);
     }
 
     public function acknowledgeAlert(string $alertId): void
     {
+        abort_unless(auth()->user()?->is_admin === true, 403);
+
         /** @var PerformanceAlertingService $alertingService */
         $alertingService = app(PerformanceAlertingService::class);
         $alertingService->acknowledgeAlert($alertId);
@@ -82,6 +102,8 @@ class ApmDashboard extends Component
 
     public function clearAlerts(): void
     {
+        abort_unless(auth()->user()?->is_admin === true, 403);
+
         /** @var PerformanceAlertingService $alertingService */
         $alertingService = app(PerformanceAlertingService::class);
         $alertingService->clearAlerts();
@@ -90,6 +112,8 @@ class ApmDashboard extends Component
 
     public function runAlertCheck(): void
     {
+        abort_unless(auth()->user()?->is_admin === true, 403);
+
         /** @var PerformanceAlertingService $alertingService */
         $alertingService = app(PerformanceAlertingService::class);
         $alertingService->checkAlerts();
@@ -133,9 +157,9 @@ class ApmDashboard extends Component
         return is_numeric($value) ? (float) $value : $default;
     }
 
+    #[Layout('components.admin-layout', ['title' => 'APM Dashboard'])]
     public function render(): View
     {
-        return view('livewire.admin.apm-dashboard')
-            ->layout('components.admin-layout');
+        return view('livewire.admin.apm-dashboard');
     }
 }

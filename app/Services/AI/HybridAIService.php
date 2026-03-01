@@ -5,6 +5,7 @@ namespace App\Services\AI;
 use App\Models\AIConversation;
 use App\Models\ConversationMessage;
 use App\Services\MCP\MCPClientService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
@@ -117,7 +118,9 @@ class HybridAIService
 
             // Store conversation if IDs provided
             if ($characterId && $conversationId) {
-                $this->storeConversation($characterId, $conversationId, $prompt, $response);
+                $authId = Auth::id();
+                $userId = is_int($authId) ? $authId : (is_numeric($authId) ? (int) $authId : null);
+                $this->storeConversation($characterId, $conversationId, $prompt, $response, $userId);
             }
 
             // Track performance metrics
@@ -140,7 +143,9 @@ class HybridAIService
 
             // Store conversation if IDs provided
             if ($characterId && $conversationId) {
-                $this->storeConversation($characterId, $conversationId, $prompt, $fallbackResponse);
+                $authId = Auth::id();
+                $userId = is_int($authId) ? $authId : (is_numeric($authId) ? (int) $authId : null);
+                $this->storeConversation($characterId, $conversationId, $prompt, $fallbackResponse, $userId);
             }
 
             // Track performance metrics for fallback
@@ -744,14 +749,15 @@ class HybridAIService
         int $characterId,
         string $conversationId,
         string $prompt,
-        array $response
+        array $response,
+        ?int $userId = null
     ): void {
         try {
             // First, ensure the conversation exists
             $conversation = AIConversation::firstOrCreate(
                 ['conversation_id' => $conversationId],
                 [
-                    'user_id' => 1, // Default user, should be passed in real implementation
+                    'user_id' => $userId ?? Auth::id(),
                     'character_id' => $characterId,
                     'conversation_type' => 'ai_advisory',
                     'status' => 'active',
@@ -783,7 +789,8 @@ class HybridAIService
 
             // Update conversation message count
             $conversation->increment('message_count', 2);
-            $conversation->update(['last_activity_at' => now()]);
+            $conversation->last_activity_at = now();
+            $conversation->save();
         } catch (\Exception $e) {
             Log::error('[HybridAI] Failed to store conversation', [
                 'error' => $e->getMessage(),
@@ -804,23 +811,24 @@ class HybridAIService
         int $limit = 50
     ): array {
         // First find the conversation(s) for this character
-        $conversationQuery = AIConversation::where('character_id', $characterId);
+        $conversationQuery = AIConversation::query()->where('character_id', '=', $characterId, 'and');
 
         if ($conversationId) {
-            $conversationQuery->where('conversation_id', $conversationId);
+            $conversationQuery = $conversationQuery->where('conversation_id', '=', $conversationId, 'and');
         }
 
-        $conversationIds = $conversationQuery->pluck('id')->toArray();
+        $conversationIds = $conversationQuery->pluck('id', null)->toArray();
 
         if (empty($conversationIds)) {
             return [];
         }
 
         // Get messages from those conversations
-        $messages = ConversationMessage::whereIn('conversation_id', $conversationIds)
+        $messages = ConversationMessage::query()
+            ->whereIn('conversation_id', $conversationIds, 'and', false)
             ->orderBy('created_at', 'desc')
             ->limit($limit)
-            ->get();
+            ->get(['*']);
 
         $result = [];
         foreach ($messages as $msg) {

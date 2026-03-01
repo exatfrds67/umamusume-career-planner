@@ -20,6 +20,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $evolution_source_id
  * @property bool $can_evolve
  * @property bool $is_evolution
+ * @property string|null $character_exclusive
+ * @property int|null $unique_skill_max_level
+ * @property bool $unique_star_upgrade
+ * @property int|null $unique_star6_initial_level
+ * @property array<string, mixed>|null $unique_base_effects
+ * @property string|null $condition_marker
  * @property array<string, mixed>|null $effects
  * @property string|null $description
  * @property array<string, mixed>|null $activation_conditions
@@ -63,6 +69,12 @@ class Skill extends Model
         'evolution_source_id',
         'can_evolve',
         'is_evolution',
+        'character_exclusive',
+        'unique_skill_max_level',
+        'unique_star_upgrade',
+        'unique_star6_initial_level',
+        'unique_base_effects',
+        'condition_marker',
         'effects',
         'description',
         'activation_conditions',
@@ -98,6 +110,10 @@ class Skill extends Model
             'synergy_skills' => 'array',
             'can_evolve' => 'boolean',
             'is_evolution' => 'boolean',
+            'unique_skill_max_level' => 'integer',
+            'unique_star_upgrade' => 'boolean',
+            'unique_star6_initial_level' => 'integer',
+            'unique_base_effects' => 'array',
             'is_active' => 'boolean',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',

@@ -54,7 +54,7 @@ class SupportCardController extends Controller
      */
     public function show(int $id): SupportCardResource|JsonResponse
     {
-        $card = SupportCardDefinition::find($id);
+        $card = SupportCardDefinition::find($id, ['*']);
 
         if (! $card) {
             return response()->json(['message' => 'Support card not found'], 404);
@@ -82,7 +82,7 @@ class SupportCardController extends Controller
      */
     public function synergies(int $id): JsonResponse
     {
-        $card = SupportCardDefinition::find($id);
+        $card = SupportCardDefinition::find($id, ['*']);
 
         if (! $card) {
             return response()->json(['message' => 'Support card not found'], 404);

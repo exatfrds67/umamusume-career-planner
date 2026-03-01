@@ -74,7 +74,7 @@ class SkillController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $skill = Skill::find($id);
+        $skill = Skill::find($id, ['*']);
         if (! $skill instanceof Skill) {
             return response()->json([
                 'message' => 'Skill not found',
@@ -100,7 +100,7 @@ class SkillController extends Controller
      */
     public function hints(int $id): JsonResponse
     {
-        $skill = Skill::find($id);
+        $skill = Skill::find($id, ['*']);
         if (! $skill instanceof Skill) {
             return response()->json([
                 'message' => 'Skill not found',

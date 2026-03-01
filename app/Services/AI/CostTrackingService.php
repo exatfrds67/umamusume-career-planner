@@ -2,6 +2,7 @@
 
 namespace App\Services\AI;
 
+use App\Models\AiCost;
 use App\Services\MCP\Tools\AWSPricingService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -51,7 +52,7 @@ class CostTrackingService
                 ? $metadata['summary']
                 : null;
 
-            DB::table('ucp_ai_costs')->insert([
+            AiCost::create([
                 'user_id' => $userId,
                 'character_id' => $characterId,
                 'provider' => $provider,
@@ -66,8 +67,6 @@ class CostTrackingService
                 'response_time' => $responseTime,
                 'cached' => $cached,
                 'request_summary' => $requestSummary,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         } catch (\Exception $e) {
             Log::error('[CostTracking] Failed to track cost', [
@@ -86,11 +85,11 @@ class CostTrackingService
         $hours = $this->periodToHours($period);
         $since = now()->subHours($hours);
 
-        $query = DB::table('ucp_ai_costs')
-            ->where('created_at', '>=', $since);
+        $query = AiCost::query()
+            ->where('created_at', '>=', $since, 'and');
 
         if ($userId) {
-            $query->where('user_id', '=', $userId);
+            $query->where('user_id', '=', $userId, 'and');
         }
 
         $sum = $query->sum('total_cost');
@@ -417,15 +416,15 @@ class CostTrackingService
      */
     protected function getCachedRequestPercentage(?int $userId = null): float
     {
-        $query = DB::table('ucp_ai_costs')
-            ->where('created_at', '>=', now()->subDays(30));
+        $query = AiCost::query()
+            ->where('created_at', '>=', now()->subDays(30), 'and');
 
         if ($userId) {
-            $query->where('user_id', '=', $userId);
+            $query->where('user_id', '=', $userId, 'and');
         }
 
-        $total = $query->count();
-        $cached = (clone $query)->where('cached', '=', true)->count();
+        $total = $query->count('*');
+        $cached = (clone $query)->where('cached', '=', true, 'and')->count('*');
 
         return $total > 0 ? ($cached / $total) * 100 : 0;
     }
@@ -435,11 +434,11 @@ class CostTrackingService
      */
     protected function getAverageTokensPerRequest(?int $userId = null): float
     {
-        $query = DB::table('ucp_ai_costs')
-            ->where('created_at', '>=', now()->subDays(30));
+        $query = AiCost::query()
+            ->where('created_at', '>=', now()->subDays(30), 'and');
 
         if ($userId) {
-            $query->where('user_id', '=', $userId);
+            $query->where('user_id', '=', $userId, 'and');
         }
 
         $avg = $query->avg('total_tokens');

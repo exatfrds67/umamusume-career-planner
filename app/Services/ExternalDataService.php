@@ -247,6 +247,7 @@ class ExternalDataService
             'is_active' => $titleEnStr !== null, // Cards without English title are unreleased
             'server_availability' => $titleEn !== null ? 'both' : 'jp',
             'meta_tier' => $this->getDefaultMetaTier($rarity),
+            'artwork_url' => "https://gametora.com/images/umamusume/supports/tex_support_card_{$idInt}.png",
             'unique_effects' => [],
             'skill_hints_provided' => [],
             'deck_synergies' => [],

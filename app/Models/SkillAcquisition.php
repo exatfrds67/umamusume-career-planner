@@ -210,7 +210,8 @@ class SkillAcquisition extends Pivot
      */
     public function updateEffectivenessRating(float $rating): void
     {
-        $this->update(['effectiveness_rating' => $rating]);
+        $this->effectiveness_rating = $rating;
+        $this->save();
     }
 
     /**

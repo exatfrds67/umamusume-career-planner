@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Character;
 use App\Models\Race;
 use App\Models\TrainingSession;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -17,7 +18,7 @@ class DashboardController extends Controller
     {
         // Get all characters (for now without auth, later filter by user_id)
         $characters = Character::query()
-            ->with(['aptitudes', 'skillAcquisitions.skill', 'supportCards'])
+            ->with(['aptitudes', 'skillAcquisitions.skill', 'supportCards', 'currentCareer.runSnapshots'])
             ->orderBy('updated_at', 'desc')
             ->get();
 
@@ -56,6 +57,8 @@ class DashboardController extends Controller
             return $this->getEmptyDashboardData();
         }
 
+        $statProgression = $this->getStatProgression($character);
+
         return [
             'metrics' => $this->getMetrics($character),
             'stats' => $this->getStats($character),
@@ -64,6 +67,10 @@ class DashboardController extends Controller
             'trainingSuggestions' => $this->getTrainingSuggestions($character),
             'recentResults' => $this->getRecentResults($character),
             'moodEnergy' => $this->getMoodEnergy($character),
+            'statProgression' => $statProgression['data'],
+            'progressionLabels' => $statProgression['labels'],
+            'raceGrades' => $this->getRaceGrades($character),
+            'recentActivity' => $this->getRecentActivity($character),
         ];
     }
 
@@ -130,13 +137,28 @@ class DashboardController extends Controller
         // Get target grade from goals
         $targetGrade = $goals['target_grade'] ?? 'A+';
 
-        // Get skills count
+        // Get skills count — try skill acquisitions first, then fall back to career metadata
         $skillsAcquired = $character->skillAcquisitions()->count();
-        $targetSkillsValue = $goals['target_skills'] ?? 12;
+        $targetSkillsValue = $goals['target_skills'] ?? null;
+
+        if ($skillsAcquired === 0) {
+            $career = $character->currentCareer;
+            if ($career) {
+                $careerMeta = $this->normalizeCareerMetadata($career->career_metadata);
+                $metaSkills = $this->extractMetadataSkills($careerMeta);
+                if ($metaSkills !== []) {
+                    $skillsAcquired = count(array_filter($metaSkills, fn (array $skillEntry): bool => ($skillEntry['acquired'] ?? false) === true));
+                    if ($targetSkillsValue === null) {
+                        $targetSkillsValue = count($metaSkills);
+                    }
+                }
+            }
+        }
+
         $targetSkills = is_numeric($targetSkillsValue) ? (int) $targetSkillsValue : 12;
 
-        // Calculate skill points (sum of all skill costs or from character data)
-        $skillPoints = $character->skillAcquisitions()->sum('final_sp_cost') ?? 0;
+        // SP Left = remaining SP available on the character
+        $skillPoints = $character->available_sp ?? 0;
 
         // Get next race info - handle potential string/malformed data gracefully
         $rawRaceSchedule = $character->race_schedule;
@@ -274,6 +296,32 @@ class DashboardController extends Controller
         $stats = is_array($rawStats) ? $rawStats : [];
 
         $upcomingRaces = [];
+
+        // Fallback: derive upcoming race from career_metadata when no schedule is set
+        if (empty($raceSchedule)) {
+            $career = $character->currentCareer;
+            $meta = $this->normalizeCareerMetadata($career?->career_metadata);
+            $raceNameValue = $meta['race_name'] ?? null;
+            $raceName = is_string($raceNameValue) ? $raceNameValue : null;
+
+            if ($raceName && $career && ($career->status ?? '') !== 'completed') {
+                $isRaceDay = ($meta['race_day'] ?? false) === true;
+                $rawTurns = $meta['turn_before_race'] ?? null;
+                $turnsBefore = is_numeric($rawTurns) ? (int) $rawTurns : null;
+                $turnsAway = $isRaceDay ? 0 : $turnsBefore;
+
+                return [[
+                    'name' => $raceName,
+                    'grade' => $this->inferRaceGrade($raceName),
+                    'date' => now()->addDays($turnsAway ?? 14)->format('Y-m-d'),
+                    'turn' => $currentTurn + ($turnsAway ?? 14),
+                    'turnsAway' => $turnsAway,
+                    'readiness' => $this->calculateRaceReadiness($stats, []),
+                ]];
+            }
+
+            return [];
+        }
 
         foreach ($raceSchedule as $race) {
             if (! is_array($race)) {
@@ -507,7 +555,7 @@ class DashboardController extends Controller
             $skillName = $acquisition->skill->name ?? 'Unknown Skill';
             $results[] = [
                 'type' => 'skill',
-                'description' => "Skill acquired: {$skillName}",
+                'description' => 'Skill acquired:',
                 'highlight' => $skillName,
                 'timestamp' => $acquisition->created_at,
                 'icon' => 'star',
@@ -553,6 +601,34 @@ class DashboardController extends Controller
             ];
         }
 
+        // Fallback: when no DB records exist, derive entries from career_metadata acquired skills
+        if (empty($results)) {
+            $career = $character->currentCareer;
+            $meta = $this->normalizeCareerMetadata($career?->career_metadata);
+            $skills = $this->extractMetadataSkills($meta);
+            $acquiredSkills = array_values(
+                array_filter($skills, fn (array $skillEntry): bool => ($skillEntry['acquired'] ?? false) === true)
+            );
+            $createdAt = $career?->created_at;
+            $baseTime = Carbon::instance($createdAt ?? now());
+
+            foreach (array_reverse($acquiredSkills) as $index => $skill) {
+                if ($index >= 3) {
+                    break;
+                }
+                $skillNameValue = $skill['name'] ?? null;
+                $skillName = is_string($skillNameValue) ? $skillNameValue : 'Unknown Skill';
+                $results[] = [
+                    'type' => 'skill',
+                    'description' => 'Skill acquired:',
+                    'highlight' => $skillName,
+                    'timestamp' => $baseTime->copy()->addMinutes($index * 5),
+                    'icon' => 'star',
+                    'color' => 'secondary',
+                ];
+            }
+        }
+
         usort($results, function (array $a, array $b) {
             $timeA = $a['timestamp'] ?? null;
             $timeB = $b['timestamp'] ?? null;
@@ -584,5 +660,279 @@ class DashboardController extends Controller
             'energy' => $character->energy_level ?? 100,
             'maxEnergy' => 100,
         ];
+    }
+
+    /**
+     * Infer a G1/G2/G3 race grade label from a race name.
+     */
+    private function inferRaceGrade(string $raceName): string
+    {
+        $upper = strtoupper($raceName);
+
+        if (
+            str_contains($upper, 'FINALE')
+            || str_contains($upper, 'TENNO SHO')
+            || str_contains($upper, 'JBC')
+            || str_contains($upper, 'JAPAN CUP')
+            || str_contains($upper, 'TAKARAZUKA')
+            || str_contains($upper, 'ARIMA')
+        ) {
+            return 'G1';
+        }
+
+        if (str_contains($upper, 'QUALIFIER') || str_contains($upper, 'SEMI') || str_contains($upper, 'MEMORIAL')) {
+            return 'G2';
+        }
+
+        return 'G3';
+    }
+
+    /**
+     * Build stat progression data for the line chart, interpolated from snapshot to current.
+     *
+     * @return array<string, mixed>
+     */
+    private function getStatProgression(Character $character): array
+    {
+        $career = $character->currentCareer;
+
+        $currentStats = is_array($character->current_stats) ? $character->current_stats : [];
+        $currentTotal = (int) array_sum(array_filter(array_values($currentStats), 'is_numeric'));
+
+        $snapshotTurn = max(1, (int) ($character->current_turn ?? 1));
+
+        if ($career && $career->runSnapshots->isNotEmpty()) {
+            $latest = $career->runSnapshots->sortByDesc('turn_number')->first();
+            if ($latest) {
+                $snapshotTurn = (int) $latest->turn_number;
+            }
+        }
+
+        if ($currentTotal === 0) {
+            return ['data' => [[]], 'labels' => []];
+        }
+
+        $numPoints = 6;
+        $lastPointIndex = 5;
+        // Uma Musume characters start with roughly 20-25% of their final stat total
+        $startingTotal = max(300, (int) ($currentTotal * 0.25));
+        $maxTurn = max($snapshotTurn, 1);
+
+        $dataPoints = [];
+        $labels = [];
+
+        for ($i = 0; $i < $numPoints; $i++) {
+            $fraction = $i / $lastPointIndex;
+            $turn = max(1, (int) round(1 + $fraction * ($maxTurn - 1)));
+            $statTotal = (int) ($startingTotal + ($currentTotal - $startingTotal) * $fraction);
+            $dataPoints[] = $statTotal;
+            $labels[] = 'Turn '.$turn;
+        }
+
+        return [
+            'data' => [$dataPoints],
+            'labels' => $labels,
+        ];
+    }
+
+    /**
+     * Build race grade fan-distribution based on the career class rank.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function getRaceGrades(Character $character): array
+    {
+        $career = $character->currentCareer;
+        $meta = $this->normalizeCareerMetadata($career?->career_metadata);
+        $classRankValue = $meta['class_rank'] ?? null;
+        $classRank = is_string($classRankValue) ? strtolower($classRankValue) : 'silver';
+
+        $colorMap = [
+            'G1' => 'bg-red-500',
+            'G2' => 'bg-orange-500',
+            'G3' => 'bg-yellow-500',
+            'Listed' => 'bg-green-500',
+            'Open' => 'bg-blue-500',
+        ];
+
+        /** @var array<string, array<string, int>> $distributions */
+        $distributions = [
+            'platinum' => ['G1' => 12000, 'G2' => 8500, 'G3' => 5000, 'Listed' => 3000, 'Open' => 1500],
+            'star' => ['G1' => 9000, 'G2' => 6500, 'G3' => 4000, 'Listed' => 2500, 'Open' => 1200],
+            'gold' => ['G1' => 5000, 'G2' => 4000, 'G3' => 2500, 'Listed' => 1500, 'Open' => 800],
+            'silver' => ['G1' => 0, 'G2' => 2500, 'G3' => 3000, 'Listed' => 2000, 'Open' => 1000],
+            'beginner' => ['G1' => 0, 'G2' => 0, 'G3' => 1500, 'Listed' => 2500, 'Open' => 3000],
+        ];
+
+        $distribution = $distributions[$classRank] ?? $distributions['silver'];
+
+        $grades = [];
+        foreach ($distribution as $grade => $fans) {
+            if ($fans > 0) {
+                $grades[] = [
+                    'grade' => $grade,
+                    'fans' => $fans,
+                    'color' => $colorMap[$grade] ?? 'bg-gray-500',
+                ];
+            }
+        }
+
+        return $grades;
+    }
+
+    /**
+     * Build recent activity timeline events from career metadata.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function getRecentActivity(Character $character): array
+    {
+        $events = [];
+        $career = $character->currentCareer;
+
+        if (! $career) {
+            return $events;
+        }
+
+        $meta = $this->normalizeCareerMetadata($career->career_metadata);
+        $baseTime = Carbon::instance($career->created_at ?? now());
+        $raceNameValue = $meta['race_name'] ?? null;
+        $raceName = is_string($raceNameValue) ? $raceNameValue : null;
+        $strategy = $meta['strategy'] ?? null;
+
+        // Race-day event is the most recent item
+        if (($meta['race_day'] ?? false) === true && $raceName !== null) {
+            $events[] = [
+                'id' => 'race_day_'.$career->id,
+                'title' => 'Race Day',
+                'description' => 'Competing in: '.$raceName,
+                'type' => 'race',
+                'timestamp' => now()->toIso8601String(),
+                'icon' => '🏆',
+                'color' => '#F59E0B',
+                'metadata' => ['strategy' => $strategy, 'race' => $raceName],
+            ];
+        }
+
+        // Acquired skill events
+        $skills = $this->extractMetadataSkills($meta);
+        $acquiredSkills = array_values(
+            array_filter($skills, fn (array $skillEntry): bool => ($skillEntry['acquired'] ?? false) === true)
+        );
+
+        foreach (array_reverse($acquiredSkills) as $index => $skill) {
+            if ($index >= 5) {
+                break;
+            }
+            $skillNameValue = $skill['name'] ?? null;
+            $skillName = is_string($skillNameValue) ? $skillNameValue : 'Unknown Skill';
+            $events[] = [
+                'id' => 'skill_'.$career->id.'_'.$index,
+                'title' => 'Skill Acquired',
+                'description' => $skillName,
+                'type' => 'skill',
+                'timestamp' => $baseTime->copy()->addMinutes($index * 5)->toIso8601String(),
+                'icon' => '⭐',
+                'color' => '#8B5CF6',
+                'metadata' => [
+                    'notes' => $skill['notes'] ?? null,
+                    'sp_cost' => $skill['sp_cost'] ?? null,
+                ],
+            ];
+        }
+
+        // Career import milestone
+        $originalPlanTitle = $meta['original_plan_title'] ?? null;
+        $careerStage = $meta['career_stage'] ?? null;
+        $careerStageLabel = is_string($careerStage) ? $careerStage : 'senior';
+
+        $events[] = [
+            'id' => 'import_'.$career->id,
+            'title' => 'Career Imported',
+            'description' => is_string($originalPlanTitle)
+                ? $originalPlanTitle
+                : 'Career plan — '.$careerStageLabel.' stage',
+            'type' => 'milestone',
+            'timestamp' => $baseTime->toIso8601String(),
+            'icon' => '📋',
+            'color' => '#3B82F6',
+            'metadata' => [
+                'class_rank' => $meta['class_rank'] ?? null,
+                'stage' => $careerStage,
+            ],
+        ];
+
+        return $events;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function normalizeCareerMetadata(mixed $metadata): array
+    {
+        if (is_array($metadata)) {
+            /** @var array<string, mixed> $normalized */
+            $normalized = [];
+            foreach ($metadata as $key => $value) {
+                if (is_string($key)) {
+                    $normalized[$key] = $value;
+                }
+            }
+
+            return $normalized;
+        }
+
+        if (is_string($metadata)) {
+            $decoded = json_decode($metadata, true);
+
+            if (! is_array($decoded)) {
+                return [];
+            }
+
+            /** @var array<string, mixed> $normalized */
+            $normalized = [];
+            foreach ($decoded as $key => $value) {
+                if (is_string($key)) {
+                    $normalized[$key] = $value;
+                }
+            }
+
+            return $normalized;
+        }
+
+        return [];
+    }
+
+    /**
+     * @param  array<string, mixed>  $metadata
+     * @return array<int, array<string, mixed>>
+     */
+    private function extractMetadataSkills(array $metadata): array
+    {
+        $skills = $metadata['skills'] ?? [];
+        if (! is_array($skills)) {
+            return [];
+        }
+
+        /** @var array<int, array<string, mixed>> $normalized */
+        $normalized = [];
+
+        foreach ($skills as $entry) {
+            if (! is_array($entry)) {
+                continue;
+            }
+
+            /** @var array<string, mixed> $skillEntry */
+            $skillEntry = [];
+            foreach ($entry as $key => $value) {
+                if (is_string($key)) {
+                    $skillEntry[$key] = $value;
+                }
+            }
+
+            $normalized[] = $skillEntry;
+        }
+
+        return $normalized;
     }
 }

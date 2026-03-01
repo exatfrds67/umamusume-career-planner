@@ -145,13 +145,19 @@ class VectorStoreService
         /** @var array<int, float>|null $result */
         $result = Cache::remember($cacheKey, self::CACHE_TTL * 7, function () use ($text) {
             try {
-                $response = Http::withHeaders([
-                    'Authorization' => 'Bearer '.$this->apiKey,
-                    'Content-Type' => 'application/json',
-                ])->post('https://api.openai.com/v1/embeddings', [
-                    'model' => self::EMBEDDING_MODEL,
-                    'input' => $text,
-                ]);
+                $timeoutConfig = config('services.openai.timeout', 30);
+                $timeout = is_int($timeoutConfig) || is_float($timeoutConfig)
+                    ? $timeoutConfig
+                    : (is_numeric($timeoutConfig) ? (float) $timeoutConfig : 30);
+
+                $response = Http::timeout($timeout)
+                    ->withHeaders([
+                        'Authorization' => 'Bearer '.$this->apiKey,
+                        'Content-Type' => 'application/json',
+                    ])->post('https://api.openai.com/v1/embeddings', [
+                        'model' => self::EMBEDDING_MODEL,
+                        'input' => $text,
+                    ]);
 
                 if ($response->successful()) {
                     $data = $response->json();
@@ -175,7 +181,6 @@ class VectorStoreService
             } catch (\Exception $e) {
                 Log::error('Exception generating embedding', [
                     'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
                 ]);
 
                 return null;

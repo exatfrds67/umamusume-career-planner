@@ -7,8 +7,6 @@ namespace App\Neuron\Agents;
 use App\Neuron\Agents\Tools\CharacterStatsTool;
 use NeuronAI\Chat\History\ChatHistoryInterface;
 use NeuronAI\Chat\History\EloquentChatHistory;
-use NeuronAI\Laravel\Facades\AIProvider;
-use NeuronAI\Providers\AIProviderInterface;
 use NeuronAI\SystemPrompt;
 
 /**
@@ -32,19 +30,6 @@ class TrainingAdvisorAgent extends BaseAgent
         private int $userId,
         private ?int $characterId = null
     ) {}
-
-    /**
-     * Get the AI provider instance.
-     *
-     * Uses Anthropic Claude as the primary provider for training advice.
-     */
-    protected function provider(): AIProviderInterface
-    {
-        /** @var AIProviderInterface $provider */
-        $provider = AIProvider::driver('anthropic');
-
-        return $provider;
-    }
 
     /**
      * Get the agent's system instructions.

@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property int $id
  * @property int $character_id
+ * @property int $star_level
  * @property int $user_id
  * @property string|null $career_name
  * @property string|null $scenario_type
@@ -67,6 +68,7 @@ class Career extends Model
      */
     protected $fillable = [
         'character_id',
+        'star_level',
         'user_id',
         'career_name',
         'scenario_type',
@@ -102,6 +104,7 @@ class Career extends Model
     {
         return [
             'character_id' => 'integer',
+            'star_level' => 'integer',
             'user_id' => 'integer',
             'current_turn' => 'integer',
             'final_speed' => 'integer',

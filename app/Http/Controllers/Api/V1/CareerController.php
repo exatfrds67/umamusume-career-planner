@@ -629,7 +629,7 @@ class CareerController extends Controller
 
         foreach ($characterIds as $characterId) {
             /** @var int $characterId */
-            $character = Character::find($characterId);
+            $character = Character::find($characterId, ['*']);
             if ($character) {
                 $allPatterns[$characterId] = $this->careerAnalyticsService->getComprehensiveAnalytics($character);
             }
@@ -732,7 +732,7 @@ class CareerController extends Controller
 
         foreach ($characterIds as $characterId) {
             /** @var int $characterId */
-            $character = Character::find($characterId);
+            $character = Character::find($characterId, ['*']);
             if (! $character) {
                 continue;
             }

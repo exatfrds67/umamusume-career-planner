@@ -9,8 +9,6 @@ use App\Neuron\Agents\Tools\RaceDataTool;
 use App\Neuron\Agents\Tools\SkillDataTool;
 use NeuronAI\Chat\History\ChatHistoryInterface;
 use NeuronAI\Chat\History\EloquentChatHistory;
-use NeuronAI\Laravel\Facades\AIProvider;
-use NeuronAI\Providers\AIProviderInterface;
 use NeuronAI\SystemPrompt;
 
 /**
@@ -36,19 +34,6 @@ class CareerPlanningAgent extends BaseAgent
         private ?int $characterId = null,
         private ?int $careerId = null
     ) {}
-
-    /**
-     * Get the AI provider instance.
-     *
-     * Uses Anthropic Claude as the primary provider for career planning.
-     */
-    protected function provider(): AIProviderInterface
-    {
-        /** @var AIProviderInterface $provider */
-        $provider = AIProvider::driver('anthropic');
-
-        return $provider;
-    }
 
     /**
      * Get the agent's system instructions.

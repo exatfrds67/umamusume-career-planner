@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Career;
 use App\Models\Character;
 use App\Models\MCPToolUsage;
 use App\Models\Skill;
@@ -35,15 +36,26 @@ class SkillManagementController extends Controller
         /** @var Character $character */
         $character = Character::query()->findOrFail($validated['character_id']);
 
+        // Build a name-keyed map from all of this character's career_metadata->skills entries.
+        // This bridges manually-entered skill data with the normalised skill catalog.
+        $metadataSkillMap = $this->buildCareerMetadataSkillMap($character);
+
         // Get all skills with acquisition status
         $skills = Skill::with(['acquisitions' => function ($query) use ($character) {
             $query->where('character_id', $character->id)
                 ->where('is_active', true);
         }])
             ->get()
-            ->map(function ($skill) use ($character) {
+            ->map(function ($skill) use ($character, $metadataSkillMap) {
                 /** @var Skill $skill */
                 $acquisition = $skill->acquisitions->first();
+
+                // Overlay career_metadata data when no normalised acquisition record exists
+                $normalizedName = $this->normalizeSkillLookupName($skill->name);
+                $metaEntry = $metadataSkillMap['by_name'][$normalizedName] ?? null;
+
+                $isAcquired = $acquisition !== null || ($metaEntry !== null && $metaEntry['acquired'] === true);
+                $isPlanned = ! $isAcquired && $metaEntry !== null;
 
                 return [
                     'id' => $skill->id,
@@ -55,7 +67,9 @@ class SkillManagementController extends Controller
                     'description' => $skill->description,
                     'effects' => $skill->effects,
                     'meta_tier' => $skill->meta_tier,
-                    'is_acquired' => $acquisition !== null,
+                    'is_acquired' => $isAcquired,
+                    'is_planned' => $isPlanned,
+                    'is_metadata_only' => false,
                     'is_evolution' => $acquisition !== null ? $acquisition->is_evolution : false,
                     'final_sp_cost' => $acquisition !== null ? $acquisition->final_sp_cost : null,
                     'sp_saved' => $acquisition !== null ? $acquisition->sp_saved : 0,
@@ -73,12 +87,250 @@ class SkillManagementController extends Controller
                         $skill,
                         $this->hintService->getUnusedHintsForSkill($character, $skill)->count()
                     ),
+                    'metadata_notes' => $metaEntry['notes'] ?? null,
+                    'metadata_sp_cost' => $metaEntry['sp_cost'] ?? null,
+                ];
+            });
+
+        // Append skills that exist only in career_metadata and have no match in ucp_skills.
+        // These are often unique inherited/imported skills that are not yet in the global catalog.
+        $catalogNamesFlipped = $skills->pluck('name')
+            ->map(fn ($n): string => $this->normalizeSkillLookupName(is_string($n) ? $n : ''))
+            ->flip();
+
+        $metadataOnlySkills = collect($metadataSkillMap['all'])
+            ->filter(fn (array $entry): bool => ! $catalogNamesFlipped->has($this->normalizeSkillLookupName($entry['name'])))
+            ->values()
+            ->map(function (array $entry, int $idx): array {
+                return [
+                    'id' => 'meta-'.$idx,
+                    'name' => $entry['name'],
+                    'internal_id' => null,
+                    'skill_type' => 'unique',
+                    'rarity' => 'unique',
+                    'base_sp_cost' => $entry['sp_cost'],
+                    'description' => $entry['notes'],
+                    'effects' => null,
+                    'meta_tier' => null,
+                    'is_acquired' => $entry['acquired'] === true,
+                    'is_planned' => $entry['acquired'] === false,
+                    'is_metadata_only' => true,
+                    'is_evolution' => false,
+                    'final_sp_cost' => null,
+                    'sp_saved' => 0,
+                    'hint_count' => 0,
+                    'races_used' => 0,
+                    'effectiveness_rating' => null,
+                    'can_evolve' => false,
+                    'evolution_target_id' => null,
+                    'available_hints' => 0,
+                    'discounted_cost' => $entry['sp_cost'] ?? 0,
+                    'sp_savings' => 0,
+                    'metadata_notes' => $entry['notes'],
+                    'metadata_sp_cost' => $entry['sp_cost'],
                 ];
             });
 
         return response()->json([
             'success' => true,
-            'data' => $skills,
+            'data' => $skills->concat($metadataOnlySkills)->values(),
+        ]);
+    }
+
+    /**
+     * Normalise a skill name for catalog lookups by stripping tier-marker symbols
+     * (○, ◎, ●, ⦾) and collapsing surrounding whitespace. This allows metadata
+     * skill entries such as "Front Runner Straightaways ○" to match their catalog
+     * counterparts ("Front Runner Straightaways") regardless of the tier marker used.
+     */
+    private function normalizeSkillLookupName(string $name): string
+    {
+        // Strip any trailing (or embedded) Japanese tier markers then normalise to lowercase.
+        $stripped = preg_replace('/\s*[○◎●⦾]\s*/', ' ', $name);
+
+        return strtolower(trim((string) $stripped));
+    }
+
+    /**
+     * Build a normalised skill map from all of a character's career_metadata->skills arrays.
+     *
+     * Skills from later careers override earlier ones when the same normalised name appears multiple times.
+     *
+     * @return array{
+     *   by_name: array<string, array{name: string, acquired: bool, sp_cost: int|null, notes: string|null}>,
+     *   all: list<array{name: string, acquired: bool, sp_cost: int|null, notes: string|null}>
+     * }
+     */
+    private function buildCareerMetadataSkillMap(Character $character): array
+    {
+        $careers = Career::query()
+            ->where('character_id', $character->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        /** @var array<string, array{name: string, acquired: bool, sp_cost: int|null, notes: string|null}> $byName */
+        $byName = [];
+
+        foreach ($careers as $career) {
+            $metadata = $this->normalizeCareerMetadata($career->career_metadata);
+
+            $skillEntries = $this->normalizeSkillEntries($metadata['skills'] ?? []);
+            if ($skillEntries === []) {
+                continue;
+            }
+
+            foreach ($skillEntries as $skillEntry) {
+                $skillName = $skillEntry['name'] ?? null;
+                if (! is_string($skillName) || trim($skillName) === '') {
+                    continue;
+                }
+
+                $normalizedName = $this->normalizeSkillLookupName($skillName);
+                $spCostValue = $skillEntry['sp_cost'] ?? null;
+                $notesValue = $skillEntry['notes'] ?? null;
+
+                $byName[$normalizedName] = [
+                    'name' => $skillName,
+                    'acquired' => (bool) ($skillEntry['acquired'] ?? false),
+                    'sp_cost' => is_numeric($spCostValue) ? (int) $spCostValue : null,
+                    'notes' => is_string($notesValue) ? $notesValue : null,
+                ];
+            }
+        }
+
+        return [
+            'by_name' => $byName,
+            'all' => array_values($byName),
+        ];
+    }
+
+    /**
+     * Mark a skill as planned for a character by writing it into the latest career's metadata.
+     * If the skill is already present in metadata it will not be overwritten.
+     */
+    public function plan(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'character_id' => 'required|integer|exists:ucp_characters,id',
+            'skill_id' => 'required|integer|exists:ucp_skills,id',
+        ]);
+
+        /** @var Character $character */
+        $character = Character::query()->findOrFail($validated['character_id']);
+
+        $this->authorize('update', $character);
+
+        /** @var Skill $skill */
+        $skill = Skill::query()->findOrFail($validated['skill_id']);
+
+        // Find or create the latest active career for this character
+        $career = Career::query()
+            ->where('character_id', $character->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($career === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No career found for this character. Create a career first.',
+            ], 422);
+        }
+
+        $metadata = $this->normalizeCareerMetadata($career->career_metadata);
+        $existingSkills = $this->normalizeSkillEntries($metadata['skills'] ?? []);
+
+        // Avoid duplicates — check by normalised name
+        $normalizedNew = strtolower(trim($skill->name));
+        $alreadyPresent = collect($existingSkills)->contains(
+            function (array $entry) use ($normalizedNew): bool {
+                $entryName = $entry['name'] ?? null;
+
+                return is_string($entryName) && strtolower(trim($entryName)) === $normalizedNew;
+            }
+        );
+
+        if (! $alreadyPresent) {
+            $existingSkills[] = [
+                'name' => $skill->name,
+                'acquired' => false,
+                'sp_cost' => $skill->base_sp_cost,
+                'notes' => null,
+            ];
+
+            $metadata['skills'] = $existingSkills;
+            $career->career_metadata = $metadata;
+            $career->save();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $alreadyPresent
+                ? "'{$skill->name}' is already in your career plan."
+                : "'{$skill->name}' added to your career plan.",
+        ]);
+    }
+
+    /**
+     * Remove an acquired or planned skill from a career's metadata.
+     */
+    public function remove(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'character_id' => 'required|integer|exists:ucp_characters,id',
+            'skill_id' => 'required|integer|exists:ucp_skills,id',
+        ]);
+
+        /** @var Character $character */
+        $character = Character::query()->findOrFail($validated['character_id']);
+
+        $this->authorize('update', $character);
+
+        /** @var Skill $skill */
+        $skill = Skill::query()->findOrFail($validated['skill_id']);
+
+        $career = Career::query()
+            ->where('character_id', $character->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($career === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No career found for this character.',
+            ], 422);
+        }
+
+        $metadata = $this->normalizeCareerMetadata($career->career_metadata);
+        $existingSkills = $this->normalizeSkillEntries($metadata['skills'] ?? []);
+
+        $normalizedTarget = strtolower(trim($skill->name));
+        $countBefore = count($existingSkills);
+
+        $filteredSkills = array_values(
+            array_filter(
+                $existingSkills,
+                function (array $entry) use ($normalizedTarget): bool {
+                    $entryName = $entry['name'] ?? null;
+
+                    return ! is_string($entryName) || strtolower(trim($entryName)) !== $normalizedTarget;
+                }
+            )
+        );
+
+        if (count($filteredSkills) === $countBefore) {
+            return response()->json([
+                'success' => false,
+                'message' => "'{$skill->name}' was not found in your career plan.",
+            ], 422);
+        }
+
+        $metadata['skills'] = $filteredSkills;
+        $career->career_metadata = $metadata;
+        $career->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => "'{$skill->name}' removed from your career plan.",
         ]);
     }
 
@@ -90,7 +342,7 @@ class SkillManagementController extends Controller
         $validated = $request->validate([
             'character_id' => 'required|integer|exists:ucp_characters,id',
             'skill_id' => 'required|integer|exists:ucp_skills,id',
-            'turn_acquired' => 'nullable|integer|min:1|max:72',
+            'turn_acquired' => 'nullable|integer|min:1|max:120',
             'career_phase' => 'nullable|string|in:junior,classic,senior',
         ]);
 
@@ -498,5 +750,74 @@ class SkillManagementController extends Controller
             ->first();
 
         return $usage ? round($usage->execution_time, 3) : 0.0;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function normalizeCareerMetadata(mixed $metadata): array
+    {
+        if (is_array($metadata)) {
+            /** @var array<string, mixed> $normalized */
+            $normalized = [];
+            foreach ($metadata as $key => $value) {
+                if (is_string($key)) {
+                    $normalized[$key] = $value;
+                }
+            }
+
+            return $normalized;
+        }
+
+        if (is_string($metadata)) {
+            $decoded = json_decode($metadata, true);
+
+            if (! is_array($decoded)) {
+                return [];
+            }
+
+            /** @var array<string, mixed> $normalized */
+            $normalized = [];
+            foreach ($decoded as $key => $value) {
+                if (is_string($key)) {
+                    $normalized[$key] = $value;
+                }
+            }
+
+            return $normalized;
+        }
+
+        return [];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeSkillEntries(mixed $skills): array
+    {
+        if (! is_array($skills)) {
+            return [];
+        }
+
+        /** @var array<int, array<string, mixed>> $normalized */
+        $normalized = [];
+
+        foreach ($skills as $entry) {
+            if (! is_array($entry)) {
+                continue;
+            }
+
+            /** @var array<string, mixed> $skillEntry */
+            $skillEntry = [];
+            foreach ($entry as $key => $value) {
+                if (is_string($key)) {
+                    $skillEntry[$key] = $value;
+                }
+            }
+
+            $normalized[] = $skillEntry;
+        }
+
+        return $normalized;
     }
 }

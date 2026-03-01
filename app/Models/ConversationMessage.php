@@ -47,6 +47,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
  * @use HasFactory<\Database\Factories\ConversationMessageFactory>
+ *
+ * @mixin \Illuminate\Database\Eloquent\Builder<ConversationMessage>
+ * @mixin \Illuminate\Database\Query\Builder
  */
 class ConversationMessage extends Model
 {
@@ -278,7 +281,8 @@ class ConversationMessage extends Model
      */
     public function markAsHelpful(): void
     {
-        $this->update(['is_helpful' => true]);
+        $this->is_helpful = true;
+        $this->save();
     }
 
     /**
@@ -286,7 +290,8 @@ class ConversationMessage extends Model
      */
     public function markAsUnhelpful(): void
     {
-        $this->update(['is_helpful' => false]);
+        $this->is_helpful = false;
+        $this->save();
     }
 
     /**
@@ -294,13 +299,12 @@ class ConversationMessage extends Model
      */
     public function addFeedback(string $feedback, ?int $rating = null): void
     {
-        $updates = ['user_feedback' => $feedback];
-
+        $this->user_feedback = $feedback;
         if ($rating !== null) {
-            $updates['quality_rating'] = $rating;
+            $this->quality_rating = $rating;
         }
 
-        $this->update($updates);
+        $this->save();
     }
 
     /**
@@ -308,7 +312,8 @@ class ConversationMessage extends Model
      */
     public function pin(): void
     {
-        $this->update(['is_pinned' => true]);
+        $this->is_pinned = true;
+        $this->save();
     }
 
     /**
@@ -316,7 +321,8 @@ class ConversationMessage extends Model
      */
     public function unpin(): void
     {
-        $this->update(['is_pinned' => false]);
+        $this->is_pinned = false;
+        $this->save();
     }
 
     /**
@@ -324,7 +330,8 @@ class ConversationMessage extends Model
      */
     public function bookmark(): void
     {
-        $this->update(['is_bookmarked' => true]);
+        $this->is_bookmarked = true;
+        $this->save();
     }
 
     /**
@@ -332,6 +339,7 @@ class ConversationMessage extends Model
      */
     public function unbookmark(): void
     {
-        $this->update(['is_bookmarked' => false]);
+        $this->is_bookmarked = false;
+        $this->save();
     }
 }

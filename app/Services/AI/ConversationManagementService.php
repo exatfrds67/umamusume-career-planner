@@ -120,7 +120,8 @@ class ConversationManagementService
 
                 // Update conversation
                 $conversation->increment('message_count');
-                $conversation->update(['last_activity_at' => now()]);
+                $conversation->last_activity_at = now();
+                $conversation->save();
 
                 return $message;
             });
@@ -158,14 +159,13 @@ class ConversationManagementService
             $branchId = Str::uuid()->toString();
 
             // Mark parent as branch point
-            $parentMessage->update([
-                'is_branch_point' => true,
-                'branch_metadata' => [
-                    'reason' => $branchReason,
-                    'alternatives' => $alternatives,
-                    'created_at' => now()->toIso8601String(),
-                ],
-            ]);
+            $parentMessage->is_branch_point = true;
+            $parentMessage->branch_metadata = [
+                'reason' => $branchReason,
+                'alternatives' => $alternatives,
+                'created_at' => now()->toIso8601String(),
+            ];
+            $parentMessage->save();
 
             Log::info('[ConversationManagement] Branch created', [
                 'parent_message_id' => $parentMessage->id,
@@ -398,11 +398,10 @@ class ConversationManagementService
         array $improvementSuggestions = []
     ): void {
         try {
-            $message->update([
-                'quality_rating' => $rating,
-                'user_feedback' => $feedback,
-                'is_helpful' => $rating >= 4,
-            ]);
+            $message->quality_rating = $rating;
+            $message->user_feedback = $feedback;
+            $message->is_helpful = $rating >= 4;
+            $message->save();
 
             // Store feedback for agent improvement
             $this->storeAgentLearning($message, $rating, $improvementSuggestions);
