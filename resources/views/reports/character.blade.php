@@ -28,7 +28,7 @@
         </div>
 
         {{-- Character Overview --}}
-        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
             <div class="flex items-center gap-6">
                 <div class="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
                     @if ($character?->avatar_url)
@@ -64,7 +64,7 @@
         </div>
 
         {{-- Performance Trends --}}
-        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Performance Trends</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
@@ -108,7 +108,7 @@
         {{-- Aggregate Statistics --}}
         <div class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
             {{-- Overall Stats --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Aggregate Statistics</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-center">
@@ -135,7 +135,7 @@
             </div>
 
             {{-- Average Stat Gains --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Average Stat Gains Per Career</h2>
                 <div class="space-y-3">
                     @php
@@ -167,7 +167,7 @@
         </div>
 
         {{-- Career History --}}
-        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Career History</h2>
             @if (!empty($report['career_history']))
                 <div class="overflow-x-auto">
@@ -237,7 +237,7 @@
         {{-- Strengths & Improvement Areas --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {{-- Strengths --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                     <svg class="w-5 h-5 inline mr-2 text-green-500" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
@@ -264,7 +264,7 @@
             </div>
 
             {{-- Improvement Areas --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                     <svg class="w-5 h-5 inline mr-2 text-yellow-500" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">

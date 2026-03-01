@@ -68,7 +68,7 @@ Accessibility: WCAG 2.2 AA compliant
                 <div class="
                     {{ $sizeClass }} 
                     flex flex-col items-center justify-center
-                    bg-gradient-to-br from-gray-50 to-gray-100
+                    bg-linear-to-br from-gray-50 to-gray-100
                     dark:from-gray-700 dark:to-gray-800
                     border-2 border-gray-300 dark:border-gray-600
                     rounded-lg
@@ -91,7 +91,7 @@ Accessibility: WCAG 2.2 AA compliant
                         w-full h-2/3 flex items-center justify-center
                         bg-gray-200 dark:bg-gray-600
                         rounded-md
-                        text-gray-400 dark:text-gray-500
+                        text-gray-500 dark:text-gray-400
                     ">
                         <svg class="w-1/2 h-1/2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -108,7 +108,7 @@ Accessibility: WCAG 2.2 AA compliant
                 <div class="absolute -top-2 -right-2 
                     {{ $tierColors[$skill->tier] ?? $tierColors['C'] }}
                     border px-1.5 py-0.5 rounded font-bold text-xs
-                    shadow-sm
+                    shadow-xs
                 ">
                     {{ $skill->tier }}
                 </div>
@@ -119,7 +119,7 @@ Accessibility: WCAG 2.2 AA compliant
                     text-amber-800 dark:text-amber-200
                     border border-amber-300
                     px-1.5 py-0.5 rounded text-xs font-semibold
-                    shadow-sm
+                    shadow-xs
                 ">
                     SP {{ $skill->sp_cost }}
                 </div>
@@ -136,7 +136,7 @@ Accessibility: WCAG 2.2 AA compliant
                             bg-red-500 hover:bg-red-600
                             text-white rounded-full p-1
                             shadow-md
-                            focus:outline-none focus:ring-2 focus:ring-red-400
+                            focus:outline-hidden focus:ring-2 focus:ring-red-400
                         "
                         aria-label="Remove {{ $skill->name }}"
                     >
@@ -169,7 +169,7 @@ Accessibility: WCAG 2.2 AA compliant
                 border-2 border-dashed border-gray-300 dark:border-gray-600
                 rounded-lg
             ">
-                <svg class="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-12 h-12 text-gray-500 dark:text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m0 0h6m-6-6v6m0-6v6m0-6h-6m0 0H6" />
                 </svg>
                 <p class="text-gray-600 dark:text-gray-400 font-medium">No skills equipped</p>
@@ -230,7 +230,7 @@ Accessibility: WCAG 2.2 AA compliant
                                 transition-opacity
                                 p-2
                                 text-red-600 hover:text-red-700
-                                focus:outline-none focus:ring-2 focus:ring-red-400 rounded
+                                focus:outline-hidden focus:ring-2 focus:ring-red-400 rounded
                             "
                             aria-label="Remove {{ $skill->name }}"
                         >
@@ -260,7 +260,7 @@ Accessibility: WCAG 2.2 AA compliant
                     {{ $tierColors[$skill->tier] ?? $tierColors['C'] }}
                     border px-3 py-1 rounded-full text-sm font-semibold
                     hover:shadow-md transition-all
-                    focus:outline-none focus:ring-2 focus:ring-offset-2
+                    focus:outline-hidden focus:ring-2 focus:ring-offset-2
                 "
                 :aria-label="`{{ $skill->name }}, Tier {{ $skill->tier }}`"
             >

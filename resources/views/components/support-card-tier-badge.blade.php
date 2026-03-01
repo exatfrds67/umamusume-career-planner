@@ -9,9 +9,9 @@
 
     $tierColors = [
         'S+' =>
-            'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 dark:from-red-900 dark:to-pink-900 dark:text-red-200 border border-red-300 dark:border-red-700',
+            'bg-linear-to-r from-red-100 to-pink-100 text-red-800 dark:from-red-900 dark:to-pink-900 dark:text-red-200 border border-red-300 dark:border-red-700',
         'S' =>
-            'bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-800 dark:from-orange-900 dark:to-yellow-900 dark:text-orange-200 border border-orange-300 dark:border-orange-700',
+            'bg-linear-to-r from-orange-100 to-yellow-100 text-orange-800 dark:from-orange-900 dark:to-yellow-900 dark:text-orange-200 border border-orange-300 dark:border-orange-700',
         'A' =>
             'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border border-green-300 dark:border-green-700',
         'B' =>

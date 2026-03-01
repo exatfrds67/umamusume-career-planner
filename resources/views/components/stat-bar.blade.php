@@ -68,10 +68,10 @@
         @endif
 
         {{-- Progress Fill --}}
-        <div class="h-full bg-gradient-to-r from-{{ $getStatColor() }}-400 to-{{ $getStatColor() }}-500 rounded-full transition-all duration-300 ease-out relative overflow-hidden"
+        <div class="h-full bg-linear-to-r from-{{ $getStatColor() }}-400 to-{{ $getStatColor() }}-500 rounded-full transition-all duration-300 ease-out relative overflow-hidden"
             style="width: {{ min(100, $getPercentage()) }}%">
             {{-- Shine effect --}}
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer">
+            <div class="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent animate-shimmer">
             </div>
 
             {{-- Above soft cap indicator (different color) --}}

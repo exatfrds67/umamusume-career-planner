@@ -4,15 +4,15 @@
 
 @php
     $gradeColors = [
-        'SS' => 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white',
-        'S' => 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
+        'SS' => 'bg-linear-to-r from-yellow-400 to-amber-500 text-white',
+        'S' => 'bg-linear-to-r from-purple-500 to-pink-500 text-white',
         'A' => 'bg-red-500 text-white',
         'B' => 'bg-orange-500 text-white',
         'C' => 'bg-yellow-500 text-gray-900',
         'D' => 'bg-green-500 text-white',
         'E' => 'bg-blue-500 text-white',
         'F' => 'bg-gray-500 text-white',
-        'G' => 'bg-gray-400 text-white',
+        'G' => 'bg-gray-500 text-white',
     ];
     $colorClass = $gradeColors[$grade] ?? 'bg-gray-400 text-white';
 @endphp

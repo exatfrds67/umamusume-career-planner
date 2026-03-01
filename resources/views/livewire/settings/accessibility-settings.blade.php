@@ -22,7 +22,7 @@
                     </div>
                     <button type="button" id="high-contrast-toggle"
                         wire:click="$toggle('highContrast')"
-                        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 {{ $highContrast ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-600' }}"
+                        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 {{ $highContrast ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-600' }}"
                         role="switch" aria-checked="{{ $highContrast ? 'true' : 'false' }}">
                         <span class="sr-only">Enable high contrast mode</span>
                         <span aria-hidden="true"
@@ -42,7 +42,7 @@
                     </div>
                     <button type="button" id="reduced-motion-toggle"
                         wire:click="$toggle('reducedMotion')"
-                        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 {{ $reducedMotion ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-600' }}"
+                        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 {{ $reducedMotion ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-600' }}"
                         role="switch" aria-checked="{{ $reducedMotion ? 'true' : 'false' }}">
                         <span class="sr-only">Enable reduced motion</span>
                         <span aria-hidden="true"
@@ -56,7 +56,7 @@
                         Font Size
                     </label>
                     <select id="font-size-select" wire:model.live="fontSize"
-                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                         <option value="small">Small</option>
                         <option value="medium">Medium (Default)</option>
                         <option value="large">Large</option>
@@ -70,7 +70,7 @@
                         Color Blind Mode
                     </label>
                     <select id="colorblind-select" wire:model.live="colorBlindMode"
-                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                         <option value="none">None</option>
                         <option value="deuteranopia">Deuteranopia (Red-Green)</option>
                         <option value="protanopia">Protanopia (Red-Green)</option>
@@ -96,7 +96,7 @@
                     </div>
                     <button type="button" id="focus-indicators-toggle"
                         wire:click="$toggle('focusIndicators')"
-                        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 {{ $focusIndicators ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-600' }}"
+                        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 {{ $focusIndicators ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-600' }}"
                         role="switch" aria-checked="{{ $focusIndicators ? 'true' : 'false' }}">
                         <span class="sr-only">Enable enhanced focus indicators</span>
                         <span aria-hidden="true"
@@ -122,7 +122,7 @@
                     </div>
                     <button type="button" id="screen-reader-toggle"
                         wire:click="$toggle('screenReaderOptimization')"
-                        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 {{ $screenReaderOptimization ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-600' }}"
+                        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 {{ $screenReaderOptimization ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-600' }}"
                         role="switch" aria-checked="{{ $screenReaderOptimization ? 'true' : 'false' }}">
                         <span class="sr-only">Enable screen reader optimization</span>
                         <span aria-hidden="true"
@@ -143,7 +143,7 @@
         {{-- Actions --}}
         <div class="pt-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
             <button type="button" wire:click="resetToDefaults"
-                class="inline-flex items-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">
+                class="inline-flex items-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-xs ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">
                 Reset to Defaults
             </button>
         </div>

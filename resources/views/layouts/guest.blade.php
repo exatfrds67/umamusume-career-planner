@@ -52,16 +52,26 @@
 </head>
 
 <body class="h-full font-sans antialiased text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">
-    <!-- Fixed Background with Theme-Aware Images -->
-    <div id="app-background" class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500"
-        data-bg-light-desktop="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png"
-        data-bg-light-mobile="/images/app_bg/uma_musume_race_planner_bg_light_1028x1536.png"
-        data-bg-dark-desktop="/images/app_bg/uma_musume_race_planner_bg_dark_1536x1028.png"
-        data-bg-dark-mobile="/images/app_bg/uma_musume_race_planner_bg_dark_1028x1536.png" aria-hidden="true">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:dark:bg-gray-800 focus:text-primary-600 focus:dark:text-primary-400 focus:rounded-md focus:shadow-lg focus:ring-2 focus:ring-primary-500 focus:outline-hidden">
+        Skip to content
+    </a>
+
+    <!-- Fixed Background with Theme-Aware Images (class-based dark mode) -->
+    <div class="fixed inset-0 z-0" aria-hidden="true">
+        {{-- Light mode backgrounds --}}
+        <picture class="block dark:hidden w-full h-full">
+            <source media="(min-width: 1024px)" srcset="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png">
+            <img src="/images/app_bg/uma_musume_race_planner_bg_light_1028x1536.png" alt="" class="w-full h-full object-cover object-center" loading="lazy" decoding="async">
+        </picture>
+        {{-- Dark mode backgrounds --}}
+        <picture class="hidden dark:block w-full h-full">
+            <source media="(min-width: 1024px)" srcset="/images/app_bg/uma_musume_race_planner_bg_dark_1536x1028.png">
+            <img src="/images/app_bg/uma_musume_race_planner_bg_dark_1028x1536.png" alt="" class="w-full h-full object-cover object-center" loading="lazy" decoding="async">
+        </picture>
     </div>
 
     <!-- Content -->
-    <div class="relative z-10">
+    <div id="main-content" class="relative z-10">
         @yield('content')
     </div>
 

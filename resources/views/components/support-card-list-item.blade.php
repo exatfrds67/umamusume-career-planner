@@ -1,12 +1,12 @@
 @props(['card'])
 
 <a href="{{ route('support-cards.show', $card) }}"
-    class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all border border-gray-200 dark:border-gray-700 overflow-hidden group">
+    class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs hover:shadow-md transition-all border border-gray-200 dark:border-gray-700 overflow-hidden group">
     <div class="p-4">
         <div class="flex items-center gap-4">
             <!-- Thumbnail -->
             <div
-                class="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gradient-to-br from-{{ $card->card_type === 'speed' ? 'blue' : ($card->card_type === 'stamina' ? 'green' : ($card->card_type === 'power' ? 'red' : ($card->card_type === 'guts' ? 'orange' : ($card->card_type === 'wit' ? 'purple' : 'pink')))) }}-400 to-{{ $card->card_type === 'speed' ? 'blue' : ($card->card_type === 'stamina' ? 'green' : ($card->card_type === 'power' ? 'red' : ($card->card_type === 'guts' ? 'orange' : ($card->card_type === 'wit' ? 'purple' : 'pink')))) }}-600">
+                class="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-linear-to-br from-{{ $card->card_type === 'speed' ? 'blue' : ($card->card_type === 'stamina' ? 'green' : ($card->card_type === 'power' ? 'red' : ($card->card_type === 'guts' ? 'orange' : ($card->card_type === 'wit' ? 'purple' : 'pink')))) }}-400 to-{{ $card->card_type === 'speed' ? 'blue' : ($card->card_type === 'stamina' ? 'green' : ($card->card_type === 'power' ? 'red' : ($card->card_type === 'guts' ? 'orange' : ($card->card_type === 'wit' ? 'purple' : 'pink')))) }}-600">
                 @if ($card->artwork_url)
                     <img src="{{ $card->artwork_url }}" alt="{{ $card->name }}" loading="lazy" decoding="async"
                         class="w-full h-full object-cover">

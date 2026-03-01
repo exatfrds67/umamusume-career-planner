@@ -15,7 +15,7 @@
 
         <!-- Card Header -->
         <div
-            class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div class="md:flex">
                 <!-- Card Image -->
                 <div
@@ -86,7 +86,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Stat Bonuses -->
             <div
-                class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Stat Bonuses</h2>
                 <div class="space-y-3">
                     @foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
@@ -112,7 +112,7 @@
 
             <!-- Training Bonuses -->
             <div
-                class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Training Bonuses</h2>
                 <div class="space-y-3">
                     @if ($supportCard->training_effect_bonus > 0)
@@ -143,7 +143,7 @@
         <!-- Unique Effects -->
         @if (!empty($supportCard->unique_effects))
             <div
-                class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Unique Effects & Event Skills</h2>
                 <ul class="space-y-2">
                     @foreach ($supportCard->unique_effects as $effect)
@@ -169,7 +169,7 @@
         <!-- Skill Hints -->
         @if (!empty($supportCard->skill_hints_provided))
             <div
-                class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Skill Hints Provided</h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach ($supportCard->skill_hints_provided as $skill)
@@ -185,7 +185,7 @@
         <!-- Strategic Notes -->
         @if (!empty($supportCard->strategic_notes))
             <div
-                class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Strategic Notes</h2>
                 <ul class="space-y-2">
                     @foreach ($supportCard->strategic_notes as $note)
@@ -204,7 +204,7 @@
         <!-- Deck Synergies -->
         @if (!empty($supportCard->deck_synergies))
             <div
-                class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Deck Synergies</h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach ($supportCard->deck_synergies as $synergy)
@@ -220,7 +220,7 @@
         <!-- Recommended Scenarios -->
         @if (!empty($supportCard->recommended_scenarios))
             <div
-                class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recommended Scenarios</h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach ($supportCard->recommended_scenarios as $scenario)

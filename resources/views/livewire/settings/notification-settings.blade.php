@@ -10,7 +10,7 @@
             </div>
             <template x-if="supported">
                 <button @click="toggle()" :disabled="loading"
-                    class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                    class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                     :class="subscribed ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'"
                     role="switch" :aria-checked="subscribed.toString()">
                     <span class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
@@ -37,7 +37,7 @@
                 <p class="text-xs text-gray-500 dark:text-gray-400">Get reminded before scheduled races.</p>
             </div>
             <button wire:click="$toggle('raceReminders')" id="race-reminders"
-                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 :class="@js($raceReminders) ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'"
                 role="switch" aria-checked="{{ $raceReminders ? 'true' : 'false' }}">
                 <span class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
@@ -52,7 +52,7 @@
                 <p class="text-xs text-gray-500 dark:text-gray-400">Alerts for optimal training opportunities.</p>
             </div>
             <button wire:click="$toggle('trainingAlerts')" id="training-alerts"
-                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 :class="@js($trainingAlerts) ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'"
                 role="switch" aria-checked="{{ $trainingAlerts ? 'true' : 'false' }}">
                 <span class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
@@ -67,7 +67,7 @@
                 <p class="text-xs text-gray-500 dark:text-gray-400">Get notified when offline changes sync.</p>
             </div>
             <button wire:click="$toggle('syncNotifications')" id="sync-notifications"
-                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 :class="@js($syncNotifications) ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'"
                 role="switch" aria-checked="{{ $syncNotifications ? 'true' : 'false' }}">
                 <span class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
@@ -89,12 +89,12 @@
             <div>
                 <label for="quiet-start" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start</label>
                 <input wire:model="quietHoursStart" type="time" id="quiet-start"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
             </div>
             <div>
                 <label for="quiet-end" class="block text-sm font-medium text-gray-700 dark:text-gray-300">End</label>
                 <input wire:model="quietHoursEnd" type="time" id="quiet-end"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
             </div>
         </div>
     </div>
@@ -114,7 +114,7 @@
             @endif
 
             <button wire:click="savePreferences" type="button"
-                class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                 <span wire:loading.remove wire:target="savePreferences">Save Preferences</span>
                 <span wire:loading wire:target="savePreferences">Saving...</span>
             </button>

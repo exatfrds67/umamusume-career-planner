@@ -25,7 +25,7 @@
                     type="button"
                     x-data
                     @click="$dispatch('menu-toggle')"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200"
                 >
                     <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
@@ -35,7 +35,7 @@
                 
                 <a 
                     href="/plans/{{ $plan->id }}/edit"
-                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200"
                 >
                     <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -49,10 +49,10 @@
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
             {{-- Left Sidebar: Character Info --}}
             <div class="lg:col-span-1">
-                <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg p-6">
+                <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xs rounded-lg shadow-lg p-6">
                     {{-- Character Portrait Section --}}
                     <div class="mb-6">
-                        <div class="aspect-square bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg mb-4 flex items-center justify-center text-white text-center">
+                        <div class="aspect-square bg-linear-to-br from-blue-400 to-purple-600 rounded-lg mb-4 flex items-center justify-center text-white text-center">
                             <div>
                                 <p class="text-4xl font-bold">{{ substr($plan->character->name ?? 'N/A', 0, 1) }}</p>
                                 <p class="text-sm mt-1">{{ $plan->character->name ?? 'Character' }}</p>
@@ -68,6 +68,18 @@
                                 {{ $plan->character->title }}
                             </p>
                         @endif
+
+                        {{-- Star Level Display --}}
+                        <div class="mt-3 text-center">
+                            <span class="text-xl tracking-wider text-yellow-400 drop-shadow-sm" aria-label="{{ $plan->star_level ?? 3 }} stars">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <span class="{{ $i <= ($plan->star_level ?? 3) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600' }}">★</span>
+                                @endfor
+                            </span>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {{ ($plan->star_level ?? 3) }}★ — {{ ($plan->star_level ?? 3) >= 3 ? 'Unique skill upgraded' : 'Base unique skill' }}
+                            </p>
+                        </div>
                     </div>
                     
                     <hr class="my-4 border-gray-200 dark:border-gray-700">
@@ -146,7 +158,7 @@
             
             {{-- Right Content: Tabbed View --}}
             <div class="lg:col-span-3">
-                <div x-data="{ activeTab: 'overview' }" class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+                <div x-data="{ activeTab: 'overview' }" class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xs rounded-lg shadow-lg overflow-hidden">
                     {{-- Tab Navigation --}}
                     <x-tab-bar 
                         :tabs="[
@@ -182,6 +194,23 @@
                                         <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Last Updated</p>
                                         <p class="text-sm font-semibold text-gray-900 dark:text-white mt-1">
                                             {{ $plan->updated_at->format('M d, Y') }}
+                                        </p>
+                                    </div>
+
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Star Level</p>
+                                        <p class="text-sm font-semibold text-yellow-500 dark:text-yellow-400 mt-1">
+                                            @for($i = 1; $i <= ($plan->star_level ?? 3); $i++)★@endfor
+                                            <span class="text-gray-400 dark:text-gray-500">
+                                                @for($i = ($plan->star_level ?? 3) + 1; $i <= 5; $i++)☆@endfor
+                                            </span>
+                                        </p>
+                                    </div>
+
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Unique Skill</p>
+                                        <p class="text-sm font-semibold mt-1 {{ ($plan->star_level ?? 3) >= 3 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400' }}">
+                                            {{ ($plan->star_level ?? 3) >= 3 ? 'Upgraded' : 'Base version' }}
                                         </p>
                                     </div>
                                 </div>

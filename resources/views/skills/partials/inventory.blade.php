@@ -3,14 +3,26 @@
     {{-- Filters --}}
     <div class="card bg-white dark:bg-gray-800">
         <div class="card-body">
+            <fieldset>
+                <legend class="sr-only">Filter skills</legend>
             <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <div>
                     <label for="search-skills" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Search Skills
                     </label>
-                    <input type="text" id="search-skills" name="search_skills" x-model="filters.searchQuery"
-                        @input="resetPagination()" placeholder="Search by name..."
-                        class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    <div class="relative">
+                        <input type="text" id="search-skills" name="search_skills" x-model="filters.searchQuery"
+                            @input="resetPagination()" placeholder="Search by name..."
+                            class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white pr-8">
+                        <button x-show="filters.searchQuery" @click="filters.searchQuery = ''; resetPagination()"
+                            type="button"
+                            class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                            aria-label="Clear search">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div>
                     <label for="filter-stat-affinity"
@@ -88,18 +100,27 @@
                     </select>
                 </div>
             </div>
+            </fieldset>
         </div>
     </div>
 
     {{-- Results Summary --}}
-    <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+    <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400"
+        role="status" aria-live="polite" aria-atomic="true">
         <div>
             Showing <span class="font-semibold" x-text="((currentPage - 1) * itemsPerPage) + 1"></span>
             to <span class="font-semibold" x-text="Math.min(currentPage * itemsPerPage, filteredSkills.length)"></span>
             of <span class="font-semibold" x-text="filteredSkills.length"></span> skills
         </div>
-        <div>
-            <span class="font-semibold" x-text="acquiredSkills.length"></span> acquired
+        <div class="flex items-center gap-4">
+            <span>
+                <span class="font-semibold text-success-600 dark:text-success-400" x-text="acquiredSkills.length"></span>
+                acquired
+            </span>
+            <span x-show="plannedSkills.length > 0">
+                <span class="font-semibold text-amber-600 dark:text-amber-400" x-text="plannedSkills.length"></span>
+                planned
+            </span>
         </div>
     </div>
 
@@ -118,12 +139,17 @@
                 <template x-for="skill in paginatedSkills" :key="skill.id">
                     <div class="relative p-4 border-2 rounded-lg transition-all duration-200 hover:shadow-lg cursor-pointer"
                         :class="{
-                            'border-success-500 bg-success-50 dark:bg-success-900/20': skill.is_acquired,
+                            'border-success-500 bg-success-50 dark:bg-gray-800 dark:border-success-400': skill.is_acquired,
+                            'border-amber-400 bg-amber-50 dark:bg-gray-800 dark:border-amber-400': !skill.is_acquired && skill.is_planned,
                             'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-primary-500 dark:hover:border-primary-400':
-                                !skill
-                                .is_acquired
+                                !skill.is_acquired && !skill.is_planned
                         }"
-                        @click="viewSkillDetails(skill)">
+                        @click="viewSkillDetails(skill)"
+                        @keydown.enter.prevent="viewSkillDetails(skill)"
+                        @keydown.space.prevent="viewSkillDetails(skill)"
+                        role="button"
+                        tabindex="0"
+                        :aria-label="`View details for ${skill.name}${skill.is_acquired ? ' — Acquired' : skill.is_planned ? ' — Planned' : ''}`">
 
                         {{-- Header: Name, Grade, Type --}}
                         <div class="flex items-start justify-between gap-3 mb-3">
@@ -210,6 +236,18 @@
                                     <span>Acquired</span>
                                 </div>
                             </div>
+
+                            {{-- Planned Badge --}}
+                            <div x-show="!skill.is_acquired && skill.is_planned" class="shrink-0">
+                                <div
+                                    class="bg-amber-400 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 dark:bg-amber-500">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    <span>Planned</span>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Description --}}
@@ -284,8 +322,8 @@
                             </div>
                         </template>
 
-                        {{-- Acquire Button (only for non-acquired skills) --}}
-                        <div x-show="!skill.is_acquired" class="mt-3">
+                        {{-- Acquire Button (only for non-acquired catalog skills) --}}
+                        <div x-show="!skill.is_acquired && !skill.is_metadata_only" class="mt-3">
                             <button @click.stop="acquireSkill(skill)" :disabled="loading"
                                 class="w-full btn btn-sm btn-primary flex items-center justify-center gap-2"
                                 :class="{ 'opacity-50 cursor-not-allowed': loading }">
@@ -310,18 +348,22 @@
         </div>
         <div class="flex items-center gap-2">
             <button @click="goToPage(1)" :disabled="currentPage === 1"
+                aria-label="Go to first page"
                 class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700">
                 First
             </button>
             <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1"
+                aria-label="Go to previous page"
                 class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700">
                 Previous
             </button>
             <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages"
+                aria-label="Go to next page"
                 class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700">
                 Next
             </button>
             <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages"
+                aria-label="Go to last page"
                 class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700">
                 Last
             </button>

@@ -7,15 +7,17 @@
         </div>
         <div class="flex items-center gap-3">
             {{-- Time Range Selector --}}
-            <div class="flex rounded-lg border border-gray-300 dark:border-gray-600">
+            <div role="group" aria-label="Select time range" class="flex rounded-lg border border-gray-300 dark:border-gray-600">
                 @foreach (['1h', '6h', '24h', '7d', '30d'] as $range)
                     <button wire:click="setTimeRange('{{ $range }}')"
+                        aria-pressed="{{ $timeRange === $range ? 'true' : 'false' }}"
                         class="px-3 py-1.5 text-sm font-medium {{ $timeRange === $range ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700' }} {{ $loop->first ? 'rounded-l-lg' : '' }} {{ $loop->last ? 'rounded-r-lg' : '' }}">
                         {{ $range }}
                     </button>
                 @endforeach
             </div>
             <button wire:click="runAlertCheck"
+                aria-label="Run performance alert check now"
                 class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
                 Run Check
             </button>
@@ -41,7 +43,7 @@
                 <span class="text-2xl font-bold">{{ number_format($overallScore, 1) }}</span>
                 <span class="text-sm font-medium uppercase">Health Score — {{ ucfirst($status) }}</span>
             </div>
-            <div class="text-sm" wire:loading.class="opacity-50">
+            <div class="text-sm" wire:loading.class="opacity-50" aria-live="polite">
                 <span wire:loading wire:target="refreshMetrics">Refreshing...</span>
                 <span wire:loading.remove wire:target="refreshMetrics">Auto-refresh: {{ $refreshInterval }}s</span>
             </div>
@@ -301,6 +303,7 @@
                 <p class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">No alerts recorded</p>
             @else
                 <div class="max-h-96 space-y-2 overflow-y-auto">
+                    <ul class="space-y-2" role="list">
                     @foreach ($recentAlerts as $alert)
                         @php
                             $alertSeverity = is_string($alert['severity'] ?? null) ? $alert['severity'] : 'info';
@@ -314,7 +317,7 @@
                                 default => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
                             };
                         @endphp
-                        <div
+                        <li
                             class="flex items-start gap-3 rounded-lg border p-3 {{ $isAcknowledged ? 'border-gray-200 bg-gray-50 opacity-60 dark:border-gray-700 dark:bg-gray-900/30' : 'border-gray-200 dark:border-gray-700' }}">
                             <span
                                 class="mt-0.5 inline-flex shrink-0 rounded-full px-2 py-0.5 text-xs font-medium {{ $severityBadge }}">
@@ -325,19 +328,20 @@
                                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                     {{ $alertTimestamp ? \Carbon\Carbon::parse($alertTimestamp)->diffForHumans() : '' }}
                                     @if ($isAcknowledged)
-                                        <span class="ml-2 text-green-600 dark:text-green-400">✓ Acknowledged</span>
+                                        <span class="ml-2 text-green-600 dark:text-green-400">&#10003; Acknowledged</span>
                                     @endif
                                 </p>
                             </div>
                             @if (!$isAcknowledged && $alertId)
                                 <button wire:click="acknowledgeAlert('{{ $alertId }}')"
                                     class="shrink-0 rounded px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
-                                    title="Acknowledge alert">
-                                    Ack
+                                    aria-label="Acknowledge alert: {{ $alertMessage }}">
+                                    Acknowledge
                                 </button>
                             @endif
-                        </div>
+                        </li>
                     @endforeach
+                    </ul>
                 </div>
             @endif
         </div>
@@ -348,48 +352,49 @@
         <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Configured Thresholds</h2>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
+                <caption class="sr-only">Configured alerting thresholds</caption>
                 <thead>
                     <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <th class="pb-3 font-medium text-gray-500 dark:text-gray-400">Metric</th>
-                        <th class="pb-3 font-medium text-yellow-600 dark:text-yellow-400">Warning</th>
-                        <th class="pb-3 font-medium text-red-600 dark:text-red-400">Critical</th>
+                        <th scope="col" class="pb-3 font-medium text-gray-500 dark:text-gray-400">Metric</th>
+                        <th scope="col" class="pb-3 font-medium text-yellow-600 dark:text-yellow-400">Warning</th>
+                        <th scope="col" class="pb-3 font-medium text-red-600 dark:text-red-400">Critical</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     <tr>
                         <td class="py-2 text-gray-900 dark:text-white">Response Time</td>
                         <td class="py-2 text-gray-700 dark:text-gray-300">
-                            &gt;{{ number_format(is_numeric($thresholds['response_time_warning'] ?? null) ? (float) $thresholds['response_time_warning'] : 0, 0) }}ms
+                            <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['response_time_warning'] ?? null) ? (float) $thresholds['response_time_warning'] : 0, 0) }}ms
                         </td>
                         <td class="py-2 text-gray-700 dark:text-gray-300">
-                            &gt;{{ number_format(is_numeric($thresholds['response_time_critical'] ?? null) ? (float) $thresholds['response_time_critical'] : 0, 0) }}ms
+                            <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['response_time_critical'] ?? null) ? (float) $thresholds['response_time_critical'] : 0, 0) }}ms
                         </td>
                     </tr>
                     <tr>
                         <td class="py-2 text-gray-900 dark:text-white">Error Rate</td>
                         <td class="py-2 text-gray-700 dark:text-gray-300">
-                            &gt;{{ number_format(is_numeric($thresholds['error_rate_warning'] ?? null) ? (float) $thresholds['error_rate_warning'] : 0, 1) }}%
+                            <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['error_rate_warning'] ?? null) ? (float) $thresholds['error_rate_warning'] : 0, 1) }}%
                         </td>
                         <td class="py-2 text-gray-700 dark:text-gray-300">
-                            &gt;{{ number_format(is_numeric($thresholds['error_rate_critical'] ?? null) ? (float) $thresholds['error_rate_critical'] : 0, 1) }}%
+                            <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['error_rate_critical'] ?? null) ? (float) $thresholds['error_rate_critical'] : 0, 1) }}%
                         </td>
                     </tr>
                     <tr>
                         <td class="py-2 text-gray-900 dark:text-white">Cache Hit Rate</td>
                         <td class="py-2 text-gray-700 dark:text-gray-300">
-                            &lt;{{ number_format(is_numeric($thresholds['cache_hit_warning'] ?? null) ? (float) $thresholds['cache_hit_warning'] : 0, 0) }}%
+                            <span class="sr-only">less than </span>&lt;{{ number_format(is_numeric($thresholds['cache_hit_warning'] ?? null) ? (float) $thresholds['cache_hit_warning'] : 0, 0) }}%
                         </td>
                         <td class="py-2 text-gray-700 dark:text-gray-300">
-                            &lt;{{ number_format(is_numeric($thresholds['cache_hit_critical'] ?? null) ? (float) $thresholds['cache_hit_critical'] : 0, 0) }}%
+                            <span class="sr-only">less than </span>&lt;{{ number_format(is_numeric($thresholds['cache_hit_critical'] ?? null) ? (float) $thresholds['cache_hit_critical'] : 0, 0) }}%
                         </td>
                     </tr>
                     <tr>
                         <td class="py-2 text-gray-900 dark:text-white">Memory Usage</td>
                         <td class="py-2 text-gray-700 dark:text-gray-300">
-                            &gt;{{ number_format(is_numeric($thresholds['memory_warning'] ?? null) ? (float) $thresholds['memory_warning'] : 0, 0) }}%
+                            <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['memory_warning'] ?? null) ? (float) $thresholds['memory_warning'] : 0, 0) }}%
                         </td>
                         <td class="py-2 text-gray-700 dark:text-gray-300">
-                            &gt;{{ number_format(is_numeric($thresholds['memory_critical'] ?? null) ? (float) $thresholds['memory_critical'] : 0, 0) }}%
+                            <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['memory_critical'] ?? null) ? (float) $thresholds['memory_critical'] : 0, 0) }}%
                         </td>
                     </tr>
                 </tbody>

@@ -72,7 +72,7 @@
         </div>
 
         {{-- Executive Summary --}}
-        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Executive Summary</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
@@ -131,7 +131,7 @@
         {{-- Performance Overview --}}
         <div class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
             {{-- Efficiency & Rates --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Performance Metrics</h2>
                 <div class="space-y-4">
                     <div>
@@ -178,7 +178,7 @@
             </div>
 
             {{-- Stat Distribution --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Stat Distribution</h2>
                 <div class="space-y-3">
                     @php
@@ -211,7 +211,7 @@
         {{-- Training & Race Analysis --}}
         <div class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
             {{-- Training Analysis --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Training Analysis</h2>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
@@ -240,7 +240,7 @@
             </div>
 
             {{-- Race Analysis --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Race Analysis</h2>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
@@ -282,7 +282,7 @@
         {{-- Key Insights & Recommendations --}}
         <div class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
             {{-- Key Insights --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                     <svg class="w-5 h-5 inline mr-2 text-blue-500" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
@@ -308,7 +308,7 @@
             </div>
 
             {{-- Recommendations --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                     <svg class="w-5 h-5 inline mr-2 text-green-500" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
@@ -335,7 +335,7 @@
         </div>
 
         {{-- Statistical Summary --}}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Statistical Summary</h2>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

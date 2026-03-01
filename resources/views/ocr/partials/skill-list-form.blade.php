@@ -26,7 +26,7 @@
         <div class="flex items-center justify-between mb-3">
             <h3 class="text-md font-semibold text-gray-900 dark:text-white">Extracted Skills</h3>
             <button type="button" id="add-skill-button"
-                class="px-3 py-1 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors">
+                class="px-3 py-1 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-hidden focus:ring-2 focus:ring-primary-500 transition-colors">
                 + Add Skill
             </button>
         </div>
@@ -87,7 +87,7 @@
                         <!-- Remove Button -->
                         <div class="md:col-span-1 flex items-end">
                             <button type="button"
-                                class="remove-skill-button w-full px-2 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg focus:outline-none transition-colors"
+                                class="remove-skill-button w-full px-2 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg focus:outline-hidden transition-colors"
                                 aria-label="Remove skill">
                                 <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

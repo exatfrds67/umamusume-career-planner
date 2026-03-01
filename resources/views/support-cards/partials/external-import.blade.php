@@ -98,7 +98,7 @@
         class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-3">
         <template x-for="card in filteredExternalCards()" :key="card.id">
             <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:scale-105 transition-all group cursor-pointer">
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:scale-105 transition-all group cursor-pointer">
                 <!-- Card Image -->
                 <div class="aspect-3/4 bg-gray-100 dark:bg-gray-700 relative">
                     <img :src="'https://gametora.com/images/umamusume/supports/tex_support_card_' + card.id + '.png'"

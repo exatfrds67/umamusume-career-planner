@@ -17,7 +17,7 @@
 
         <!-- Success/Error Messages -->
         @if (session('success'))
-            <div class="rounded-md bg-green-50 dark:bg-green-900/20 p-4">
+            <div class="rounded-md bg-green-50 dark:bg-green-900/20 p-4" role="alert">
                 <div class="flex">
                     <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
@@ -32,7 +32,7 @@
         @endif
 
         @if ($errors->any())
-            <div class="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
+            <div class="rounded-md bg-red-50 dark:bg-red-900/20 p-4" role="alert">
                 <div class="flex">
                     <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
@@ -59,13 +59,13 @@
 
             <!-- Tab Navigation -->
             <div class="border-b border-gray-200 dark:border-gray-700">
-                <nav class="-mb-px flex gap-2 overflow-x-auto scrollbar-hide" aria-label="Profile sections">
+                <nav class="-mb-px flex gap-2 overflow-x-auto scrollbar-hide" aria-label="Profile sections" role="tablist">
                     <button type="button" @click="activeTab = 'account'"
                         :class="activeTab === 'account' ?
                             'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' :
                             'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'"
                         class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg"
-                        role="tab" :aria-selected="activeTab === 'account'">
+                        role="tab" id="tab-account" :aria-selected="activeTab === 'account'" aria-controls="panel-account">
                         <span class="flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -79,7 +79,7 @@
                             'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' :
                             'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'"
                         class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg"
-                        role="tab" :aria-selected="activeTab === 'preferences'">
+                        role="tab" id="tab-preferences" :aria-selected="activeTab === 'preferences'" aria-controls="panel-preferences">
                         <span class="flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -95,7 +95,7 @@
                             'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' :
                             'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'"
                         class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg"
-                        role="tab" :aria-selected="activeTab === 'notifications'">
+                        role="tab" id="tab-notifications" :aria-selected="activeTab === 'notifications'" aria-controls="panel-notifications">
                         <span class="flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -109,7 +109,7 @@
                             'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' :
                             'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'"
                         class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg"
-                        role="tab" :aria-selected="activeTab === 'privacy'">
+                        role="tab" id="tab-privacy" :aria-selected="activeTab === 'privacy'" aria-controls="panel-privacy">
                         <span class="flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -123,7 +123,7 @@
                             'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' :
                             'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'"
                         class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg"
-                        role="tab" :aria-selected="activeTab === 'security'">
+                        role="tab" id="tab-security" :aria-selected="activeTab === 'security'" aria-controls="panel-security">
                         <span class="flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -136,29 +136,29 @@
             </div>
 
             <!-- Account Tab -->
-            <div x-show="activeTab === 'account'" x-transition role="tabpanel">
+            <div x-show="activeTab === 'account'" x-transition role="tabpanel" id="panel-account" aria-labelledby="tab-account">
                 @include('profile.partials.account-tab-content', ['user' => $user, 'stats' => $stats])
             </div>
 
             <!-- Preferences Tab -->
-            <div x-show="activeTab === 'preferences'" x-transition role="tabpanel">
+            <div x-show="activeTab === 'preferences'" x-transition role="tabpanel" id="panel-preferences" aria-labelledby="tab-preferences">
                 @include('profile.partials.preferences-tab-content', ['user' => $user])
             </div>
 
             <!-- Notifications Tab -->
-            <div x-show="activeTab === 'notifications'" x-transition role="tabpanel">
+            <div x-show="activeTab === 'notifications'" x-transition role="tabpanel" id="panel-notifications" aria-labelledby="tab-notifications">
                 @include('profile.partials.notifications-tab-content', ['user' => $user])
             </div>
 
             <!-- Privacy & Data Tab -->
-            <div x-show="activeTab === 'privacy'" x-transition role="tabpanel">
+            <div x-show="activeTab === 'privacy'" x-transition role="tabpanel" id="panel-privacy" aria-labelledby="tab-privacy">
                 @include('profile.partials.privacy-tab-content', ['user' => $user])
             </div>
 
             <!-- Save Button (shown for all tabs except Security) -->
             <div x-show="activeTab !== 'security'"
                 class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <button type="button" onclick="window.location.reload()" class="btn btn-secondary">
+                <button type="button" onclick="this.closest('form').reset()" class="btn btn-secondary">
                     Cancel
                 </button>
                 <button type="submit" class="btn btn-primary">
@@ -168,7 +168,7 @@
         </form>
 
         <!-- Security Tab (Outside outer form — has its own separate forms) -->
-        <div x-show="activeTab === 'security'" x-transition role="tabpanel">
+        <div x-show="activeTab === 'security'" x-transition role="tabpanel" id="panel-security" aria-labelledby="tab-security">
             @include('profile.partials.security-tab', ['user' => $user])
         </div>
     </div>

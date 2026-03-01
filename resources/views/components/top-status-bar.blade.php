@@ -22,7 +22,7 @@
         <div class="flex items-center gap-3">
             <span class="text-gray-500 dark:text-gray-400">Turn</span>
             <span class="font-semibold text-gray-900 dark:text-white">{{ $turnValue }}</span>
-            <span class="text-gray-400 dark:text-gray-500">/</span>
+            <span class="text-gray-500 dark:text-gray-400">/</span>
             <span class="text-gray-600 dark:text-gray-300">{{ $turnMax }}</span>
         </div>
 

@@ -175,7 +175,7 @@
             <!-- Search and Filters -->
             <div class="space-y-3">
                 <!-- Search Bar -->
-                <div class="relative rounded-md shadow-sm">
+                <div class="relative rounded-md shadow-xs">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
@@ -242,6 +242,7 @@
                         <div class="flex items-start gap-3">
                             <img :src="character.thumb_img || '/images/app_logo/logo.svg'" :alt="character.name_en"
                                 class="w-16 h-16 rounded-lg object-cover cursor-pointer"
+                                loading="lazy" decoding="async"
                                 @click="showCharacterDetail(character)">
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate cursor-pointer hover:text-primary-600 dark:hover:text-primary-400"
@@ -330,7 +331,7 @@
             <!-- Search and Filters -->
             <div class="space-y-3">
                 <!-- Search Bar -->
-                <div class="relative rounded-md shadow-sm">
+                <div class="relative rounded-md shadow-xs">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
@@ -436,6 +437,7 @@
                         <div class="flex items-start gap-3">
                             <img :src="getSupportCardImage(card.id)" :alt="card.title_en || 'Support Card'"
                                 class="w-16 h-16 rounded-lg object-cover cursor-pointer"
+                                loading="lazy" decoding="async"
                                 x-on:error="$event.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(card.title_en || card.name_en || 'Card') + '&background=random&color=fff'"
                                 @click="showSupportCardDetail(card)">
                             <div class="flex-1 min-w-0">
@@ -456,7 +458,7 @@
                                                     .rarity === 'R'
                                             }"
                                             x-text="card.rarity || 'R'"></span>
-                                        <span x-show="card.gametora" class="text-xs text-gray-400 dark:text-gray-500">
+                                        <span x-show="card.gametora" class="text-xs text-gray-500 dark:text-gray-400">
                                             #<span x-text="card.id"></span>
                                         </span>
                                     </div>
@@ -552,7 +554,7 @@
             <!-- Search and Filters -->
             <div class="space-y-3">
                 <!-- Search Bar -->
-                <div class="relative rounded-md shadow-sm">
+                <div class="relative rounded-md shadow-xs">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
@@ -716,7 +718,7 @@
                                         Tier <span x-text="skill.meta_tier"></span>
                                     </span>
                                     <!-- Internal ID -->
-                                    <span x-show="skill.internal_id" class="text-xs text-gray-400 dark:text-gray-500">
+                                    <span x-show="skill.internal_id" class="text-xs text-gray-500 dark:text-gray-400">
                                         #<span x-text="skill.internal_id"></span>
                                     </span>
                                 </div>
@@ -790,14 +792,14 @@
                         <div class="flex items-start gap-4">
                             <div x-show="item.thumb_img" class="shrink-0">
                                 <img :src="item.thumb_img" :alt="item.title_en"
-                                    class="w-24 h-24 rounded-lg object-cover">
+                                    class="w-24 h-24 rounded-lg object-cover" loading="lazy" decoding="async">
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 mb-2">
                                     <span
                                         class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300"
                                         x-text="item.category || 'News'"></span>
-                                    <span class="text-xs text-gray-400 dark:text-gray-500"
+                                    <span class="text-xs text-gray-500 dark:text-gray-400"
                                         x-text="item.published_at ? new Date(item.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Unknown date'"></span>
                                 </div>
                                 <div class="text-sm text-gray-900 dark:text-white line-clamp-3"
@@ -842,7 +844,7 @@
             x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75"
+                <div class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/75"
                     @click="showCharacterModal = false"></div>
                 <div
                     class="relative inline-block w-full max-w-lg p-6 my-8 text-left align-middle bg-white dark:bg-gray-800 rounded-xl shadow-xl transform transition-all">
@@ -859,7 +861,7 @@
                         <div class="space-y-4">
                             <div class="flex items-start gap-4">
                                 <img :src="selectedCharacter.thumb_img || '/images/app_logo/logo.svg'"
-                                    :alt="selectedCharacter.name_en" class="w-24 h-24 rounded-xl object-cover">
+                                    :alt="selectedCharacter.name_en" class="w-24 h-24 rounded-xl object-cover" loading="lazy" decoding="async">
                                 <div class="flex-1">
                                     <h3 class="text-xl font-bold text-gray-900 dark:text-white"
                                         x-text="selectedCharacter.name_en"></h3>
@@ -912,7 +914,7 @@
             x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75"
+                <div class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/75"
                     @click="showSupportCardModal = false"></div>
                 <div
                     class="relative inline-block w-full max-w-lg p-6 my-8 text-left align-middle bg-white dark:bg-gray-800 rounded-xl shadow-xl transform transition-all">
@@ -930,6 +932,7 @@
                             <div class="flex items-start gap-4">
                                 <img :src="getSupportCardImage(selectedSupportCard.id)"
                                     :alt="selectedSupportCard.title_en" class="w-24 h-24 rounded-xl object-cover"
+                                    loading="lazy" decoding="async"
                                     x-on:error="$event.target.src = '/images/app_logo/logo.svg'">
                                 <div class="flex-1">
                                     <h3 class="text-xl font-bold text-gray-900 dark:text-white"

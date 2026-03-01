@@ -17,7 +17,7 @@
                         </p>
                     </div>
                     <a href="{{ route('ocr.upload') }}"
-                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors">
+                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-gray-500 transition-colors">
                         Back to Upload
                     </a>
                 </div>
@@ -26,7 +26,7 @@
             @if ($extraction)
                 <!-- Extraction Info Card -->
                 <div
-                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                    class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Screen Type</p>
@@ -59,7 +59,7 @@
 
                 <!-- Screenshot Preview -->
                 <div
-                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                    class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-6">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Screenshot Preview</h2>
                     <div class="flex justify-center">
                         <img src="{{ Storage::url($extraction->image_path) }}" alt="Uploaded screenshot" loading="lazy"
@@ -74,7 +74,7 @@
                     @csrf
 
                     <div
-                        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                        class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-6">
                         <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                             Extracted Data
                             <span class="text-sm font-normal text-gray-600 dark:text-gray-400">(Editable)</span>
@@ -102,9 +102,9 @@
 
                     <!-- Raw Text (Collapsible) -->
                     <div
-                        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                        class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-6">
                         <button type="button" id="toggle-raw-text"
-                            class="w-full flex items-center justify-between text-left focus:outline-none"
+                            class="w-full flex items-center justify-between text-left focus:outline-hidden"
                             aria-expanded="false" aria-controls="raw-text-content">
                             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Raw OCR Text</h2>
                             <svg class="w-5 h-5 text-gray-500 transform transition-transform" fill="none"
@@ -123,27 +123,27 @@
                     <div class="flex items-center justify-between">
                         <div class="flex gap-3">
                             <button type="submit" name="action" value="import"
-                                class="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors font-medium">
+                                class="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors font-medium">
                                 Import Data
                             </button>
                             <button type="submit" name="action" value="save_draft"
-                                class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors font-medium">
+                                class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-gray-500 transition-colors font-medium">
                                 Save as Draft
                             </button>
                         </div>
                         <button type="button"
                             onclick="if(confirm('Are you sure you want to discard this extraction?')) { window.location.href='{{ route('ocr.upload') }}'; }"
-                            class="px-6 py-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 focus:outline-none transition-colors font-medium">
+                            class="px-6 py-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 focus:outline-hidden transition-colors font-medium">
                             Discard
                         </button>
                     </div>
                 </form>
             @else
                 <div
-                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+                    class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-12 text-center">
                     <p class="text-gray-500 dark:text-gray-400 mb-4">No extraction found.</p>
                     <a href="{{ route('ocr.upload') }}"
-                        class="inline-block px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors">
+                        class="inline-block px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-hidden focus:ring-2 focus:ring-primary-500 transition-colors">
                         Upload Screenshot
                     </a>
                 </div>

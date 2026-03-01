@@ -25,7 +25,7 @@
                 <div class="flex items-center gap-2">
                     <label for="scenario-count" class="text-sm text-gray-700 dark:text-gray-300">Scenarios:</label>
                     <select wire:model.live="scenarioCount" id="scenario-count"
-                        class="rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                        class="rounded-md border-gray-300 text-sm shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
                         @for ($i = 2; $i <= 10; $i++)
                             <option value="{{ $i }}">{{ $i }}</option>
                         @endfor
@@ -43,7 +43,7 @@
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">Training Focus</label>
                                 <select wire:model="scenarios.{{ $index }}.training_focus"
-                                    class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                                    class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
                                     <option value="balanced">Balanced</option>
                                     <option value="speed">Speed</option>
                                     <option value="stamina">Stamina</option>
@@ -57,7 +57,7 @@
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">Scenario Type</label>
                                 <select wire:model="scenarios.{{ $index }}.scenario_type"
-                                    class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                                    class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
                                     <option value="ura_finale">URA Finale</option>
                                     <option value="unity_cup">Unity Cup</option>
                                 </select>
@@ -68,7 +68,7 @@
                                 <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">Support Bonus</label>
                                 <input type="number" wire:model="scenarios.{{ $index }}.support_deck_bonus"
                                     step="0.1" min="0.5" max="2.0"
-                                    class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                                    class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
                             </div>
 
                             {{-- Target Stats --}}
@@ -80,7 +80,7 @@
                                         </label>
                                         <input type="number" wire:model="scenarios.{{ $index }}.{{ $stat }}"
                                             min="100" max="1200"
-                                            class="mt-1 block w-full rounded-md border-gray-300 text-center text-xs shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                                            class="mt-1 block w-full rounded-md border-gray-300 text-center text-xs shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
                                     </div>
                                 @endforeach
                             </div>
@@ -91,7 +91,7 @@
 
             <div class="flex justify-end">
                 <button wire:click="runSimulation" wire:loading.attr="disabled"
-                    class="rounded-md bg-blue-600 px-6 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-offset-gray-900">
+                    class="rounded-md bg-blue-600 px-6 py-2 text-sm font-medium text-white shadow-xs hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-offset-gray-900">
                     <span wire:loading.remove wire:target="runSimulation">Run Simulation</span>
                     <span wire:loading wire:target="runSimulation">Processing...</span>
                 </button>

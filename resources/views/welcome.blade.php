@@ -5,7 +5,7 @@
 @section('content')
     {{-- Skip to main content link for keyboard navigation (Requirement 1.4, 10.6) --}}
     <a href="#main-content"
-        class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2"
+        class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2"
         aria-label="Skip to main content">
         Skip to main content
     </a>
@@ -13,13 +13,6 @@
     {{-- Hero Section - Two Column Layout --}}
     <main id="main-content" class="relative min-h-screen flex items-center justify-center py-12" role="main"
         aria-labelledby="hero-heading">
-        {{-- Background Image with responsive sources - covers full viewport --}}
-        <div id="hero-background" class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500"
-            data-bg-light-desktop="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png"
-            data-bg-light-mobile="/images/app_bg/uma_musume_race_planner_bg_light_1028x1536.png"
-            data-bg-dark-desktop="/images/app_bg/uma_musume_race_planner_bg_dark_1536x1028.png"
-            data-bg-dark-mobile="/images/app_bg/uma_musume_race_planner_bg_dark_1028x1536.png" aria-hidden="true">
-        </div>
 
         {{-- Responsive container with two-column layout --}}
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -34,7 +27,7 @@
                             <img src="/images/app_logo/uma_musume_race_planner_logo_256.png"
                                 alt="{{ config('app.name', 'Umamusume Career Planner') }} logo"
                                 class="h-20 w-20 sm:h-24 sm:w-24 mx-auto mb-4 animate-fade-in-delay-1" width="96"
-                                height="96" loading="eager">
+                                height="96" loading="eager" fetchpriority="high" decoding="async">
 
                             <h1 id="hero-heading"
                                 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300 animate-fade-in-delay-2">
@@ -48,15 +41,15 @@
 
                             <p
                                 class="text-sm sm:text-base text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-6 animate-fade-in-delay-2">
-                                Leverage modern web technologies, machine learning, and community integration to achieve A+
-                                grade rankings in both URA Finale and Unity Cup scenarios
+                                Leverage modern web technologies, machine learning, and community integration to reach
+                                S-rank aptitudes and achieve Grade 1 victories in both URA Finale and Unity Cup scenarios
                             </p>
 
                             {{-- Primary CTA Button --}}
                             @auth
                                 <a href="{{ route('dashboard') }}"
-                                    class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
-                                    role="button" aria-label="Go to your dashboard">
+                                    class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
+                                    aria-label="Go to your dashboard">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                         aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -67,8 +60,8 @@
                             @else
                                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
                                     <a href="{{ route('login') }}"
-                                        class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
-                                        role="button" aria-label="Sign in to your account">
+                                        class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
+                                        aria-label="Sign in to your account">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                             aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -77,8 +70,8 @@
                                         Sign In
                                     </a>
                                     <a href="{{ route('register') }}"
-                                        class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-primary-700 bg-white hover:bg-gray-50 active:bg-gray-100 dark:bg-gray-800 dark:text-primary-300 dark:hover:bg-gray-700 dark:active:bg-gray-600 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
-                                        role="button" aria-label="Create a new account">
+                                        class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-primary-700 bg-white hover:bg-gray-50 active:bg-gray-100 dark:bg-gray-800 dark:text-primary-300 dark:hover:bg-gray-700 dark:active:bg-gray-600 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
+                                        aria-label="Create a new account">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                             aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -101,7 +94,7 @@
                                         d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
                                 <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-1">Training</h3>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">AI predictions</p>
+                                <p class="text-xs text-gray-700 dark:text-gray-300">Turn-by-turn AI predictions</p>
                             </div>
 
                             {{-- Race Strategy --}}
@@ -112,7 +105,7 @@
                                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
                                 <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-1">Race Strategy</h3>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">Performance analysis</p>
+                                <p class="text-xs text-gray-700 dark:text-gray-300">Readiness & running style scoring</p>
                             </div>
 
                             {{-- Skill Management --}}
@@ -194,7 +187,7 @@
                         <div
                             class="flex flex-col sm:flex-row items-center justify-center gap-4 text-center animate-fade-in-delay-4">
                             <a href="{{ route('about') }}"
-                                class="inline-flex items-center min-h-11 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
+                                class="inline-flex items-center min-h-11 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
                                 aria-label="Learn more about Umamusume Career Planner">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     aria-hidden="true">
@@ -205,7 +198,7 @@
                             </a>
                             <a href="https://github.com/exatfrds67/umamusume-career-planner" target="_blank"
                                 rel="noopener noreferrer"
-                                class="inline-flex items-center min-h-11 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
+                                class="inline-flex items-center min-h-11 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
                                 aria-label="View on GitHub (opens in new tab)">
                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path fill-rule="evenodd"
@@ -216,7 +209,7 @@
                             </a>
                             @if (app()->environment('local', 'development'))
                                 <a href="{{ route('dev.demos') }}"
-                                    class="inline-flex items-center min-h-11 text-xs text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
+                                    class="inline-flex items-center min-h-11 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
                                     aria-label="Developer demos and testing tools">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                         aria-hidden="true">
@@ -243,8 +236,8 @@
                 <div class="lg:col-span-1 flex flex-col gap-6">
 
                     {{-- Comprehensive Scenario Support --}}
-                    <div class="glass-card-alt rounded-xl p-8 animate-fade-in-delay-5 focus-within:ring-4 focus-within:ring-primary-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-all duration-200"
-                        tabindex="0" role="region" aria-labelledby="scenario-support-heading">
+                    <div class="glass-card-alt rounded-xl p-8 animate-fade-in-delay-5"
+                        role="region" aria-labelledby="scenario-support-heading">
                         <h2 id="scenario-support-heading"
                             class="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">Comprehensive
                             Scenario
@@ -268,7 +261,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M5 13l4 4L19 7" />
                                         </svg>
-                                        <span>Friendship training mechanics</span>
+                                        <span>Bond-level friendship training (80%+ threshold)</span>
                                     </li>
                                     <li class="flex items-start gap-2">
                                         <svg class="w-5 h-5 text-success-600 dark:text-success-300 shrink-0 mt-0.5"
@@ -284,7 +277,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M5 13l4 4L19 7" />
                                         </svg>
-                                        <span>Stat distribution strategies</span>
+                                        <span>5-stat system with 1200+ soft cap management</span>
                                     </li>
                                 </ul>
                             </div>
@@ -306,7 +299,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M5 13l4 4L19 7" />
                                         </svg>
-                                        <span>Spirit Burst timing coordination</span>
+                                        <span>Spirit Burst gauge for massive training boosts</span>
                                     </li>
                                     <li class="flex items-start gap-2">
                                         <svg class="w-5 h-5 text-success-600 dark:text-success-300 shrink-0 mt-0.5"
@@ -314,7 +307,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M5 13l4 4L19 7" />
                                         </svg>
-                                        <span>Facility level management</span>
+                                        <span>Team-rank-based facility level progression</span>
                                     </li>
                                     <li class="flex items-start gap-2">
                                         <svg class="w-5 h-5 text-success-600 dark:text-success-300 shrink-0 mt-0.5"
@@ -350,8 +343,7 @@
                                 </svg>
                                 <div class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Hint Optimization
                                 </div>
-                                <div class="text-xs text-gray-700 dark:text-gray-300">20% SP reduction per duplicate (40%
-                                    max)
+                                <div class="text-xs text-gray-700 dark:text-gray-300">5-level system, up to 40% SP cost reduction
                                 </div>
                             </div>
                             <div class="text-center p-4 glass-card-inner rounded-lg">
@@ -380,10 +372,10 @@
     </main>
 
     {{-- Theme toggle button (Requirements 13.1, 13.2) --}}
-    <div class="fixed bottom-4 right-4 z-40">
+    <div class="fixed bottom-4 right-4 z-40" x-data="{ isDark: document.documentElement.classList.contains('dark') }" @theme-changed.window="isDark = $event.detail">
         <button type="button" id="theme-toggle"
-            class="inline-flex items-center justify-center min-h-11 min-w-11 p-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-            aria-label="Toggle theme" aria-pressed="false">
+            class="inline-flex items-center justify-center min-h-11 min-w-11 p-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+            aria-label="Toggle theme" :aria-pressed="isDark.toString()">
             <svg class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -36,8 +36,8 @@
         ]) !!}
     </script>
 
-    {{-- Load Assets --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/pages/support-cards/deck-builder.js'])
+    {{-- Load Page-Specific Assets --}}
+    @vite(['resources/js/pages/support-cards/deck-builder.js'])
 
     {{-- Initialize Alpine Component --}}
     <div class="deck-builder-container space-y-6" x-data="deckBuilder()">
@@ -84,7 +84,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <div class="lg:col-span-2 space-y-4">
-                <section class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm" aria-labelledby="slots-heading">
+                <section class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs" aria-labelledby="slots-heading">
                     <div class="flex justify-between items-center mb-4">
                         <h2 id="slots-heading" class="text-lg font-semibold text-gray-900 dark:text-white">
                             Deck Slots (<span x-text="deckCount"></span>/6)
@@ -205,20 +205,20 @@
             </div>
 
             <div class="space-y-6">
-                <section class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm" aria-labelledby="stats-heading">
+                <section class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs" aria-labelledby="stats-heading">
                     <h2 id="stats-heading" class="text-lg font-semibold mb-3">Deck Statistics</h2>
 
                     <dl class="space-y-2 mb-4">
                         <div class="flex justify-between text-sm">
-                            <dt class="text-gray-500">Cards</dt>
+                            <dt class="text-gray-500 dark:text-gray-400">Cards</dt>
                             <dd class="font-medium" x-text="deckCount + '/6'"></dd>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <dt class="text-gray-500">Friend Cards</dt>
+                            <dt class="text-gray-500 dark:text-gray-400">Friend Cards</dt>
                             <dd class="font-medium" x-text="friendCardCount + '/1'"></dd>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <dt class="text-gray-500">Unique Types</dt>
+                            <dt class="text-gray-500 dark:text-gray-400">Unique Types</dt>
                             <dd class="font-medium" x-text="uniqueTypes"></dd>
                         </div>
                     </dl>
@@ -256,18 +256,18 @@
                     <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <dl class="space-y-2">
                             <div class="flex justify-between text-sm">
-                                <dt class="text-gray-500">Avg Bond</dt>
+                                <dt class="text-gray-500 dark:text-gray-400">Avg Bond</dt>
                                 <dd class="font-medium" x-text="averageBond + '%'"></dd>
                             </div>
                             <div class="flex justify-between text-sm">
-                                <dt class="text-gray-500">Avg LB</dt>
+                                <dt class="text-gray-500 dark:text-gray-400">Avg LB</dt>
                                 <dd class="font-medium" x-text="averageLimitBreak + '★'"></dd>
                             </div>
                         </dl>
                     </div>
                 </section>
 
-                <aside class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex flex-col h-150"
+                <aside class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs flex flex-col h-150"
                     aria-labelledby="library-heading">
                     <h2 id="library-heading" class="text-lg font-semibold mb-4">Available Cards</h2>
 
@@ -296,10 +296,10 @@
 
                     <div class="space-y-2 flex-1 overflow-y-auto pr-2">
                         <template x-for="card in filteredCards" :key="card.id">
-                            <div class="card-library-item flex items-center gap-3 p-2" @click="selectCard(card.id)"
-                                @keydown.enter="selectCard(card.id)" tabindex="0">
+                            <div class="card-library-item group flex items-center gap-3 p-2" @click="selectCard(card.id)"
+                                @keydown.enter="selectCard(card.id)" tabindex="0" role="button">
                                 <img :src="card.artwork_url || '/placeholder.png'"
-                                    class="w-10 h-10 rounded-md object-cover border border-gray-200 dark:border-gray-600">
+                                    class="w-10 h-10 rounded-md object-cover border border-gray-200 dark:border-gray-600" loading="lazy" decoding="async">
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate"
                                         x-text="card.name"></h4>
@@ -310,7 +310,7 @@
                                     </div>
                                 </div>
                                 <button
-                                    class="btn btn-xs btn-primary opacity-0 group-hover:opacity-100 transition-opacity">+</button>
+                                    class="btn btn-xs btn-primary opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 transition-opacity">+</button>
                             </div>
                         </template>
                         <template x-if="filteredCards.length === 0">

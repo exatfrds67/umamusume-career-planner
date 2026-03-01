@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Plan: ' . $plan->name ?? 'Untitled')
+@section('title', 'Edit Plan: ' . ($plan->name ?? 'Untitled'))
 
 @section('content')
     <div class="relative z-10 container mx-auto px-4 py-8">
         {{-- Wizard Container --}}
-        <div x-data="planWizard({ mode: 'edit', plan: {{ json_encode($plan) }} })" x-init="init()" class="max-w-5xl mx-auto">
+        <div x-data="planWizard({ mode: 'edit', plan: {{ Js::from($plan) }} })" x-init="init()" class="max-w-5xl mx-auto">
 
             {{-- Header with Title and Draft Actions --}}
             <div class="mb-6 flex items-center justify-between">
@@ -24,7 +24,7 @@
                 {{-- Draft Actions --}}
                 <div class="flex items-center gap-2">
                     <button type="button" @click="loadDraft()"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200">
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200">
                         <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -33,7 +33,7 @@
                     </button>
 
                     <button type="button" @click="saveDraft()"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200">
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200">
                         <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
@@ -52,7 +52,7 @@
             </div>
 
             {{-- Wizard Content Card --}}
-            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg p-6 mb-6">
+            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xs rounded-lg shadow-lg p-6 mb-6">
 
                 {{-- Step 1: Character Selection --}}
                 <div x-show="currentStep === 0" x-transition class="space-y-6">
@@ -76,6 +76,55 @@
                     <div class="text-center py-8 text-gray-500 dark:text-gray-400">
                         <p class="text-sm">Character selection is locked for existing plans</p>
                     </div>
+
+                    {{-- Star Level Selector (editable even for existing plans) --}}
+                    <div class="p-5 bg-white dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            Star Level
+                        </h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            Set the character's star level (才能開花). At ★★★ and above, the character's unique skill is upgraded to its full-power version.
+                        </p>
+
+                        {{-- Star Rating Selector --}}
+                        <div class="flex items-center gap-6">
+                            <div class="flex items-center gap-1" role="radiogroup" aria-label="Star level selection">
+                                <template x-for="star in [1, 2, 3, 4, 5]" :key="star">
+                                    <button type="button"
+                                        @click="setStarLevel(star)"
+                                        :aria-label="`${star} star${star > 1 ? 's' : ''}`"
+                                        :aria-checked="plan.star_level >= star"
+                                        role="radio"
+                                        class="text-3xl transition-all duration-150 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded p-0.5 cursor-pointer"
+                                        :class="plan.star_level >= star
+                                            ? 'text-yellow-400 hover:text-yellow-500 drop-shadow-sm'
+                                            : 'text-gray-300 dark:text-gray-600 hover:text-yellow-300 dark:hover:text-yellow-600'"
+                                    >★</button>
+                                </template>
+                            </div>
+
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                                x-text="`${plan.star_level}★`"></span>
+                        </div>
+
+                        {{-- Star Level Info Badge --}}
+                        <div class="mt-3 flex items-center gap-2">
+                            <span x-show="plan.star_level >= 3"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Unique skill upgraded
+                            </span>
+                            <span x-show="plan.star_level < 3"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                                Base unique skill (weaker)
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Step 2: Goal Setting --}}
@@ -96,7 +145,7 @@
                             </label>
                             <input type="number" id="goal-speed" x-model.number="plan.goals.target_speed"
                                 @input="updateGoal('target_speed', $event.target.value)" min="0" max="1200"
-                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
+                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
                         </div>
 
                         {{-- Stamina Goal --}}
@@ -107,7 +156,7 @@
                             </label>
                             <input type="number" id="goal-stamina" x-model.number="plan.goals.target_stamina"
                                 @input="updateGoal('target_stamina', $event.target.value)" min="0" max="1200"
-                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
+                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
                         </div>
 
                         {{-- Power Goal --}}
@@ -117,7 +166,7 @@
                             </label>
                             <input type="number" id="goal-power" x-model.number="plan.goals.target_power"
                                 @input="updateGoal('target_power', $event.target.value)" min="0" max="1200"
-                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
+                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
                         </div>
 
                         {{-- Guts Goal --}}
@@ -127,7 +176,7 @@
                             </label>
                             <input type="number" id="goal-guts" x-model.number="plan.goals.target_guts"
                                 @input="updateGoal('target_guts', $event.target.value)" min="0" max="1200"
-                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
+                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
                         </div>
 
                         {{-- Wit Goal --}}
@@ -137,7 +186,7 @@
                             </label>
                             <input type="number" id="goal-wit" x-model.number="plan.goals.target_wit"
                                 @input="updateGoal('target_wit', $event.target.value)" min="0" max="1200"
-                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
+                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
                         </div>
 
                         {{-- SP Goal --}}
@@ -156,7 +205,7 @@
                             </label>
                             <input type="number" id="goal-sp" x-model.number="plan.goals.target_total_sp"
                                 @input="updateGoal('target_total_sp', $event.target.value)" min="0" max="500"
-                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
+                                class="w-full px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900" />
                         </div>
                     </div>
                 </div>
@@ -206,14 +255,14 @@
                     {{-- Filters --}}
                     <div class="flex flex-wrap gap-3 mb-4">
                         <select x-model="gradeFilter" aria-label="Filter by grade"
-                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500">
                             <option value="">All Grades</option>
                             <option value="G1">G1</option>
                             <option value="G2">G2</option>
                             <option value="G3">G3</option>
                         </select>
                         <select x-model="distanceFilter" aria-label="Filter by distance"
-                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500">
                             <option value="">All Distances</option>
                             <option value="short">Short (&lt;1400m)</option>
                             <option value="mile">Mile (1400-1800m)</option>
@@ -221,13 +270,13 @@
                             <option value="long">Long (2400m+)</option>
                         </select>
                         <select x-model="surfaceFilter" aria-label="Filter by surface"
-                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500">
                             <option value="">All Surfaces</option>
                             <option value="turf">Turf</option>
                             <option value="dirt">Dirt</option>
                         </select>
                         <select x-model="phaseFilter" aria-label="Filter by career phase"
-                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500">
                             <option value="">All Phases</option>
                             <option value="junior">Junior</option>
                             <option value="classic">Classic</option>
@@ -252,7 +301,7 @@
                                                 clip-rule="evenodd" />
                                         </svg>
                                     </span>
-                                    <span x-show="!isSelected(race.id)" class="text-gray-400 dark:text-gray-500">
+                                    <span x-show="!isSelected(race.id)" class="text-gray-500 dark:text-gray-400">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <circle cx="12" cy="12" r="10" stroke-width="2" />
                                         </svg>
@@ -390,7 +439,7 @@
             {{-- Navigation Buttons --}}
             <div class="flex items-center justify-between">
                 <button type="button" @click="prevStep()" x-show="!isFirstStep" :disabled="isFirstStep"
-                    class="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-all duration-200">
+                    class="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-all duration-200">
                     <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
@@ -399,13 +448,13 @@
 
                 <div class="flex items-center gap-3">
                     <a href="/plans/{{ $plan->id }}"
-                        class="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200">
+                        class="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200">
                         Cancel
                     </a>
 
                     <button type="button" @click="isLastStep ? submit() : nextStep()"
                         :disabled="!canProceed || isSubmitting"
-                        class="px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-all duration-200">
+                        class="px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-all duration-200">
                         <span x-show="!isSubmitting" x-text="isLastStep ? 'Save Changes' : 'Next'"></span>
                         <span x-show="isSubmitting" class="flex items-center gap-2">
                             <x-spinner class="w-4 h-4" />
@@ -420,4 +469,7 @@
             </div>
         </div>
     </div>
+
+    {{-- AI Advisory Panel --}}
+    <livewire:advisory-panel />
 @endsection

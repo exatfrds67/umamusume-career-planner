@@ -42,7 +42,7 @@
         @if (!isset($longTermTrends['error']))
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {{-- Total Careers --}}
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6 border border-gray-200 dark:border-gray-700">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
                             <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor"
@@ -61,7 +61,7 @@
                 </div>
 
                 {{-- Overall Trend --}}
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6 border border-gray-200 dark:border-gray-700">
                     <div class="flex items-center">
                         <div
                             class="p-3 rounded-full {{ ($longTermTrends['trend_summary']['overall_trend'] ?? '') === 'improving' ? 'bg-green-100 dark:bg-green-900' : (($longTermTrends['trend_summary']['overall_trend'] ?? '') === 'declining' ? 'bg-red-100 dark:bg-red-900' : 'bg-gray-100 dark:bg-gray-700') }}">
@@ -94,7 +94,7 @@
                 </div>
 
                 {{-- Success Rate --}}
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6 border border-gray-200 dark:border-gray-700">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
                             <svg class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor"
@@ -113,7 +113,7 @@
                 </div>
 
                 {{-- Percentile Ranking --}}
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6 border border-gray-200 dark:border-gray-700">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900">
                             <svg class="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor"
@@ -137,7 +137,7 @@
         @if (!isset($longTermTrends['error']))
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {{-- Performance Evolution Chart --}}
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6 border border-gray-200 dark:border-gray-700">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Performance Evolution</h2>
                     <div class="space-y-4">
                         @foreach ($longTermTrends['performance_evolution'] ?? [] as $evolution)
@@ -159,7 +159,7 @@
                 </div>
 
                 {{-- Success Rate with Confidence Intervals --}}
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6 border border-gray-200 dark:border-gray-700">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Success Rate Analysis</h2>
                     @if (isset($successRates['overall_success_rate']))
                         <div class="space-y-4">
@@ -168,7 +168,7 @@
                                     {{ $successRates['overall_success_rate']['success_rate'] }}%
                                 </p>
                                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Overall Success Rate</p>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                     95% CI: {{ $successRates['overall_success_rate']['confidence_interval_95']['lower'] }}%
                                     - {{ $successRates['overall_success_rate']['confidence_interval_95']['upper'] }}%
                                 </p>
@@ -192,7 +192,7 @@
 
                 {{-- Benchmark Comparison --}}
                 <div
-                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                    class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6 border border-gray-200 dark:border-gray-700">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Benchmark Comparison</h2>
                     @if (isset($benchmarkComparison['benchmark_comparison']))
                         <div class="space-y-4">
@@ -226,7 +226,7 @@
 
                 {{-- Improvement Velocity --}}
                 <div
-                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                    class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6 border border-gray-200 dark:border-gray-700">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Improvement Velocity</h2>
                     @if (isset($longTermTrends['improvement_velocity']))
                         @php $velocity = $longTermTrends['improvement_velocity']; @endphp
@@ -266,7 +266,7 @@
         {{-- Improvement Areas & Recommendations --}}
         @if (!isset($longTermTrends['error']) && isset($benchmarkComparison['improvement_areas']))
             <div
-                class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6 border border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Areas for Improvement</h2>
                 @if (!empty($benchmarkComparison['improvement_areas']))
                     <ul class="space-y-2">
@@ -291,7 +291,7 @@
         {{-- Performance Summary --}}
         @if (!isset($longTermTrends['error']) && isset($benchmarkComparison['performance_summary']))
             <div
-                class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6 border border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Performance Summary</h2>
                 @php $summary = $benchmarkComparison['performance_summary']; @endphp
 

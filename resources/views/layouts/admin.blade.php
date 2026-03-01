@@ -13,9 +13,10 @@
 </head>
 
 <body class="bg-gray-50 dark:bg-gray-900">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-gray-900 dark:focus:bg-gray-800 dark:focus:text-white">Skip to main content</a>
     <div class="min-h-screen">
         <!-- Admin Navigation -->
-        <nav class="bg-red-600 dark:bg-red-800 border-b border-red-700">
+        <nav aria-label="Admin navigation" class="bg-red-600 dark:bg-red-800 border-b border-red-700 dark:border-red-900">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex h-16 justify-between">
                     <div class="flex">
@@ -38,6 +39,9 @@
                             <x-nav-link :href="route('admin.queue.index')" :active="request()->routeIs('admin.queue.*')" class="text-white hover:text-red-100">
                                 Queue
                             </x-nav-link>
+                            <x-nav-link :href="route('admin.apm')" :active="request()->routeIs('admin.apm')" class="text-white hover:text-red-100">
+                                APM
+                            </x-nav-link>
                         </div>
                     </div>
 
@@ -57,16 +61,16 @@
         </nav>
 
         <!-- Page Content -->
-        <main class="py-12">
+        <main id="main-content" class="py-12">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 @if (session('success'))
-                    <div class="mb-4 rounded-md bg-green-50 p-4 dark:bg-green-900/20">
+                    <div role="alert" class="mb-4 rounded-md bg-green-50 p-4 dark:bg-green-900/20">
                         <p class="text-sm text-green-800 dark:text-green-200">{{ session('success') }}</p>
                     </div>
                 @endif
 
                 @if (session('error'))
-                    <div class="mb-4 rounded-md bg-red-50 p-4 dark:bg-red-900/20">
+                    <div role="alert" class="mb-4 rounded-md bg-red-50 p-4 dark:bg-red-900/20">
                         <p class="text-sm text-red-800 dark:text-red-200">{{ session('error') }}</p>
                     </div>
                 @endif

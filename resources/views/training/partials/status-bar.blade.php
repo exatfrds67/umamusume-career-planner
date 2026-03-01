@@ -1,12 +1,18 @@
 {{-- WF-004: Status Bar - Energy, Mood, Turn, Fail% --}}
 <section class="card rounded-xl p-4 mb-6 animate-fade-in-delay-2" aria-labelledby="status-bar-heading">
+    <h2 id="status-bar-heading" class="sr-only">Current Status</h2>
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-6 flex-wrap">
             {{-- Energy Gauge --}}
             <div class="flex items-center gap-2">
                 <span class="text-sm text-gray-600 dark:text-gray-400">Energy:</span>
                 <div class="flex items-center gap-2">
-                    <div class="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div class="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+                        role="progressbar"
+                        aria-valuenow="{{ $character->energy_level }}"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-label="Energy level: {{ $character->energy_level }} out of 100">
                         @php
                             $energyColor = match (true) {
                                 $character->energy_level >= 70 => 'bg-green-500',
@@ -29,27 +35,27 @@
                 <span class="text-sm font-semibold text-gray-900 dark:text-white capitalize flex items-center gap-1">
                     @switch($character->mood_status)
                         @case('great')
-                            <svg class="w-5 h-5 inline-block text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Great <span class="text-xs text-green-600">(+4%)</span>
+                            <svg class="w-5 h-5 inline-block text-green-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Great <span class="text-xs text-green-500 dark:text-green-400">(+10%)</span>
                         @break
 
                         @case('good')
-                            <svg class="w-5 h-5 inline-block text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Good <span class="text-xs text-blue-600">(+2%)</span>
+                            <svg class="w-5 h-5 inline-block text-blue-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Good <span class="text-xs text-blue-400 dark:text-blue-300">(+5%)</span>
                         @break
 
                         @case('normal')
-                            <svg class="w-5 h-5 inline-block text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14h6m-6-4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Normal
+                            <svg class="w-5 h-5 inline-block text-gray-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14h6m-6-4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Normal
                         @break
 
                         @case('bad')
-                            <svg class="w-5 h-5 inline-block text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Bad <span class="text-xs text-orange-600">(-2%)</span>
+                            <svg class="w-5 h-5 inline-block text-orange-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Bad <span class="text-xs text-orange-500 dark:text-orange-400">(-15%)</span>
                         @break
 
                         @case('awful')
-                            <svg class="w-5 h-5 inline-block text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Awful <span class="text-xs text-red-600">(-4%)</span>
+                            <svg class="w-5 h-5 inline-block text-red-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Awful <span class="text-xs text-red-500 dark:text-red-400">(-30%)</span>
                         @break
 
                         @default
-                            <svg class="w-5 h-5 inline-block text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14h6m-6-4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> {{ $character->mood_status }}
+                            <svg class="w-5 h-5 inline-block text-gray-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14h6m-6-4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> {{ $character->mood_status }}
                     @endswitch
                 </span>
             </div>

@@ -28,7 +28,7 @@
             </div>
             <div class="mt-4 flex md:ml-4 md:mt-0">
                 <button type="button" @click="resetDefaults()"
-                    class="inline-flex items-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    class="inline-flex items-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-xs ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">
                     Reset to Defaults
                 </button>
             </div>
@@ -176,7 +176,7 @@
                                         </label>
                                         <input type="text" id="display-name" name="name"
                                             x-model="name"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                     </div>
                                     <div>
                                         <label for="email"
@@ -185,7 +185,7 @@
                                         </label>
                                         <input type="email" id="email" name="email"
                                             x-model="email"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                     </div>
                                     <div>
                                         <label for="language"
@@ -193,7 +193,7 @@
                                             Language
                                         </label>
                                         <select id="language" x-model="language"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option value="en">English</option>
                                             <option value="ja">日本語 (Japanese)</option>
                                         </select>
@@ -204,7 +204,7 @@
                                             Timezone
                                         </label>
                                         <select id="timezone" x-model="timezone"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option value="UTC">UTC</option>
                                             <option value="Asia/Tokyo">Asia/Tokyo</option>
                                             <option value="America/New_York">America/New_York</option>
@@ -214,7 +214,7 @@
                                 </div>
                                 <div class="mt-4 flex justify-end">
                                     <button type="submit"
-                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-xs text-white bg-primary-600 hover:bg-primary-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Save Profile
                                     </button>
                                 </div>
@@ -225,7 +225,7 @@
                                 <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Security</h4>
                                 <div class="space-y-3">
                                     <button type="button" @click="showPasswordModal = true"
-                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Change Password
                                     </button>
                                     <div class="flex items-center justify-between">
@@ -239,7 +239,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="two-factor"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable two-factor authentication</span>
                                             <span aria-hidden="true"
@@ -256,11 +256,11 @@
                                 <div class="space-y-3">
                                     <button type="button"
                                         @click="window.location.href = '{{ route('settings.export') }}'"
-                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Export Account Data
                                     </button>
                                     <button type="button" @click="showDeleteModal = true"
-                                        class="inline-flex items-center px-3 py-2 border border-error-300 dark:border-error-600 shadow-sm text-sm leading-4 font-medium rounded-md text-error-700 dark:text-error-300 bg-white dark:bg-gray-700 hover:bg-error-50 dark:hover:bg-error-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-error-500">
+                                        class="inline-flex items-center px-3 py-2 border border-error-300 dark:border-error-600 shadow-xs text-sm leading-4 font-medium rounded-md text-error-700 dark:text-error-300 bg-white dark:bg-gray-700 hover:bg-error-50 dark:hover:bg-error-900/20 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-error-500">
                                         Delete Account
                                     </button>
                                 </div>
@@ -295,7 +295,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="analytics"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable anonymous analytics</span>
                                             <span aria-hidden="true"
@@ -313,7 +313,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="cloud-backup"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable cloud backup</span>
                                             <span aria-hidden="true"
@@ -331,7 +331,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="cloud-ai"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable cloud AI processing</span>
                                             <span aria-hidden="true"
@@ -357,7 +357,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="umapyoi"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable umapyoi.net integration</span>
                                             <span aria-hidden="true"
@@ -375,7 +375,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="umamusumedb"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable UmamusumeDB integration</span>
                                             <span aria-hidden="true"
@@ -391,12 +391,12 @@
                                 <div class="space-y-3">
                                     <button type="button"
                                         @click="window.location.href = '{{ route('settings.export') }}'"
-                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Export All Data (JSON)
                                     </button>
                                     <button type="button"
                                         @click="clearLocalCache()"
-                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Clear Local Cache
                                     </button>
                                     <div class="mt-2">
@@ -428,7 +428,7 @@
                                             Preferred AI Provider
                                         </label>
                                         <select id="ai-provider"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option value="ollama" {{ ($aiSettings['provider'] ?? 'ollama') === 'ollama' ? 'selected' : '' }}>Ollama (Local - Privacy First)</option>
                                             <option value="bedrock" {{ ($aiSettings['provider'] ?? 'ollama') === 'bedrock' ? 'selected' : '' }}>AWS Bedrock (Cloud - Advanced)</option>
                                             <option value="hybrid" {{ ($aiSettings['provider'] ?? 'ollama') === 'hybrid' ? 'selected' : '' }}>Hybrid (Auto-select based on task)</option>
@@ -444,7 +444,7 @@
                                             Model Preference
                                         </label>
                                         <select id="ai-model"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <optgroup label="Local Models (Ollama)">
                                                 <option selected>Llama 3.3 (Recommended)</option>
                                                 <option>Mistral</option>
@@ -472,7 +472,7 @@
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Daily Limit
                                         </label>
-                                        <div class="mt-1 relative rounded-md shadow-sm">
+                                        <div class="mt-1 relative rounded-md shadow-xs">
                                             <div
                                                 class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                                 <span class="text-gray-500 sm:text-sm">$</span>
@@ -486,7 +486,7 @@
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Weekly Limit
                                         </label>
-                                        <div class="mt-1 relative rounded-md shadow-sm">
+                                        <div class="mt-1 relative rounded-md shadow-xs">
                                             <div
                                                 class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                                 <span class="text-gray-500 sm:text-sm">$</span>
@@ -500,7 +500,7 @@
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Monthly Limit
                                         </label>
-                                        <div class="mt-1 relative rounded-md shadow-sm">
+                                        <div class="mt-1 relative rounded-md shadow-xs">
                                             <div
                                                 class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                                 <span class="text-gray-500 sm:text-sm">$</span>
@@ -525,7 +525,7 @@
                                             Recommendation Frequency
                                         </label>
                                         <select id="recommendation-frequency"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option value="per_turn" {{ ($aiSettings['recommendation_frequency'] ?? 'per_turn') === 'per_turn' ? 'selected' : '' }}>Per Turn (Automatic)</option>
                                             <option value="per_session" {{ ($aiSettings['recommendation_frequency'] ?? 'per_turn') === 'per_session' ? 'selected' : '' }}>Per Session</option>
                                             <option value="manual" {{ ($aiSettings['recommendation_frequency'] ?? 'per_turn') === 'manual' ? 'selected' : '' }}>Manual Only</option>
@@ -537,7 +537,7 @@
                                             Explanation Detail Level
                                         </label>
                                         <select id="explanation-detail"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option value="brief" {{ ($aiSettings['explanation_detail'] ?? 'detailed') === 'brief' ? 'selected' : '' }}>Brief</option>
                                             <option value="detailed" {{ ($aiSettings['explanation_detail'] ?? 'detailed') === 'detailed' ? 'selected' : '' }}>Detailed</option>
                                             <option value="expert" {{ ($aiSettings['explanation_detail'] ?? 'detailed') === 'expert' ? 'selected' : '' }}>Expert</option>
@@ -554,7 +554,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="show-model"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Show model transparency</span>
                                             <span aria-hidden="true"
@@ -581,7 +581,7 @@
                                 <div class="grid grid-cols-3 gap-3">
                                     <button type="button" @click="applyTheme('light')"
                                         :class="theme === 'light' ? 'border-primary-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'"
-                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white p-4 focus:outline-none">
+                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white p-4 focus:outline-hidden">
                                         <svg class="h-8 w-8 text-gray-900 mb-2" fill="none" viewBox="0 0 24 24"
                                             stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -594,7 +594,7 @@
                                     </button>
                                     <button type="button" @click="applyTheme('dark')"
                                         :class="theme === 'dark' ? 'border-primary-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'"
-                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white dark:bg-gray-700 p-4 focus:outline-none">
+                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white dark:bg-gray-700 p-4 focus:outline-hidden">
                                         <svg class="h-8 w-8 text-gray-900 dark:text-white mb-2" fill="none"
                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -607,7 +607,7 @@
                                     </button>
                                     <button type="button" @click="applyTheme('system')"
                                         :class="theme === 'system' ? 'border-primary-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'"
-                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white dark:bg-gray-700 p-4 focus:outline-none">
+                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white dark:bg-gray-700 p-4 focus:outline-hidden">
                                         <svg class="h-8 w-8 text-gray-900 dark:text-white mb-2" fill="none"
                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -636,7 +636,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="compact-mode"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable compact mode</span>
                                             <span aria-hidden="true"
@@ -654,7 +654,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="animations"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable animations</span>
                                             <span aria-hidden="true"
@@ -700,7 +700,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="high-contrast"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable high contrast mode</span>
                                             <span aria-hidden="true"
@@ -718,7 +718,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="reduced-motion"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable reduced motion</span>
                                             <span aria-hidden="true"
@@ -731,7 +731,7 @@
                                             Color Blind Mode
                                         </label>
                                         <select id="colorblind-mode"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option selected>None</option>
                                             <option>Deuteranopia (Red-Green)</option>
                                             <option>Protanopia (Red-Green)</option>
@@ -756,7 +756,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="screen-reader-opt"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable screen reader optimization</span>
                                             <span aria-hidden="true"
@@ -797,7 +797,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="training-notif"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable training notifications</span>
                                             <span aria-hidden="true"
@@ -815,7 +815,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="race-notif"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable race notifications</span>
                                             <span aria-hidden="true"
@@ -833,7 +833,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="goal-notif"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable goal notifications</span>
                                             <span aria-hidden="true"
@@ -851,7 +851,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="budget-notif"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable budget notifications</span>
                                             <span aria-hidden="true"
@@ -873,7 +873,7 @@
                                             </label>
                                         </div>
                                         <button type="button" id="in-app-notif"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable in-app notifications</span>
                                             <span aria-hidden="true"
@@ -888,7 +888,7 @@
                                             </label>
                                         </div>
                                         <button type="button" id="sound-notif"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable sound notifications</span>
                                             <span aria-hidden="true"
@@ -908,7 +908,7 @@
                                             Start Time
                                         </label>
                                         <input type="time" id="quiet-start" value="22:00"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                     </div>
                                     <div>
                                         <label for="quiet-end"
@@ -916,7 +916,7 @@
                                             End Time
                                         </label>
                                         <input type="time" id="quiet-end" value="08:00"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                     </div>
                                 </div>
                             </div>
@@ -941,12 +941,12 @@
                                             Default Training Facility
                                         </label>
                                         <select id="default-facility"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option selected>Speed</option>
                                             <option>Stamina</option>
                                             <option>Power</option>
                                             <option>Guts</option>
-                                            <option>Wisdom</option>
+                                            <option>Wit</option>
                                         </select>
                                     </div>
                                     <div class="flex items-center justify-between">
@@ -960,7 +960,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="auto-accept"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable auto-accept recommendations</span>
                                             <span aria-hidden="true"
@@ -985,7 +985,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="skill-hints"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable skill hint notifications</span>
                                             <span aria-hidden="true"
@@ -1003,7 +1003,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="sp-budget"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable SP budget alerts</span>
                                             <span aria-hidden="true"
@@ -1022,7 +1022,7 @@
                                         Default Card Sorting
                                     </label>
                                     <select id="card-sorting"
-                                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                         <option>Rarity (Highest First)</option>
                                         <option selected>Meta Tier</option>
                                         <option>Type (Speed/Stamina/etc.)</option>
@@ -1052,7 +1052,7 @@
                                             Auto-Save Frequency
                                         </label>
                                         <select id="auto-save"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option selected>Every Turn</option>
                                             <option>Every 5 Turns</option>
                                             <option>Manual Only</option>
@@ -1064,7 +1064,7 @@
                                             Backup Frequency
                                         </label>
                                         <select id="backup-frequency"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option selected>Daily</option>
                                             <option>Weekly</option>
                                             <option>Monthly</option>
@@ -1082,7 +1082,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="lazy-loading"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="true">
                                             <span class="sr-only">Enable lazy loading</span>
                                             <span aria-hidden="true"
@@ -1108,7 +1108,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="debug-mode"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable debug mode</span>
                                             <span aria-hidden="true"
@@ -1126,7 +1126,7 @@
                                             </p>
                                         </div>
                                         <button type="button" id="error-reporting"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable error reporting</span>
                                             <span aria-hidden="true"
@@ -1174,11 +1174,11 @@
                             <div x-show="passwordError" class="text-sm text-red-600 dark:text-red-400" x-text="passwordError"></div>
                             <div class="flex justify-end gap-3 pt-2">
                                 <button type="button" @click="showPasswordModal = false; currentPassword = ''; newPassword = ''; confirmPassword = ''; passwordError = ''"
-                                    class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50">
+                                    class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50">
                                     Cancel
                                 </button>
                                 <button type="submit"
-                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-xs text-white bg-primary-600 hover:bg-primary-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                     Update Password
                                 </button>
                             </div>
@@ -1209,14 +1209,14 @@
                         </div>
                         <div class="flex justify-end gap-3">
                             <button type="button" @click="showDeleteModal = false; deleteConfirmation = ''"
-                                class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50">
+                                class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50">
                                 Cancel
                             </button>
                             <button type="button"
                                 @click="deleteAccount()"
                                 :disabled="deleteConfirmation !== 'DELETE'"
                                 :class="deleteConfirmation === 'DELETE' ? 'bg-red-600 hover:bg-red-700 cursor-pointer' : 'bg-red-200 cursor-not-allowed'"
-                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-xs text-white focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                 Delete My Account
                             </button>
                         </div>
@@ -1236,11 +1236,11 @@
                 <!-- Save Button -->
                 <div class="flex justify-end gap-3">
                     <button type="button" @click="active = 'account'"
-                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                         Cancel
                     </button>
                     <button type="button" @click="saveSettings()"
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-xs text-white bg-primary-600 hover:bg-primary-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                         Save All Changes
                     </button>
                 </div>

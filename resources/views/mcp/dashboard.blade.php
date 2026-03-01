@@ -14,7 +14,7 @@
                     Last updated: <span x-text="lastUpdated">--</span>
                 </span>
                 <button @click="refreshAll()"
-                    class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                     <svg class="inline-block h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
@@ -71,7 +71,7 @@
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                     <!-- Total Servers Card -->
-                    <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                    <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center justify-between">
                                 <div>
@@ -106,7 +106,7 @@
                     </div>
 
                     <!-- Active Agents Card -->
-                    <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                    <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center justify-between">
                                 <div>
@@ -132,7 +132,7 @@
                     </div>
 
                     <!-- Total Cost (24h) Card -->
-                    <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                    <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center justify-between">
                                 <div>
@@ -158,7 +158,7 @@
                     </div>
 
                     <!-- Avg Response Time Card -->
-                    <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                    <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                         <div class="p-6">
                             <div class="flex items-center justify-between">
                                 <div>
@@ -186,7 +186,7 @@
                 <!-- Quick Actions -->
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <!-- Server Health Summary -->
-                    <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                    <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                         <div class="p-6">
                             <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Server Health Summary
                             </h3>
@@ -219,7 +219,7 @@
                     </div>
 
                     <!-- Recent Agent Activity -->
-                    <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                    <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                         <div class="p-6">
                             <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Recent Agent Activity
                             </h3>
@@ -257,7 +257,7 @@
             <div x-show="activeTab === 'servers'" class="space-y-4">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <template x-for="(server, name) in servers" :key="name">
-                        <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                        <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                             <div class="p-6">
                                 <div class="flex items-center justify-between">
                                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white"
@@ -295,7 +295,7 @@
             <div x-show="activeTab === 'agents'" class="space-y-4">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <template x-for="(agent, id) in agents" :key="id">
-                        <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                        <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                             <div class="p-6">
                                 <div class="flex items-center justify-between">
                                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white"
@@ -343,7 +343,7 @@
 
             <!-- Cost Transparency Tab -->
             <div x-show="activeTab === 'costs'">
-                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Cost Transparency</h3>
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -369,7 +369,7 @@
 
             <!-- Performance Tab -->
             <div x-show="activeTab === 'performance'">
-                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Performance Metrics</h3>
                         <div class="space-y-4">
@@ -398,7 +398,7 @@
 
             <!-- Settings Tab -->
             <div x-show="activeTab === 'settings'">
-                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">MCP Settings & Controls
                         </h3>

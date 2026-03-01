@@ -33,7 +33,7 @@
         </div>
 
         <!-- Filters -->
-        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700"
             aria-label="Filters">
             <h2 class="sr-only">Collection Filters</h2>
             <form method="GET" action="{{ route('support-cards.index') }}" class="space-y-4">
@@ -176,7 +176,7 @@
 
         <!-- Collection Stats Widget (WF-010 requirement) -->
         <!-- Collection Stats Widget -->
-        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700"
             aria-labelledby="stats-heading">
             <h2 id="stats-heading" class="sr-only">Collection Statistics</h2>
             <div class="flex flex-wrap items-center justify-between gap-4">
@@ -237,7 +237,7 @@
                 </div>
             @else
                 <div
-                    class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

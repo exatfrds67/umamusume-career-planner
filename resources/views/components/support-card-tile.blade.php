@@ -1,7 +1,7 @@
 @props(['card'])
 
 <div
-    class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all border border-gray-200 dark:border-gray-700 overflow-hidden group">
+    class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs hover:shadow-md transition-all border border-gray-200 dark:border-gray-700 overflow-hidden group">
     <!-- Card Image/Placeholder -->
     <div
         class="relative h-48 bg-linear-to-br from-{{ $card->card_type ? ($card->card_type === 'speed' ? 'blue' : ($card->card_type === 'stamina' ? 'green' : ($card->card_type === 'power' ? 'red' : ($card->card_type === 'guts' ? 'orange' : ($card->card_type === 'wit' ? 'purple' : 'pink'))))) : 'gray' }}-400 to-{{ $card->card_type ? ($card->card_type === 'speed' ? 'blue' : ($card->card_type === 'stamina' ? 'green' : ($card->card_type === 'power' ? 'red' : ($card->card_type === 'guts' ? 'orange' : ($card->card_type === 'wit' ? 'purple' : 'pink'))))) : 'gray' }}-600">

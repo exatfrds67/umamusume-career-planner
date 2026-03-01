@@ -43,7 +43,7 @@
 
         <!-- Format Conversion Tab -->
         <div id="tab-convert" class="tab-content">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Convert Legacy Data Format</h2>
                 <p class="text-gray-600 dark:text-gray-400 mb-6">
                     Paste your legacy data below. The system will automatically detect the format and convert it to the
@@ -113,7 +113,7 @@
 
         <!-- Batch Import Tab -->
         <div id="tab-batch" class="tab-content hidden">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Batch Import Processing</h2>
                 <p class="text-gray-600 dark:text-gray-400 mb-6">
                     Import large datasets with progress tracking and automatic conflict handling.
@@ -229,7 +229,7 @@
 
         <!-- Validate Data Tab -->
         <div id="tab-validate" class="tab-content hidden">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Validate Data Before Import</h2>
                 <p class="text-gray-600 dark:text-gray-400 mb-6">
                     Check your data for errors and get detailed validation feedback before importing.
@@ -276,7 +276,7 @@
 
         <!-- Resolve Conflicts Tab -->
         <div id="tab-conflicts" class="tab-content hidden">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Resolve Import Conflicts</h2>
                 <p class="text-gray-600 dark:text-gray-400 mb-6">
                     Review and resolve conflicts from batch imports. Enter a batch ID to view pending conflicts.

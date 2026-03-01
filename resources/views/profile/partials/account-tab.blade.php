@@ -14,6 +14,7 @@
                             class="h-20 w-20 rounded-full bg-gray-50 ring-2 ring-gray-200 dark:ring-gray-700 object-cover"
                             :src="previewUrl ||
                                 '{{ $user->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=3b82f6&color=fff&size=128' }}'"
+                            loading="lazy" decoding="async"
                             alt="{{ $user->name }}">
                         <div x-show="uploading"
                             class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
@@ -64,7 +65,7 @@
                     Display Name
                 </label>
                 <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                 @error('name')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -75,10 +76,10 @@
                 <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email Address
                 </label>
-                <div class="mt-1 flex rounded-md shadow-sm">
+                <div class="mt-1 flex rounded-md shadow-xs">
                     <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
                         required
-                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                     @if ($user->email_verified_at)
                         <span
                             class="ml-3 inline-flex items-center px-3 py-2 text-sm font-medium text-green-700 dark:text-green-400">
@@ -102,7 +103,7 @@
                     Bio
                 </label>
                 <textarea name="bio" id="bio" rows="3" placeholder="Tell us about yourself..."
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">{{ old('bio', $user->bio ?? '') }}</textarea>
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">{{ old('bio', $user->bio ?? '') }}</textarea>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Brief description for your profile.</p>
             </div>
 

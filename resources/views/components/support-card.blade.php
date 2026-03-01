@@ -6,7 +6,7 @@
     <div
         class="relative aspect-2/3 overflow-hidden bg-linear-to-br from-neutral-200 to-neutral-300 dark:from-neutral-700 dark:to-neutral-800">
         @if ($getImageUrl())
-            <img src="{{ $getImageUrl() }}" alt="{{ $getName() }}" class="w-full h-full object-cover" loading="lazy" />
+            <img src="{{ $getImageUrl() }}" alt="{{ $getName() }}" class="w-full h-full object-cover" loading="lazy" decoding="async" />
         @else
             <div class="w-full h-full flex items-center justify-center text-neutral-400 dark:text-neutral-600">
                 <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
@@ -39,7 +39,7 @@
         <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
             @for ($i = 0; $i < 4; $i++)
                 <div
-                    class="w-3 h-3 rotate-45 {{ $i < $limitBreak ? 'bg-yellow-400' : 'bg-neutral-400/50' }} border border-white/50 shadow-sm">
+                    class="w-3 h-3 rotate-45 {{ $i < $limitBreak ? 'bg-yellow-400' : 'bg-neutral-400/50' }} border border-white/50 shadow-xs">
                 </div>
             @endfor
         </div>

@@ -41,7 +41,7 @@
                             <span class="text-sm text-gray-500 dark:text-gray-400">Live:</span>
                             <button @click="togglePolling()"
                                 :class="isPolling ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'"
-                                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                 role="switch" :aria-checked="isPolling">
                                 <span :class="isPolling ? 'translate-x-5' : 'translate-x-0'"
                                     class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
@@ -72,7 +72,7 @@
                             Last updated: <span id="last-updated" x-text="lastUpdated">{{ now()->format('H:i:s') }}</span>
                         </span>
                         <button @click="refreshDashboard()" :disabled="isLoading"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50">
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-xs text-white bg-blue-600 hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50">
                             <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': isLoading }" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

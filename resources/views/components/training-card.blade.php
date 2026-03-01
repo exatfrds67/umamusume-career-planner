@@ -88,7 +88,7 @@
                     <span
                         class="text-sm text-gray-700 dark:text-gray-300 capitalize transition-colors duration-300">{{ $stat }}</span>
                     <span
-                        class="text-sm font-bold {{ $gain > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500' }} transition-colors duration-300">
+                        class="text-sm font-bold {{ $gain > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400' }} transition-colors duration-300">
                         {{ $gain > 0 ? '+' : '' }}{{ $gain }}
                     </span>
                 </div>

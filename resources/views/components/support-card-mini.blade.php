@@ -65,28 +65,28 @@ Accessibility: WCAG 2.2 AA compliant
 
     <div class="{{ $dimensions }} relative rounded-lg overflow-hidden shadow-md transition-all duration-200"
         :class="selected ? 'ring-2 ring-blue-500 dark:ring-blue-400 shadow-lg scale-105' :
-            'hover:shadow-lg hover:scale-102 group-hover:ring-2 group-hover:ring-blue-300 dark:group-hover:ring-blue-600'">
+            'hover:shadow-lg hover:scale-[1.02] group-hover:ring-2 group-hover:ring-blue-300 dark:group-hover:ring-blue-600'">
 
         {{-- Card Image/Icon Background --}}
         @if (isset($card['imageUrl']))
             <img src="{{ $card['imageUrl'] }}" alt="{{ $card['name'] ?? 'Card' }}"
-                class="w-full h-full object-cover bg-gray-300 dark:bg-gray-700">
+                class="w-full h-full object-cover bg-gray-300 dark:bg-gray-700" loading="lazy" decoding="async">
         @else
             <div
-                class="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 dark:from-blue-600 dark:to-purple-700 flex items-center justify-center text-2xl opacity-80">
+                class="w-full h-full bg-linear-to-br from-blue-400 to-purple-500 dark:from-blue-600 dark:to-purple-700 flex items-center justify-center text-2xl opacity-80">
                 🎴
             </div>
         @endif
 
         {{-- Rarity Badge --}}
         <div
-            class="absolute top-1 left-1 {{ $rarityClass }} text-white {{ $fontSize }} font-bold px-1.5 rounded-sm shadow-md">
+            class="absolute top-1 left-1 {{ $rarityClass }} text-white {{ $fontSize }} font-bold px-1.5 rounded-xs shadow-md">
             ★
         </div>
 
         {{-- Card Stats Overlay --}}
         <div
-            class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            class="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             {{-- Card Name --}}
             <p class="text-white {{ $fontSize }} font-semibold truncate">
                 {{ $card['name'] ?? 'Card' }}
@@ -126,7 +126,7 @@ Accessibility: WCAG 2.2 AA compliant
         {{-- Remove Button --}}
         @if ($removable)
             <button @click.stop="$dispatch('card-removed', { id: '{{ $card['id'] ?? '' }}' })"
-                class="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-red-400"
+                class="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 focus:outline-hidden focus:ring-2 focus:ring-red-400"
                 aria-label="Remove card">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

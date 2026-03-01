@@ -25,7 +25,7 @@
 
         {{-- Report Content --}}
         <div
-            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 print:shadow-none print:border-0 print:p-0">
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-8 print:shadow-none print:border-0 print:p-0">
             {{-- Header --}}
             <div class="text-center mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $pdfData['title'] }}</h1>

@@ -49,7 +49,7 @@
             <div x-show="agentPerformance?.activities && agentPerformance.activities.length > 0" class="space-y-3">
                 <template x-for="activity in agentPerformance.activities" :key="activity.id">
                     <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
                             :class="{
                                 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400': activity
                                     .type === 'success',

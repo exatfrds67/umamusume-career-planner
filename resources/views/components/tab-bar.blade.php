@@ -31,12 +31,12 @@
                 $tabIcon = is_array($tab) && isset($tab['icon']) ? $tab['icon'] : null;
                 $isActive = $tabKey === $active;
                 
-                $baseClasses = "inline-flex items-center gap-2 font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 ";
+                $baseClasses = "inline-flex items-center gap-2 font-medium transition-all duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 ";
                 $baseClasses .= $sizeClasses . ' ';
                 
                 if ($isPills) {
                     if ($isActive) {
-                        $baseClasses .= 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm rounded-md';
+                        $baseClasses .= 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-xs rounded-md';
                     } else {
                         $baseClasses .= 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 rounded-md';
                     }

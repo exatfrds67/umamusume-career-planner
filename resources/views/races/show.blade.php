@@ -1,182 +1,196 @@
 @extends('layouts.app')
 
+@section('title', $gameRace->name_en)
+
 @section('content')
-    <main class="space-y-6">
-        <!-- Breadcrumbs & Header -->
-        <header class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <x-breadcrumb :items="[
-                    ['label' => 'Races', 'url' => route('races.index')],
-                    ['label' => $race->race_name]
-                ]" />
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                    {{ $race->race_name }}
-                    <span class="ml-2 px-2.5 py-0.5 rounded text-sm font-bold 
-                        {{ $race->race_grade === 'G1' ? 'bg-yellow-100 text-yellow-800' : 
-                           ($race->race_grade === 'G2' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800') }}"
-                           aria-label="Grade {{ $race->race_grade }}">
-                        {{ $race->race_grade }}
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[
+        ['label' => 'Races', 'url' => route('races.index')],
+        ['label' => $gameRace->name_en],
+    ]" />
+
+    <div class="space-y-6">
+        {{-- Header --}}
+        @php
+            $gradeColors = [
+                'G1'     => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+                'G2'     => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+                'G3'     => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+                'OP'     => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+                'Pre-OP' => 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400',
+                'Debut'  => 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+            ];
+            $phaseLabels = [
+                'junior'  => 'Junior (Year 1)',
+                'classic' => 'Classic (Year 2)',
+                'senior'  => 'Senior (Year 3+)',
+                'all'     => 'All Phases',
+            ];
+        @endphp
+
+        <header class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold {{ $gradeColors[$gameRace->grade] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' }}">
+                        <span class="sr-only">Grade: </span>{{ $gameRace->grade }}
                     </span>
-                </h1>
-            </div>
-            @if($race->turn_number)
-                <div class="text-sm font-medium text-gray-500 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full"
-                     role="status" aria-label="Current Turn">
-                    Turn {{ $race->turn_number }}
+                    @if ($gameRace->is_ura_finale)
+                        <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                            <span aria-hidden="true">⭐</span><span class="sr-only">Special: </span> URA Finale
+                        </span>
+                    @endif
+                    @if (isset($phaseLabels[$gameRace->phase]))
+                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ $phaseLabels[$gameRace->phase] }}</span>
+                    @endif
                 </div>
-            @endif
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $gameRace->name_en }}</h1>
+                @if ($gameRace->name_jp)
+                    <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">{{ $gameRace->name_jp }}</p>
+                @endif
+            </div>
+            <a href="{{ route('races.index') }}"
+                class="btn btn-secondary text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded">
+                ← Back to Races
+            </a>
         </header>
 
-        <!-- Race Info Card -->
-        <section class="card bg-white dark:bg-gray-800 overflow-hidden" aria-labelledby="race-info-title">
-            <h2 id="race-info-title" class="sr-only">Race Information</h2>
+        {{-- Course Info Card --}}
+        <section class="card bg-white dark:bg-gray-800 overflow-hidden" aria-labelledby="course-info-heading">
+            <h2 id="course-info-heading" class="sr-only">Course Information</h2>
             <div class="md:flex">
-                <div class="p-8 md:w-1/2 bg-linear-to-br from-primary-600 to-primary-800 text-white flex flex-col justify-center">
-                    <div class="uppercase tracking-wide text-sm font-semibold text-primary-200">Course Details</div>
-                    <div class="mt-2 text-3xl font-extrabold" aria-label="Distance">{{ $race->distance_meters }}m</div>
-                    <dl class="mt-1 text-xl text-primary-100 flex items-center gap-2">
-                         <div class="flex items-center">
-                            <dt class="sr-only">Surface</dt>
-                            <dd>{{ $race->surface }}</dd>
-                         </div>
-                         <span aria-hidden="true">•</span>
-                         <div class="flex items-center">
-                            <dt class="sr-only">Category</dt>
-                            <dd>{{ $race->distance_category }}</dd>
-                         </div>
-                         <span aria-hidden="true">•</span>
-                         <div class="flex items-center">
-                            <dt class="sr-only">Weather</dt>
-                            <dd>{{ $race->weather ?? 'Unknown Weather' }}</dd>
-                         </div>
-                    </dl>
-                    @if($race->race_conditions)
-                        <div class="mt-6">
-                            <h3 class="text-sm font-bold text-primary-200 uppercase">Conditions</h3>
-                            <ul class="mt-2 space-y-1 text-sm">
-                                @foreach($race->race_conditions as $condition)
-                                    <li class="flex items-start gap-2">
-                                        <svg class="w-5 h-5 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        {{ $condition }}
-                                    </li>
-                                @endforeach
-                            </ul>
+                {{-- Left panel: key metrics --}}
+                <div class="md:w-2/5 p-8 bg-linear-to-br from-primary-600 to-primary-800 text-white flex flex-col justify-center">
+                    <p class="text-sm font-semibold uppercase tracking-wide text-primary-200">Course Details</p>
+                    <div class="mt-2 text-5xl font-extrabold" aria-label="Distance">
+                        {{ number_format($gameRace->distance_meters) }}<span class="text-2xl font-medium ml-1">m</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap gap-3 text-primary-100 text-sm">
+                        <span>{{ ucfirst($gameRace->surface) }}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{{ ucwords(str_replace('_', ' ', $gameRace->distance_category)) }}</span>
+                        @if ($gameRace->hand)
+                            <span aria-hidden="true">·</span>
+                            <span>{{ ucfirst($gameRace->hand) }}-handed</span>
+                        @endif
+                    </div>
+                    @if ($gameRace->venue || $gameRace->season)
+                        <div class="mt-4 space-y-1 text-sm text-primary-200">
+                            @if ($gameRace->venue)
+                                <div class="flex items-center gap-2">
+                                    <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    {{ $gameRace->venue }}
+                                </div>
+                            @endif
+                            @if ($gameRace->season)
+                                <div class="flex items-center gap-2">
+                                    <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                                    </svg>
+                                    {{ ucfirst($gameRace->season) }}
+                                    @if ($gameRace->month_label)
+                                        — {{ $gameRace->month_label }}
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     @endif
                 </div>
-                
-                <div class="p-8 md:w-1/2">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Character Snapshot</h3>
-                    
-                    @if($race->character)
-                        @php
-                            $avatarPath = null;
-                            if ($race->character) {
-                                $attributes = $race->character->getAttributes();
-                                $avatarPath = $attributes['avatar_path'] ?? null;
-                            }
-                        @endphp
-                        <article class="flex items-center gap-4 mb-6">
-                            @if($avatarPath)
-                                <img src="{{ $avatarPath }}" alt="{{ $race->character->name }}" loading="lazy" decoding="async" class="w-16 h-16 rounded-full object-cover">
-                            @else
-                                <div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400" aria-hidden="true">
-                                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </div>
-                            @endif
-                            <div>
-                                <h4 class="font-bold text-gray-900 dark:text-white">{{ $race->character->name }}</h4>
-                                <dl class="text-xs text-gray-500 flex gap-2">
-                                    <div class="flex gap-1">
-                                        <dt>Condition:</dt>
-                                        <dd>{{ $race->character_condition ?? 'Unknown' }}</dd>
-                                    </div>
-                                    <span aria-hidden="true">|</span>
-                                    <div class="flex gap-1">
-                                        <dt>Mood:</dt>
-                                        <dd>{{ $race->motivation ?? 'Normal' }}</dd>
-                                    </div>
-                                </dl>
-                            </div>
-                        </article>
 
-                        <!-- Stats Grid -->
-                        <div class="grid grid-cols-5 gap-2 text-center" role="list" aria-label="Character Stats">
-                            @foreach(['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
-                                @php $val = $race->{$stat . '_at_race'} ?? 0; @endphp
-                                <div class="bg-gray-50 dark:bg-gray-700 rounded p-2" role="listitem">
-                                    <dt class="text-xs text-gray-500 uppercase">{{ $stat }}</dt>
-                                    <dd class="font-bold text-gray-900 dark:text-white">{{ $val }}</dd>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-gray-500 italic">No character data recorded for this race.</div>
-                    @endif
+                {{-- Right panel: requirements & rewards --}}
+                <div class="md:w-3/5 p-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {{-- Fan Requirement --}}
+                    <div>
+                        <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">Fan Requirement</h3>
+                        @if ($gameRace->fan_requirement)
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                {{ number_format($gameRace->fan_requirement) }}
+                                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">fans</span>
+                            </p>
+                        @else
+                            <p class="text-sm text-gray-400 dark:text-gray-500">None</p>
+                        @endif
+                    </div>
 
-                    @if($race->finish_position)
-                        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700" role="status">
-                            <h4 class="text-sm font-medium text-gray-500 uppercase">Race Result</h4>
-                            <div class="flex items-baseline gap-2 mt-2">
-                                <span class="text-4xl font-extrabold 
-                                    {{ $race->finish_position == 1 ? 'text-yellow-500' : 'text-gray-900 dark:text-white' }}"
-                                    aria-label="Position {{ $race->finish_position }}">
-                                    {{ $race->finish_position }}
-                                </span>
-                                <span class="text-gray-500 font-medium text-lg">
-                                    {{ \Illuminate\Support\Number::ordinal($race->finish_position) }} Place
-                                </span>
-                            </div>
-                            @if($race->finish_time)
-                                <p class="text-sm text-gray-500 mt-1">Time: {{ $race->finish_time }}</p>
-                            @endif
-                        </div>
-                    @endif
+                    {{-- Stat Requirements --}}
+                    <div>
+                        <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">Stat Requirements</h3>
+                        @if ($gameRace->stat_requirements && count($gameRace->stat_requirements) > 0)
+                            <dl class="space-y-1">
+                                @foreach ($gameRace->stat_requirements as $stat => $value)
+                                    <div class="flex items-center justify-between text-sm">
+                                        <dt class="capitalize text-gray-600 dark:text-gray-400">{{ $stat }}</dt>
+                                        <dd class="font-semibold text-gray-900 dark:text-white">{{ number_format($value) }}</dd>
+                                    </div>
+                                @endforeach
+                            </dl>
+                        @else
+                            <p class="text-sm text-gray-400 dark:text-gray-500">None recorded</p>
+                        @endif
+                    </div>
+
+                    {{-- Fans Reward --}}
+                    <div>
+                        <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">Fans Reward (Win)</h3>
+                        @if ($gameRace->fans_reward)
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                +{{ number_format($gameRace->fans_reward) }}
+                                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">fans</span>
+                            </p>
+                        @else
+                            <p class="text-sm text-gray-400 dark:text-gray-500">—</p>
+                        @endif
+                    </div>
+
+                    {{-- SP Reward --}}
+                    <div>
+                        <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">SP Reward</h3>
+                        @if ($gameRace->sp_reward)
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                +{{ number_format($gameRace->sp_reward) }}
+                                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">SP</span>
+                            </p>
+                        @else
+                            <p class="text-sm text-gray-400 dark:text-gray-500">—</p>
+                        @endif
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Preparation & Analysis -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            @if($race->preparation_strategy)
-                <section class="card bg-white dark:bg-gray-800 h-full" aria-labelledby="prep-strategy-title">
-                    <div class="card-header">
-                        <h3 id="prep-strategy-title" class="font-medium">Preparation Strategy</h3>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-disc list-inside space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                            @foreach($race->preparation_strategy as $strat)
-                                <li>{{ $strat }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </section>
-            @endif
+        {{-- Year in Scenario --}}
+        @if ($gameRace->year_in_scenario)
+            <section class="card bg-white dark:bg-gray-800 p-6" aria-labelledby="scenario-heading">
+                <h2 id="scenario-heading" class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">Scenario Timing</h2>
+                <p class="text-gray-700 dark:text-gray-300">
+                    Available in Year {{ $gameRace->year_in_scenario }} of the scenario.
+                    @if ($gameRace->month_label)
+                        Held in <strong>{{ $gameRace->month_label }}</strong>.
+                    @endif
+                </p>
+            </section>
+        @endif
 
-            @if($race->performance_analysis)
-                 <section class="card bg-white dark:bg-gray-800 h-full" aria-labelledby="perf-analysis-title">
-                    <div class="card-header">
-                        <h3 id="perf-analysis-title" class="font-medium">Performance Analysis</h3>
-                    </div>
-                    <div class="card-body">
-                         <div class="prose dark:prose-invert text-sm">
-                             @if(is_array($race->performance_analysis))
-                                <ul class="list-disc list-inside">
-                                    @foreach($race->performance_analysis as $analysis)
-                                        <li>{{ $analysis }}</li>
-                                    @endforeach
-                                </ul>
-                             @else
-                                {{ $race->performance_analysis }}
-                             @endif
-                         </div>
-                    </div>
-                </section>
-            @endif
+        {{-- Notes --}}
+        @if ($gameRace->notes)
+            <section class="card bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-6" aria-labelledby="notes-heading">
+                <h2 id="notes-heading" class="flex items-center gap-2 text-sm font-semibold text-amber-800 dark:text-amber-300 mb-2">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Notes
+                </h2>
+                <p class="text-sm text-amber-900 dark:text-amber-200">{{ $gameRace->notes }}</p>
+            </section>
+        @endif
+
+        {{-- Back link --}}
+        <div>
+            <a href="{{ route('races.index') }}" class="btn btn-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded">
+                ← Back to Race Calendar
+            </a>
         </div>
-    </main>
+    </div>
 @endsection

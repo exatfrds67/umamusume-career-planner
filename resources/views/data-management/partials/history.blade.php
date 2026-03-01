@@ -112,7 +112,7 @@
                     <div class="text-right">
                         <p class="text-sm text-gray-500 dark:text-gray-400"
                             x-text="formatDate(op.completed_at || op.created_at)"></p>
-                        <p class="text-xs text-gray-400 dark:text-gray-500 font-mono"
+                        <p class="text-xs text-gray-500 dark:text-gray-400 font-mono"
                             x-text="op.operation_id ? op.operation_id.substring(0, 8) + '...' : ''"></p>
                     </div>
                 </div>

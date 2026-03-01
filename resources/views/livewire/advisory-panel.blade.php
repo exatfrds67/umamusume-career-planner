@@ -27,7 +27,7 @@ Accessibility: WCAG 2.2 AA compliant
     {{-- Toggle Button (when panel is closed) --}}
     <div x-show="!isOpen" class="fixed bottom-6 right-6 z-40">
         <button @click="togglePanel()"
-            class="group relative flex items-center gap-3 px-5 py-3 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-primary-500/50"
+            class="group relative flex items-center gap-3 px-5 py-3 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-hidden focus:ring-4 focus:ring-primary-500/50"
             aria-label="Open AI Advisory Panel (Alt+A)" :aria-expanded="isOpen">
             {{-- AI Icon --}}
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -108,7 +108,7 @@ Accessibility: WCAG 2.2 AA compliant
 
             {{-- Close Button --}}
             <button @click="closePanel()"
-                class="p-2 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
+                class="p-2 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
                 aria-label="Close advisory panel (Escape)">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -142,7 +142,7 @@ Accessibility: WCAG 2.2 AA compliant
                     @if ($criticalAlerts->isNotEmpty())
                         <section aria-labelledby="critical-alerts-heading">
                             <button @click="toggleSection('alerts')"
-                                class="w-full flex items-center justify-between mb-4 group focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg p-2 -m-2"
+                                class="w-full flex items-center justify-between mb-4 group focus:outline-hidden focus:ring-2 focus:ring-primary-500 rounded-lg p-2 -m-2"
                                 :aria-expanded="activeSection === 'alerts'" aria-controls="critical-alerts-content"
                                 data-expandable="true">
                                 <div class="flex items-center gap-2">
@@ -203,7 +203,7 @@ Accessibility: WCAG 2.2 AA compliant
                                                 </div>
                                                 <button
                                                     wire:click="dismissAlert('{{ $alert->id ?? $alert->type->value }}')"
-                                                    class="p-1 rounded hover:bg-danger-200 dark:hover:bg-danger-800 transition-colors text-danger-600 dark:text-danger-400 focus:outline-none focus:ring-2 focus:ring-danger-500"
+                                                    class="p-1 rounded hover:bg-danger-200 dark:hover:bg-danger-800 transition-colors text-danger-600 dark:text-danger-400 focus:outline-hidden focus:ring-2 focus:ring-danger-500"
                                                     aria-label="Dismiss alert: {{ $alert->message ?? 'alert' }}">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24" aria-hidden="true">
@@ -241,7 +241,7 @@ Accessibility: WCAG 2.2 AA compliant
                                             @if ($alert->detailedAnalysis)
                                                 <button
                                                     @click="toggleAlert('{{ $alert->id ?? $alert->type->value }}')"
-                                                    class="mt-3 text-xs font-semibold text-danger-700 dark:text-danger-300 hover:text-danger-800 dark:hover:text-danger-200 flex items-center gap-1 focus:outline-none focus:underline"
+                                                    class="mt-3 text-xs font-semibold text-danger-700 dark:text-danger-300 hover:text-danger-800 dark:hover:text-danger-200 flex items-center gap-1 focus:outline-hidden focus:underline"
                                                     :aria-expanded="expandedAlert === '{{ $alert->id ?? $alert->type->value }}'"
                                                     data-expandable="true">>
                                                     <span
@@ -272,7 +272,7 @@ Accessibility: WCAG 2.2 AA compliant
                     @if ($trainingRecommendations->isNotEmpty())
                         <section aria-labelledby="training-recommendations-heading">
                             <button @click="toggleSection('training')"
-                                class="w-full flex items-center justify-between mb-4 group focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg p-2 -m-2"
+                                class="w-full flex items-center justify-between mb-4 group focus:outline-hidden focus:ring-2 focus:ring-primary-500 rounded-lg p-2 -m-2"
                                 :aria-expanded="activeSection === 'training'"
                                 aria-controls="training-recommendations-content" data-expandable="true">
                                 <div class="flex items-center gap-2">
@@ -353,7 +353,7 @@ Accessibility: WCAG 2.2 AA compliant
                                                 </div>
                                                 <button
                                                     wire:click="dismissRecommendation('{{ $recommendation->id ?? $recommendation->action }}')"
-                                                    class="p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-neutral-600 dark:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                                    class="p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-neutral-600 dark:text-neutral-400 focus:outline-hidden focus:ring-2 focus:ring-primary-500"
                                                     aria-label="Dismiss recommendation">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -372,7 +372,7 @@ Accessibility: WCAG 2.2 AA compliant
                                             @if (!empty($recommendation->expectedOutcomes) || !empty($recommendation->risks))
                                                 <button
                                                     @click="toggleRecommendation('{{ $recommendation->id ?? $recommendation->action }}')"
-                                                    class="text-xs font-semibold text-primary-700 dark:text-primary-300 hover:text-primary-800 dark:hover:text-primary-200 flex items-center gap-1 focus:outline-none focus:underline"
+                                                    class="text-xs font-semibold text-primary-700 dark:text-primary-300 hover:text-primary-800 dark:hover:text-primary-200 flex items-center gap-1 focus:outline-hidden focus:underline"
                                                     :aria-expanded="expandedRecommendation === '{{ $recommendation->id ?? $recommendation->action }}'"
                                                     data-expandable="true">>
                                                     <span
@@ -470,7 +470,7 @@ Accessibility: WCAG 2.2 AA compliant
                 </div>
                 @if ($dismissedAlerts || $dismissedRecommendations)
                     <button wire:click="clearDismissed"
-                        class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-200 font-semibold focus:outline-none focus:underline">
+                        class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-200 font-semibold focus:outline-hidden focus:underline">
                         Clear Dismissed
                     </button>
                 @endif

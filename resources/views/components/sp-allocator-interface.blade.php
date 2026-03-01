@@ -43,7 +43,7 @@ Accessibility: WCAG 2.2 AA compliant
                     hover:bg-gray-50 dark:hover:bg-gray-700
                     disabled:opacity-50 disabled:cursor-not-allowed
                     transition-colors
-                    focus:outline-none focus:ring-2 focus:ring-blue-500
+                    focus:outline-hidden focus:ring-2 focus:ring-blue-500
                 "
                 aria-label="Undo allocation"
             >
@@ -64,7 +64,7 @@ Accessibility: WCAG 2.2 AA compliant
                     hover:bg-gray-50 dark:hover:bg-gray-700
                     disabled:opacity-50 disabled:cursor-not-allowed
                     transition-colors
-                    focus:outline-none focus:ring-2 focus:ring-blue-500
+                    focus:outline-hidden focus:ring-2 focus:ring-blue-500
                 "
                 aria-label="Redo allocation"
             >
@@ -91,7 +91,7 @@ Accessibility: WCAG 2.2 AA compliant
             </div>
             
             <div class="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <div class="absolute h-full bg-gradient-to-r from-green-500 to-emerald-500"
+                <div class="absolute h-full bg-linear-to-r from-green-500 to-emerald-500"
                      :style="`width: ${(totalAllocated / totalBudget) * 100}%`">
                 </div>
             </div>
@@ -114,7 +114,7 @@ Accessibility: WCAG 2.2 AA compliant
         {{-- Over Budget Warning --}}
         <template x-if="showBudgetWarning && isOverBudget">
             <div class="flex items-start gap-2 bg-red-100 dark:bg-red-900/50 border border-red-300 dark:border-red-700 rounded p-3">
-                <svg class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                 </svg>
                 <div>
@@ -138,7 +138,7 @@ Accessibility: WCAG 2.2 AA compliant
                 text-blue-700 dark:text-blue-300
                 hover:bg-blue-200 dark:hover:bg-blue-900/50
                 transition-colors
-                focus:outline-none focus:ring-2 focus:ring-blue-500
+                focus:outline-hidden focus:ring-2 focus:ring-blue-500
             "
         >
             Distribute Evenly
@@ -153,7 +153,7 @@ Accessibility: WCAG 2.2 AA compliant
                 text-gray-700 dark:text-gray-300
                 hover:bg-gray-200 dark:hover:bg-gray-600
                 transition-colors
-                focus:outline-none focus:ring-2 focus:ring-gray-500
+                focus:outline-hidden focus:ring-2 focus:ring-gray-500
             "
         >
             Clear All
@@ -229,7 +229,7 @@ Accessibility: WCAG 2.2 AA compliant
                                     hover:bg-gray-200 dark:hover:bg-gray-600
                                     disabled:opacity-50 disabled:cursor-not-allowed
                                     transition-colors
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500
+                                    focus:outline-hidden focus:ring-2 focus:ring-blue-500
                                 "
                                 aria-label="Decrease SP"
                             >
@@ -249,7 +249,7 @@ Accessibility: WCAG 2.2 AA compliant
                                     bg-gray-100 dark:bg-gray-700
                                     border border-gray-200 dark:border-gray-600
                                     text-gray-900 dark:text-white
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500
+                                    focus:outline-hidden focus:ring-2 focus:ring-blue-500
                                 "
                                 aria-label="SP amount"
                             />
@@ -265,7 +265,7 @@ Accessibility: WCAG 2.2 AA compliant
                                     hover:bg-blue-200 dark:hover:bg-blue-900/50
                                     disabled:opacity-50 disabled:cursor-not-allowed
                                     transition-colors
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500
+                                    focus:outline-hidden focus:ring-2 focus:ring-blue-500
                                 "
                                 aria-label="Increase SP"
                             >
@@ -283,7 +283,7 @@ Accessibility: WCAG 2.2 AA compliant
                                     text-red-600 dark:text-red-400
                                     hover:bg-red-200 dark:hover:bg-red-900/50
                                     transition-colors
-                                    focus:outline-none focus:ring-2 focus:ring-red-500
+                                    focus:outline-hidden focus:ring-2 focus:ring-red-500
                                 "
                                 aria-label="Remove allocation"
                             >
@@ -314,7 +314,7 @@ Accessibility: WCAG 2.2 AA compliant
                             hover:border-blue-400 dark:hover:border-blue-600
                             hover:bg-blue-50 dark:hover:bg-blue-900/20
                             transition-colors
-                            focus:outline-none focus:ring-2 focus:ring-blue-500
+                            focus:outline-hidden focus:ring-2 focus:ring-blue-500
                             group
                         "
                     >
@@ -335,7 +335,7 @@ Accessibility: WCAG 2.2 AA compliant
     {{-- Empty State --}}
     <template x-if="skills.length === 0">
         <div class="py-12 text-center">
-            <svg class="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-12 h-12 text-gray-500 dark:text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p class="text-gray-600 dark:text-gray-400 font-medium">No skills available</p>

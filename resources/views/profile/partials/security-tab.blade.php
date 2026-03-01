@@ -12,7 +12,7 @@
                     Current Password
                 </label>
                 <input type="password" name="current_password" id="current_password" required autocomplete="current-password"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                 @error('current_password')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -24,7 +24,7 @@
                     New Password
                 </label>
                 <input type="password" name="password" id="password" required autocomplete="new-password"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                 @error('password')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -36,7 +36,7 @@
                     Confirm New Password
                 </label>
                 <input type="password" name="password_confirmation" id="password_confirmation" required autocomplete="new-password"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
             </div>
 
             <!-- Update Password Button -->
@@ -96,7 +96,7 @@
 
     <!-- Delete Account Modal -->
     <div x-show="show" x-cloak @click.away="closeModal()" @keydown.escape.window="closeModal()"
-        class="fixed inset-0 bg-gray-500 bg-opacity-75 z-50 flex items-center justify-center p-4">
+        class="fixed inset-0 bg-gray-500/75 z-50 flex items-center justify-center p-4">
         <div @click.stop class="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-xl">
             <div class="flex items-center gap-3 mb-4">
                 <div
@@ -138,7 +138,7 @@
                         Confirm your password
                     </label>
                     <input type="password" name="password" id="delete_password" required x-model="password" autocomplete="current-password"
-                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                 </div>
 
                 <div>
@@ -148,7 +148,7 @@
                     </label>
                     <input type="text" name="confirmation" id="delete_confirmation" required x-model="confirmation"
                         placeholder="{{ $user?->name ?? 'your username' }}"
-                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                         :class="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': confirmationError }">
                     <p x-show="confirmationError" x-cloak class="mt-1 text-sm text-red-600 dark:text-red-400">
                         Account name does not match. Please type <strong>{{ $user?->name ?? 'your username' }}</strong> exactly.

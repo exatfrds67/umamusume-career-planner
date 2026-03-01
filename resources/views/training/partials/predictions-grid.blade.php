@@ -54,7 +54,7 @@
     <div id="predictions-loading" class="card rounded-xl p-12 text-center" role="status" aria-busy="true"
         aria-live="polite">
         <div class="text-primary-500 dark:text-primary-400 mb-4">
-            <svg class="mx-auto h-16 w-16 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="mx-auto h-16 w-16 animate-spin" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
@@ -66,7 +66,7 @@
     {{-- Error State --}}
     <div id="predictions-error" class="card rounded-xl p-12 text-center hidden" role="alert" aria-live="assertive">
         <div class="text-red-500 dark:text-red-400 mb-4">
-            <svg class="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="mx-auto h-16 w-16" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -75,7 +75,8 @@
         <p id="predictions-error-message" class="text-gray-700 dark:text-gray-300 mb-4">An error occurred while fetching
             training predictions.</p>
         <button onclick="refreshPredictions()"
-            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            aria-label="Retry loading training predictions">
             Try Again
         </button>
     </div>
@@ -84,33 +85,35 @@
     <div id="predictions-grid" class="hidden">
         {{-- Section Header with Legend --}}
         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 id="facilities-heading" class="text-lg font-semibold text-gray-900 dark:text-white">
                 Training Facilities
                 <span class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">(Levels 1-5)</span>
             </h2>
-            <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Low Risk
+            <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400" aria-label="Risk level legend">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500" aria-hidden="true"></span> Low Risk
                     (&lt;15%)</span>
-                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> Medium
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500" aria-hidden="true"></span> Medium
                     (15-40%)</span>
-                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> High
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500" aria-hidden="true"></span> High
                     (&gt;40%)</span>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" aria-labelledby="facilities-heading">
             @foreach (['speed', 'stamina', 'power', 'guts', 'wit', 'rest'] as $facility)
                 @php $config = $facilityConfig[$facility]; @endphp
-                <div class="card rounded-xl p-5 training-facility hover:shadow-lg transition-shadow cursor-pointer"
-                    data-facility="{{ $facility }}" data-testid="prediction-card-{{ $facility }}" role="article"
-                    tabindex="0" onclick="selectFacility('{{ $facility }}')"
-                    onkeydown="if(event.key==='Enter')selectFacility('{{ $facility }}')">
+                <div class="card p-5 training-facility hover:shadow-lg transition-shadow cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                    data-facility="{{ $facility }}" data-testid="prediction-card-{{ $facility }}"
+                    role="article" tabindex="0"
+                    aria-label="Select {{ $facility }} training facility"
+                    onclick="selectFacility('{{ $facility }}')"
+                    onkeydown="if(event.key==='Enter'||event.key===' ')selectFacility('{{ $facility }}')">
 
                     {{-- Header with Icon, Name, and Badges --}}
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg {{ $config['bgLight'] }} flex items-center justify-center">
-                                <svg class="w-6 h-6 {{ $config['textColor'] }}" fill="none" stroke="currentColor"
+                            <div class="w-10 h-10 rounded-lg {{ $config['bgLight'] }} flex items-center justify-center" aria-hidden="true">
+                                <svg class="w-6 h-6 {{ $config['textColor'] }}" aria-hidden="true" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     {!! $config['icon'] !!}
                                 </svg>
@@ -129,7 +132,8 @@
                             <span
                                 class="ai-badge hidden items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
                                 data-testid="ai-recommended-badge">
-                                AI <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span aria-hidden="true">AI <svg class="w-3 h-3 inline" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></span>
+                                <span class="sr-only">AI Recommended</span>
                             </span>
                             {{-- Risk Badge --}}
                             <span
@@ -182,12 +186,12 @@
                             class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
                             <span class="text-xs text-gray-500 dark:text-gray-400">Efficiency:</span>
                             <div class="efficiency-rating flex items-center gap-1">
-                                <span class="efficiency-stars flex items-center text-yellow-500">
+                                <span class="efficiency-stars flex items-center text-yellow-500" aria-hidden="true">
                                     @for($i=0; $i<5; $i++)
-                                        <svg class="w-4 h-4 text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                        <svg class="w-4 h-4 text-gray-300 dark:text-gray-600" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                                     @endfor
                                 </span>
-                                <span class="efficiency-score text-xs text-gray-600 dark:text-gray-400">(--)</span>
+                                <span class="efficiency-score text-xs text-gray-600 dark:text-gray-400" aria-label="Efficiency rating">(--)</span>
                             </div>
                         </div>
                     @else
@@ -213,9 +217,10 @@
 
                     {{-- Action Button --}}
                     <button
-                        class="w-full mt-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                        class="w-full mt-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2
                         {{ $facility === 'rest' ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' : 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-200 dark:hover:bg-primary-800' }}"
-                        onclick="event.stopPropagation(); selectTraining('{{ $facility }}')">
+                        onclick="event.stopPropagation(); selectTraining('{{ $facility }}')"
+                        aria-label="{{ $facility === 'rest' ? 'Choose rest this turn' : 'Choose ' . $facility . ' training this turn' }}">
                         {{ $facility === 'rest' ? 'Rest' : 'Train' }}
                     </button>
                 </div>
@@ -227,7 +232,7 @@
             aria-labelledby="ai-recommendation-heading">
             <h3 id="ai-recommendation-heading"
                 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor"
+                <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" aria-hidden="true" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -241,7 +246,8 @@
             {{-- Calculation Breakdown (Collapsible) --}}
             <details class="mt-4">
                 <summary
-                    class="text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-white">
+                    class="text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-white"
+                    aria-label="Toggle calculation breakdown">
                     View Calculation Breakdown
                 </summary>
                 <div id="calculation-breakdown" class="mt-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-sm">
@@ -261,6 +267,32 @@
         </div>
     </div>
 </div>
+
+<script>
+    if (typeof window.selectFacility !== 'function') {
+        window.selectFacility = function (facility) {
+            document.querySelectorAll('.training-facility').forEach(function (el) {
+                el.classList.remove('ring-2', 'ring-primary-500');
+            });
+
+            const selected = document.querySelector('[data-facility="' + facility + '"]');
+            if (selected) {
+                selected.classList.add('ring-2', 'ring-primary-500');
+            }
+        };
+    }
+
+    if (typeof window.selectTraining !== 'function') {
+        window.selectTraining = function (facility) {
+            window.dispatchEvent(new CustomEvent('toast', {
+                detail: {
+                    type: 'info',
+                    message: 'Training selection: ' + facility.charAt(0).toUpperCase() + facility.slice(1),
+                },
+            }));
+        };
+    }
+</script>
 
 {{-- Extracted: JS logic moved to resources/js/pages/training/partials/predictions-grid.js --}}
 @pushOnce('scripts')

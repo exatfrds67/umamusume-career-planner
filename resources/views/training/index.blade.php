@@ -10,7 +10,7 @@
             </div>
             <div class="flex items-center gap-4">
                  <!-- Vital Stats -->
-                <div class="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg px-4 py-2 shadow-sm">
+                <div class="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-lg px-4 py-2 shadow-xs">
                     <div class="flex items-center gap-2">
                          <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Energy:</span>
                          <span class="font-bold {{ $character->energy_level < 30 ? 'text-red-600' : 'text-green-600' }}">{{ $character->energy_level }}/100</span>

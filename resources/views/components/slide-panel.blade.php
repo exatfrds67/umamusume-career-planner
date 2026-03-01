@@ -66,12 +66,12 @@ Accessibility: WCAG 2.2 AA compliant
         {{-- Header --}}
         @if ($showHeader)
             <div
-                class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+                class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
                     {{ $title }}
                 </h2>
                 <button @click="close()"
-                    class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                    class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                     aria-label="Close panel">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -89,7 +89,7 @@ Accessibility: WCAG 2.2 AA compliant
         {{-- Footer Slot (optional) --}}
         @if ($slot->has('footer'))
             <div
-                class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 flex-shrink-0 bg-gray-50 dark:bg-gray-900/50">
+                class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 shrink-0 bg-gray-50 dark:bg-gray-900/50">
                 {{ $slot->get('footer') }}
             </div>
         @endif

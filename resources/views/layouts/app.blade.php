@@ -59,7 +59,7 @@
     @livewireStyles
 </head>
 
-<body class="h-full font-sans antialiased text-gray-900 dark:text-gray-100" x-data="{ sidebarOpen: false }"
+<body class="h-full font-sans antialiased text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900" x-data="{ sidebarOpen: false }"
     @keydown.escape.window="sidebarOpen = false">
 
     <!-- Skip to Content (Accessibility) -->
@@ -68,26 +68,33 @@
         Skip to content
     </a>
 
-    <!-- Fixed Background with Theme-Aware Images -->
-    <div id="app-background" class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500"
-        data-bg-light-desktop="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png"
-        data-bg-light-mobile="/images/app_bg/uma_musume_race_planner_bg_light_1028x1536.png"
-        data-bg-dark-desktop="/images/app_bg/uma_musume_race_planner_bg_dark_1536x1028.png"
-        data-bg-dark-mobile="/images/app_bg/uma_musume_race_planner_bg_dark_1028x1536.png" aria-hidden="true">
-    </div>
+<!-- Fixed Background with Theme-Aware Images (class-based dark mode) -->
+<div class="fixed inset-0 z-0" aria-hidden="true">
+    {{-- Light mode backgrounds --}}
+    <picture class="block dark:hidden w-full h-full">
+        <source media="(min-width: 1024px)" srcset="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png">
+        <img src="/images/app_bg/uma_musume_race_planner_bg_light_1028x1536.png" alt="" class="w-full h-full object-cover object-center" loading="lazy" decoding="async">
+    </picture>
+    {{-- Dark mode backgrounds --}}
+    <picture class="hidden dark:block w-full h-full">
+        <source media="(min-width: 1024px)" srcset="/images/app_bg/uma_musume_race_planner_bg_dark_1536x1028.png">
+        <img src="/images/app_bg/uma_musume_race_planner_bg_dark_1028x1536.png" alt="" class="w-full h-full object-cover object-center" loading="lazy" decoding="async">
+    </picture>
+</div>
 
     <!-- Mobile Sidebar Backdrop -->
-    <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300"
+    <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-out duration-300"
         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-        x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100"
+        x-transition:leave="transition-opacity ease-in duration-300" x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900/80 z-40 lg:hidden" aria-hidden="true"
         @click="sidebarOpen = false"></div>
 
     <!-- Mobile Sidebar (shown when sidebarOpen is true) -->
-    <div x-show="sidebarOpen" x-transition:enter="transition ease-in-out duration-300 transform"
+    <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300 transform"
         x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
-        x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0"
+        x-transition:leave="transition ease-in duration-300 transform" x-transition:leave-start="translate-x-0"
         x-transition:leave-end="-translate-x-full"
+        x-trap.noscroll="sidebarOpen"
         class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-800 shadow-xl lg:hidden">
         <x-app.sidebar />
     </div>
@@ -107,14 +114,14 @@
 
         <!-- Sticky Header -->
         <header
-            class="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm">
+            class="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-xs">
             <div class="flex flex-col">
                 {{-- TODO: Provide storage mode and SP data from a shared context or controller-specific view data. --}}
                 <x-top-status-bar :current-turn="$topStatus['currentTurn'] ?? null" :max-turns="$topStatus['maxTurns'] ?? null" :sp-available="$topStatus['spAvailable'] ?? null" :storage-mode="$topStatus['storageMode'] ?? null" />
 
                 <div class="flex h-16 shrink-0 items-center gap-x-4 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
                     <button type="button" id="sidebar-toggle-btn" class="-m-2.5 p-2.5 text-gray-700 dark:text-gray-200 lg:hidden"
-                        @click="sidebarOpen = true">
+                        @click="sidebarOpen = true" :aria-expanded="sidebarOpen.toString()">
                         <span class="sr-only">Open sidebar</span>
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                             aria-hidden="true">

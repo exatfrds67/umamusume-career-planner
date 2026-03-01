@@ -115,7 +115,7 @@ Accessibility: WCAG 2.2 AA compliant, ARIA progress indicators, keyboard navigat
     @endif
 
     {{-- Main Content --}}
-    <div class="wizard-content bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
+    <div class="wizard-content bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
         {{ $slot }}
     </div>
 

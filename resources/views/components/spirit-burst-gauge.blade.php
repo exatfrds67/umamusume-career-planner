@@ -143,7 +143,7 @@
         <div x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-            class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 transition-opacity"
+            class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/75 transition-opacity"
             aria-hidden="true" @click="showModal = false"></div>
 
         <!-- Modal panel -->
@@ -188,11 +188,11 @@
             </div>
             <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
                 <button @click="confirmTrigger" type="button"
-                    class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-linear-to-r from-yellow-400 to-orange-500 text-base font-medium text-white hover:from-yellow-500 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-xs px-4 py-2 bg-linear-to-r from-yellow-400 to-orange-500 text-base font-medium text-white hover:from-yellow-500 hover:to-orange-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:ml-3 sm:w-auto sm:text-sm">
                     Confirm Trigger
                 </button>
                 <button @click="showModal = false" type="button"
-                    class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:w-auto sm:text-sm">
+                    class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-xs px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:w-auto sm:text-sm">
                     Cancel
                 </button>
             </div>

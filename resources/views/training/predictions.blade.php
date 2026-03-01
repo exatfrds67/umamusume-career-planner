@@ -18,7 +18,7 @@
                 @if ($selectedCharacter)
                     <div class="flex items-center gap-2">
                         <button onclick="refreshPredictions()"
-                            class="px-4 py-2 card hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2"
+                            class="px-4 py-2 card hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded-xl"
                             aria-label="Refresh predictions">
                             <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -28,7 +28,7 @@
                             <span class="text-sm font-medium text-gray-900 dark:text-white">Refresh</span>
                         </button>
                         <button onclick="clearCache()"
-                            class="px-4 py-2 card hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2"
+                            class="px-4 py-2 card hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 rounded-xl"
                             aria-label="Clear cache">
                             <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -43,9 +43,9 @@
         </div>
 
         <!-- Character Selection -->
-        <section class="card rounded-xl p-6 mb-6 animate-fade-in-delay-1">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Select Character</h2>
-            <form method="GET" action="{{ route('training.predictions') }}">
+        <section class="card rounded-xl p-6 mb-6 animate-fade-in-delay-1" aria-labelledby="select-character-heading">
+            <h2 id="select-character-heading" class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Select Character</h2>
+            <form method="GET" action="{{ route('training.predictions') }}" role="search" aria-label="Select character for training predictions">
                 <div>
                     <label for="character_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Character
@@ -58,12 +58,12 @@
                             @foreach ($characters as $char)
                                 <option value="{{ $char->id }}"
                                     {{ $selectedCharacter && $selectedCharacter->id === $char->id ? 'selected' : '' }}>
-                                    {{ $char->name }} ({{ ucfirst($char->scenario_type) }})
+                                    {{ $char->name }} ({{ ucwords(str_replace('_', ' ', $char->scenario_type)) }})
                                 </option>
                             @endforeach
                         </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none" aria-hidden="true">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </div>
@@ -79,8 +79,8 @@
             @include('training.partials.predictions-grid', ['character' => $selectedCharacter])
         @else
             <div class="card rounded-xl p-12 text-center animate-fade-in-delay-2">
-                <div class="text-gray-400 dark:text-gray-500 mb-4">
-                    <svg class="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="text-gray-500 dark:text-gray-400 mb-4" aria-hidden="true">
+                    <svg class="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>

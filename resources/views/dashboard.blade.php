@@ -35,10 +35,11 @@
                 @if ($hasCharacters)
                     <!-- Character Selector -->
                     <div class="relative">
+                        <span id="char-select-nav-desc" class="sr-only">Changing this selection immediately navigates to that character's dashboard.</span>
                         <label for="character-selector" class="sr-only">Select character</label>
                         <select id="character-selector"
                             class="form-select rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm pr-10 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                            aria-label="Select character" data-url="{{ route('dashboard') }}"
+                            aria-label="Select character" aria-describedby="char-select-nav-desc" data-url="{{ route('dashboard') }}"
                             onchange="window.location.href = this.dataset.url + '?character=' + this.value;">
                             @foreach ($characters as $character)
                                 <option value="{{ $character->id }}"
@@ -50,7 +51,7 @@
                     </div>
                 @endif
                 <a href="{{ route('characters.create') }}"
-                    class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors">
+                    class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
@@ -80,12 +81,12 @@
                                 <dl>
                                     <dt class="text-sm font-medium truncate">Current Turn
                                     </dt>
-                                    <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold">
+                                    <dd class="flex items-baseline flex-wrap gap-x-2">
+                                        <div class="text-2xl font-semibold whitespace-nowrap">
                                             {{ $metrics['currentTurn'] }} / {{ $metrics['maxTurns'] }}
                                         </div>
                                         <div
-                                            class="ml-2 flex items-baseline text-sm font-semibold {{ $metrics['trackStatus'] === 'Ahead' ? 'text-success-600 dark:text-success-400' : ($metrics['trackStatus'] === 'On Track' ? 'text-primary-600 dark:text-primary-400' : 'text-warning-600 dark:text-warning-400') }}">
+                                            class="flex items-baseline text-sm font-semibold whitespace-nowrap {{ $metrics['trackStatus'] === 'Ahead' ? 'text-success-600 dark:text-success-400' : ($metrics['trackStatus'] === 'On Track' ? 'text-primary-600 dark:text-primary-400' : 'text-warning-600 dark:text-warning-400') }}">
                                             {{ $metrics['trackStatus'] }}
                                         </div>
                                     </dd>
@@ -139,12 +140,12 @@
                                 <dl>
                                     <dt class="text-sm font-medium truncate">Skills
                                         Acquired</dt>
-                                    <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold">
+                                    <dd class="flex items-baseline flex-wrap gap-x-2">
+                                        <div class="text-2xl font-semibold whitespace-nowrap">
                                             {{ $metrics['skillsAcquired'] }} / {{ $metrics['targetSkills'] }}
                                         </div>
-                                        <div class="ml-2 flex items-baseline text-sm font-semibold">
-                                            SP: {{ $metrics['skillPoints'] }}
+                                        <div class="flex items-baseline text-sm font-semibold whitespace-nowrap text-gray-600 dark:text-gray-300">
+                                            SP&nbsp;Left:&nbsp;{{ $metrics['skillPoints'] }}
                                         </div>
                                     </dd>
                                 </dl>
@@ -224,12 +225,14 @@
                 </div>
             </div>
 
+            <!-- Analytics & Quick Actions -->
+            <div class="space-y-8">
             <!-- Quick Actions -->
             <div class="animate-fade-in-delay-3">
-                <h3 class="text-lg font-medium mb-4">Analytics & Race Planning</h3>
+                <h3 class="text-lg font-semibold mb-4 border-l-4 border-primary-500 pl-3">Analytics & Race Planning</h3>
 
                 {{-- Phase 5: Analytics Section --}}
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 items-start">
                     {{-- Stat Progression Chart --}}
                     <x-line-chart title="Stat Progression" :data="$statProgression ?? [[100, 150, 200, 280, 350, 420, 480]]" :labels="$progressionLabels ?? [
                         'Turn 5',
@@ -240,6 +243,7 @@
                         'Turn 28',
                         'Turn 32',
                     ]" :colors="['#3B82F6', '#10B981', '#F59E0B']"
+                        :dataset-labels="['Total Stats']"
                         height="h-72" />
 
                     {{-- Fan Count Hierarchy --}}
@@ -257,7 +261,7 @@
             </div>
 
             <div class="animate-fade-in-delay-3">
-                <h3 class="text-lg font-medium mb-4">Quick Actions</h3>
+                <h3 class="text-lg font-semibold mb-4 border-l-4 border-primary-500 pl-3">Quick Actions</h3>
                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                     <a href="{{ $selectedCharacter ? route('training.predictions.show', $selectedCharacter) : route('training.predictions') }}"
                         class="glass-card-inner relative group block w-full rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 p-6 text-center hover:border-primary-500 dark:hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-all duration-200 hover:shadow-lg">
@@ -304,13 +308,14 @@
                                 d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25" />
                         </svg>
                         <span class="mt-2 block text-sm font-semibold">Support Deck</span>
-                        <span class="mt-1 block text-xs">Build & optimize your deck</span>
+                        <span class="mt-1 block text-xs">Build &amp; optimize your deck</span>
                     </a>
                 </div>
             </div>
+            </div>{{-- /space-y-8 --}}
 
             <!-- Additional Resources -->
-            <div class="glass-card-alt rounded-lg p-6 animate-fade-in-delay-4">
+            <div class="glass-card-alt rounded-xl p-6 animate-fade-in-delay-4">
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-lg font-semibold mb-2">Need Help Getting Started?
@@ -320,7 +325,8 @@
                     </div>
                     <div class="flex gap-3">
                         <a href="{{ route('about') }}"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/50 dark:text-primary-300 dark:hover:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/50 dark:text-primary-300 dark:hover:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                            aria-label="Learn more about training strategy guides and tutorials">
                             Learn More
                         </a>
                     </div>

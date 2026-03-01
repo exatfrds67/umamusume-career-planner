@@ -21,7 +21,7 @@
 
             <!-- OCR Status Card -->
             <div id="ocr-status-card"
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">OCR System Status</h2>
@@ -35,7 +35,7 @@
 
             <!-- Character Selection -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="character-select"
@@ -82,12 +82,12 @@
 
             <!-- Upload Area -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-6">
                 <div id="drop-zone"
                     class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-12 text-center transition-colors hover:border-primary-500 dark:hover:border-primary-400 cursor-pointer"
                     role="button" tabindex="0" aria-label="Drag and drop screenshots or click to select files">
                     <div class="flex flex-col items-center">
-                        <svg class="w-16 h-16 text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor"
+                        <svg class="w-16 h-16 text-gray-500 dark:text-gray-400 mb-4" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
@@ -100,7 +100,7 @@
                             or click to browse files
                         </p>
                         <button type="button" id="browse-button"
-                            class="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors">
+                            class="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors">
                             Browse Files
                         </button>
                         <input type="file" id="file-input" class="hidden"
@@ -115,17 +115,17 @@
 
             <!-- Upload Queue -->
             <div id="upload-queue" class="hidden mb-6">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Upload Queue</h2>
                         <div class="flex gap-2">
                             <button id="process-all-button"
-                                class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-hidden focus:ring-2 focus:ring-primary-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled>
                                 Process All
                             </button>
                             <button id="clear-queue-button"
-                                class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors">
+                                class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-gray-500 transition-colors">
                                 Clear Queue
                             </button>
                         </div>
@@ -138,7 +138,7 @@
 
             <!-- Processing Results -->
             <div id="processing-results" class="hidden">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Processing Results</h2>
                     <div id="results-container" class="space-y-4">
                         <!-- Results will be inserted here -->

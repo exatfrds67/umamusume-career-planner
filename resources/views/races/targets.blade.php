@@ -16,9 +16,15 @@ Accessibility: WCAG 2.2 AA compliant
 @section('title', 'Race Targets - ' . ($character?->name ?? 'Uma Musume Career Planner'))
 
 @section('content')
+    <x-breadcrumb :items="[
+        ['label' => 'Home', 'href' => route('dashboard')],
+        ['label' => 'Races', 'href' => route('races.index')],
+        ['label' => 'Target Planning'],
+    ]" />
+
     <div class="space-y-8 py-8">
         {{-- Page Header --}}
-        <div class="space-y-2">
+        <header class="space-y-2">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
                 @if ($character)
                     {{ $character->name }}'s Race Plan
@@ -29,16 +35,18 @@ Accessibility: WCAG 2.2 AA compliant
             <p class="text-gray-600 dark:text-gray-400">
                 Plan and target specific races to maximize your character's potential
             </p>
-        </div>
+        </header>
 
         {{-- Navigation Tabs --}}
-        <div class="flex gap-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex gap-4 border-b border-gray-200 dark:border-gray-700" role="tablist" aria-label="Race views">
             <a href="{{ route('races.calendar') }}"
-                class="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300 transition-colors">
+                class="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300 transition-colors"
+                role="tab" aria-selected="false">
                 Calendar View
             </a>
             <a href="{{ route('races.targets') }}"
-                class="px-4 py-3 border-b-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 font-semibold">
+                class="px-4 py-3 border-b-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 font-semibold"
+                role="tab" aria-selected="true" aria-current="page">
                 Target Planning
             </a>
         </div>
@@ -55,30 +63,61 @@ Accessibility: WCAG 2.2 AA compliant
                         Choose races you want to focus on for this career run
                     </p>
 
-                    {{-- Grade Selector --}}
+                    {{-- Grade Filter --}}
                     <div class="space-y-3">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span id="grade-filter-label" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             Filter by Grade
-                        </label>
-                        <div class="flex flex-wrap gap-2">
+                        </span>
+                        <div class="flex flex-wrap gap-2" role="group" aria-labelledby="grade-filter-label">
                             <button type="button"
-                                class="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white transition-colors text-sm font-medium"
-                                @click="filterGrade = null">
+                                class="px-4 py-2 rounded-lg transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                                :class="filterGrade === null ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white'"
+                                @click="setGradeFilter(null)"
+                                :aria-pressed="filterGrade === null">
                                 All Grades
                             </button>
-                            <template x-for="grade in ['G1', 'G2', 'G3', 'Listed', 'Open']" :key="grade">
-                                <button type="button" @click="filterGrade = grade"
-                                    :class="filterGrade === grade ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' :
-                                        'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'"
-                                    class="px-4 py-2 rounded-lg text-gray-900 dark:text-white transition-colors text-sm font-medium"
+                            <template x-for="grade in grades" :key="grade">
+                                <button type="button" @click="setGradeFilter(grade)"
+                                    :class="filterGrade === grade ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' :
+                                        'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white'"
+                                    class="px-4 py-2 rounded-lg transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                                    :aria-pressed="filterGrade === grade"
                                     x-text="grade">
                                 </button>
                             </template>
                         </div>
                     </div>
 
+                    {{-- Phase Filter --}}
+                    <div class="space-y-3">
+                        <span id="phase-filter-label" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Filter by Phase
+                        </span>
+                        <div class="flex flex-wrap gap-2" role="group" aria-labelledby="phase-filter-label">
+                            <button type="button"
+                                class="px-4 py-2 rounded-lg transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                :class="filterPhase === null ? 'ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white'"
+                                @click="setPhaseFilter(null)"
+                                :aria-pressed="filterPhase === null">
+                                All Phases
+                            </button>
+                            <template x-for="phase in phases" :key="phase">
+                                <button type="button" @click="setPhaseFilter(phase)"
+                                    :class="filterPhase === phase ? 'ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300' :
+                                        'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white'"
+                                    class="px-4 py-2 rounded-lg transition-colors text-sm font-medium capitalize focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                    :aria-pressed="filterPhase === phase"
+                                    x-text="phase.charAt(0).toUpperCase() + phase.slice(1)">
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
                     {{-- Race List --}}
-                    <div class="space-y-2 max-h-96 overflow-y-auto">
+                    <div class="space-y-2 max-h-96 overflow-y-auto"
+                        role="region"
+                        aria-label="Available races"
+                        tabindex="0">
                         <template x-if="filteredRaces.length > 0">
                             <div class="space-y-2">
                                 <template x-for="race in filteredRaces" :key="race.id">
@@ -87,7 +126,15 @@ Accessibility: WCAG 2.2 AA compliant
                                         <input type="checkbox" @change="toggleTargetRace(race.id)"
                                             :checked="selectedRaces.includes(race.id)"
                                             class="mt-1 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500">
-                                        <div class="flex-1">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
+                                                <template x-if="race.isUraFinale">
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300" aria-label="URA Finale">⭐ URA</span>
+                                                </template>
+                                                <template x-if="race.phase">
+                                                    <span class="inline-block px-1.5 py-0.5 rounded text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 capitalize" x-text="race.phase"></span>
+                                                </template>
+                                            </div>
                                             <p class="font-medium text-gray-900 dark:text-white" x-text="race.name">
                                             </p>
                                             <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -95,8 +142,23 @@ Accessibility: WCAG 2.2 AA compliant
                                                 <span x-text="`${race.distance}m · `"></span>
                                                 <span x-text="race.type" class="capitalize"></span>
                                             </p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                                                <span x-text="`👥 ${race.fanCount.toLocaleString()} fans`"></span>
+                                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1 flex flex-wrap gap-3">
+                                                <span>
+                                                    <span aria-hidden="true">👥</span>
+                                                    <span x-text="`${(race.fanCount ?? 0).toLocaleString()} fans on win`"></span>
+                                                </span>
+                                                <template x-if="(race.spReward ?? 0) > 0">
+                                                    <span>
+                                                        <span aria-hidden="true">✨</span>
+                                                        <span x-text="`${race.spReward} SP`"></span>
+                                                    </span>
+                                                </template>
+                                                <template x-if="(race.fanRequirement ?? 0) > 0">
+                                                    <span class="text-amber-600 dark:text-amber-400">
+                                                        <span aria-hidden="true">🔒</span>
+                                                        <span x-text="`Need ${(race.fanRequirement).toLocaleString()} fans`"></span>
+                                                    </span>
+                                                </template>
                                             </p>
                                         </div>
                                         <span
@@ -104,10 +166,11 @@ Accessibility: WCAG 2.2 AA compliant
                                                 'text-red-500': race.grade === 'G1',
                                                 'text-orange-500': race.grade === 'G2',
                                                 'text-yellow-500': race.grade === 'G3',
-                                                'text-green-500': race.grade === 'Listed',
-                                                'text-blue-500': race.grade === 'Open'
+                                                'text-green-600': race.grade === 'OP',
+                                                'text-teal-500': race.grade === 'Pre-OP',
+                                                'text-blue-500': race.grade === 'Debut'
                                             }"
-                                            class="text-sm font-semibold flex-shrink-0" x-text="race.grade">
+                                            class="text-sm font-semibold shrink-0" x-text="race.grade">
                                         </span>
                                     </label>
                                 </template>
@@ -136,7 +199,7 @@ Accessibility: WCAG 2.2 AA compliant
                             <template x-for="(raceId, idx) in selectedRaces" :key="raceId">
                                 <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                     <div
-                                        class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                                        class="shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                                         <span class="text-blue-700 dark:text-blue-300 font-semibold text-sm"
                                             x-text="idx + 1">
                                         </span>
@@ -153,8 +216,10 @@ Accessibility: WCAG 2.2 AA compliant
                                     <input type="number" placeholder="Turn #" min="1"
                                         @change="updateRaceTurn(raceId, $event.target.value)"
                                         :value="raceTurns[raceId] || ''"
+                                        :aria-label="`Turn number for ${selectedRaceDetails[raceId]?.name || 'race'}`"
                                         class="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                     <button @click="removeTargetRace(raceId)"
+                                        :aria-label="`Remove ${selectedRaceDetails[raceId]?.name || 'race'} from timeline`"
                                         class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300">
                                         ✕
                                     </button>
@@ -190,7 +255,7 @@ Accessibility: WCAG 2.2 AA compliant
                     <div class="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Grade Distribution</p>
                         <div class="space-y-1">
-                            <template x-for="grade in ['G1', 'G2', 'G3', 'Listed', 'Open']" :key="grade">
+                            <template x-for="grade in grades" :key="grade">
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="text-gray-600 dark:text-gray-400" x-text="grade"></span>
                                     <span class="font-semibold text-gray-900 dark:text-white" x-text="getGradeCount(grade)">
@@ -219,17 +284,20 @@ Accessibility: WCAG 2.2 AA compliant
                 {{-- Quick Tips --}}
                 <div
                     class="bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700/50 p-4 space-y-3">
-                    <h4 class="font-semibold text-blue-900 dark:text-blue-100">💡 Race Planning Tips</h4>
+                    <h4 class="font-semibold text-blue-900 dark:text-blue-100"><span aria-hidden="true">💡</span> Race Planning Tips</h4>
                     <ul class="space-y-2 text-xs text-blue-800 dark:text-blue-200">
-                        <li>• Focus on G1 races for maximum fan growth</li>
-                        <li>• Plan races aligned with your stat development</li>
-                        <li>• Balance high-difficulty and safe races</li>
-                        <li>• Track race completion to optimize strategy</li>
+                        <li>Focus on G1 races for maximum fan growth</li>
+                        <li>Plan races aligned with your stat development</li>
+                        <li>Balance high-difficulty and safe races</li>
+                        <li>Track race completion to optimize strategy</li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
 
+    <script>
+        window.pageData = {!! json_encode(['races' => $races]) !!};
+    </script>
     @vite(['resources/js/pages/races/targets.js'])
 @endsection

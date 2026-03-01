@@ -12,7 +12,7 @@
                     Theme
                 </label>
                 <select name="preferences[theme]" id="theme"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                     <option value="light"
                         {{ old('preferences.theme', $user->preferences['theme'] ?? 'auto') === 'light' ? 'selected' : '' }}>
                         Light</option>
@@ -31,7 +31,7 @@
                     Language
                 </label>
                 <select name="preferences[language]" id="language"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                     <option value="en"
                         {{ old('preferences.language', $user->preferences['language'] ?? 'en') === 'en' ? 'selected' : '' }}>
                         English</option>
@@ -47,7 +47,7 @@
                     Timezone
                 </label>
                 <select name="preferences[timezone]" id="timezone"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                     <option value="UTC"
                         {{ old('preferences.timezone', $user->preferences['timezone'] ?? 'UTC') === 'UTC' ? 'selected' : '' }}>
                         UTC</option>
@@ -84,7 +84,7 @@
                     Time Format
                 </label>
                 <select name="preferences[time_format]" id="time_format"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                     <option value="12h"
                         {{ old('preferences.time_format', $user->preferences['time_format'] ?? '12h') === '12h' ? 'selected' : '' }}>
                         12-hour (2:30 PM)</option>
