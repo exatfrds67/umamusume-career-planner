@@ -153,4 +153,19 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | OpenAI API Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for OpenAI API integration (used for RAG embeddings).
+    |
+    */
+
+    'openai' => [
+        'timeout' => env('OPENAI_TIMEOUT', 30),
+        'api_key' => env('OPENAI_KEY'),
+        'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+    ],
+
 ];

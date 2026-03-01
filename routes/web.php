@@ -105,6 +105,8 @@ Route::middleware('auth')->group(function () {
 
     // Race routes
     Route::get('/races', [RaceController::class, 'index'])->name('races.index');
+    Route::get('/races/calendar', [RaceController::class, 'calendar'])->name('races.calendar');
+    Route::get('/races/targets', [RaceController::class, 'targets'])->name('races.targets');
     Route::get('/races/{race}', [RaceController::class, 'show'])->name('races.show');
 
     // Skills routes
