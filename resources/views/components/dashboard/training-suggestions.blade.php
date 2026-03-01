@@ -4,21 +4,29 @@
 
 @php
     $riskColors = [
-        'none' => 'text-gray-500 dark:text-gray-400',
+        'none' => 'text-gray-600 dark:text-gray-300',
         'low' => 'text-success-600 dark:text-success-400',
         'medium' => 'text-warning-600 dark:text-warning-400',
         'high' => 'text-error-600 dark:text-error-400',
     ];
+
+    $riskLabels = [
+        'none' => 'No risk',
+        'low' => 'Low risk',
+        'medium' => 'Medium risk',
+        'high' => 'High risk',
+    ];
 @endphp
 
-<div {{ $attributes->merge(['class' => 'card bg-white dark:bg-gray-800 overflow-hidden rounded-lg shadow']) }}>
+<div {{ $attributes->merge(['class' => 'glass-card rounded-xl overflow-hidden']) }}>
     <div class="px-4 py-5 sm:p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">
                 Training Suggestions
             </h3>
             <a href="{{ route('training.predictions') }}"
-                class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
+                class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                aria-label="View all training suggestions">
                 View All
             </a>
         </div>
@@ -38,7 +46,7 @@
             <div class="space-y-2">
                 @foreach ($suggestions as $suggestion)
                     <div
-                        class="flex items-center justify-between p-3 rounded-lg {{ $suggestion['recommended'] ?? false ? 'bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800' : 'bg-gray-50 dark:bg-gray-700/50' }} hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        class="flex items-center justify-between p-3 rounded-lg {{ $suggestion['recommended'] ?? false ? 'bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 hover:bg-primary-100/70 dark:hover:bg-primary-900/40' : 'bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700' }} transition-colors">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2">
                                 <span class="text-sm font-medium text-gray-900 dark:text-white">
@@ -51,16 +59,16 @@
                                     </span>
                                 @endif
                             </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            <p class="text-xs text-gray-600 dark:text-gray-300 mt-0.5">
                                 {{ $suggestion['gains'] ?? '' }}
                             </p>
                         </div>
                         <div class="flex items-center gap-3 ml-4">
                             <span class="text-xs font-medium {{ $riskColors[$suggestion['risk'] ?? 'low'] }}">
-                                {{ ucfirst($suggestion['risk'] ?? 'low') }} risk
+                                {{ $riskLabels[$suggestion['risk'] ?? 'low'] }}
                             </span>
                             <a href="{{ route('training.predictions') }}"
-                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
                                 aria-label="Select {{ $suggestion['action'] ?? 'training' }}">
                                 Select
                             </a>

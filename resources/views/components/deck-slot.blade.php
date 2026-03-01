@@ -4,7 +4,7 @@
     {{ $attributes->merge([
         'class' => 'relative rounded-lg border-2 transition-all duration-200 ' . $getSizeClasses() . ' ' .
             ($clickable ? 'cursor-pointer hover:scale-105 hover:shadow-lg' : '') . ' ' .
-            ($card ? 'border-blue-500 dark:border-blue-400 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900' : 'border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:border-blue-400 dark:hover:border-blue-500')
+            ($card ? 'border-blue-500 dark:border-blue-400 bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900' : 'border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:border-blue-400 dark:hover:border-blue-500')
     ]) }}
     role="button"
     tabindex="{{ $clickable ? '0' : '-1' }}"
@@ -58,7 +58,7 @@
                     </div>
                     <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                         <div
-                            class="h-full rounded-full transition-all duration-300 {{ $card['bond_level'] >= 80 ? 'bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500' : 'bg-blue-500' }}"
+                            class="h-full rounded-full transition-all duration-300 {{ $card['bond_level'] >= 80 ? 'bg-linear-to-r from-pink-500 via-purple-500 to-blue-500' : 'bg-blue-500' }}"
                             style="width: {{ $card['bond_level'] }}%"
                         ></div>
                     </div>
@@ -82,7 +82,7 @@
     @else
         {{-- Empty Slot --}}
         <div class="absolute inset-0 flex flex-col items-center justify-center p-2">
-            <svg class="w-8 h-8 text-gray-400 dark:text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8 text-gray-500 dark:text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             <p class="text-xs text-gray-500 dark:text-gray-400 text-center">

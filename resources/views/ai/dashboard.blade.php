@@ -11,7 +11,7 @@
             <!-- Summary Cards -->
             <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4" aria-label="Summary Statistics">
                 <!-- Total Requests Card -->
-                <article class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
@@ -36,7 +36,7 @@
                 </article>
 
                 <!-- Average Response Time Card -->
-                <article class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
@@ -56,7 +56,7 @@
                 </article>
 
                 <!-- Total Cost Card -->
-                <article class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
@@ -77,7 +77,7 @@
                 </article>
 
                 <!-- Server Health Card -->
-                <article class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
@@ -101,7 +101,7 @@
             </section>
 
             <!-- MCP Server Status -->
-            <section class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg" aria-labelledby="mcp-server-status-title">
+            <section class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg" aria-labelledby="mcp-server-status-title">
                 <div class="p-6">
                     <h2 id="mcp-server-status-title" class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">MCP Server Status</h2>
                     <div class="space-y-4">
@@ -157,7 +157,7 @@
             </section>
 
             <!-- Performance Comparison -->
-            <section class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg" aria-labelledby="performance-comparison-title">
+            <section class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg" aria-labelledby="performance-comparison-title">
                 <div class="p-6">
                     <h2 id="performance-comparison-title" class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">AI Provider Performance
                         Comparison</h2>
@@ -204,7 +204,7 @@
             </div>
 
             <!-- Cost Summary -->
-            <section class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg" aria-labelledby="cost-summary-title">
+            <section class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg" aria-labelledby="cost-summary-title">
                 <div class="p-6">
                     <h2 id="cost-summary-title" class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Cost Summary</h2>
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">

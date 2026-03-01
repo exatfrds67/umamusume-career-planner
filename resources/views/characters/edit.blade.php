@@ -5,6 +5,9 @@
         /** @var \App\Models\Character $character */
     @endphp
     <div class="max-w-7xl mx-auto space-y-6">
+        {{-- Breadcrumb Navigation --}}
+        <x-breadcrumb :items="[['label' => 'Characters', 'url' => route('characters.index')], ['label' => $character->name, 'url' => route('characters.show', $character)], ['label' => 'Edit']]" />
+
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
@@ -64,8 +67,8 @@
                 <!-- Basic Information & Status -->
                 <div class="glass-card rounded-lg">
                     <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Basic Information &
-                            Status</h3>
+                        <h2 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Basic Information &
+                            Status</h2>
                     </div>
                     <div class="card-body grid grid-cols-1 gap-4">
                         <div>
@@ -111,19 +114,19 @@
                                 <select id="mood_status" name="mood_status" class="form-select">
                                     <option value="awful"
                                         {{ old('mood_status', $character->mood_status) === 'awful' ? 'selected' : '' }}>
-                                        Awful (-20%)</option>
+                                        Awful (-30%)</option>
                                     <option value="bad"
                                         {{ old('mood_status', $character->mood_status) === 'bad' ? 'selected' : '' }}>
-                                        Bad (-10%)</option>
+                                        Bad (-15%)</option>
                                     <option value="normal"
                                         {{ old('mood_status', $character->mood_status) === 'normal' ? 'selected' : '' }}>
                                         Normal</option>
                                     <option value="good"
                                         {{ old('mood_status', $character->mood_status) === 'good' ? 'selected' : '' }}>
-                                        Good (+10%)</option>
+                                        Good (+5%)</option>
                                     <option value="great"
                                         {{ old('mood_status', $character->mood_status) === 'great' ? 'selected' : '' }}>
-                                        Great (+20%)</option>
+                                        Great (+10%)</option>
                                 </select>
                             </div>
                         </div>
@@ -133,7 +136,7 @@
                 <!-- Current Stats -->
                 <div class="glass-card rounded-lg">
                     <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Current Stats</h3>
+                        <h2 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Current Stats</h2>
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Values between 0-1200</p>
                     </div>
                     <div class="card-body">
@@ -142,7 +145,7 @@
                                 <div>
                                     <label for="stat_{{ $stat }}" class="form-label capitalize text-xs">
                                         {{ $stat }}
-                                        <span class="text-xs text-gray-500 ml-1 font-bold">
+                                        <span class="text-xs text-gray-500 ml-1 font-bold" aria-label="(Grade {{ $character->getStatGrade($character->current_stats[$stat] ?? 0) }})">
                                             {{ $character->getStatGrade($character->current_stats[$stat] ?? 0) }}
                                         </span>
                                     </label>
@@ -150,8 +153,9 @@
                                         name="stats[{{ $stat }}]"
                                         value="{{ old('stats.' . $stat, $character->current_stats[$stat] ?? 0) }}"
                                         min="0" max="1200" step="1" class="form-input stat-input"
-                                        data-stat="{{ $stat }}" oninput="enforceStatMax(this)">
-                                    <p id="stat_{{ $stat }}_error" class="text-xs text-red-500 hidden mt-1">Max
+                                        data-stat="{{ $stat }}" oninput="enforceStatMax(this)"
+                                        aria-describedby="stat_{{ $stat }}_error">
+                                    <p id="stat_{{ $stat }}_error" class="text-xs text-red-500 hidden mt-1" role="alert" aria-live="polite">Max
                                         1200</p>
                                 </div>
                             @endforeach
@@ -163,7 +167,7 @@
             <!-- Row 2: Goals (Full Width) -->
             <div class="glass-card-alt rounded-lg">
                 <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                    <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Training Goals</h3>
+                    <h2 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Training Goals</h2>
                 </div>
                 <div class="card-body space-y-6">
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
@@ -189,7 +193,8 @@
                 <div class="card-footer bg-transparent border-t border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
                     <button type="button"
                         onclick="if(confirm('Delete character? This cannot be undone.')) document.getElementById('delete-form').submit()"
-                        class="text-red-600 hover:text-red-800 text-sm font-medium focus:outline-none">
+                        class="text-red-600 hover:text-red-800 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 rounded"
+                        aria-label="Delete character {{ $character->name }} permanently">
                         Delete Character
                     </button>
                     <div class="flex gap-4">

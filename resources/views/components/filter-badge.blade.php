@@ -19,7 +19,7 @@ Accessibility: WCAG 2.2 AA compliant
     <button
         type="button"
         @if($onRemove) @click="{{ $onRemove }}" @endif
-        class="inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-primary-200 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+        class="inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-primary-200 dark:hover:bg-primary-800 focus:outline-hidden focus:ring-2 focus:ring-primary-500 transition-colors"
         aria-label="Remove {{ $label }} filter"
     >
         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">

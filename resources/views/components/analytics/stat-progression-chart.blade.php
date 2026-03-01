@@ -75,9 +75,9 @@
             @foreach ($stats as $stat)
                 <button type="button" @click="toggleStat('{{ $stat }}')"
                     :class="visibleStats.includes('{{ $stat }}') ?
-                        'bg-opacity-100 ring-2 ring-offset-2' :
-                        'bg-opacity-50 hover:bg-opacity-75'"
-                    class="px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                        'opacity-100 ring-2 ring-offset-2' :
+                        'opacity-50 hover:opacity-75'"
+                    class="px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-offset-2"
                     style="background-color: {{ $statColors[$stat]['line'] }}; color: white;"
                     :aria-pressed="visibleStats.includes('{{ $stat }}')"
                     aria-label="Toggle {{ ucfirst($stat) }} visibility">

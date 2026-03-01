@@ -31,7 +31,7 @@
     x-bind:aria-expanded="expanded.toString()">
     {{-- Header (Always Visible) --}}
     <button @click="expanded = !expanded"
-        class="w-full text-left p-4 focus:outline-none focus:ring-2 focus:ring-{{ $color }}-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 rounded-t-lg"
+        class="w-full text-left p-4 focus:outline-hidden focus:ring-2 focus:ring-{{ $color }}-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 rounded-t-lg"
         aria-controls="{{ $cardId }}-content" aria-label="Toggle recommendation details">
         <div class="flex items-start justify-between gap-3">
             {{-- Icon & Title --}}
@@ -142,7 +142,7 @@
             @if ($showActions)
                 <div class="flex items-center gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-700">
                     <button type="button" wire:click="applyRecommendation('{{ $recommendation->id ?? '' }}')"
-                        class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm bg-{{ $color }}-600 text-white hover:bg-{{ $color }}-700 focus:outline-none focus:ring-2 focus:ring-{{ $color }}-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 transition-colors duration-200"
+                        class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm bg-{{ $color }}-600 text-white hover:bg-{{ $color }}-700 focus:outline-hidden focus:ring-2 focus:ring-{{ $color }}-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 transition-colors duration-200"
                         aria-label="Apply this recommendation">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             aria-hidden="true">
@@ -152,13 +152,13 @@
                     </button>
 
                     <button type="button" @click="dismissed = true"
-                        class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 transition-colors duration-200"
+                        class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600 focus:outline-hidden focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 transition-colors duration-200"
                         aria-label="Dismiss this recommendation">
                         Dismiss
                     </button>
 
                     <button type="button" wire:click="provideFeedback('{{ $recommendation->id ?? '' }}')"
-                        class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 transition-colors duration-200"
+                        class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600 focus:outline-hidden focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 transition-colors duration-200"
                         aria-label="Provide feedback on this recommendation">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             aria-hidden="true">

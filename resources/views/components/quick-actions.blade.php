@@ -71,7 +71,7 @@ Accessibility: WCAG 2.2 AA compliant
 
                 {{-- Action Button --}}
                 <button @click="executeAction(item)" :class="getItemColor(item)"
-                    class="w-12 h-12 rounded-full flex items-center justify-center text-lg shadow-lg transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
+                    class="w-12 h-12 rounded-full flex items-center justify-center text-lg shadow-lg transition-transform duration-200 hover:scale-110 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
                     :aria-label="item.label" :title="item.label">
                     <span x-text="item.icon"></span>
                 </button>
@@ -81,7 +81,7 @@ Accessibility: WCAG 2.2 AA compliant
 
     {{-- Primary Action Button --}}
     <button @click="toggle()" :class="isOpen ? 'scale-110 rotate-45' : 'scale-100 rotate-0'"
-        class="{{ $color }} w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-xl transition-all duration-300 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
+        class="{{ $color }} w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-xl transition-all duration-300 hover:shadow-2xl focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
         :aria-label="isOpen ? 'Close menu' : primaryLabel" :title="primaryLabel">
         <span x-text="'{{ $primaryIcon }}'"></span>
     </button>

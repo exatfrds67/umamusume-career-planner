@@ -1,7 +1,7 @@
 @props(['agent'])
 
 <div
-    class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
+    class="rounded-lg border border-gray-200 bg-white p-4 shadow-xs transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
     <div class="flex items-start justify-between">
         <!-- Agent Info -->
         <div class="flex items-start space-x-3">

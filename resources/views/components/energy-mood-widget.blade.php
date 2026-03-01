@@ -19,6 +19,15 @@
     ];
     $moodEmoji = $moodEmojis[$mood] ?? '😐';
 
+    $moodLabels = [
+        'great' => 'Great',
+        'good' => 'Good',
+        'normal' => 'Normal',
+        'bad' => 'Bad',
+        'awful' => 'Awful',
+    ];
+    $moodLabel = $moodLabels[$mood] ?? ucfirst($mood);
+
     $energyColor = $energy >= 70 ? 'green' : ($energy >= 40 ? 'yellow' : 'red');
 @endphp
 
@@ -62,8 +71,8 @@
             <div class="flex items-center gap-2">
                 <span class="text-lg" aria-hidden="true">{{ $moodEmoji }}</span>
                 <span
-                    class="text-sm font-bold text-{{ $moodColor }}-600 dark:text-{{ $moodColor }}-400 capitalize transition-colors duration-300">
-                    {{ $mood }}
+                    class="text-sm font-bold text-{{ $moodColor }}-600 dark:text-{{ $moodColor }}-400 transition-colors duration-300">
+                    {{ $moodLabel }}
                 </span>
             </div>
         </div>

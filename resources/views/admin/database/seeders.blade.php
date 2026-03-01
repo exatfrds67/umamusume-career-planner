@@ -1,16 +1,18 @@
-<x-admin-layout>
+<x-admin-layout title="Database Seeders">
     <div class="space-y-6">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Database Seeders</h1>
 
         <!-- Run All Seeders -->
         <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
             <h2 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Run All Seeders</h2>
-            <form method="POST" action="{{ route('admin.database.seeders.all') }}"
-                onsubmit="return confirm('Run all seeders?')">
-                @csrf
-                <button type="submit" class="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700">Run All
-                    Seeders</button>
-            </form>
+            <x-admin-confirm-action
+                :action="route('admin.database.seeders.all')"
+                title="Run All Seeders"
+                message="This will execute all database seeders, which may insert or replace data. Continue?"
+                variant="warning"
+                confirmText="Run All"
+                buttonLabel="Run All Seeders"
+                buttonClass="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2" />
         </div>
 
         <!-- Individual Seeders -->
@@ -26,11 +28,12 @@
                             <p class="text-sm text-gray-500 dark:text-gray-400">{{ $seeder['class'] }}</p>
                         </div>
                         <form method="POST" action="{{ route('admin.database.seeders.run') }}"
-                            onsubmit="return confirm('Run this seeder?')">
+                            onsubmit="return confirm('Run {{ $seeder['name'] }} seeder?')">
                             @csrf
                             <input type="hidden" name="seeder" value="{{ $seeder['class'] }}">
                             <button type="submit"
-                                class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Run</button>
+                                aria-label="Run {{ $seeder['name'] }} seeder"
+                                class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">Run</button>
                         </form>
                     </div>
                 @empty

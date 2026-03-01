@@ -26,18 +26,20 @@ Accessibility: WCAG 2.2 AA compliant
     'data' => [],
     'labels' => [],
     'colors' => ['#3B82F6'],
+    'datasetLabels' => [],
     'height' => 'h-64',
     'animated' => true,
     'responsive' => true,
 ])
 
-<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4"
+<div class="glass-card rounded-xl p-6 space-y-4"
     x-data="lineChart(
         {{ json_encode($data) }},
         {{ json_encode($labels) }},
         {{ json_encode($colors) }},
         {{ $animated ? 'true' : 'false' }},
-        {{ $responsive ? 'true' : 'false' }}
+        {{ $responsive ? 'true' : 'false' }},
+        {{ json_encode($datasetLabels) }}
     )">
     {{-- Header --}}
     <div>

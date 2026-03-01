@@ -47,7 +47,7 @@
     x-transition:leave-end="opacity-0"
     x-cloak
     @keydown.escape.window="show = false; {{ $cancelAction ? $cancelAction . '()' : '' }}"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs"
     role="dialog"
     aria-modal="true"
     aria-labelledby="confirm-dialog-title"
@@ -101,7 +101,7 @@
             <button 
                 type="button"
                 @click="show = false; {{ $cancelAction ? $cancelAction . '()' : '' }}"
-                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200"
+                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200"
             >
                 {{ $cancelText }}
             </button>
@@ -109,7 +109,7 @@
             <button 
                 type="button"
                 @click="show = false; {{ $confirmAction ? $confirmAction . '()' : '' }}"
-                class="px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-all duration-200 {{ $confirmButtonClasses }}"
+                class="px-4 py-2 text-sm font-medium rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-all duration-200 {{ $confirmButtonClasses }}"
             >
                 {{ $confirmText }}
             </button>

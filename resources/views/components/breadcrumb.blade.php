@@ -28,7 +28,7 @@
                 @if (!$isLast)
                     {{-- Clickable breadcrumb item --}}
                     <a href="{{ $url }}"
-                        class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-1"
+                        class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-1"
                         @if ($index === 0) aria-label="Home" @endif>
                         @if ($icon === 'home')
                             {{-- Home icon --}}

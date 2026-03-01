@@ -70,7 +70,7 @@
                                     </p>
                                 </div>
                                 <kbd
-                                    class="px-2 py-1 text-sm font-semibold text-gray-900 dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-sm"
+                                    class="px-2 py-1 text-sm font-semibold text-gray-900 dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-xs"
                                     x-text="formatShortcut(shortcut)"
                                 ></kbd>
                             </div>

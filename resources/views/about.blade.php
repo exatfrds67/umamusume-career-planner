@@ -27,7 +27,7 @@
                     Powerful Training Tools
                 </h2>
                 <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-                    Everything you need to achieve A-grade rankings and optimize your character development
+                    Everything you need to reach S-rank aptitudes and optimize your character development
                 </p>
             </div>
 
@@ -63,7 +63,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Comprehensive Stat Tracking</h3>
                     <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                        Monitor Speed, Stamina, Power, Guts, and Wisdom with detailed progression analytics
+                        Monitor Speed, Stamina, Power, Guts, and Wit with detailed progression analytics
                         and performance visualization.
                     </p>
                 </article>
@@ -148,11 +148,11 @@
                 Ready to Optimize Your Training?
             </h2>
             <p class="text-xl text-primary-100 mb-10 max-w-3xl mx-auto leading-relaxed">
-                Join trainers who are already achieving A-grade rankings with intelligent career planning
+                Join trainers who are already reaching S-rank aptitudes with intelligent career planning
             </p>
 
             <a href="{{ route('dashboard') }}"
-                class="inline-flex items-center justify-center px-10 py-5 text-lg font-semibold text-primary-600 bg-white hover:bg-gray-50 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-600"
+                class="inline-flex items-center justify-center px-10 py-5 text-lg font-semibold text-primary-600 bg-white hover:bg-gray-50 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-600"
                 aria-label="Start your training journey now">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

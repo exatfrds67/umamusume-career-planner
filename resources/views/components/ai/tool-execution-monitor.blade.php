@@ -2,7 +2,7 @@
     'refreshInterval' => 10000, // 10 seconds
 ])
 
-<div class="tool-execution-monitor bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6" x-data="toolExecutionMonitor({
+<div class="tool-execution-monitor bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6" x-data="toolExecutionMonitor({
     refreshInterval: {{ $refreshInterval }}
 })">
     {{-- Header --}}

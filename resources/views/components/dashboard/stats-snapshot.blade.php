@@ -15,7 +15,7 @@
         'stamina' => ['label' => 'Stamina', 'type' => 'stamina'],
         'power' => ['label' => 'Power', 'type' => 'power'],
         'guts' => ['label' => 'Guts', 'type' => 'guts'],
-        'wit' => ['label' => 'Wisdom', 'type' => 'wisdom'],
+        'wit' => ['label' => 'Wit', 'type' => 'wisdom'],
     ];
 
     // Helper function to get grade from stat value
@@ -39,13 +39,14 @@
     };
 @endphp
 
-<div {{ $attributes->merge(['class' => 'card bg-white dark:bg-gray-800 overflow-hidden rounded-lg shadow']) }}>
+<div {{ $attributes->merge(['class' => 'glass-card rounded-xl overflow-hidden']) }}>
     <div class="px-4 py-5 sm:p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Stat Snapshot</h3>
             @if ($character)
                 <a href="{{ route('characters.show', $character) }}"
-                    class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
+                    class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                    aria-label="View detailed stats for {{ $character->name }}">
                     View Details
                 </a>
             @endif
@@ -56,7 +57,7 @@
                 @php
                     $value = $stats[$key] ?? 0;
                 @endphp
-                <x-stat-bar :stat="$key" :current="$value" :max="2000" show-icon show-percentage
+                <x-stat-bar :stat="$key" :current="$value" :max="1200" show-icon show-percentage
                     show-soft-cap />
             @endforeach
         </div>

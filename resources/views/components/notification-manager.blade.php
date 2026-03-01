@@ -19,7 +19,7 @@
             class="flex items-start gap-3 p-4 border rounded-lg shadow-lg w-full"
         >
             <!-- Icon -->
-            <div :class="getIconColor(notification.type)" class="flex-shrink-0 text-lg font-bold">
+            <div :class="getIconColor(notification.type)" class="shrink-0 text-lg font-bold">
                 <span x-text="getIcon(notification.type)"></span>
             </div>
 
@@ -43,7 +43,7 @@
                 <button
                     @click="removeNotification(notification.id)"
                     :class="getTextColor(notification.type)"
-                    class="flex-shrink-0 hover:opacity-70 transition"
+                    class="shrink-0 hover:opacity-70 transition"
                     aria-label="Dismiss notification"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

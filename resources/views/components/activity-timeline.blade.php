@@ -52,7 +52,7 @@ Accessibility: WCAG 2.2 AA compliant
             <div class="relative">
                 {{-- Timeline Line --}}
                 <div
-                    class="absolute left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-purple-400 dark:from-blue-500 dark:to-purple-500">
+                    class="absolute left-4 top-0 bottom-0 w-1 bg-linear-to-b from-blue-400 to-purple-400 dark:from-blue-500 dark:to-purple-500">
                 </div>
 
                 {{-- Events --}}
@@ -131,7 +131,7 @@ Accessibility: WCAG 2.2 AA compliant
                     role="article">
 
                     {{-- Icon --}}
-                    <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                    <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg"
                         :class="getEventColor(event.type)">
                         <span x-text="getEventIcon(event.type)"></span>
                     </div>
@@ -157,11 +157,11 @@ Accessibility: WCAG 2.2 AA compliant
                 <div
                     class="flex items-center justify-between text-xs p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded transition-colors">
                     <div class="flex items-center gap-2 flex-1 min-w-0">
-                        <span class="text-lg flex-shrink-0" x-text="getEventIcon(event.type)"></span>
+                        <span class="text-lg shrink-0" x-text="getEventIcon(event.type)"></span>
                         <span class="text-gray-900 dark:text-white font-medium truncate" x-text="event.title">
                         </span>
                     </div>
-                    <span class="text-gray-500 dark:text-gray-400 flex-shrink-0" x-text="getTimeAgo(event.timestamp)">
+                    <span class="text-gray-500 dark:text-gray-400 shrink-0" x-text="getTimeAgo(event.timestamp)">
                     </span>
                 </div>
             </template>

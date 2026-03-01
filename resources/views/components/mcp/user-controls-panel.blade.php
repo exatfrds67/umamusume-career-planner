@@ -1,6 +1,6 @@
 @props(['settings' => []])
 
-<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-xs dark:border-gray-700 dark:bg-gray-800">
     <h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">MCP Settings & Controls</h3>
 
     <!-- MCP Server Preferences -->
@@ -45,7 +45,7 @@
                     Agent</label>
                 <select x-model="settings.agents.training"
                     @change="$dispatch('update-agent-config', { type: 'training', value: settings.agents.training })"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
                     <option value="auto">Auto-select (Recommended)</option>
                     <option value="ollama">Ollama (Local)</option>
                     <option value="bedrock">AWS Bedrock (Cloud)</option>
@@ -58,7 +58,7 @@
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Career Planning Agent</label>
                 <select x-model="settings.agents.career"
                     @change="$dispatch('update-agent-config', { type: 'career', value: settings.agents.career })"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
                     <option value="auto">Auto-select (Recommended)</option>
                     <option value="ollama">Ollama (Local)</option>
                     <option value="bedrock">AWS Bedrock (Cloud)</option>
@@ -71,7 +71,7 @@
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Race Strategy Agent</label>
                 <select x-model="settings.agents.race"
                     @change="$dispatch('update-agent-config', { type: 'race', value: settings.agents.race })"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
                     <option value="auto">Auto-select (Recommended)</option>
                     <option value="ollama">Ollama (Local)</option>
                     <option value="bedrock">AWS Bedrock (Cloud)</option>
@@ -85,7 +85,7 @@
                     Agent</label>
                 <select x-model="settings.agents.skill"
                     @change="$dispatch('update-agent-config', { type: 'skill', value: settings.agents.skill })"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
                     <option value="auto">Auto-select (Recommended)</option>
                     <option value="ollama">Ollama (Local)</option>
                     <option value="bedrock">AWS Bedrock (Cloud)</option>
@@ -108,7 +108,7 @@
                     <input type="number" id="daily-budget-input" name="daily_budget" x-model="settings.budget.daily"
                         @change="$dispatch('update-budget-limit', { period: 'daily', value: settings.budget.daily })"
                         step="0.01" min="0"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        class="block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
                 </div>
             </div>
 
@@ -122,7 +122,7 @@
                         x-model="settings.budget.monthly"
                         @change="$dispatch('update-budget-limit', { period: 'monthly', value: settings.budget.monthly })"
                         step="0.01" min="0"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
+                        class="block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
                 </div>
             </div>
 
@@ -192,11 +192,11 @@
     <!-- Action Buttons -->
     <div class="flex space-x-3 border-t border-gray-200 pt-4 dark:border-gray-700">
         <button @click="$dispatch('save-settings')"
-            class="flex-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+            class="flex-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
             Save Settings
         </button>
         <button @click="$dispatch('reset-settings')"
-            class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:focus:ring-offset-gray-800">
+            class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:focus:ring-offset-gray-800">
             Reset to Defaults
         </button>
     </div>

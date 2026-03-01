@@ -63,11 +63,11 @@
         </div>
 
         {{-- Status Text --}}
-        <div class="mt-1 text-xs font-medium {{ $getColorClasses() }}">
+        <div class="mt-2 mb-1 text-xs font-medium text-gray-600 dark:text-gray-300">
             {{ match ($getStatus()) {
                 'high' => '✓ Good condition',
                 'medium' => '⚠ Moderate energy',
-                'low' => '⚠ Low energy - rest recommended',
+                'low' => '⚠ Low energy — rest recommended',
                 default => 'Unknown',
             } }}
         </div>

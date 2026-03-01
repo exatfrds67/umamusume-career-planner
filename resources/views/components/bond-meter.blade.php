@@ -36,7 +36,7 @@
             {{-- Shimmer Effect --}}
             @if ($isThresholdReached())
                 <div
-                    class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer">
+                    class="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-shimmer">
                 </div>
             @endif
         </div>

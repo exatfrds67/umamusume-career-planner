@@ -7,7 +7,7 @@
 
         <template x-for="tool in activeTools" :key="tool.id">
             <div
-                class="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-gray-700 rounded-full border border-blue-200 dark:border-blue-800 shadow-sm">
+                class="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-gray-700 rounded-full border border-blue-200 dark:border-blue-800 shadow-xs">
                 {{-- Tool Icon --}}
                 <svg class="w-3 h-3 text-blue-600 dark:text-blue-400 animate-pulse" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">

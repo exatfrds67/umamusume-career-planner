@@ -34,6 +34,9 @@
     ]) }}
     @click="$dispatch('open-advisory-panel', { section: 'alerts' })">
     <span class="sr-only">
+        Critical Alert Badge
+    </span>
+    <span class="sr-only">
         @if ($hasCriticalAlerts)
             View {{ $alertCount }} critical {{ Str::plural('alert', $alertCount) }}
         @else

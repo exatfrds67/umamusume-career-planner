@@ -1,4 +1,4 @@
-<x-admin-layout>
+<x-admin-layout title="Edit User: {{ $user->name }}">
     <div class="space-y-6">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Edit User: {{ $user->name }}</h1>
 
@@ -12,10 +12,11 @@
                         <label for="name"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
                         <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}"
-                            required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                            required autocomplete="name"
+                            @error('name') aria-describedby="name-error" aria-invalid="true" @enderror
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
                         @error('name')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            <p id="name-error" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -23,10 +24,11 @@
                         <label for="email"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                         <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
-                            required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                            required autocomplete="email"
+                            @error('email') aria-describedby="email-error" aria-invalid="true" @enderror
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
                         @error('email')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            <p id="email-error" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -34,7 +36,7 @@
                         <label for="bio"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
                         <textarea name="bio" id="bio" rows="3"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">{{ old('bio', $user->bio) }}</textarea>
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">{{ old('bio', $user->bio) }}</textarea>
                         @error('bio')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
@@ -51,9 +53,13 @@
 
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New
-                            Password (leave blank to keep current)</label>
+                            Password</label>
+                        <p id="password-hint" class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Leave blank to keep current password.</p>
                         <input type="password" name="password" id="password"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                            autocomplete="new-password"
+                            aria-describedby="password-hint"
+                            @error('password') aria-invalid="true" @enderror
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
                         @error('password')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
@@ -63,7 +69,8 @@
                         <label for="password_confirmation"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
                         <input type="password" name="password_confirmation" id="password_confirmation"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                            autocomplete="new-password"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
                     </div>
                 </div>
 
@@ -72,7 +79,7 @@
                         Update User
                     </button>
                     <a href="{{ route('admin.users.index') }}"
-                        class="rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700">
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                         Cancel
                     </a>
                 </div>

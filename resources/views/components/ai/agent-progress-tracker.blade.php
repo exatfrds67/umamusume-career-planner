@@ -2,7 +2,7 @@
     'refreshInterval' => 5000, // 5 seconds for real-time updates
 ])
 
-<div class="agent-progress-tracker bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6" x-data="agentProgressTracker({
+<div class="agent-progress-tracker bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6" x-data="agentProgressTracker({
     refreshInterval: {{ $refreshInterval }}
 })">
     {{-- Header --}}
@@ -33,14 +33,14 @@
             </path>
         </svg>
         <p class="text-gray-500 dark:text-gray-400">No active workflow</p>
-        <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Agent workflows will appear here when active</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Agent workflows will appear here when active</p>
     </div>
 
     {{-- Active Workflow --}}
     <div x-show="progress?.workflow_id" class="space-y-6">
         {{-- Workflow Info --}}
         <div
-            class="bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900 dark:to-primary-800 rounded-lg p-4">
+            class="bg-linear-to-r from-primary-50 to-primary-100 dark:from-primary-900 dark:to-primary-800 rounded-lg p-4">
             <div class="flex items-center justify-between mb-2">
                 <h4 class="text-sm font-medium text-primary-900 dark:text-primary-100"
                     x-text="progress?.workflow_name || 'Unnamed Workflow'"></h4>
@@ -73,7 +73,7 @@
                     x-text="(progress?.progress_percentage || 0).toFixed(1) + '%'"></span>
             </div>
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                <div class="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-500 ease-out"
+                <div class="bg-linear-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-500 ease-out"
                     :style="'width: ' + (progress?.progress_percentage || 0) + '%'">
                 </div>
             </div>

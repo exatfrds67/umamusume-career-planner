@@ -6,14 +6,15 @@
     'characterId' => null,
 ])
 
-<div {{ $attributes->merge(['class' => 'card bg-white dark:bg-gray-800 overflow-hidden rounded-lg shadow']) }}>
+<div {{ $attributes->merge(['class' => 'glass-card rounded-xl overflow-hidden']) }}>
     <div class="px-4 py-5 sm:p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">
                 Current Goals
             </h3>
             <a href="{{ $characterId ? route('characters.edit', $characterId) : route('characters.index') }}"
-                class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
+                class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                aria-label="Edit goals for this character">
                 Edit Goals
             </a>
         </div>
@@ -27,14 +28,14 @@
                         <svg class="w-4 h-4 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24"
                             stroke-width="2" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                     </span>
                     <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Short-term</span>
                 </div>
                 <p class="text-sm text-gray-900 dark:text-white mb-2">{{ $shortTermGoal }}</p>
-                <x-ui.progress-bar :value="$shortTermProgress" :max="100" color="primary" size="md" />
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $shortTermProgress }}% complete</p>
+                <x-ui.progress-bar :value="$shortTermProgress" :max="100" color="primary" size="md" :aria-label="'Short-term goal: ' . $shortTermProgress . '% complete'" />
+                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1.5">{{ $shortTermProgress }}% complete</p>
             </div>
 
             {{-- Long-term Goal --}}
@@ -51,8 +52,8 @@
                     <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Long-term</span>
                 </div>
                 <p class="text-sm text-gray-900 dark:text-white mb-2">{{ $longTermGoal }}</p>
-                <x-ui.progress-bar :value="$longTermProgress" :max="100" color="success" size="md" />
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $longTermProgress }}% complete</p>
+                <x-ui.progress-bar :value="$longTermProgress" :max="100" color="success" size="md" :aria-label="'Long-term goal: ' . $longTermProgress . '% complete'" />
+                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1.5">{{ $longTermProgress }}% complete</p>
             </div>
         </div>
     </div>

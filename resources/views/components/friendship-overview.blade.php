@@ -1,6 +1,6 @@
 @props(['overview'])
 
-<div class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+<div class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
     <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Friendship Levels</h2>
         <div class="text-sm text-gray-500 dark:text-gray-400">

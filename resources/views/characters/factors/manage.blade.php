@@ -98,7 +98,7 @@
                                     Factor Type
                                 </label>
                                 <select name="factor_type" id="factor_type" required
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500">
                                     <option value="">Select Type</option>
                                     <option value="blue_stats">Blue (Stat Bonuses)</option>
                                     <option value="red_aptitudes">Red (Aptitude Upgrades)</option>
@@ -117,7 +117,7 @@
                                     Factor Name
                                 </label>
                                 <input type="text" name="factor_name" id="factor_name" required
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500"
                                     placeholder="Enter factor name">
                                 @error('factor_name')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -131,7 +131,7 @@
                                     Star Level
                                 </label>
                                 <select name="star_level" id="star_level" required
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500">
                                     <option value="">Select Star Level</option>
                                     <option value="1_star">⭐ One Star</option>
                                     <option value="2_star">⭐⭐ Two Star</option>
@@ -149,7 +149,7 @@
                                     Stat Type
                                 </label>
                                 <select name="stat_type" id="stat_type"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500">
                                     <option value="">Select Stat</option>
                                     <option value="speed">Speed</option>
                                     <option value="stamina">Stamina</option>
@@ -165,7 +165,7 @@
                                     Aptitude Type
                                 </label>
                                 <select name="aptitude_type" id="aptitude_type"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500">
                                     <option value="">Select Aptitude</option>
                                     <option value="sprint">Sprint</option>
                                     <option value="mile">Mile</option>
@@ -186,7 +186,7 @@
                                     Unique Skill Name
                                 </label>
                                 <input type="text" name="unique_skill_name" id="unique_skill_name"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500"
                                     placeholder="Enter unique skill name">
                             </div>
 
@@ -196,7 +196,7 @@
                                     Normal Skill Name
                                 </label>
                                 <input type="text" name="normal_skill_name" id="normal_skill_name"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500"
                                     placeholder="Enter normal skill name">
                             </div>
 
@@ -207,7 +207,7 @@
                                     Source Parent
                                 </label>
                                 <select name="source_parent" id="source_parent" required
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500">
                                     <option value="">Select Parent</option>
                                     <option value="main_parent_1">Main Parent 1</option>
                                     <option value="main_parent_2">Main Parent 2</option>
@@ -228,7 +228,7 @@
                                     Source Character Name (Optional)
                                 </label>
                                 <input type="text" name="source_character_name" id="source_character_name"
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500"
                                     placeholder="Enter character name">
                                 @error('source_character_name')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>

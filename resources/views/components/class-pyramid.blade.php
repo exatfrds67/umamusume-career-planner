@@ -34,7 +34,7 @@ Accessibility: WCAG 2.2 AA compliant
     'height' => 'h-96',
 ])
 
-<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4"
+<div class="glass-card rounded-xl p-6 space-y-4"
     x-data="classPyramid({{ json_encode($grades) }})">
     {{-- Header --}}
     <div>

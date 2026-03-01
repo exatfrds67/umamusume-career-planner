@@ -43,7 +43,7 @@
                         {{-- Step Card --}}
                         <div class="flex items-start gap-3 p-3 bg-white dark:bg-gray-700 rounded-lg border"
                             :class="{
-                                'border-blue-500 shadow-sm': step.status === 'running',
+                                'border-blue-500 shadow-xs': step.status === 'running',
                                 'border-green-500': step.status === 'completed',
                                 'border-red-500': step.status === 'failed',
                                 'border-gray-200 dark:border-gray-600': step.status === 'pending'

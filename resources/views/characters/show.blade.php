@@ -15,7 +15,7 @@
                     @csrf
                     <button type="submit"
                         class="btn {{ $character->isPinnedBy(Auth::id()) ? 'btn-primary' : 'btn-secondary' }}"
-                        title="{{ $character->isPinnedBy(Auth::id()) ? 'Unpin character' : 'Pin character for quick access' }}">
+                        aria-label="{{ $character->isPinnedBy(Auth::id()) ? 'Unpin ' . $character->name : 'Pin ' . $character->name . ' for quick access' }}">
                         @if ($character->isPinnedBy(Auth::id()))
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
                                 <path
@@ -34,8 +34,9 @@
 
                 <form action="{{ route('characters.rest', $character) }}" method="POST" class="inline">
                     @csrf
-                    <button type="submit" class="btn btn-secondary text-green-700 dark:text-green-400">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="submit" class="btn btn-secondary text-green-700 dark:text-green-400"
+                        aria-label="Perform rest action for {{ $character->name }}">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                         </svg>
@@ -45,8 +46,9 @@
 
                 <form action="{{ route('characters.next-turn', $character) }}" method="POST" class="inline">
                     @csrf
-                    <button type="submit" class="btn btn-secondary text-blue-700 dark:text-blue-400">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="submit" class="btn btn-secondary text-blue-700 dark:text-blue-400"
+                        aria-label="Advance to next training turn for {{ $character->name }}">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                         </svg>
@@ -122,31 +124,36 @@
 
                             <!-- AI Advisor (Desktop Position) -->
                             <div class="hidden lg:block w-80">
-                                <x-dashboard.ai-advisor-card class="shadow-sm border-0" :lastTip="$aiTip" />
+                                <x-dashboard.ai-advisor-card class="shadow-xs border-0" :lastTip="$aiTip" />
                             </div>
                         </div>
 
                         <!-- Quick Progress Bars -->
                         <div
-                            class="max-w-2xl bg-white/50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50 backdrop-blur-sm">
+                            class="max-w-2xl bg-white/50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50 backdrop-blur-xs"
+                            aria-label="Character status indicators">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div class="space-y-2">
                                     <div class="flex justify-between text-xs font-semibold uppercase tracking-wider">
                                         <span class="text-gray-500 dark:text-gray-400">Energy Level</span>
                                         <span
-                                            class="{{ $character->energy_level < 30 ? 'text-red-500' : 'text-green-500' }}">{{ $character->energy_level }}%</span>
+                                            class="{{ $character->energy_level < 30 ? 'text-red-500' : 'text-green-500' }}"
+                                            aria-label="Energy level: {{ $character->energy_level }}%">{{ $character->energy_level }}%</span>
                                     </div>
                                     <x-ui.progress-bar :value="$character->energy_level" :max="100"
                                         color="{{ $character->energy_level < 30 ? 'bg-red-500' : 'bg-green-500' }}"
-                                        size="sm" :show-text="false" />
+                                        size="sm" :show-text="false"
+                                        aria-label="Energy level {{ $character->energy_level }} percent" />
                                 </div>
                                 <div class="space-y-2">
                                     <div class="flex justify-between text-xs font-semibold uppercase tracking-wider">
                                         <span class="text-gray-500 dark:text-gray-400">Goal Progress</span>
-                                        <span class="text-primary-500">{{ $character->getProgressPercentage() }}%</span>
+                                        <span class="text-primary-500"
+                                            aria-label="Goal progress: {{ $character->getProgressPercentage() }}%">{{ $character->getProgressPercentage() }}%</span>
                                     </div>
                                     <x-ui.progress-bar :value="$character->getProgressPercentage()" :max="100" color="bg-primary-500"
-                                        size="sm" :show-text="false" />
+                                        size="sm" :show-text="false"
+                                        aria-label="Goal progress {{ $character->getProgressPercentage() }} percent" />
                                 </div>
                             </div>
                         </div>
@@ -222,12 +229,18 @@
                                                 {{ $card->name ?? 'Unknown Card' }}</div>
                                             <div class="flex items-center gap-2 mt-1">
                                                 <div
-                                                    class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+                                                    role="progressbar"
+                                                    aria-valuenow="{{ $bondLevel }}"
+                                                    aria-valuemin="0"
+                                                    aria-valuemax="{{ $bondMax }}"
+                                                    aria-label="Bond with {{ $card->name ?? 'support card' }}: {{ $bondLevel }} of {{ $bondMax }}">
                                                     <div class="h-full bg-primary-500 rounded-full transition-all"
                                                         @style(['width' => $bondPercentage . '%'])></div>
                                                 </div>
                                                 <span
-                                                    class="text-xs text-gray-500 dark:text-gray-400 tabular-nums">{{ $bondLevel }}</span>
+                                                    class="text-xs text-gray-500 dark:text-gray-400 tabular-nums"
+                                                    aria-hidden="true">{{ $bondLevel }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -242,8 +255,9 @@
                                 </svg>
                                 <p class="mb-3">No support cards equipped.</p>
                                 <a href="{{ route('characters.deck-builder', $character) }}"
-                                    class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+                                    aria-label="Add support cards for {{ $character->name }}">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 4v16m8-8H4" />
                                     </svg>
@@ -380,7 +394,7 @@
                                 <div
                                     class="flex items-center justify-between p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-yellow-400"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-yellow-400" aria-hidden="true"></div>
                                         <span
                                             class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ $skill->name }}</span>
                                     </div>
@@ -394,14 +408,15 @@
                     @else
                         <div class="text-center text-sm text-gray-500 py-6">
                             <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
+                                stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                             </svg>
                             <p class="mb-3">No skills acquired yet.</p>
                             <a href="{{ route('skills.index', ['character' => $character->id]) }}"
-                                class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+                                aria-label="Browse skills for {{ $character->name }}">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 4v16m8-8H4" />
                                 </svg>
@@ -462,7 +477,7 @@
                     @else
                         <div class="text-center text-sm text-gray-500 py-6">
                             <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
+                                stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
@@ -513,7 +528,8 @@
                                     <h4
                                         class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                                         <div
-                                            class="w-2 h-2 rounded-full bg-{{ str_replace('_stats', '', str_replace('_aptitudes', '', str_replace('_unique_skills', '', str_replace('_normal_skills', '', $type)))) }}-500">
+                                            class="w-2 h-2 rounded-full bg-{{ str_replace('_stats', '', str_replace('_aptitudes', '', str_replace('_unique_skills', '', str_replace('_normal_skills', '', $type)))) }}-500"
+                                            aria-hidden="true">
                                         </div>
                                         {{ $factorTypeLabels[$type] ?? ucfirst($type) }}
                                         <span class="text-gray-400">({{ $factors->count() }})</span>
@@ -524,15 +540,16 @@
                                                 class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 {{ !$factor->is_active ? 'opacity-50' : '' }}">
                                                 <div class="flex items-center gap-2">
                                                     <!-- Star Level -->
-                                                    <div class="flex items-center">
+                                                    <div class="flex items-center" aria-hidden="true">
                                                         @for ($i = 1; $i <= 3; $i++)
                                                             <svg class="w-3 h-3 {{ $i <= (int) str_replace('_star', '', $factor->star_level) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600' }}"
-                                                                fill="currentColor" viewBox="0 0 20 20">
+                                                                fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                                                 <path
                                                                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                                             </svg>
                                                         @endfor
                                                     </div>
+                                                    <span class="sr-only">{{ (int) str_replace('_star', '', $factor->star_level) }} star{{ (int) str_replace('_star', '', $factor->star_level) !== 1 ? 's' : '' }}</span>
 
                                                     <!-- Factor Name -->
                                                     <span class="text-sm font-medium text-gray-900 dark:text-white">
@@ -629,7 +646,7 @@
                     @else
                         <div class="text-center text-sm text-gray-500 py-8">
                             <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
+                                stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>

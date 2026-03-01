@@ -22,7 +22,7 @@
 
     {{-- Message Content --}}
     <div class="flex-1 max-w-3xl">
-        <div class="rounded-lg p-4 shadow-sm"
+        <div class="rounded-lg p-4 shadow-xs"
             :class="message.sender === 'user' ?
                 'bg-primary-600 text-white' :
                 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600'">

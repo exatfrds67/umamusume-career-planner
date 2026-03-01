@@ -90,7 +90,7 @@
                         </h3>
                         <p class="text-gray-600 dark:text-gray-400 max-w-md">
                             Ask me anything about training strategies, character optimization, race preparation, or
-                            skill builds. I'm here to help you achieve A-grade rankings!
+                            skill builds. I'm here to help you reach S-rank aptitudes!
                         </p>
                     </div>
                 </template>
@@ -121,7 +121,7 @@
 
                         {{-- Message Content --}}
                         <div class="flex-1 max-w-3xl">
-                            <div class="rounded-lg p-4 shadow-sm"
+                            <div class="rounded-lg p-4 shadow-xs"
                                 :class="msg.sender === 'user' ?
                                     'bg-primary-600 text-white' :
                                     'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600'">
@@ -289,7 +289,7 @@
                     </div>
 
                     <button type="submit" :disabled="!currentMessage.trim() || isProcessing"
-                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         aria-label="Send message">
                         <svg x-show="!isProcessing" class="w-5 h-5" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">

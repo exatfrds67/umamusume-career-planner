@@ -19,7 +19,7 @@
         </p>
 
         <a href="{{ route('characters.create') }}"
-            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-xs text-white bg-primary-600 hover:bg-primary-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
@@ -39,7 +39,7 @@
                 </svg>
             </div>
             <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Track Stats</h4>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Monitor Speed, Stamina, Power, Guts, and Wisdom
+            <p class="text-xs text-gray-500 dark:text-gray-400">Monitor Speed, Stamina, Power, Guts, and Wit
                 progression in real-time.</p>
         </div>
 

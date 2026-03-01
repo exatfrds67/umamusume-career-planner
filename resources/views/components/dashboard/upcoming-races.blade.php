@@ -2,14 +2,15 @@
     'races' => [],
 ])
 
-<div {{ $attributes->merge(['class' => 'card bg-white dark:bg-gray-800 overflow-hidden rounded-lg shadow']) }}>
+<div {{ $attributes->merge(['class' => 'glass-card rounded-xl overflow-hidden']) }}>
     <div class="px-4 py-5 sm:p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">
                 Upcoming Races
             </h3>
             <a href="{{ route('races.index') }}"
-                class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
+                class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                aria-label="View all upcoming races">
                 View All
             </a>
         </div>
@@ -30,7 +31,11 @@
                         </div>
                         <span class="text-xs text-gray-500 dark:text-gray-400">
                             @if (isset($race['turnsAway']))
-                                In {{ $race['turnsAway'] }} turn{{ $race['turnsAway'] !== 1 ? 's' : '' }}
+                                @if ($race['turnsAway'] === 0)
+                                    <span class="font-semibold text-primary-600 dark:text-primary-400">Race Day!</span>
+                                @else
+                                    In {{ $race['turnsAway'] }} turn{{ $race['turnsAway'] !== 1 ? 's' : '' }}
+                                @endif
                             @elseif (isset($race['date']))
                                 {{ \Carbon\Carbon::parse($race['date'])->format('M d, Y') }}
                             @endif
@@ -49,7 +54,7 @@
                     </div>
                 </div>
             @empty
-                <div class="text-center py-6">
+                <div class="text-center py-4">
                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"

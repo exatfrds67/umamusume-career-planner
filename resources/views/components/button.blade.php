@@ -37,7 +37,7 @@
 @endphp
 
 @if ($href && !$isDisabled)
-    <a href="{{ $href }}" class="{{ $classes }}" role="button"
+    <a href="{{ $href }}" class="{{ $classes }}"
         @foreach ($ariaAttributes as $key => $value)
             @if ($value)
                 {{ $key }}="{{ $value }}"

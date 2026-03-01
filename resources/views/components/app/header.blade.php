@@ -17,8 +17,10 @@
     <div class="flex items-center gap-x-4 lg:gap-x-6">
         <!-- Theme Toggle -->
         <button type="button" id="theme-toggle"
+            x-data="{ isDark: document.documentElement.classList.contains('dark') }" 
+            @theme-changed.window="isDark = $event.detail"
             class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200"
-            aria-label="Toggle theme" aria-pressed="false" title="Toggle light/dark theme">
+            aria-label="Toggle theme" :aria-pressed="isDark.toString()" title="Toggle light/dark theme">
             <span class="sr-only">Toggle theme</span>
             <!-- Sun icon (shown in dark mode) -->
             <svg class="h-6 w-6 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -78,12 +80,12 @@
                 x-transition:leave="transition ease-in duration-75"
                 x-transition:leave-start="transform opacity-100 scale-100"
                 x-transition:leave-end="transform opacity-0 scale-95"
-                class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white dark:bg-gray-800 py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none"
+                class="absolute right-0 z-10 mt-2.5 w-40 origin-top-right rounded-md bg-white dark:bg-gray-800 py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-hidden"
                 role="menu" aria-orientation="vertical">
-                <a href="{{ route('profile.show') ?? '#' }}"
+                <a href="{{ route('profile.show') }}"
                     class="block px-3 py-1 text-sm leading-6 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
                     role="menuitem">Your profile</a>
-                <form method="POST" action="{{ route('logout') ?? '#' }}" id="logout-form">
+                <form method="POST" action="{{ route('logout') }}" id="logout-form">
                     @csrf
                     <button type="submit" id="logout-btn"
                         class="block w-full text-left px-3 py-1 text-sm leading-6 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"

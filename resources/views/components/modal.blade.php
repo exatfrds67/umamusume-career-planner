@@ -84,7 +84,7 @@ Accessibility: WCAG 2.2 AA compliant, focus trap, Escape key closes
         x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 bg-gray-900/50 dark:bg-gray-900/80 backdrop-blur-sm"
+        class="fixed inset-0 z-50 bg-gray-900/50 dark:bg-gray-900/80 backdrop-blur-xs"
         @if($closeable) @click="open = false" @endif
         aria-hidden="true"
     ></div>
@@ -127,7 +127,7 @@ Accessibility: WCAG 2.2 AA compliant, focus trap, Escape key closes
                             <button
                                 type="button"
                                 @click="open = false"
-                                class="rounded-lg p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+                                class="rounded-lg p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-primary-500 transition-colors"
                                 aria-label="Close modal"
                             >
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">

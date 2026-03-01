@@ -85,7 +85,7 @@
                             @endif
                         </p>
                         @if (isset($operation['operation_id']))
-                            <p class="text-xs text-gray-400 dark:text-gray-500 font-mono">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 font-mono">
                                 {{ substr($operation['operation_id'], 0, 8) }}...
                             </p>
                         @endif

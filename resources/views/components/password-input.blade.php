@@ -16,12 +16,12 @@
     <div class="relative">
         <input id="{{ $id }}" name="{{ $name }}" type="password" autocomplete="{{ $autocomplete }}"
             @if ($required) required @endif value="{{ $value }}"
-            class="appearance-none relative block w-full px-3 py-2 {{ $showToggle ? 'pr-10' : '' }} border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
+            class="appearance-none relative block w-full px-3 py-2 {{ $showToggle ? 'pr-10' : '' }} border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-hidden focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
             placeholder="{{ $placeholder }}" {{ $attributes }}>
 
         @if ($showToggle)
             <button type="button"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-md"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-md"
                 onclick="togglePasswordVisibility('{{ $id }}')" aria-label="Toggle password visibility"
                 title="Show/hide password">
                 <svg id="{{ $id }}-eye-open"

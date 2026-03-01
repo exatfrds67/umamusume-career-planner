@@ -35,21 +35,22 @@
         </div>
 
         <!-- Instant Search Filtering System -->
-        <div class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700" role="search" aria-label="Character search and filters">
             <div class="divide-y divide-gray-200 dark:divide-gray-700">
                 <!-- Phase 1: Search Bar (Instant) -->
                 <div class="p-4">
                     <div class="relative">
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                 <path fill-rule="evenodd"
                                     d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
                                     clip-rule="evenodd" />
                             </svg>
                         </div>
-                        <input type="text" x-model="filters.search" @input="filterCharacters"
+                        <input type="text" x-model="filters.search" @input.debounce.300ms="filterCharacters"
                             class="form-input block w-full rounded-md border-gray-300 pl-10 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            placeholder="Search characters... (e.g., Vodka, Special Week)">
+                            placeholder="Search characters... (e.g., Vodka, Special Week)"
+                            aria-label="Search characters">
                     </div>
                 </div>
 
@@ -57,8 +58,8 @@
                 <div class="p-4">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Scenario</label>
-                            <select x-model="filters.scenario" @change="filterCharacters"
+                            <label for="filter-scenario" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Scenario</label>
+                            <select id="filter-scenario" x-model="filters.scenario" @change="filterCharacters"
                                 class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="">All Scenarios</option>
                                 <option value="ura_finale">URA Finale</option>
@@ -67,8 +68,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                            <select x-model="filters.status" @change="filterCharacters"
+                            <label for="filter-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                            <select id="filter-status" x-model="filters.status" @change="filterCharacters"
                                 class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="">All Status</option>
                                 <option value="active">Active</option>
@@ -78,8 +79,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort</label>
-                            <select x-model="filters.sort" @change="filterCharacters"
+                            <label for="filter-sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort</label>
+                            <select id="filter-sort" x-model="filters.sort" @change="filterCharacters"
                                 class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="name">Name</option>
                                 <option value="updated_at">Recently Updated</option>
@@ -102,7 +103,7 @@
         </div>
 
         <!-- Results Summary -->
-        <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+        <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400" aria-live="polite" aria-atomic="true">
             <div>
                 Showing <span class="font-semibold" x-text="filteredCharacters.length"></span> of
                 <span class="font-semibold" x-text="allCharacters.length"></span> characters
@@ -113,42 +114,48 @@
         <div x-show="filteredCharacters.length > 0">
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
                 <template x-for="character in filteredCharacters" :key="character.id">
-                    <a :href="`/characters/${character.id}`" class="block relative">
+                    <a :href="`{{ url('/characters') }}/${character.id}`" class="block relative"
+                        :aria-label="`View ${character.name}${character.is_pinned ? ' (pinned)' : ''} — Speed: ${character.current_stats?.speed || 0}, Stamina: ${character.current_stats?.stamina || 0}, Power: ${character.current_stats?.power || 0}, Guts: ${character.current_stats?.guts || 0}, Wit: ${character.current_stats?.wit || 0}`">
                         <div x-show="character.is_pinned"
                             class="absolute -top-2 -right-2 z-10 bg-primary-500 text-white rounded-full p-1.5 shadow-lg"
-                            title="Pinned">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                            aria-hidden="true">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path
                                     d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z" />
                             </svg>
                         </div>
                         <div
-                            class="character-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
+                            class="character-card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
                             <div class="aspect-3/4 relative">
                                 <img :src="character.avatar_url || '/images/trainee_images/default.png'"
-                                    :alt="character.name" class="w-full h-full object-cover">
+                                    :alt="character.name" class="w-full h-full object-cover" loading="lazy" decoding="async">
                             </div>
-                            <div class="p-2">
+                            <div class="p-2" aria-hidden="true">
                                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate"
                                     x-text="character.name"></h3>
                                 <div class="mt-1 grid grid-cols-5 gap-1 text-xs">
                                     <div class="text-center">
+                                        <div class="text-[9px] text-gray-400 dark:text-gray-500">Spd</div>
                                         <div class="text-stat-speed-600 dark:text-stat-speed-400 font-bold"
                                             x-text="character.current_stats?.speed || 0"></div>
                                     </div>
                                     <div class="text-center">
+                                        <div class="text-[9px] text-gray-400 dark:text-gray-500">Sta</div>
                                         <div class="text-stat-stamina-600 dark:text-stat-stamina-400 font-bold"
                                             x-text="character.current_stats?.stamina || 0"></div>
                                     </div>
                                     <div class="text-center">
+                                        <div class="text-[9px] text-gray-400 dark:text-gray-500">Pow</div>
                                         <div class="text-stat-power-600 dark:text-stat-power-400 font-bold"
                                             x-text="character.current_stats?.power || 0"></div>
                                     </div>
                                     <div class="text-center">
+                                        <div class="text-[9px] text-gray-400 dark:text-gray-500">Gut</div>
                                         <div class="text-stat-guts-600 dark:text-stat-guts-400 font-bold"
                                             x-text="character.current_stats?.guts || 0"></div>
                                     </div>
                                     <div class="text-center">
+                                        <div class="text-[9px] text-gray-400 dark:text-gray-500">Wit</div>
                                         <div class="text-stat-wit-600 dark:text-stat-wit-400 font-bold"
                                             x-text="character.current_stats?.wit || 0"></div>
                                     </div>
@@ -161,7 +168,7 @@
         </div>
 
         <div x-show="filteredCharacters.length === 0"
-            class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 aria-hidden="true">
                 <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

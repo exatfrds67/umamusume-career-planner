@@ -1,6 +1,6 @@
 @props(['analysis', 'character'])
 
-<div class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+<div class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Deck Analysis Dashboard</h2>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

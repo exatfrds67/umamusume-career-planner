@@ -31,7 +31,7 @@
         x-transition:leave-end="opacity-0">
         <x-sidebar-tooltip :text="$label">
             <a href="{{ $href }}" @class([
-                'group flex justify-center rounded-md p-2 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500',
+                'group flex justify-center rounded-md p-2 transition-colors focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-primary-500',
                 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' => $active,
                 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400' => !$active,
             ]) aria-current="{{ $active ? 'page' : 'false' }}">

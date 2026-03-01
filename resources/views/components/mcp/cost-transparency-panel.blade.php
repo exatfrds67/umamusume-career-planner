@@ -1,6 +1,6 @@
 @props(['costs' => []])
 
-<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-xs dark:border-gray-700 dark:bg-gray-800">
     <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Cost Transparency</h3>
         <button @click="$dispatch('refresh-costs')"

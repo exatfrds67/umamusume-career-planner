@@ -58,7 +58,7 @@ Current stamina is only 320',
     {{-- Medium Priority (Blue) --}}
     <x-ai.recommendation-card :recommendation="(object) [
         'priority' => 'medium',
-        'action' => 'Consider Wisdom Training',
+        'action' => 'Consider Wit Training',
         'reasoning' => 'Energy recovery needed',
         'confidence_score' => 0.78,
     ]" />

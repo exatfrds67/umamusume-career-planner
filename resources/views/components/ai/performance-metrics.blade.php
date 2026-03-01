@@ -2,7 +2,7 @@
     'refreshInterval' => 30000, // 30 seconds
 ])
 
-<div class="performance-metrics bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6" x-data="performanceMetrics({
+<div class="performance-metrics bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6" x-data="performanceMetrics({
     refreshInterval: {{ $refreshInterval }}
 })">
     {{-- Header --}}
@@ -76,7 +76,7 @@
 
         {{-- Best Performers --}}
         <div x-show="metrics?.comparison"
-            class="bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900 dark:to-primary-800 rounded-lg p-4">
+            class="bg-linear-to-r from-primary-50 to-primary-100 dark:from-primary-900 dark:to-primary-800 rounded-lg p-4">
             <h4 class="text-sm font-medium text-primary-900 dark:text-primary-100 mb-3">Top Performers</h4>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>

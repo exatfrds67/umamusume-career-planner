@@ -5,7 +5,7 @@
     <div class="condition-badge {{ $getSizeClasses() }} {{ $getConditionColor() }} rounded-full font-semibold text-white shadow-md flex items-center gap-1.5 transition-all hover:scale-105"
         title="{{ $getConditionDescription() }}">
         {{-- Trend Icon --}}
-        @if ($getTrendIcon())
+        @if ($showTrend && $getTrendIcon())
             <span class="text-lg leading-none">{{ $getTrendIcon() }}</span>
         @endif
 

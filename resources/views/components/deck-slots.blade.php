@@ -1,6 +1,6 @@
 @props(['character', 'currentDeck'])
 
-<div class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+<div class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700"
     data-character-id="{{ $character->id }}">
     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Deck Slots ({{ $currentDeck->count() }}/6)
@@ -58,7 +58,7 @@
                                 <p class="text-sm text-gray-500 dark:text-gray-400">
                                     {{ $isFriendSlot ? 'Friend Card Slot (Optional)' : 'Empty Slot' }}
                                 </p>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                     Click "Add Card" or drag a card here
                                 </p>
                             </div>

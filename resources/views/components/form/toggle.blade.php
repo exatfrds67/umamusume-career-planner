@@ -76,7 +76,7 @@ Accessibility: WCAG 2.2 AA compliant, role="switch", 44px touch target
             @if($hasError) aria-invalid="true" @endif
             @if($ariaDescribedBy) aria-describedby="{{ $ariaDescribedBy }}" @endif
             :class="enabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-700'"
-            class="{{ $sizeConfig['track'] }} relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }} {{ $hasError ? 'ring-2 ring-error-500' : '' }}"
+            class="{{ $sizeConfig['track'] }} relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }} {{ $hasError ? 'ring-2 ring-error-500' : '' }}"
         >
             <span class="sr-only">{{ $label }}</span>
             <span

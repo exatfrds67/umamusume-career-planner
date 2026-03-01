@@ -38,7 +38,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation, screen reader friendl
     
     $selectClasses = 'block w-full rounded-lg border px-4 py-2.5 text-sm transition-colors duration-150 ' .
         'appearance-none bg-no-repeat bg-right pr-10 cursor-pointer ' .
-        'focus:outline-none focus:ring-2 focus:ring-offset-0 ' .
+        'focus:outline-hidden focus:ring-2 focus:ring-offset-0 ' .
         ($hasError 
             ? 'border-error-500 text-error-900 focus:border-error-500 focus:ring-error-500/20 bg-error-50 dark:bg-error-900/10 dark:text-error-400 dark:border-error-500' 
             : 'border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-primary-500 focus:ring-primary-500/20 bg-white dark:bg-gray-800'

@@ -16,7 +16,7 @@
         x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 transform translate-y-0"
         x-transition:leave-end="opacity-0 transform translate-y-8"
-        class="fixed bottom-4 right-4 z-50 w-full max-w-sm bg-yellow-500 dark:bg-yellow-600 text-white shadow-lg rounded-lg overflow-hidden"
+        class="fixed bottom-20 lg:bottom-4 right-4 z-50 w-full max-w-sm bg-yellow-500 dark:bg-yellow-600 text-white shadow-lg rounded-lg overflow-hidden"
         role="alert" aria-live="assertive">
         <div class="px-4 py-3">
             <div class="flex items-start justify-between gap-3">
@@ -89,7 +89,7 @@
         x-transition:enter-end="opacity-100 transform translate-y-0"
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 transform translate-y-0"
-        x-transition:leave-end="opacity-0 transform translate-y-2" class="fixed bottom-4 right-4 z-50 max-w-sm"
+        x-transition:leave-end="opacity-0 transform translate-y-2" class="fixed bottom-20 lg:bottom-4 right-4 z-50 max-w-sm"
         role="alert" aria-live="polite">
         <div class="rounded-lg shadow-lg p-4 flex items-start gap-3"
             :class="{
@@ -145,7 +145,7 @@
     </div>
 
     {{-- Online Status Indicator (small badge in corner) - Only show when offline --}}
-    <div x-show="!isOnline" class="fixed bottom-4 left-4 z-40">
+    <div x-show="!isOnline" class="fixed bottom-20 lg:bottom-4 left-4 z-40">
         <div class="flex items-center gap-2 px-3 py-2 rounded-full shadow-lg text-xs font-medium transition-colors bg-red-500 text-white"
             title="Offline">
             {{-- Status Dot --}}

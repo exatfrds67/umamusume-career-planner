@@ -6,7 +6,7 @@
 
     <!-- Desktop Sidebar Stepper (lg+ screens, WF-002 Spec) -->
     <aside
-        class="hidden lg:block fixed left-0 top-16 h-[calc(100%-4rem)] w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-40 overflow-y-auto"
+        class="hidden lg:block fixed left-0 top-16 h-[calc(100%-4rem)] w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-xs z-40 overflow-y-auto"
         x-data="{ steps: ['Basic Info', 'Stats', 'Aptitudes', 'Review'], descriptions: ['Name & scenario', 'Initial stats setup', 'Distance, surface, style', 'Review & confirm'] }">
         <nav class="space-y-2 p-4" role="navigation" aria-label="Wizard steps">
             <template x-for="(step, index) in steps" :key="index">
@@ -197,8 +197,9 @@
                         Name and image have been pre-filled. You can modify them as needed.
                     </p>
                 </div>
-                <button @click="showExternalPrefillNotice = false" class="text-green-500 hover:text-green-700">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button @click="showExternalPrefillNotice = false" class="text-green-500 hover:text-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 rounded"
+                    aria-label="Dismiss pre-filled data notice">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
@@ -247,7 +248,7 @@
                     <div
                         class="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-100 dark:border-primary-800">
                         <div class="flex items-center gap-3">
-                            <div class="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-xs">
                                 <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -362,7 +363,7 @@
                 aria-labelledby="step-2-heading" aria-live="polite">
                 <header class="card-header">
                     <h2 id="step-2-heading" class="text-lg font-medium text-gray-900 dark:text-white">Current Stats</h2>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Set initial stat values (0-1200)</p>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Set initial stat values (soft cap at 1,200 — stats can exceed with diminishing returns)</p>
                 </header>
                 <div class="card-body">
                     @php
@@ -414,7 +415,7 @@
                                     <input type="number" id="stat_{{ $stat }}"
                                         name="stats[{{ $stat }}]"
                                         x-model.number="formData.stats.{{ $stat }}" min="0"
-                                        max="1200" step="10" class="form-input pr-16 text-lg font-semibold"
+                                        max="2000" step="10" class="form-input pr-16 text-lg font-semibold"
                                         @input="validateStat('{{ $stat }}')">
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                         <span class="text-sm font-medium px-2 py-1 rounded"
@@ -424,7 +425,7 @@
                                 </div>
                                 <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                                     <div class="h-full bg-{{ $info['color'] }}-500 transition-all duration-300"
-                                        :style="`width: ${(formData.stats.{{ $stat }} / 1200) * 100}%`"></div>
+                                        :style="`width: ${Math.min((formData.stats.{{ $stat }} / 1200) * 100, 100)}%`"></div>
                                 </div>
                             </div>
                         @endforeach
@@ -440,8 +441,7 @@
                             </svg>
                             <div class="text-sm text-blue-800 dark:text-blue-200">
                                 <p class="font-semibold mb-1">Stat Information:</p>
-                                <p class="text-xs">Set your character's initial stats. These will grow through training and
-                                    races.</p>
+                                <p class="text-xs">Set your character's initial stats. Stats above 1,200 gain at 50% effectiveness (soft cap).</p>
                             </div>
                         </div>
                     </div>

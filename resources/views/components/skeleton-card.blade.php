@@ -20,7 +20,7 @@ Accessibility: WCAG 2.2 AA compliant, aria-hidden, reduced motion support
 
 <div 
     {{ $attributes->merge([
-        'class' => 'animate-pulse rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm',
+        'class' => 'animate-pulse rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-xs',
         'aria-hidden' => 'true',
     ]) }}
     role="presentation"

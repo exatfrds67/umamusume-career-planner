@@ -38,7 +38,7 @@
                     </svg>
                 </div>
             </div>
-            <div class="glass-card-inner rounded-2xl rounded-tl-none p-3.5 shadow-sm max-w-[90%]">
+            <div class="glass-card-inner rounded-2xl rounded-tl-none p-3.5 shadow-xs max-w-[90%]">
                 <p class="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">
                     {{ $lastTip }}
                 </p>
@@ -48,15 +48,15 @@
         {{-- Contextual Suggestions (Simulating chat logic) --}}
         <div class="pl-9 space-y-2">
              <div class="flex flex-wrap gap-2">
-                <a href="{{ route('ai.chat', ['topic' => 'training']) }}" 
-                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-xs font-medium text-gray-600 dark:text-gray-300 shadow-sm">
+                     <a href="{{ route('ai.chat', ['topic' => 'training']) }}" 
+                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:border-primary-300 dark:hover:border-primary-700 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-xs font-medium text-gray-700 dark:text-gray-200 shadow-xs">
                     <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     Analyze Training
                 </a>
-                <a href="{{ route('ai.chat', ['topic' => 'race']) }}" 
-                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-secondary-300 dark:hover:border-secondary-700 hover:text-secondary-600 dark:hover:text-secondary-400 transition-colors text-xs font-medium text-gray-600 dark:text-gray-300 shadow-sm">
+                     <a href="{{ route('ai.chat', ['topic' => 'race']) }}" 
+                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:border-secondary-300 dark:hover:border-secondary-700 hover:text-secondary-600 dark:hover:text-secondary-400 transition-colors text-xs font-medium text-gray-700 dark:text-gray-200 shadow-xs">
                     <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-8a2 2 0 012-2h14a2 2 0 012 2v8M3 21h18M5 21v-8a2 2 0 012-2h14a2 2 0 012 2v8m-2 0h.01M12 17h.01M12 11H8m8 0h-2" />
                     </svg>
@@ -75,8 +75,8 @@
                    class="w-full pl-3 pr-10 py-2 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
                    autocomplete="off">
             <button type="submit" 
-                    class="absolute right-1.5 top-1.5 p-1 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-md transition-colors"
-                    aria-label="Send">
+                    class="absolute right-1.5 top-1.5 p-2.5 min-w-11 min-h-11 flex items-center justify-center text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-md transition-colors"
+                    aria-label="Send message to AI Advisor">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>

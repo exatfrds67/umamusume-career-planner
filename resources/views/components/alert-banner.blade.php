@@ -106,7 +106,7 @@ Accessibility: WCAG 2.2 AA compliant, role="alert", visible focus on dismiss
                 <button
                     type="button"
                     @click="show = false"
-                    class="inline-flex rounded-md p-1.5 {{ $config['button'] }} focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+                    class="inline-flex rounded-md p-1.5 {{ $config['button'] }} focus:outline-hidden focus:ring-2 focus:ring-offset-2 transition-colors"
                     aria-label="Dismiss alert"
                 >
                     <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
