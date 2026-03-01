@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 27, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0  
+**Status**: Current - Aligned with codebase v2.3.0  
 **Related Documents**: [SRS-FR-02], [SRS-FR-10], [SDS-4.2], [DBD-4.2], [SPEC-001]
 
 **Source Specs**:
@@ -239,10 +239,16 @@ Players struggle to manually track complex character states—including factor i
   - Advanced goal tracking alerts.
   - Batch import of characters via JSON/OCR.
   - Character comparison tool.
-- **v2.2.0 (Current)**:
+- **v2.2.0**:
   - Updated stat system with diminishing returns above 1200.
   - Corrected aptitude scale (G-S, no SS).
   - Game-accurate aptitude modifiers.
+- **v2.3.0 (Current)**:
+  - Game character catalog (`ucp_game_characters`) with 61 characters seeded.
+  - Per-character race target associations (`ucp_game_character_target_races`) with 244 associations.
+  - `GameCharacter` model with `targetRaces()`, `goalRaces()`, `requiredRaces()` relationships.
+  - Silence Suzuka avatar fix — seeder now handles non-standard hash-only image filenames via manual overrides and self-healing update path.
+  - Duplicate character record removed (DB integrity restored, 169 unique characters).
 
 ---
 
@@ -259,6 +265,7 @@ Players struggle to manually track complex character states—including factor i
 
 | Version | Date | Changes |
 | --- | --- | --- |
+| 2.3.0 | February 27, 2026 | Added game character catalog (`ucp_game_characters`, 61 chars seeded), per-character race target associations (`ucp_game_character_target_races`, 244 associations), `GameCharacter` model with relationship scopes. Fixed Silence Suzuka avatar (non-standard hash-only filename). Removed duplicate character DB record. |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: corrected aptitude scale (G-S, no SS), added aptitude modifier table, updated stat system to reflect 1200+ capability with diminishing returns, added important stat breakpoints (901, 1200, 1600). |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
 | 2.0.0 | January 2026 | Initial v2 release with dual storage architecture. |

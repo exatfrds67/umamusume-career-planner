@@ -50,6 +50,32 @@ categorization, SP cost calculation, hint-based discounts, skill evolution chain
 - Examples: "Special Week's Determination", "Silence Suzuka's Silent Step"
 - Best for: Character specialization and inheritance
 
+### 2. Unique Skill Star Level Upgrade System
+
+All 67 character-exclusive unique skills have a two-tier effect system tied to the character's star level:
+
+| Star Level | Skill Behavior |
+| --- | --- |
+| Star 1–2 | Weaker base version (`unique_base_effects`) — 200 SP cost |
+| Star 3+ | Full-power version (`effects`) — starts at level 1 |
+| Star 6 | Full-power version starts at level 3 (`unique_star6_initial_level`) |
+
+#### Key Database Fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `unique_star_upgrade` | boolean \| null | `true` for all 67 upgradeable unique skills |
+| `unique_star6_initial_level` | int \| null | Always `3` for upgradeable unique skills |
+| `unique_base_effects` | JSON \| null | Effect map for star 1–2 (weaker version) |
+
+#### Base Effect Reduction Pattern
+
+Effect values in `unique_base_effects` follow a consistent rule vs full-power `effects`:
+
+- Target Speed/Acceleration ≥ +0.20: reduced by exactly −0.20
+- Small secondary effects: halved
+- Stamina Recovery 0.075 → 0.035; 0.055 → 0.015
+
 ### 3. SP Cost System
 
 #### Base Costs

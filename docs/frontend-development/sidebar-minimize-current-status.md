@@ -1,54 +1,32 @@
 # Sidebar Minimize Feature - Current Status
 
-**Date**: 2026-02-08  
-**Status**: In Progress - Tooltips Fixed, Text Hiding Issue Identified
+**Date**: February 27, 2026  
+**Status**: ✅ **COMPLETED** — Icons-only minimized state fully working
 
 ## Summary
 
-The sidebar minimize feature has been partially implemented with the following progress:
+The sidebar minimize feature is fully implemented. All nav items now correctly hide their text labels
+when minimized and show only icons, matching the spec in `.kiro/specs/sidebar-minimize/`.
 
-### ✅ Completed
+### ✅ All Completed
 
-1. **Tooltip Component Fixed**: Updated `sidebar-tooltip.blade.php` to use proper Alpine.js syntax (`tooltipShow`
-instead of nested functions)
-2. **Duplicate Navigation Removed**: Removed duplicate Profile/Settings/Help section from bottom of sidebar
-3. **Navigation Positioning**: Profile, Settings, Help moved higher in sidebar (after primary navigation)
-4. **Build Successful**: Assets compiled successfully with `npm run build`
+1. **Container padding**: Dynamic `px-2` (minimized) / `px-6` (expanded) via Alpine `:class`
+2. **9 primary/bottom nav links** (Dashboard, Characters, Training, Races, Skills, Support Cards,
+   Profile, Settings, Help): labels hidden with `x-show="!$store.sidebar.minimized"`, icons centered
+   with `:class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'"`
+3. **5 collapsible group buttons** (Data Management, Analytics & Reports, AI & Tools,
+   External Resources, Admin Panel): group label and chevron hidden, click-when-minimized triggers
+   `$store.sidebar.expand()`, sub-menus close with `x-show="xOpen && !$store.sidebar.minimized"`
+4. **Hover tooltips**: Each item has `x-data="{ showTooltip: false }"` with `@mouseenter`/`@mouseleave`.
+   Tooltip `<div>` positioned `left-full ml-3` appears only when minimized and hovered.
+5. **Alpine store** (`app.js`): `expand()`, `minimize()`, `toggle()`, `persist()` — unchanged, already correct
+6. **Layout** (`app.blade.php`): `lg:w-72`/`lg:w-20` and `lg:pl-72`/`lg:pl-20` — unchanged, already correct
 
-### ❌ Current Issues
+## Modified Files
 
-1. **Text Not Hiding When Minimized**:
-   - Alpine store shows `minimized: true`
-   - But navigation text (e.g., "Dashboard", "Characters") is still visible
-   - The `x-show="!$store.sidebar.minimized"` directives on text spans are not working
-   - This prevents the sidebar from appearing as a narrow column of icons
+- `resources/views/components/app/sidebar.blade.php` — all nav items updated
 
-2. **Tooltips Not Tested**:
-   - Cannot verify tooltip functionality until text hiding is fixed
-   - Tooltips should only appear when sidebar is minimized and icons are hovered
-
-### 🔍 Root Cause Analysis
-
-The issue appears to be that the `x-show` directives on the `<span>` elements containing navigation text are not
-responding to the `$store.sidebar.minimized` state change. Possible causes:
-
-1. Alpine.js reactivity issue with nested components
-2. CSS conflicts preventing `display: none` from being applied
-3. Timing issue with Alpine initialization
-
-### 📋 Next Steps
-
-1. **Debug Text Hiding**:
-   - Inspect actual DOM to see if `style="display: none;"` is being applied
-   - Check if Alpine.js is properly watching the store state
-   - Verify no CSS is overriding the `x-show` behavior
-
-2. **Test Tooltips**:
-   - Once text is hidden, hover over icons to verify tooltips appear
-   - Check tooltip positioning and styling
-   - Verify tooltips only show when minimized
-
-3. **Visual Verification**:
+1. **Visual Verification**:
    - Confirm sidebar appears as narrow column when minimized
    - Verify icons are larger (h-7 w-7) when minimized
    - Check logo remains visible but smaller

@@ -1,18 +1,20 @@
 # Database Schema Alignment Verification
 
 **Task 1.3.3 - Database Schema Alignment Verification**
-**Status**: ✅ **COMPLETED**
-**Date**: January 12, 2026
+**Status**: ✅ **COMPLETED** (Updated February 27, 2026)
+**Date**: January 12, 2026 | Last Updated: February 27, 2026
 
 ## Executive Summary
 
-This document provides comprehensive verification that the implemented 18-table database schema fully supports all requirements referenced in Task 1.3.3 (Requirements 1, 2, 4, 6, 7, 50) and aligns with the specification documents. The verification confirms that all 60+ requirements have supporting database tables and that the entity relationship diagrams match the actual database structure.
+This document provides comprehensive verification that the implemented database schema fully supports all requirements referenced in Task 1.3.3 (Requirements 1, 2, 4, 6, 7, 50) and aligns with the specification documents. The verification confirms that all 60+ requirements have supporting database tables and that the entity relationship diagrams match the actual database structure.
+
+**Schema Update (February 27, 2026)**: The schema has grown to 21 tables with the addition of three game catalog tables (`ucp_game_races`, `ucp_game_characters`, `ucp_game_character_target_races`) introduced for the Race Strategy and Character Management features.
 
 ## Implemented Database Schema Overview
 
 The UmamusumeCareerPlanner application implements a comprehensive 18-table database schema with the `ucp_` prefix:
 
-### Core Tables (18 Total)
+### Core Tables (21 Total)
 
 1. **ucp_users** - User management and authentication
 2. **ucp_characters** - Character data with comprehensive stat tracking
@@ -32,6 +34,9 @@ The UmamusumeCareerPlanner application implements a comprehensive 18-table datab
 16. **ucp_mcp_agents** - MCP agent configuration and performance tracking
 17. **ucp_user_preferences** - User preference management with scoping
 18. **ucp_system_logs** - Comprehensive system logging and audit trails
+19. **ucp_game_races** - Game race catalog (49 races across Junior/Classic/Senior/All phases)
+20. **ucp_game_characters** - Game character reference catalog (61 characters with aptitudes and growth data)
+21. **ucp_game_character_target_races** - Pivot table mapping game characters to their target races with `is_goal` and `is_required` flags
 
 ## Requirements Coverage Analysis
 
@@ -206,7 +211,7 @@ ucp_support_cards (N) ──→ (N) ucp_skill_hints [provision mapping]
 
 The implemented schema matches the design document specifications with the following confirmations:
 
-1. **Table Count**: 18 tables as specified in design document
+1. **Table Count**: 21 tables (18 original + 3 game catalog tables added February 2026)
 2. **Naming Convention**: `ucp_` prefix consistently applied
 3. **Data Types**: JSON fields for complex data, enums for constrained values
 4. **Indexing Strategy**: Performance-critical indexes implemented
@@ -238,7 +243,7 @@ All 60+ requirements have supporting database tables:
 
 ### Key Achievements
 
-- ✅ **18-Table Schema**: Complete implementation of all specified tables
+- ✅ **21-Table Schema**: Complete implementation of all specified tables plus game catalog reference tables
 - ✅ **Requirement Coverage**: All 60+ requirements have supporting database infrastructure
 - ✅ **Performance Optimization**: Advanced indexing and query optimization implemented
 - ✅ **Data Integrity**: Comprehensive constraints and validation rules
@@ -256,6 +261,7 @@ All 60+ requirements have supporting database tables:
 ---
 
 **Verification Completed**: January 12, 2026
+**Schema Last Updated**: February 27, 2026 (added 3 game catalog tables — total 21)
 **Schema Status**: ✅ **PRODUCTION READY**
 **Requirements Coverage**: ✅ **100% COMPLETE**
 **Next Phase**: Ready for Task 1.4 - Core Models and Eloquent Relationships

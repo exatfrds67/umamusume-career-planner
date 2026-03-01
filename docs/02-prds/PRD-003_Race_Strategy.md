@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.4.0  
+**Date**: March 4, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0  
+**Status**: Current - Aligned with codebase v2.4.0  
 **Related Documents**: [SRS-FR-04], [SDS-4.3], [DBD-4.2], [SPEC-003]
 
 **Source Specs**:
@@ -192,6 +192,14 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 - **Grid Layout**: Monthly view showing turns (Early/Late) and available races.
 - **Readiness Badges**: Small colored dots (Green/Yellow/Red) on calendar slots.
 - **Details Panel**: Slide-out panel showing race specifics when clicked.
+- **Phase Filter**: Filter strip for Junior / Classic / Senior / All career phases.
+- **Surface Filter**: Separate filter for Turf / Dirt (must not be combined with distance).
+- **Distance Filter**: Separate filter for Sprint / Mile / Medium / Long / Super Long.
+- **Month Display**: Month labels must use `month_label` strings from game data (e.g. "April", "Early Summer"), grouped by `year_in_scenario`; not raw calendar month numbers.
+- **Fan Requirement**: Each race card must display the minimum fan count required to enter.
+- **SP Reward**: Each race card must display the SP points awarded upon winning.
+- **URA Finale Badge**: Races with `is_ura_finale = true` must receive a distinct visual badge labelled "URA Finale".
+- **Phase Badge**: Each race card must display a coloured phase badge (Junior / Classic / Senior / All).
 
 ### 5.2 Preparation Screen
 
@@ -207,6 +215,15 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 - **Result Input**: Simple number input for placement.
 - **Reward Confirmation**: Display of Fans/Stat/SP gained.
 - **Analysis**: If loss, provide AI analysis of potential causes.
+
+### 5.4 Race Targets Interface
+
+- **Grade Filter**: Filter buttons must use actual game grades in priority order: G1 / G2 / G3 / OP / Pre-OP / Debut. Legacy values "Listed" and "Open" are incorrect and must not appear.
+- **Phase Filter**: Filter strip for Junior / Classic / Senior / All career phases.
+- **Fan Requirement Per Race**: Each race row must display the minimum fans required to enter that race.
+- **SP Reward Per Race**: Each race row must display the SP reward alongside the fans reward.
+- **URA Finale Flag**: Races with `is_ura_finale = true` must be highlighted with a distinct badge.
+- **Save Plan**: The save-plan action must persist the selected race list to `localStorage` (client-only), with a server POST fallback when an authenticated account session is active.
 
 ---
 
@@ -260,10 +277,22 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 - **v2.1.0**:
   - Rival generation and specific rival analysis.
   - Advanced simulation (Monte Carlo).
-- **v2.2.0 (Current)**:
+- **v2.2.0**:
   - Game-accurate aptitude modifiers (G-S scale, no SS).
   - Track condition system with stat penalties.
   - Weather impact on track conditions.
+- **v2.3.0**:
+  - Race catalog expanded to **49 races** across Junior / Classic / Senior / All phases.
+  - Removed 4 duplicate entries; added 22 new G1/G2/G3/Pre-Open races.
+  - Game character catalog links each character to their target races via `ucp_game_character_target_races` with `is_goal` and `is_required` flags.
+  - `GameRace` model updated with `gameCharacters()` reverse BelongsToMany relationship.
+- **v2.4.0 (Current)**:
+  - Calendar page: split combined race-type filter into separate Surface (Turf/Dirt) and Distance Category (Sprint/Mile/Medium/Long/Super Long) filters.
+  - Calendar page: add Phase filter (Junior/Classic/Senior/All), URA Finale badge, fan-requirement and SP-reward display on each race card.
+  - Calendar page: fix month display to use `month_label` string values grouped by `year_in_scenario` instead of raw numeric calendar months.
+  - Targets page: correct grade filter values from incorrect `Listed/Open` to actual game grades `OP/Pre-OP/Debut`.
+  - Targets page: add Phase filter, fan-requirement per race, SP-reward per race, URA Finale badge.
+  - Both pages: `RaceController` enriched with `spReward`, `fanRequirement`, `statRequirements`, `distanceCategory`, and `surface` fields for targets.
 
 ---
 
@@ -279,6 +308,8 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 
 | Version | Date | Changes |
 | --- | --- | --- |
+| 2.4.0 | March 4, 2026 | Calendar page: separate surface/distance filters, phase filter, URA Finale badge, fan-requirement and SP-reward display, corrected month-label display. Targets page: corrected grade filter values (OP/Pre-OP/Debut), phase filter, per-race fan-requirement and SP-reward, URA Finale badge. RaceController data contract enriched. |
+| 2.3.0 | February 27, 2026 | Race catalog expanded to 49 races (22 new races added, 4 duplicates removed). Added `ucp_game_character_target_races` pivot linking characters to their canonical race targets. `GameRace` model updated with `gameCharacters()` reverse relationship. |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: corrected aptitude scale (G-S, no SS), added aptitude modifier table, added track condition system with stat penalties (Firm/Good/Soft/Heavy), weather impact on track conditions. |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
 | 2.0.0 | January 2026 | Initial v2 release with race calendar and readiness scoring. |

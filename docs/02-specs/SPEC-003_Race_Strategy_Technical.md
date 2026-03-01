@@ -1,9 +1,9 @@
 # SPEC-003: Race Strategy System - Technical Specification
 
-**Document Version**: 2.3.0  
-**Date**: 2026-02-22  
+**Document Version**: 2.4.0  
+**Date**: 2026-03-04  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Complete - Implementation verified  
+**Status**: Current - Calendar/Targets view data contracts updated  
 **Classification**: Internal - Development Team
 
 ---
@@ -54,7 +54,8 @@
 11. [Performance Optimization](#11-performance-optimization)
 12. [Security Considerations](#12-security-considerations)
 13. [Testing Strategy](#13-testing-strategy)
-14. [Appendices](#14-appendices)
+14. [Frontend View Data Contracts](#14-frontend-view-data-contracts)
+15. [Appendices](#15-appendices)
 
 ---
 
@@ -2313,7 +2314,89 @@ class RaceResultFactory extends Factory
 
 ---
 
-## 14. Appendices
+## 14. Frontend View Data Contracts
+
+This section defines the exact JSON shape passed by `RaceController` to the Alpine.js components for the Calendar and Targets views.
+
+### 14.1 Race Calendar View (`/races/calendar`)
+
+Data is embedded via `<script id="race-calendar-data" type="application/json">` and consumed by the `raceCarouselView()` Alpine component.
+
+**Controller method**: `RaceController::calendar()`
+
+Each race object in the array:
+
+| Key | Type | Source field | Description |
+| --- | --- | --- | --- |
+| `id` | int | `game_races.id` | Primary key |
+| `name` | string | `name_en` | English race name |
+| `grade` | string | `grade` | G1 / G2 / G3 / OP / Pre-OP / Debut |
+| `surface` | string | `surface` | `turf` or `dirt` |
+| `distance` | int | `distance_meters` | Distance in metres |
+| `distanceCategory` | string | `distance_category` | sprint / mile / medium / long / super\_long |
+| `phase` | string | `phase` | junior / classic / senior / all |
+| `month` | string | `month_label` | In-game month string (e.g. "April") |
+| `year` | int | `year_in_scenario` | 1 = Junior, 2 = Classic, 3 = Senior |
+| `venue` | string | `venue` | Track venue name |
+| `fanRequirement` | int | `fan_requirement` | Minimum fans required to enter |
+| `fansReward` | int | `fans_reward` | Fans awarded on win |
+| `spReward` | int | `sp_reward` | SP awarded on win |
+| `statRequirements` | object\|null | `stat_requirements` | Stat threshold map (e.g. `{"speed": 700}`) |
+| `isUraFinale` | bool | `is_ura_finale` | True for URA Finale races |
+| `status` | string | computed | "upcoming" (static placeholder; will reflect run data in a future version) |
+
+**Important**: The Alpine component must reference `race.fansReward` (not `race.fanCount`) for calendar data.
+
+### 14.2 Race Targets View (`/races/targets`)
+
+Data is embedded via `window.pageData` before Vite and consumed by the `raceTargets()` Alpine component.
+
+**Controller method**: `RaceController::targets()`
+
+Each race object in `window.pageData.races`:
+
+| Key | Type | Source field | Description |
+| --- | --- | --- | --- |
+| `id` | int | `game_races.id` | Primary key |
+| `name` | string | `name_en` | English race name |
+| `grade` | string | `grade` | G1 / G2 / G3 / OP / Pre-OP / Debut |
+| `distance` | int | `distance_meters` | Distance in metres |
+| `distanceCategory` | string | `distance_category` | sprint / mile / medium / long / super\_long |
+| `type` | string | `surface` | `turf` or `dirt` |
+| `phase` | string | `phase` | junior / classic / senior / all |
+| `fanCount` | int | `fans_reward` | Fans awarded on win |
+| `fanRequirement` | int | `fan_requirement` | Minimum fans required to enter |
+| `spReward` | int | `sp_reward` | SP awarded on win |
+| `statRequirements` | object\|null | `stat_requirements` | Stat threshold map |
+| `year` | int | `year_in_scenario` | 1 = Junior, 2 = Classic, 3 = Senior |
+| `month` | string | `month_label` | In-game month string |
+| `isUraFinale` | bool | `is_ura_finale` | True for URA Finale races |
+
+### 14.3 Calendar Alpine Component: Filter State
+
+The `raceCarouselView()` component maintains the following filter state:
+
+| Property | Type | Values | Description |
+| --- | --- | --- | --- |
+| `activeSurfaceFilter` | string\|null | `turf`, `dirt`, or `null` | Surface filter |
+| `activeDistanceFilter` | string\|null | `sprint`, `mile`, `medium`, `long`, `super_long`, or `null` | Distance category filter |
+| `activePhaseFilter` | string\|null | `junior`, `classic`, `senior`, `all`, or `null` | Career phase filter |
+| `activeMonthFilter` | string\|null | In-game month label string or `null` | Month filter |
+
+Filters use `null` = show all. Surface and distance are independent filters, never combined in a single filter property.
+
+### 14.4 Targets Alpine Component: Filter State
+
+The `raceTargets()` component maintains the following filter state:
+
+| Property | Type | Values | Description |
+| --- | --- | --- | --- |
+| `filterGrade` | string\|null | `G1`, `G2`, `G3`, `OP`, `Pre-OP`, `Debut`, or `null` | Grade filter |
+| `filterPhase` | string\|null | `junior`, `classic`, `senior`, `all`, or `null` | Phase filter |
+
+---
+
+## 15. Appendices
 
 ### Appendix A: Race Grade Fan Rewards
 
@@ -2411,6 +2494,7 @@ class RaceResultFactory extends Factory
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.0 | 2026-03-04 | Development Team | Added Section 14 (Frontend View Data Contracts) defining exact JSON shapes for calendar and targets views. Documented split surface/distance filters, phase filter, corrected grade values, fansReward vs fanCount distinction. |
 | 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0: RaceConditionService, Neuron\RaceStrategyService, ExternalDataService, AdviceService, GameTora fallback, Neuron AI v2.11, status complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate track conditions (Firm/Good/Soft/Heavy with flat stat penalties), corrected aptitude modifiers (S max, A baseline), surface-specific power penalties |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added AI integration, complete analysis engines, comprehensive testing strategy |

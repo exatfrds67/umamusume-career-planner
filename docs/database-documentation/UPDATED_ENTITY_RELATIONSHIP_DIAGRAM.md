@@ -1,8 +1,8 @@
 # Updated Entity Relationship Diagram
 
-**Database Schema**: 18-Table Implementation
-**Updated**: January 12, 2026
-**Status**: ✅ **VERIFIED AGAINST ACTUAL IMPLEMENTATION**
+**Database Schema**: 21-Table Implementation
+**Updated**: February 27, 2026
+**Status**: ✅ **UPDATED — 3 game catalog tables added**
 
 ## Complete Entity Relationship Diagram
 
@@ -136,6 +136,27 @@ This diagram reflects the actual implemented database structure with all 18 tabl
                        │ source_system   │
                        │ created_at      │
                        └─────────────────┘
+
+┌──────────────────────────────────────────────────────────────┐
+│           GAME CATALOG TABLES (Added February 2026)          │
+└──────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐    ┌─────────────────┐    ┌──────────────────────────┐
+│ ucp_game_races  │    │ucp_game_chars   │    │ucp_game_character_target │
+├─────────────────┤    ├─────────────────┤    │       _races (pivot)     │
+│ id (PK)         │◄──┐│ id (PK)         │◄──┐├──────────────────────────┤
+│ name            │   ││ name            │   ││ id (PK)                  │
+│ slug            │   ││ slug            │   ││ game_character_id (FK)   │
+│ grade           │   ││ rarity          │   ││ game_race_id (FK)        │
+│ distance_meters │   ││ card_id         │   ││ is_goal                  │
+│ surface         │   ││ aptitude data   │   ││ is_required              │
+│ career_phase    │   ││ growth_rates    │   │└──────────────────────────┘
+│ fan_requirement │   │└─────────────────┘   │
+│ fans_reward     │   │                      │
+│ sp_reward       │   └──────────────────────┘
+└─────────────────┘
+         │
+         └──────────────────────────────────────────────────────────┘
 ```
 
 ## Relationship Details
@@ -162,6 +183,9 @@ This diagram reflects the actual implemented database structure with all 18 tabl
 | ucp_skills | ucp_skills | One-to-One | evolution_target_id | SET NULL |
 | ucp_mcp_servers | ucp_mcp_agents | One-to-Many | server_id | CASCADE |
 
+| ucp_game_characters | ucp_game_character_target_races | Many-to-Many | game_character_id | CASCADE |
+| ucp_game_races | ucp_game_character_target_races | Many-to-Many | game_race_id | CASCADE |
+
 ### Special Relationships
 
 #### Self-Referencing Relationships
@@ -174,6 +198,7 @@ This diagram reflects the actual implemented database structure with all 18 tabl
 - **Characters ↔ Skills**: Via `ucp_skill_acquisitions` table
 - **Characters ↔ Support Cards**: Via JSON field in `ucp_careers.support_deck`
 - **Skills ↔ Support Cards**: Via JSON field in `ucp_support_cards.skill_hints_provided`
+- **Game Characters ↔ Game Races**: Via `ucp_game_character_target_races` pivot (`is_goal`, `is_required` flags)
 
 #### JSON-Based Relationships
 
@@ -231,7 +256,7 @@ This diagram reflects the actual implemented database structure with all 18 tabl
 
 ---
 
-**Diagram Updated**: January 12, 2026
+**Diagram Updated**: February 27, 2026
 **Verification Status**: ✅ **MATCHES ACTUAL IMPLEMENTATION**
-**Relationship Count**: 25+ properly defined relationships
+**Relationship Count**: 28+ properly defined relationships
 **Integrity Status**: ✅ **FULL REFERENTIAL INTEGRITY**

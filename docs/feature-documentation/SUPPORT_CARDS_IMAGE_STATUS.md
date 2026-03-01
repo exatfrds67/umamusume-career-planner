@@ -1,52 +1,67 @@
 # Support Card Image Status
 
-**Last Updated**: January 18, 2026  
-**Status**: ✅ **7 ACTUAL IMAGES INTEGRATED**  
-**Total Cards**: 15  
-**Cards with Images**: 7 (47%)  
-**Cards with Placeholders**: 8 (53%)
+**Last Updated**: February 27, 2026  
+**Status**: ✅ **522/522 CARDS HAVE ARTWORK URLs (100%)**  
+**Total Cards**: 522  
+**Cards with Images**: 522 (100%)  
+**Cards with Placeholders**: 0 (0%)
+
+---
+
+## Implementation Method (February 27, 2026)
+
+All 522 support cards were populated with artwork URLs using the GameTora CDN pattern:
+
+```text
+https://gametora.com/images/umamusume/supports/tex_support_card_{external_source_id}.png
+```
+
+### Artisan Command
+
+A new artisan command was created to populate artwork:
+
+```bash
+php artisan support-cards:populate-artwork        # Populate missing artwork
+php artisan support-cards:populate-artwork --force  # Re-populate all cards
+php artisan support-cards:populate-artwork --dry-run # Preview without saving
+```
+
+**Source**: `app/Console/Commands/PopulateSupportCardArtworkCommand.php`
+
+### How It Works
+
+1. Each card has an `external_source_id` synced from Umapyoi
+2. The GameTora CDN stores card art at a predictable URL using this ID
+3. IDs verified working: `tex_support_card_30022.png` (Kitasan Black), `tex_support_card_10001.png`
+4. Future syncs via `ExternalDataService::transformUmapyoiCard()` now auto-populate `artwork_url`
+
+### Tests
+
+6 Pest tests covering the command live at:
+`tests/Feature/Feature/Commands/PopulateSupportCardArtworkCommandTest.php` ✅ All passing
 
 ---
 
 ## Cards with Actual Images ✅
 
-### S+ Tier (4/5)
+All 522 cards now use CDN-hosted artwork from GameTora. Example URLs:
 
-1. ✅ **Kitasan Black [Fire at My Heels]**
-   - File: `Kitasan_Black_Fire_at_My_Heels.png`
-   - Path: `/images/support_cards/Kitasan_Black_Fire_at_My_Heels.png`
-
-2. ✅ **Super Creek [Piece of Mind]**
-   - File: `Super_Creek_Piece_of_Mind.png`
-   - Path: `/images/support_cards/Super_Creek_Piece_of_Mind.png`
-
-3. ✅ **Fine Motion [Wave of Gratitude]**
-   - File: `Fine_Motion_Wave_of_Gratitude.jpg`
-   - Path: `/images/support_cards/Fine_Motion_Wave_of_Gratitude.jpg`
-
-4. ✅ **Tazuna Hayakawa [Tracen Reception]**
-   - File: `Tazuna_Hayakawa_Tracen_Reception.jpg`
-   - Path: `/images/support_cards/Tazuna_Hayakawa_Tracen_Reception.jpg`
-
-### S Tier (1/5)
-
-1. ✅ **Silence Suzuka [Beyond This Shining Moment]**
-   - File: `Silence_Suzuka_Beyond_This_Shining_Moment.png`
-   - Path: `/images/support_cards/Silence_Suzuka_Beyond_This_Shining_Moment.png`
-
-### A Tier (2/5)
-
-1. ✅ **Tokai Teio [Dream Big!]**
-   - File: `Tokai_Teio_Dream_Big!.png`
-   - Path: `/images/support_cards/Tokai_Teio_Dream_Big!.png`
-
-2. ✅ **Mejiro McQueen [Your Team Ace]**
-   - File: `Mejiro_McQueen_Your_Team_Ace.png`
-   - Path: `/images/support_cards/Mejiro_McQueen_Your_Team_Ace.png`
+- `https://gametora.com/images/umamusume/supports/tex_support_card_30022.png`
+- `https://gametora.com/images/umamusume/supports/tex_support_card_10001.png`
 
 ---
 
-## Cards Still Using Placeholders ⚠️
+## ~~Cards Still Using Placeholders~~
+
+> **N/A** — All 522 cards have artwork URLs as of February 27, 2026. The old manual file-based method
+> (placing PNGs in `public/images/support_cards/`) is superseded by the GameTora CDN approach.
+
+---
+
+## Copyright Notice
+
+All Umamusume: Pretty Derby character designs and card artwork are © Cygames, Inc.
+Images are sourced via GameTora CDN for reference/planning purposes only and are not for commercial use.
 
 ### S+ Tier (1/5)
 
@@ -92,7 +107,7 @@
 
 Use this naming convention:
 
-```
+```text
 {Character_Name}_{Card_Title}.{ext}
 ```
 
@@ -103,7 +118,7 @@ Examples:
 
 ### Step 3: Save to Directory
 
-```
+```text
 public/images/support_cards/
 ```
 
@@ -158,7 +173,7 @@ For database updates, use these internal IDs:
 
 ---
 
-## Copyright Notice
+## Copyright and Licensing Notice
 
 All Umamusume: Pretty Derby character designs and card artwork are © Cygames, Inc.
 

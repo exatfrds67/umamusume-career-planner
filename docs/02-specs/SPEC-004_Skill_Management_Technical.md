@@ -246,6 +246,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $id
  * @property string $name
  * @property string|null $name_jp
+ * @property string|null $name_en
  * @property string $description
  * @property SkillType $skill_type
  * @property SkillRarity $rarity
@@ -253,6 +254,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $base_sp_cost
  * @property string|null $icon_path
  * @property int|null $evolution_from_id
+ * @property string|null $character_exclusive
+ * @property int|null $unique_skill_max_level
+ * @property bool|null $unique_star_upgrade
+ * @property int|null $unique_star6_initial_level
+ * @property array<string, mixed>|null $unique_base_effects
  * @property array|null $conditions
  * @property array|null $effects
  * @property \Carbon\Carbon $created_at
@@ -1532,15 +1538,20 @@ CREATE TABLE ucp_skills (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     name_jp VARCHAR(255) NULL,
-    name_en VARCHAR(255) NULL COMMENT 'NEW: English skill name for i18n',
+    name_en VARCHAR(255) NULL COMMENT 'English skill name for i18n',
     description TEXT NOT NULL,
     skill_type VARCHAR(50) NOT NULL COMMENT 'acceleration, speed, stamina, etc.',
     rarity ENUM('normal', 'rare', 'unique') NOT NULL,
     category VARCHAR(50) NOT NULL COMMENT 'start_dash, positioning, etc.',
-    status ENUM('active', 'deprecated', 'unreleased') NOT NULL DEFAULT 'active' COMMENT 'NEW: Skill availability status',
+    status ENUM('active', 'deprecated', 'unreleased') NOT NULL DEFAULT 'active' COMMENT 'Skill availability status',
     base_sp_cost SMALLINT UNSIGNED NOT NULL,
     icon_path VARCHAR(500) NULL,
     evolution_from_id BIGINT UNSIGNED NULL COMMENT 'Base skill for evolutions',
+    character_exclusive VARCHAR(255) NULL COMMENT 'Character name for unique skills',
+    unique_skill_max_level TINYINT NULL COMMENT 'Max level for unique skills (typically 4)',
+    unique_star_upgrade TINYINT(1) NULL COMMENT 'Whether this unique skill upgrades at star 3; null for non-unique',
+    unique_star6_initial_level TINYINT NULL COMMENT 'Level unique skill starts at for star 6 characters (3)',
+    unique_base_effects JSON NULL COMMENT 'Weaker base effects at star 1-2 before the star 3 upgrade',
     conditions JSON NULL COMMENT 'Activation conditions',
     effects JSON NULL COMMENT 'Skill effects and values',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

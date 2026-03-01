@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: March 1, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [SRS], [BRS]
 
 **Source Specifications**:
@@ -172,7 +172,7 @@ stateDiagram-v2
 
 #### 3.1.1 Trainee Selection Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Create New Career - Step 1 of 5                           │
 ├────────────────────────────────────────────────────────────┤
@@ -207,21 +207,50 @@ stateDiagram-v2
 
 | Action | Description | Next State |
 | --- | --- | --- |
-| Select Trainee | Click on character card | Enable "Next" button |
+| Select Trainee | Click on character card | Show star level selector; enable "Next" button |
+| Set Star Level | Click 1–5 stars (shown after trainee selected) | Update unique skill status badge |
 | Search | Type in search box | Filter trainee list |
 | Filter | Apply rarity/distance/aptitude filters | Update trainee list |
 | Load More | Pagination | Display additional trainees |
 
+**Star Level Configuration** (appears after trainee is selected):
+
+```text
+┌────────────────────────────────────────────────────────────┐
+│  ✔ Selected: Special Week                                  │
+├────────────────────────────────────────────────────────────┤
+│  Star Level (才能開花)                                     │
+│  Set the character's current star level. At ★★★ and above, │
+│  the unique skill is upgraded to its full-power version.   │
+│                                                            │
+│  ★  ★  ★  ☆  ☆       3★                                 │
+│  [1] [2] [3] [4] [5]                                       │
+│                                                            │
+│  ✔ Unique skill upgraded  (shown at 3★+)                  │
+│  ⚠ Base unique skill (weaker)  (shown at 1–2★)            │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Star Level Rules**:
+
+| Star Level | Unique Skill | Notes |
+| --- | --- | --- |
+| 1★ | Base version (weaker) | Characters scouted at this tier by default |
+| 2★ | Base version (weaker) | |
+| 3★ | **Full-power version** | Default; Green Spark eligibility unlocked |
+| 4★ | Full-power version | Higher base stat bonuses |
+| 5★ | Full-power version | Maximum base stats |
+
 **Implementation Details**:
 
-- **Route**: `/careers/create/step/1`
-- **Livewire Component**: `App\Livewire\Career\TraineeSelector`
-- **Data Source**: `characters` table via `CharacterRepository`
-- **Validation**: Trainee selection is required before proceeding
+- **Route**: `/plans/create`
+- **Component**: Alpine.js `planWizard` (`resources/js/components/plan-wizard.js`)
+- **Data Source**: `ucp_characters` table
+- **Validation**: Trainee selection is required; star level must be 1–5 (default: 3)
 
 #### 3.1.2 Scenario Selection Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Create New Career - Step 1 of 5 (continued)               │
 ├────────────────────────────────────────────────────────────┤
@@ -276,7 +305,7 @@ stateDiagram-v2
 
 #### 3.2.1 Parent Selection Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Create New Career - Step 2 of 5                           │
 ├────────────────────────────────────────────────────────────┤
@@ -390,7 +419,7 @@ class FactorInheritanceService
 
 #### 3.3.1 Deck Building Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Create New Career - Step 3 of 5                           │
 ├────────────────────────────────────────────────────────────┤
@@ -497,7 +526,7 @@ class DeckSynergyCalculator
 
 **Validation Errors**:
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  ⚠️ Deck Validation Errors                                  │
 ├────────────────────────────────────────────────────────────┤
@@ -516,7 +545,7 @@ class DeckSynergyCalculator
 
 #### 3.4.1 Review Summary Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Create New Career - Step 4 of 5                           │
 ├────────────────────────────────────────────────────────────┤
@@ -777,6 +806,7 @@ flowchart TD
 | Field | Rule | Error Message |
 | --- | --- | --- |
 | `trainee_id` | Required, exists in `characters` table | "Trainee selection is required" |
+| `star_level` | Required, integer, min 1, max 5 | "Star level must be between 1 and 5" |
 | `scenario_type` | Required, valid enum value | "Invalid scenario type" |
 | `parent_a_id` | Required, exists in `characters` table | "Parent A selection is required" |
 | `parent_b_id` | Required, exists in `characters` table, ≠ parent_a_id | "Parent B must be different from Parent A" |
@@ -793,6 +823,7 @@ class CreateCareerRequest extends FormRequest
     {
         return [
             'trainee_id' => 'required|exists:characters,id',
+            'star_level' => 'required|integer|min:1|max:5',
             'scenario_type' => 'required|in:ura_finale,grand_masters,make_a_new_track,aoharu_cup',
             'parent_a_id' => 'required|exists:characters,id',
             'parent_b_id' => 'required|exists:characters,id|different:parent_a_id',
@@ -805,6 +836,8 @@ class CreateCareerRequest extends FormRequest
     {
         return [
             'trainee_id.required' => 'Please select a trainee character.',
+            'star_level.min' => 'Star level must be between 1 and 5.',
+            'star_level.max' => 'Star level must be between 1 and 5.',
             'parent_a_id.required' => 'Parent A selection is required.',
             'parent_b_id.different' => 'Parent B must be different from Parent A.',
             'support_deck.size' => 'Support deck must contain exactly 6 cards.',
@@ -1030,6 +1063,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-01 | Development Team | Added star level (才能開花, 1★–5★) to Step 1 of career setup; updated trainee selection interface wireframe, user actions, implementation details, and validation rules; reflects actual Alpine.js `planWizard` implementation at `/plans/create` |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); corrected aptitude grade system (G→F→E→D→C→B→A→S, S is maximum); updated support card bond system (80% threshold for friendship training, 10-35% bonus by rarity); added career structure details (~70-78 turns, Summer Training Camp mechanics) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added factor inheritance, deck synergy, validation details; integrated with current implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |

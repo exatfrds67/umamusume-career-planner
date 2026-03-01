@@ -93,7 +93,7 @@ mindmap
 - **Table**: `ucp_skill_hints`; **Purpose**: Hint tracking; **Key Columns**: character_id, skill_id, source_type, discount_percentage, is_used
 - **Table**: `ucp_skill_acquisitions`; **Purpose**: Acquisition history; **Key Columns**: character_id, skill_id, career_id, final_sp_cost, is_evolution, is_active, hint_level, hint_count
 - **Table**: `ucp_skill_builds`; **Purpose**: Skill build plans; **Key Columns**: user_id, name, skills (JSON), total_sp_cost
-- **Table**: `ucp_careers`; **Purpose**: Career runs; **Key Columns**: character_id, scenario_type, status, current_turn, final_stats
+- **Table**: `ucp_careers`; **Purpose**: Career runs; **Key Columns**: character_id, star_level, scenario_type, status, current_turn, final_stats
 - **Table**: `ucp_training_sessions`; **Purpose**: Training logs; **Key Columns**: career_id, turn_number, training_type, stat_gains, support_bonuses
 - **Table**: `ucp_races`; **Purpose**: Race data; **Key Columns**: career_id, race_name, distance, surface, placement, rewards
 - **Table**: `ucp_events`; **Purpose**: Game events; **Key Columns**: career_id, event_type, turn_number, choices, outcomes
@@ -208,6 +208,7 @@ erDiagram
     ucp_careers {
         bigint id PK
         bigint character_id FK
+        tinyint star_level
         enum scenario_type
         enum status
         int current_turn
@@ -478,7 +479,7 @@ flowchart TD
 
 ### 7.1 Migration Naming Convention
 
-```
+```text
 YYYY_MM_DD_HHMMSS_create_ucp_table_name.php
 YYYY_MM_DD_HHMMSS_add_column_to_ucp_table.php
 YYYY_MM_DD_HHMMSS_modify_column_in_ucp_table.php

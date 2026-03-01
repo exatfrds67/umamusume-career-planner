@@ -8,7 +8,11 @@ applyTo: '**'
 - Use PHP 8.3+ strict types and type declarations
 - Implement WCAG 2.2 AA accessibility compliance
 - Prefer Pest testing framework over PHPUnit
-- Use Laravel Pint for code formatting- **Markdownlint Compliance**: All markdown (`.md`) files MUST adhere to markdownlint standards (see section below)
+- Use Laravel Pint for code formatting
+- **CRITICAL: Never run the full test suite.** Only run the specific test file(s) relevant to the change being made, one by one.
+- **Markdownlint Compliance**: All markdown (`.md`) files MUST adhere to markdownlint standards (see section below)
+- Tailwind v4 focus utility conventions in this project use `focus:outline-hidden` (not `focus:outline-none`) in rendered Blade output and related assertions
+- Browser tests in this repo should avoid `$page->resize(...)` (unsupported); use `$page->script('window.resizeTo(...)')` and brief `wait(...)` before initial assertions on heavy pages
 
 ## Project Architecture
 
@@ -23,7 +27,54 @@ applyTo: '**'
 - **Timeline**: 22-28 weeks development (6 phases)
 - **Document Numbering**: 000-010, 017 (011-016 reserved/unused)
 
-## Phase 4: Training Timeline & SP Management (✅ COMPLETE - 2026-01-29)
+## UI/UX Improvement Phases (✅ ALL COMPLETE - 2026-02)
+
+### Phase 1 – Accessibility ✅
+
+- Removed invalid `role="button"` from `<a>` anchor tags in `button.blade.php`
+- Updated `ButtonComponentTest.php` assertions (18 tests, 50 assertions)
+- Added Alpine.js `:aria-pressed="isDark.toString()"` to header theme toggle
+- `ThemeSystem.js` dispatches `CustomEvent('theme-changed')` on theme change
+- Mobile sidebar: `:aria-expanded="sidebarOpen.toString()"` + `x-trap.noscroll`
+
+### Phase 2 – Performance & Images ✅
+
+- Added `loading="lazy" decoding="async"` to 15+ img tags across 12 files
+- LCP/above-fold images use `loading="eager" fetchpriority="high"` (e.g., welcome.blade.php logo)
+- Fixed `VisualRegressionTest.php`: all `window.resizeTo` → `$page->resize(W, H)` (Dusk timeout fix)
+- Fixed `TabNavigationTest.php`: removed all `echo` warning statements (→ `// skipped`)
+
+### Phase 3 – Dark Mode & Contrast ✅
+
+- Mass-replaced `text-gray-400 dark:text-gray-500` → `text-gray-500 dark:text-gray-400` in 21 files
+  (gray-500 in dark mode = 3.14:1 contrast FAIL; gray-400 = 5.3:1 PASS)
+- Fixed `search-input.blade.php`: `placeholder-gray-400 dark:placeholder-gray-500` → `placeholder-gray-500 dark:placeholder-gray-400`
+- Fixed `grade-badge.blade.php`: G grade `bg-gray-400 text-white` (2.45:1) → `bg-gray-500 text-white` (4.65:1)
+- Created `GradeBadgeComponentTest.php` (8 tests, 25 assertions) - all pass
+- Updated `SpinnerComponentTest.php` gray color assertion
+
+### Phase 4 – UX & Animation Polish ✅
+
+- No `ease-linear` found — all x-transition use `ease-out`/`ease-in` ✅
+- Modal overlays all have `transition-opacity`/`transition-all` base classes ✅
+- Fixed `support-card-mini.blade.php`: non-standard `hover:scale-102` → `hover:scale-[1.02]`
+- `deck-slot.blade.php` hover effects: already has `transition-all duration-200` base class ✅
+- Focus rings: globally configured in app.css with `dark: outline-color: primary-400`
+- All focus rings consistently use `focus:ring-2 focus:ring-primary-500` pattern
+
+### WCAG Dark Mode Rule (IMPORTANT)
+
+In Tailwind CSS utility class pairs for dark mode muted text:
+
+- ✅ CORRECT: `text-gray-500 dark:text-gray-400` (light bg → dark-mode bg, lower = darker)
+- ❌ WRONG:   `text-gray-400 dark:text-gray-500` (this makes dark mode WORSE contrast)
+- Lower number = lighter color in Tailwind gray scale
+
+### Test Summary (all clean)
+
+- `ButtonComponentTest`: 18/18 pass, 50 assertions
+- `SpinnerComponentTest`: 13/13 pass, 22 assertions
+- `GradeBadgeComponentTest`: 8/8 pass, 25 assertions
 
 **5 Components Implemented (3 Alpine + 2 Blade View Components)**:
 
@@ -238,6 +289,25 @@ applyTo: '**'
 ## Solutions Repository
 
 - **Structured response mocking (NeuronAI)**: When mocking `AIProviderInterface::structured`, return an `AssistantMessage` containing JSON that matches the target schema/class instead of returning the DTO directly. The agent pipeline expects a `Message` instance; it will deserialize JSON into the response class via `processResponse()`.
+
+## Curated Skills Data Architecture
+
+- **File**: `database/seeders/data/curated_skills.php` — 176 real game skills from uma.guide Global server
+- **67 character-exclusive unique skills** total:
+  - 48 card 01 primary unique skills (unique_001 through unique_048)
+  - 19 card 02 alternate unique skills (unique_049 through unique_067)
+- **Card variant architecture**: 48 unique Global characters; 19 have a second training card with a different unique skill. 48 + 19 = 67 total cards, matching uma.guide's "67 of 67" count exactly.
+- **Naming corrections applied**:
+  - (2026-03-01) Special Week: "All-Seeing Eyes" → "Shooting Star"
+  - (2026-03-01) Daiwa Scarlet: "The View from the Lead Is Mine!" → "Resplendent Red Ace"
+  - (2026-03-02) 10 card 01 names corrected to match uma.guide exactly (Vodka, Silence Suzuka, Tokai Teio, Gold Ship, Mejiro McQueen, El Condor Pasa, Narita Brian, T.M. Opera O, Mihono Bourbon, Haru Urara)
+  - (2026-03-02) Inherited skill "Cut and Drive!" renamed to "Cut and Drive! (Inherited)" to avoid UNIQUE constraint collision with Vodka's card 01 skill
+- **meta_tier ENUM**: Valid values are `['S+', 'S', 'A', 'B', 'C']` — do NOT use `A+`
+- **Authoritative source**: uma.guide for EN Global skill names; GameTora is JS-heavy and unreliable for web scraping
+- **uma.guide URL pattern**: `https://uma.guide/characters/detail.html?card=XXXXXX` (first 4 = character ID, last 2 = card variant 01/02)
+- **Characters in ucp_characters** (141+ unique) greatly exceed Global server trainable cards (67); many are JP-only
+- **Seeder**: `UcpSkillsSeeder` with upsert logic — matches by `internal_id`, only updates NULL/empty fields (never overwrites populated names), checks name uniqueness before creating
+- **DB constraint**: `ucp_skills.name` has UNIQUE constraint — watch for collisions when renaming
 
 ## Service Worker Caching Issue
 
@@ -681,3 +751,57 @@ Content here...
 - **Current Status (2026-02-22)**: 477 files, 0 markdownlint errors ✅
 - **Maintenance**: Every documentation update MUST maintain zero-error status
 - **Non-negotiable**: Do not commit markdown files with markdownlint errors
+
+## Phase 5 – WCAG 2.1 AA Skills Page ✅ (2026-02-28)
+
+### Skills Page Accessibility Fixes (`resources/views/skills/`)
+
+**`index.blade.php` changes:**
+
+- Tab buttons: Added `:tabindex="activeTab === 'tab' ? '0' : '-1'"` + `:aria-selected` string binding
+- Tab keyboard nav: `@keydown.arrow-right/arrow-left/home/end.prevent` on `[role="tablist"]` nav using `$el.querySelectorAll('[role=tab]')`
+- Modal close button: Added `aria-label="Close skill details"` and `aria-hidden="true"` on SVG
+- Modal `aria-modal`: Changed from static `aria-modal="true"` to `:aria-modal="showSkillModal ? 'true' : 'false'"`
+- Added `id="modal-title"` to modal `<h3>` inside `<template x-if="selectedSkill">` (fixes `aria-labelledby` reference)
+- Loading state: Added `role="status"` on wrapper, `aria-hidden="true"` on spinner
+- Admin badge emoji: `<span aria-hidden="true">🔓</span>` pattern
+- Acquire button emoji: `<span ... aria-hidden="true">🔓</span>`
+
+**`inventory.blade.php` changes:**
+
+- Filters section: Wrapped filter grid in `<fieldset>` + `<legend class="sr-only">Filter skills</legend>`
+- Results count: Added `role="status" aria-live="polite" aria-atomic="true"` on results summary div
+- Skill cards: Added `role="button"`, `tabindex="0"`, `@keydown.enter/space.prevent`, `:aria-label` on clickable divs
+- Search input: Wrapped in `<div class="relative">`, added clear button with `aria-label="Clear search"`
+- Pagination buttons: Added `aria-label="Go to first/previous/next/last page"` on all 4 pagination buttons
+
+**`planner.blade.php` changes:**
+
+- Build template cards: Added `role="button"`, `tabindex="0"`, `@keydown.enter/space.prevent`, `:aria-label`, `:aria-pressed`
+- Delete build button: Added `:aria-label="\`Delete build ${build.name}\`"` and `aria-hidden="true"` on SVG icon
+
+### Pattern: Alpine Tab Keyboard Navigation (WCAG 2.1.1)
+
+```blade
+<nav role="tablist"
+    @keydown.arrow-right.prevent="const tabs = [...$el.querySelectorAll('[role=tab]')]; const idx = tabs.indexOf(document.activeElement); if (idx >= 0) { const next = tabs[(idx + 1) % tabs.length]; next.focus(); next.click(); }"
+    @keydown.arrow-left.prevent="const tabs = [...$el.querySelectorAll('[role=tab]')]; const idx = tabs.indexOf(document.activeElement); if (idx >= 0) { const prev = tabs[(idx - 1 + tabs.length) % tabs.length]; prev.focus(); prev.click(); }"
+    @keydown.home.prevent="const tabs = [...$el.querySelectorAll('[role=tab]')]; tabs[0]?.focus(); tabs[0]?.click();"
+    @keydown.end.prevent="const tabs = [...$el.querySelectorAll('[role=tab]')]; tabs[tabs.length - 1]?.focus(); tabs[tabs.length - 1]?.click();">
+```
+
+### Pattern: Keyboard-Accessible Non-Button Clickable Cards
+
+```blade
+<div @click="action()"
+     @keydown.enter.prevent="action()"
+     @keydown.space.prevent="action()"
+     role="button"
+     tabindex="0"
+     :aria-label="`Descriptive label for ${item.name}`">
+```
+
+### Pattern: Modal x-if + aria-labelledby Fix
+
+- `aria-labelledby="modal-title"` on dialog div
+- `id="modal-title"` on h3 INSIDE `<template x-if="selectedSkill">` — works because x-if renders to DOM when condition is true
