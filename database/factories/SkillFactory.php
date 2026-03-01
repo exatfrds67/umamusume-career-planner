@@ -40,6 +40,9 @@ class SkillFactory extends Factory
             'evolution_source_id' => null,
             'can_evolve' => false,
             'is_evolution' => false,
+            'character_exclusive' => null,
+            'unique_skill_max_level' => null,
+            'condition_marker' => null,
             'effects' => [
                 'primary' => fake()->sentence(),
                 'secondary' => fake()->optional()->sentence(),
@@ -146,6 +149,29 @@ class SkillFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'stat_requirements' => $requirements,
+        ]);
+    }
+
+    /**
+     * Set the skill as a character-exclusive unique skill.
+     */
+    public function characterExclusive(string $character): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'character_exclusive' => $character,
+            'unique_skill_max_level' => 4,
+            'skill_type' => 'unique',
+            'rarity' => 'unique',
+        ]);
+    }
+
+    /**
+     * Set the condition marker (○ or ◎).
+     */
+    public function withConditionMarker(string $marker): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'condition_marker' => $marker,
         ]);
     }
 

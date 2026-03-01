@@ -19,6 +19,7 @@ class CareerFactory extends Factory
         return [
             'user_id' => \App\Models\User::factory(),
             'character_id' => \App\Models\Character::factory(),
+            'star_level' => fake()->numberBetween(1, 5),
             'career_name' => fake()->words(3, true).' Career',
             'scenario_type' => fake()->randomElement(['ura_finale', 'unity_cup']),
             'status' => 'active',
@@ -94,6 +95,16 @@ class CareerFactory extends Factory
             'final_guts' => fake()->numberBetween(800, 1200),
             'final_wit' => fake()->numberBetween(800, 1200),
             'final_sp' => fake()->numberBetween(100, 300),
+        ]);
+    }
+
+    /**
+     * Set a specific star level for the career.
+     */
+    public function withStarLevel(int $starLevel): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'star_level' => max(1, min(5, $starLevel)),
         ]);
     }
 }

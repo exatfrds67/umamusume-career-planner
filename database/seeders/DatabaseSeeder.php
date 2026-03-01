@@ -32,6 +32,8 @@ class DatabaseSeeder extends Seeder
             UcpSupportCardsSeeder::class,
             EnhancedRealUmaMusumeCharactersSeeder::class, // Real Uma Musume characters with official baseline data
             // UcpAptitudesSeeder::class, // Skip - aptitudes now created by EnhancedRealUmaMusumeCharactersSeeder
+            GameRaceSeeder::class,
+            GameCharacterSeeder::class,
         ]);
     }
 }

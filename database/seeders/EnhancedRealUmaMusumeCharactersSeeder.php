@@ -84,21 +84,61 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
         try {
             foreach ($englishCharacters as $charData) {
                 $characterName = $charData['name_en'];
+                $normalizedName = $this->normalizeCharacterName($characterName);
 
-                // Check if character already exists
-                $character = Character::where('user_id', $user->id)
-                    ->where('name', $characterName)
+                // Check if character already exists — try exact name first,
+                // then fall back to a variant with U+00A0 before the last word,
+                // to handle legacy DB rows like "T.M. Opera\u{00A0}O" or
+                // "Sakura Bakushin\u{00A0}O".
+                /** @var \Illuminate\Database\Eloquent\Builder<\App\Models\Character> $charQuery */
+                $charQuery = Character::query();
+                $character = $charQuery
+                    ->where('user_id', '=', $user->id)
+                    ->where('name', '=', $characterName)
                     ->first();
 
+                if (! $character && str_contains($characterName, ' ')) {
+                    $lastSpacePos = strrpos($characterName, ' ');
+                    $nbspVariant = substr($characterName, 0, $lastSpacePos)."\u{00A0}".substr($characterName, $lastSpacePos + 1);
+                    /** @var \Illuminate\Database\Eloquent\Builder<\App\Models\Character> $nbspQuery */
+                    $nbspQuery = Character::query();
+                    $character = $nbspQuery
+                        ->where('user_id', '=', $user->id)
+                        ->where('name', '=', $nbspVariant)
+                        ->first();
+                }
+
                 if ($character) {
+                    /** @var \App\Models\Character $character */
                     // Update existing character with aptitudes if we have data and they don't have aptitudes yet
-                    if (isset($this->aptitudeData[$characterName])) {
-                        $existingAptitudes = Aptitude::where('character_id', $character->id)->count();
+                    if (isset($this->aptitudeData[$normalizedName])) {
+                        /** @var \Illuminate\Database\Eloquent\Builder<\App\Models\Aptitude> $aptQuery */
+                        $aptQuery = Aptitude::query();
+                        $existingAptitudes = $aptQuery->where('character_id', '=', $character->id)->count();
                         if ($existingAptitudes === 0) {
-                            $this->createAptitudes($character, $this->aptitudeData[$characterName]);
+                            $this->createAptitudes($character, $this->aptitudeData[$normalizedName]);
                             $withAptitudes++;
                         }
                     }
+
+                    // Fix broken external avatar URLs when a local image is now available
+                    if (
+                        $this->localImageMap->has($characterName)
+                        && ! str_starts_with((string) $character->avatar_url, '/images/')
+                    ) {
+                        /** @var \Illuminate\Database\Eloquent\Builder<\App\Models\Character> $avatarQuery */
+                        $avatarQuery = Character::query();
+                        $avatarQuery->where('id', '=', $character->id)->update(['avatar_url' => $this->localImageMap->get($characterName)]);
+                    }
+
+                    // Always refresh current_stats and growth_rates from latest game data
+                    /** @var \Illuminate\Database\Eloquent\Builder<\App\Models\Character> $statsQuery */
+                    $statsQuery = Character::query();
+                    $statsQuery->where('id', '=', $character->id)->update([
+                        'current_stats' => json_encode($this->getBaseStats($normalizedName)),
+                        'growth_rates' => json_encode($this->getGrowthRates($normalizedName)),
+                    ]);
+
                     $skipped++;
 
                     continue;
@@ -119,7 +159,7 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
                     'scenario_type' => 'ura_finale',
                     'career_stage' => 'junior',
                     'current_turn' => 1,
-                    'current_stats' => $this->getBaseStats($characterName),
+                    'current_stats' => $this->getBaseStats($normalizedName),
                     'stat_priorities' => [
                         'speed' => 5,
                         'stamina' => 4,
@@ -143,7 +183,7 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
                     ],
                     'race_schedule' => [],
                     'training_plan' => [],
-                    'growth_rates' => $this->getGrowthRates($characterName),
+                    'growth_rates' => $this->getGrowthRates($normalizedName),
                     'inherited_factors' => [],
                     'legacy_parents' => [],
                     'team_composition' => [],
@@ -155,8 +195,8 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
                 ]);
 
                 // Create aptitude records if we have data for this character
-                if (isset($this->aptitudeData[$characterName])) {
-                    $this->createAptitudes($character, $this->aptitudeData[$characterName]);
+                if (isset($this->aptitudeData[$normalizedName])) {
+                    $this->createAptitudes($character, $this->aptitudeData[$normalizedName]);
                     $withAptitudes++;
                 }
 
@@ -208,6 +248,18 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
 
             return [];
         })->filter();
+
+        // Manual overrides for image files with non-standard naming conventions.
+        $manualOverrides = [
+            'bb962aabeafaee5cbf7831e4d178ca64.jpg' => 'Silence Suzuka',
+        ];
+
+        foreach ($manualOverrides as $filename => $characterName) {
+            $fullPath = $imagePath.DIRECTORY_SEPARATOR.$filename;
+            if (File::exists($fullPath)) {
+                $this->localImageMap->put($characterName, '/images/trainee_images/'.$filename);
+            }
+        }
     }
 
     /**
@@ -276,9 +328,45 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
             'zenno_rob_roy' => 'Zenno Rob Roy',
             'biwa_hayahide' => 'Biwa Hayahide',
             'grass_wonder' => 'Grass Wonder',
+            'silence_suzuka' => 'Silence Suzuka',
         ];
 
         return $nameMap[$slug] ?? Str::title(str_replace('_', ' ', $slug));
+    }
+
+    /**
+     * Normalise a raw API name_en value to the canonical form used as keys in
+     * getBaseStats() / getGrowthRates() / aptitudeData[].
+     *
+     * The API occasionally uses:
+     *  - Non-breaking spaces (U+00A0) before suffixes like "O"
+     *  - Zero-width spaces (U+200B) embedded in names
+     *  - Ligature / umlaut variants (ä vs a, etc.)
+     */
+    private function normalizeCharacterName(string $name): string
+    {
+        // Replace zero-width space (U+200B) with a regular space so
+        // "Matikane​fukukitaru" regains its word separator.
+        $hasZwsp = str_contains($name, "\u{200B}");
+        $name = str_replace("\u{200B}", ' ', $name);
+        // Replace non-breaking space (U+00A0) with a regular space.
+        $name = str_replace("\u{00A0}", ' ', $name);
+        // Collapse any double-spaces left by replacements.
+        $name = trim((string) preg_replace('/ {2,}/', ' ', $name));
+        // Only apply per-word capitalisation when a zero-width space was
+        // present, to fix cases like "Matikane fukukitaru" → "Matikane Fukukitaru".
+        // We intentionally skip this step for names like "Sounds of Earth"
+        // so that lowercase connectors ("of", "the", "and", "in") are preserved.
+        if ($hasZwsp) {
+            $name = implode(' ', array_map('ucfirst', explode(' ', $name)));
+        }
+
+        // Specific canonical overrides for names the API renders differently
+        $overrides = [
+            'Matikane Tannhäuser' => 'Matikane Tannhauser',
+        ];
+
+        return $overrides[$name] ?? $name;
     }
 
     /**
@@ -308,9 +396,8 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
      */
     private function getGrowthRates(string $characterName): array
     {
-        // Character-specific growth rates based on specializations
-        $specializedRates = [
-            // Speed Specialists (Sprint/Mile focus)
+        $rates = [
+            // ── Speed/Sprint specialists ────────────────────────────────────
             'Silence Suzuka' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
             'Fuji Kiseki' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
             'Taiki Shuttle' => ['speed' => 1.3, 'stamina' => 0.8, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
@@ -318,8 +405,42 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
             'Agnes Tachyon' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.0, 'guts' => 0.9, 'wit' => 1.2],
             'Agnes Digital' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
             'Sakura Bakushin O' => ['speed' => 1.3, 'stamina' => 0.8, 'power' => 1.2, 'guts' => 1.0, 'wit' => 0.8],
+            'Admire Vega' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Sweep Tosho' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Twin Turbo' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.1, 'wit' => 0.8],
+            'Nishino Flower' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Air Shakur' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Gran Alegria' => ['speed' => 1.3, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 0.9, 'wit' => 1.0],
+            'Daiichi Ruby' => ['speed' => 1.2, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Durandal' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Vivlos' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.0, 'guts' => 0.9, 'wit' => 1.2],
+            'Gold City' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Eishin Flash' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Logotype' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Yamanin Zephyr' => ['speed' => 1.3, 'stamina' => 0.8, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Bamboo Memory' => ['speed' => 1.3, 'stamina' => 0.8, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Tap Dance City' => ['speed' => 1.2, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'North Flight' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Inari One' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Shinko Windy' => ['speed' => 1.2, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Seeking the Pearl' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Ines Fujin' => ['speed' => 1.3, 'stamina' => 0.8, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Haiseiko' => ['speed' => 1.1, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.1, 'wit' => 1.0],
+            'Speed Symboli' => ['speed' => 1.3, 'stamina' => 0.8, 'power' => 1.0, 'guts' => 1.1, 'wit' => 0.9],
+            'Katsuragi Ace' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Marvelous Sunday' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Rulership' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Hokko Tarumae' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.2, 'guts' => 1.0, 'wit' => 0.9],
+            'Smart Falcon' => ['speed' => 1.2, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.8],
+            'Copano Rickey' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.2, 'guts' => 1.0, 'wit' => 1.0],
+            'Daitaku Helios' => ['speed' => 1.1, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Transcend' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.2, 'guts' => 1.0, 'wit' => 0.9],
+            'Nice Nature' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.1, 'wit' => 1.0],
+            'Bubble Gum Fellow' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Sakura Chiyono O' => ['speed' => 1.2, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Sakura Chitose O' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
 
-            // Stamina Specialists (Long distance focus)
+            // ── Stamina/Long distance specialists ──────────────────────────
             'Maruzensky' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
             'Gold Ship' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.2, 'wit' => 0.8],
             'Kitasan Black' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.1, 'guts' => 1.1, 'wit' => 0.9],
@@ -333,37 +454,136 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
             'Manhattan Cafe' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
             'Tamamo Cross' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
             'Matikane Fukukitaru' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.2, 'wit' => 0.9],
+            'Mejiro Ardan' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Matikane Tannhauser' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Super Creek' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Sakura Laurel' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.1, 'guts' => 1.1, 'wit' => 0.9],
+            'Stay Gold' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.2, 'wit' => 0.9],
+            'Still in Love' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Zenno Rob Roy' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Sounds of Earth' => ['speed' => 0.8, 'stamina' => 1.3, 'power' => 0.9, 'guts' => 1.2, 'wit' => 1.0],
+            'Mejiro Bright' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Mejiro Ramonu' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Tanino Gimlet' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Nakayama Festa' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.2, 'wit' => 0.9],
+            'Narita Top Road' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'No Reason' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Neo Universe' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Orfevre' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.2, 'wit' => 0.8],
+            'Lucky Lilac' => ['speed' => 0.9, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Loves Only You' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.1, 'wit' => 1.0],
+            'Epiphaneia' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Kiseki' => ['speed' => 0.8, 'stamina' => 1.3, 'power' => 0.9, 'guts' => 1.2, 'wit' => 0.9],
+            'Duramente' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
 
-            // Power Specialists (Acceleration focus)
+            // ── Power/Acceleration specialists ─────────────────────────────
             'Oguri Cap' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.2, 'wit' => 0.8],
             'Narita Brian' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.2, 'guts' => 1.0, 'wit' => 0.9],
             'Haru Urara' => ['speed' => 1.1, 'stamina' => 0.9, 'power' => 1.2, 'guts' => 1.3, 'wit' => 0.7],
             'Mihono Bourbon' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.2, 'guts' => 1.0, 'wit' => 0.8],
+            'Narita Taishin' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.2, 'guts' => 1.0, 'wit' => 1.0],
+            'Sirius Symboli' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.1, 'wit' => 0.9],
+            'Meisho Doto' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.1, 'wit' => 0.9],
+            'Ikuno Dictus' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.0, 'wit' => 1.1],
+            'Jungle Pocket' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.2, 'guts' => 1.0, 'wit' => 1.0],
+            'Samson Big' => ['speed' => 0.9, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.2, 'wit' => 0.8],
+            'Hishi Akebono' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.2, 'wit' => 0.8],
+            'Hishi Amazon' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.1, 'wit' => 1.0],
+            'Hishi Miracle' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.1, 'wit' => 0.9],
+            'Daring Tact' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.2, 'guts' => 1.0, 'wit' => 1.0],
+            'Marche Lorraine' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Victoire Pisa' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.0, 'wit' => 0.9],
+            'Gentildonna' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Dream Journey' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.1, 'wit' => 0.9],
+            'Satono Crown' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.1, 'wit' => 0.9],
+            'Almond Eye' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Chrono Genesis' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Fenomeno' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.0, 'wit' => 0.9],
 
-            // Balanced All-Rounders (Medium distance focus)
+            // ── Wit/Intelligence specialists ───────────────────────────────
+            'Biwa Hayahide' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.2],
+            'Grass Wonder' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Fine Motion' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Tosen Jordan' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Kawakami Princess' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Seiun Sky' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Admire Groove' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Cesario' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Daring Heart' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Fusaichi Pandora' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Rigantona' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Rhein Kraft' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+
+            // ── Balanced / Medium distance ──────────────────────────────────
             'Special Week' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
             'Tokai Teio' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
             'Vodka' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
             'Air Groove' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
             'Symboli Rudolf' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
-            'Grass Wonder' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
-            'Biwa Hayahide' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.2],
             'King Halo' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
             'El Condor Pasa' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.1, 'wit' => 0.9],
-            'Admire Vega' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
-            'Fine Motion' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
-            'Tosen Jordan' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
-            'Kawakami Princess' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Mr. C.B.' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Winning Ticket' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.2, 'guts' => 1.0, 'wit' => 0.9],
+            'Biko Pegasus' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Air Messiah' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Yaeno Muteki' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.0],
+            'Yukino Bijin' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Wonder Acute' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Cheval Grand' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Espoir City' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Buena Vista' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Red Desire' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Tsurumaru Tsuyoshi' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.1, 'wit' => 1.0],
+            'Win Variation' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Mayano Top Gun' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.1, 'guts' => 1.1, 'wit' => 0.9],
+            'Symboli Kris S' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.1, 'wit' => 0.9],
+            'Saint Lite' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.1, 'wit' => 1.0],
+            'Rose Kingdom' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Aston Machan' => ['speed' => 1.1, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 0.9, 'wit' => 1.2],
+            'Believe' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 0.9, 'wit' => 1.1],
+            'Casino Drive' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Forever Young' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Curren Chan' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Curren Bouquetd\'or' => ['speed' => 1.1, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Dantsu Flame' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 0.9],
+            'Happy Meek' => ['speed' => 1.1, 'stamina' => 0.9, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Calstone Light O' => ['speed' => 1.2, 'stamina' => 0.9, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Bitter Glasse' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Blast Onepiece' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'K.S. Miracle' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Light Hello' => ['speed' => 1.1, 'stamina' => 0.9, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Little Cocon' => ['speed' => 1.1, 'stamina' => 0.9, 'power' => 1.0, 'guts' => 0.9, 'wit' => 1.2],
+            'Royce and Royce' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Ryoka Tsurugi' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.0],
+            'Sugar Lights' => ['speed' => 1.1, 'stamina' => 0.9, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Tucker Bryne' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Venus Paques' => ['speed' => 1.1, 'stamina' => 0.9, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.1],
+            'Verxina' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.0, 'guts' => 0.9, 'wit' => 1.2],
+
+            // ── Student trainer characters ──────────────────────────────────
+            'Tazuna Hayakawa' => ['speed' => 1.0, 'stamina' => 1.0, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.2],
+            'Etsuko Otonashi' => ['speed' => 1.0, 'stamina' => 1.0, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.3],
+            'Misato Akasaka' => ['speed' => 1.0, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.2],
+            'Junko Hosoe' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.1],
+            'Kiyoko Hoshina' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.1],
+            'Aoi Kiryuin' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.2],
+            'Mei Satake' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.2],
+            'Riko Kashimoto' => ['speed' => 1.0, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.1, 'wit' => 1.2],
+            'Yayoi Akikawa' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.2],
+            'Sasami Anshinzawa' => ['speed' => 1.0, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.1, 'wit' => 1.2],
+            'Sonon Elfie' => ['speed' => 1.1, 'stamina' => 1.0, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.2],
+            'Yunohana Bloom' => ['speed' => 1.0, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.0, 'wit' => 1.2],
+
+            // ── Foundation horses ───────────────────────────────────────────
+            'Byerley Turk' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.0, 'guts' => 1.2, 'wit' => 0.9],
+            'Darley Arabian' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.0, 'guts' => 1.1, 'wit' => 1.0],
+            'Godolphin Barb' => ['speed' => 1.0, 'stamina' => 1.2, 'power' => 1.1, 'guts' => 1.1, 'wit' => 0.9],
+
+            // ── Additional characters ────────────────────────────────────────
+            'Furioso' => ['speed' => 1.1, 'stamina' => 1.1, 'power' => 1.1, 'guts' => 1.1, 'wit' => 0.9],
         ];
 
-        // Return character-specific rates if available, otherwise balanced defaults
-        return $specializedRates[$characterName] ?? [
-            'speed' => 1.0,
-            'stamina' => 1.0,
-            'power' => 1.0,
-            'guts' => 1.0,
-            'wit' => 1.0,
-        ];
+        return $rates[$characterName] ?? ['speed' => 1.0, 'stamina' => 1.0, 'power' => 1.0, 'guts' => 1.0, 'wit' => 1.0];
     }
 
     /**
@@ -376,13 +596,12 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
      * - Power specialists: Higher power base
      * - Balanced characters: Even distribution
      *
-     * Typical ranges: 30-60 per stat (total ~200-250)
+     * Typical ranges: 30-65 per stat (total ~195-255)
      */
     private function getBaseStats(string $characterName): array
     {
-        // Character-specific base stats based on specializations
-        $specializedStats = [
-            // Speed Specialists (Sprint/Mile focus)
+        $stats = [
+            // ── Speed/Sprint specialists ────────────────────────────────────
             'Silence Suzuka' => ['speed' => 60, 'stamina' => 40, 'power' => 45, 'guts' => 40, 'wit' => 50],
             'Fuji Kiseki' => ['speed' => 60, 'stamina' => 35, 'power' => 50, 'guts' => 40, 'wit' => 45],
             'Taiki Shuttle' => ['speed' => 65, 'stamina' => 30, 'power' => 55, 'guts' => 40, 'wit' => 40],
@@ -392,8 +611,41 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
             'Sakura Bakushin O' => ['speed' => 65, 'stamina' => 30, 'power' => 60, 'guts' => 40, 'wit' => 35],
             'Admire Vega' => ['speed' => 55, 'stamina' => 45, 'power' => 45, 'guts' => 40, 'wit' => 50],
             'Sweep Tosho' => ['speed' => 60, 'stamina' => 40, 'power' => 50, 'guts' => 40, 'wit' => 45],
+            'Twin Turbo' => ['speed' => 60, 'stamina' => 35, 'power' => 55, 'guts' => 50, 'wit' => 35],
+            'Nishino Flower' => ['speed' => 55, 'stamina' => 45, 'power' => 50, 'guts' => 40, 'wit' => 45],
+            'Air Shakur' => ['speed' => 60, 'stamina' => 40, 'power' => 50, 'guts' => 40, 'wit' => 45],
+            'Gran Alegria' => ['speed' => 65, 'stamina' => 35, 'power' => 50, 'guts' => 40, 'wit' => 45],
+            'Daiichi Ruby' => ['speed' => 60, 'stamina' => 40, 'power' => 50, 'guts' => 40, 'wit' => 50],
+            'Durandal' => ['speed' => 60, 'stamina' => 35, 'power' => 55, 'guts' => 40, 'wit' => 40],
+            'Vivlos' => ['speed' => 60, 'stamina' => 40, 'power' => 45, 'guts' => 40, 'wit' => 55],
+            'Gold City' => ['speed' => 60, 'stamina' => 35, 'power' => 55, 'guts' => 45, 'wit' => 40],
+            'Eishin Flash' => ['speed' => 60, 'stamina' => 40, 'power' => 50, 'guts' => 40, 'wit' => 50],
+            'Logotype' => ['speed' => 55, 'stamina' => 45, 'power' => 50, 'guts' => 40, 'wit' => 50],
+            'Yamanin Zephyr' => ['speed' => 65, 'stamina' => 30, 'power' => 55, 'guts' => 40, 'wit' => 40],
+            'Bamboo Memory' => ['speed' => 65, 'stamina' => 30, 'power' => 55, 'guts' => 45, 'wit' => 35],
+            'Tap Dance City' => ['speed' => 60, 'stamina' => 40, 'power' => 50, 'guts' => 40, 'wit' => 50],
+            'North Flight' => ['speed' => 60, 'stamina' => 35, 'power' => 55, 'guts' => 40, 'wit' => 45],
+            'Inari One' => ['speed' => 55, 'stamina' => 45, 'power' => 55, 'guts' => 40, 'wit' => 40],
+            'Shinko Windy' => ['speed' => 60, 'stamina' => 40, 'power' => 50, 'guts' => 40, 'wit' => 45],
+            'Seeking the Pearl' => ['speed' => 60, 'stamina' => 35, 'power' => 55, 'guts' => 40, 'wit' => 45],
+            'Ines Fujin' => ['speed' => 65, 'stamina' => 30, 'power' => 55, 'guts' => 40, 'wit' => 40],
+            'Haiseiko' => ['speed' => 55, 'stamina' => 40, 'power' => 55, 'guts' => 45, 'wit' => 45],
+            'Speed Symboli' => ['speed' => 65, 'stamina' => 30, 'power' => 50, 'guts' => 45, 'wit' => 40],
+            'Katsuragi Ace' => ['speed' => 55, 'stamina' => 45, 'power' => 50, 'guts' => 40, 'wit' => 50],
+            'Marvelous Sunday' => ['speed' => 55, 'stamina' => 50, 'power' => 50, 'guts' => 40, 'wit' => 45],
+            'Rulership' => ['speed' => 55, 'stamina' => 50, 'power' => 50, 'guts' => 40, 'wit' => 45],
+            'Hokko Tarumae' => ['speed' => 55, 'stamina' => 45, 'power' => 55, 'guts' => 45, 'wit' => 40],
+            'Smart Falcon' => ['speed' => 60, 'stamina' => 45, 'power' => 55, 'guts' => 40, 'wit' => 35],
+            'Copano Rickey' => ['speed' => 55, 'stamina' => 45, 'power' => 55, 'guts' => 40, 'wit' => 45],
+            'Daitaku Helios' => ['speed' => 55, 'stamina' => 40, 'power' => 55, 'guts' => 40, 'wit' => 50],
+            'Transcend' => ['speed' => 55, 'stamina' => 45, 'power' => 55, 'guts' => 45, 'wit' => 40],
+            'Nice Nature' => ['speed' => 55, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 45],
+            'Bubble Gum Fellow' => ['speed' => 60, 'stamina' => 35, 'power' => 55, 'guts' => 40, 'wit' => 45],
+            'Winning Ticket' => ['speed' => 50, 'stamina' => 50, 'power' => 55, 'guts' => 45, 'wit' => 40],
+            'Sakura Chiyono O' => ['speed' => 60, 'stamina' => 40, 'power' => 50, 'guts' => 40, 'wit' => 50],
+            'Sakura Chitose O' => ['speed' => 55, 'stamina' => 45, 'power' => 50, 'guts' => 40, 'wit' => 50],
 
-            // Stamina Specialists (Long distance focus)
+            // ── Stamina/Long distance specialists ──────────────────────────
             'Maruzensky' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
             'Gold Ship' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 55, 'wit' => 35],
             'Kitasan Black' => ['speed' => 45, 'stamina' => 60, 'power' => 50, 'guts' => 50, 'wit' => 40],
@@ -409,37 +661,137 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
             'Matikane Fukukitaru' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 55, 'wit' => 40],
             'Mejiro Ardan' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
             'Matikane Tannhauser' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
+            'Super Creek' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
+            'Sakura Laurel' => ['speed' => 45, 'stamina' => 60, 'power' => 50, 'guts' => 50, 'wit' => 40],
+            'Stay Gold' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 55, 'wit' => 40],
+            'Still in Love' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
+            'Zenno Rob Roy' => ['speed' => 45, 'stamina' => 60, 'power' => 50, 'guts' => 45, 'wit' => 40],
+            'Sounds of Earth' => ['speed' => 35, 'stamina' => 65, 'power' => 40, 'guts' => 55, 'wit' => 45],
+            'Mejiro Bright' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
+            'Mejiro Ramonu' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
+            'Tanino Gimlet' => ['speed' => 45, 'stamina' => 60, 'power' => 50, 'guts' => 45, 'wit' => 40],
+            'Nakayama Festa' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 55, 'wit' => 40],
+            'Narita Top Road' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
+            'No Reason' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
+            'Neo Universe' => ['speed' => 45, 'stamina' => 55, 'power' => 50, 'guts' => 45, 'wit' => 45],
+            'Orfevre' => ['speed' => 45, 'stamina' => 60, 'power' => 45, 'guts' => 55, 'wit' => 35],
+            'Lucky Lilac' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
+            'Loves Only You' => ['speed' => 45, 'stamina' => 55, 'power' => 50, 'guts' => 50, 'wit' => 45],
+            'Epiphaneia' => ['speed' => 45, 'stamina' => 60, 'power' => 50, 'guts' => 45, 'wit' => 45],
+            'Kiseki' => ['speed' => 35, 'stamina' => 65, 'power' => 40, 'guts' => 60, 'wit' => 35],
+            'Kitasan Express' => ['speed' => 40, 'stamina' => 60, 'power' => 45, 'guts' => 50, 'wit' => 45],
+            'Duramente' => ['speed' => 50, 'stamina' => 55, 'power' => 50, 'guts' => 45, 'wit' => 45],
 
-            // Power Specialists (Acceleration focus)
+            // ── Power/Acceleration specialists ─────────────────────────────
             'Oguri Cap' => ['speed' => 45, 'stamina' => 50, 'power' => 60, 'guts' => 55, 'wit' => 35],
             'Narita Brian' => ['speed' => 50, 'stamina' => 45, 'power' => 60, 'guts' => 45, 'wit' => 40],
             'Haru Urara' => ['speed' => 50, 'stamina' => 40, 'power' => 60, 'guts' => 60, 'wit' => 30],
             'Mihono Bourbon' => ['speed' => 60, 'stamina' => 40, 'power' => 60, 'guts' => 45, 'wit' => 35],
+            'Narita Taishin' => ['speed' => 50, 'stamina' => 45, 'power' => 60, 'guts' => 45, 'wit' => 45],
+            'Sirius Symboli' => ['speed' => 45, 'stamina' => 50, 'power' => 60, 'guts' => 50, 'wit' => 40],
+            'Meisho Doto' => ['speed' => 45, 'stamina' => 50, 'power' => 60, 'guts' => 50, 'wit' => 40],
+            'Ikuno Dictus' => ['speed' => 45, 'stamina' => 50, 'power' => 60, 'guts' => 45, 'wit' => 50],
+            'Jungle Pocket' => ['speed' => 50, 'stamina' => 45, 'power' => 60, 'guts' => 45, 'wit' => 45],
+            'Samson Big' => ['speed' => 40, 'stamina' => 55, 'power' => 60, 'guts' => 55, 'wit' => 35],
+            'Hishi Akebono' => ['speed' => 45, 'stamina' => 50, 'power' => 60, 'guts' => 55, 'wit' => 35],
+            'Hishi Amazon' => ['speed' => 50, 'stamina' => 45, 'power' => 55, 'guts' => 50, 'wit' => 45],
+            'Hishi Miracle' => ['speed' => 45, 'stamina' => 50, 'power' => 60, 'guts' => 50, 'wit' => 40],
+            'Daring Tact' => ['speed' => 50, 'stamina' => 45, 'power' => 60, 'guts' => 45, 'wit' => 45],
+            'Marche Lorraine' => ['speed' => 50, 'stamina' => 45, 'power' => 55, 'guts' => 45, 'wit' => 50],
+            'Victoire Pisa' => ['speed' => 50, 'stamina' => 50, 'power' => 60, 'guts' => 45, 'wit' => 40],
+            'Gentildonna' => ['speed' => 50, 'stamina' => 50, 'power' => 55, 'guts' => 45, 'wit' => 50],
+            'Dream Journey' => ['speed' => 45, 'stamina' => 50, 'power' => 60, 'guts' => 50, 'wit' => 40],
+            'Satono Crown' => ['speed' => 45, 'stamina' => 50, 'power' => 60, 'guts' => 50, 'wit' => 40],
+            'Almond Eye' => ['speed' => 55, 'stamina' => 45, 'power' => 55, 'guts' => 45, 'wit' => 50],
+            'Chrono Genesis' => ['speed' => 50, 'stamina' => 50, 'power' => 55, 'guts' => 45, 'wit' => 45],
+            'Fenomeno' => ['speed' => 50, 'stamina' => 50, 'power' => 60, 'guts' => 45, 'wit' => 40],
 
-            // Balanced All-Rounders (Medium distance focus)
+            // ── Wit/Intelligence specialists ───────────────────────────────
+            'Biwa Hayahide' => ['speed' => 45, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 55],
+            'Grass Wonder' => ['speed' => 50, 'stamina' => 50, 'power' => 45, 'guts' => 45, 'wit' => 50],
+            'Fine Motion' => ['speed' => 50, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Tosen Jordan' => ['speed' => 45, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Kawakami Princess' => ['speed' => 50, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Seiun Sky' => ['speed' => 50, 'stamina' => 50, 'power' => 45, 'guts' => 45, 'wit' => 50],
+            'Admire Groove' => ['speed' => 50, 'stamina' => 50, 'power' => 45, 'guts' => 45, 'wit' => 55],
+            'Cesario' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Daring Heart' => ['speed' => 50, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 55],
+            'Fusaichi Pandora' => ['speed' => 50, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 55],
+            'Rigantona' => ['speed' => 45, 'stamina' => 55, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Rhein Kraft' => ['speed' => 45, 'stamina' => 55, 'power' => 50, 'guts' => 45, 'wit' => 50],
+
+            // ── Balanced / Medium distance ──────────────────────────────────
             'Special Week' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 45],
             'Tokai Teio' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 45],
             'Vodka' => ['speed' => 50, 'stamina' => 50, 'power' => 45, 'guts' => 50, 'wit' => 45],
             'Air Groove' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 45],
             'Symboli Rudolf' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 45],
-            'Grass Wonder' => ['speed' => 50, 'stamina' => 50, 'power' => 45, 'guts' => 45, 'wit' => 50],
-            'Biwa Hayahide' => ['speed' => 45, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 55],
             'King Halo' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 45],
             'El Condor Pasa' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 50, 'wit' => 40],
-            'Fine Motion' => ['speed' => 50, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 50],
-            'Tosen Jordan' => ['speed' => 45, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
-            'Kawakami Princess' => ['speed' => 50, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 50],
-            'Seiun Sky' => ['speed' => 50, 'stamina' => 50, 'power' => 45, 'guts' => 45, 'wit' => 50],
+            'Mr. C.B.' => ['speed' => 50, 'stamina' => 55, 'power' => 50, 'guts' => 45, 'wit' => 40],
+            'Biko Pegasus' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Air Messiah' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Yaeno Muteki' => ['speed' => 50, 'stamina' => 55, 'power' => 50, 'guts' => 45, 'wit' => 40],
+            'Yukino Bijin' => ['speed' => 45, 'stamina' => 55, 'power' => 50, 'guts' => 50, 'wit' => 40],
+            'Wonder Acute' => ['speed' => 55, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 45],
+            'Cheval Grand' => ['speed' => 45, 'stamina' => 60, 'power' => 50, 'guts' => 45, 'wit' => 40],
+            'Espoir City' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Buena Vista' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Red Desire' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Tsurumaru Tsuyoshi' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 50, 'wit' => 45],
+            'Win Variation' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Mayano Top Gun' => ['speed' => 45, 'stamina' => 55, 'power' => 55, 'guts' => 50, 'wit' => 40],
+            'Symoli Kris S' => ['speed' => 45, 'stamina' => 55, 'power' => 50, 'guts' => 50, 'wit' => 40],
+            'Symboli Kris S' => ['speed' => 45, 'stamina' => 55, 'power' => 50, 'guts' => 50, 'wit' => 40],
+            'Saint Lite' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 50, 'wit' => 45],
+            'Rose Kingdom' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Aston Machan' => ['speed' => 55, 'stamina' => 40, 'power' => 50, 'guts' => 40, 'wit' => 55],
+            'Believe' => ['speed' => 55, 'stamina' => 45, 'power' => 50, 'guts' => 40, 'wit' => 50],
+            'Casino Drive' => ['speed' => 50, 'stamina' => 50, 'power' => 55, 'guts' => 45, 'wit' => 45],
+            'Forever Young' => ['speed' => 55, 'stamina' => 45, 'power' => 55, 'guts' => 45, 'wit' => 40],
+            'Curren Chan' => ['speed' => 60, 'stamina' => 35, 'power' => 55, 'guts' => 45, 'wit' => 40],
+            'Curren Bouquetd\'or' => ['speed' => 55, 'stamina' => 40, 'power' => 55, 'guts' => 45, 'wit' => 45],
+            'Dantsu Flame' => ['speed' => 55, 'stamina' => 45, 'power' => 55, 'guts' => 45, 'wit' => 40],
+            'Happy Meek' => ['speed' => 55, 'stamina' => 40, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Calstone Light O' => ['speed' => 60, 'stamina' => 35, 'power' => 55, 'guts' => 40, 'wit' => 45],
+            'Bite Glasse' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Bitter Glasse' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Blast Onepiece' => ['speed' => 55, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'K.S. Miracle' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 50, 'wit' => 45],
+            'Light Hello' => ['speed' => 55, 'stamina' => 40, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Little Cocon' => ['speed' => 55, 'stamina' => 40, 'power' => 50, 'guts' => 40, 'wit' => 55],
+            'Royce and Royce' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Ryoka Tsurugi' => ['speed' => 50, 'stamina' => 50, 'power' => 55, 'guts' => 45, 'wit' => 45],
+            'Sugar Lights' => ['speed' => 55, 'stamina' => 40, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Tucker Bryne' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Venus Paques' => ['speed' => 55, 'stamina' => 40, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Verxina' => ['speed' => 55, 'stamina' => 45, 'power' => 50, 'guts' => 40, 'wit' => 55],
+            'Yasuda Kinen' => ['speed' => 50, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+
+            // ── Student trainer characters (support card characters) ────────
+            'Tazuna Hayakawa' => ['speed' => 45, 'stamina' => 45, 'power' => 45, 'guts' => 50, 'wit' => 55],
+            'Etsuko Otonashi' => ['speed' => 45, 'stamina' => 45, 'power' => 45, 'guts' => 45, 'wit' => 60],
+            'Misato Akasaka' => ['speed' => 45, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 55],
+            'Junko Hosoe' => ['speed' => 45, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 50],
+            'Kiyoko Hoshina' => ['speed' => 45, 'stamina' => 50, 'power' => 45, 'guts' => 50, 'wit' => 50],
+            'Aoi Kiryuin' => ['speed' => 50, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 55],
+            'Mei Satake' => ['speed' => 45, 'stamina' => 50, 'power' => 45, 'guts' => 50, 'wit' => 55],
+            'Riko Kashimoto' => ['speed' => 45, 'stamina' => 45, 'power' => 50, 'guts' => 50, 'wit' => 55],
+            'Yayoi Akikawa' => ['speed' => 45, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 55],
+            'Sasami Anshinzawa' => ['speed' => 45, 'stamina' => 45, 'power' => 50, 'guts' => 50, 'wit' => 55],
+            'Sonon Elfie' => ['speed' => 50, 'stamina' => 45, 'power' => 50, 'guts' => 45, 'wit' => 55],
+            'Yunohana Bloom' => ['speed' => 45, 'stamina' => 50, 'power' => 50, 'guts' => 45, 'wit' => 55],
+
+            // ── Foundation horses (historical ancestors) ───────────────────
+            'Byerley Turk' => ['speed' => 50, 'stamina' => 55, 'power' => 50, 'guts' => 55, 'wit' => 40],
+            'Darley Arabian' => ['speed' => 55, 'stamina' => 50, 'power' => 50, 'guts' => 50, 'wit' => 45],
+            'Godolphin Barb' => ['speed' => 50, 'stamina' => 55, 'power' => 55, 'guts' => 50, 'wit' => 40],
+
+            // ── Additional characters ────────────────────────────────────────
+            'Furioso' => ['speed' => 50, 'stamina' => 50, 'power' => 55, 'guts' => 50, 'wit' => 45],
         ];
 
-        // Return character-specific stats if available, otherwise balanced defaults
-        return $specializedStats[$characterName] ?? [
-            'speed' => 45,
-            'stamina' => 45,
-            'power' => 45,
-            'guts' => 45,
-            'wit' => 45,
-        ];
+        return $stats[$characterName] ?? ['speed' => 45, 'stamina' => 45, 'power' => 45, 'guts' => 45, 'wit' => 45];
     }
 
     /**
@@ -2838,7 +3190,9 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
 
         // Bulk insert aptitudes
         if (! empty($aptitudeRecords)) {
-            Aptitude::insert($aptitudeRecords);
+            /** @var \Illuminate\Database\Eloquent\Builder<\App\Models\Aptitude> $insertQuery */
+            $insertQuery = Aptitude::query();
+            $insertQuery->insert($aptitudeRecords);
         }
     }
 }

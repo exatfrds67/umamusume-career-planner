@@ -120,7 +120,21 @@ class CharacterTestSeeder extends Seeder
         ];
 
         foreach ($characters as $characterData) {
-            Character::create(array_merge($characterData, ['user_id' => $user->id]));
+            Character::firstOrCreate(
+                ['user_id' => $user->id, 'name' => $characterData['name']],
+                array_merge($characterData, ['user_id' => $user->id])
+            );
+        }
+
+        // Also seed characters for the admin user if they exist
+        $adminUser = User::where('email', 'admin@umamusume.local')->first();
+        if ($adminUser && $adminUser->id !== $user->id) {
+            foreach ($characters as $characterData) {
+                Character::firstOrCreate(
+                    ['user_id' => $adminUser->id, 'name' => $characterData['name']],
+                    array_merge($characterData, ['user_id' => $adminUser->id])
+                );
+            }
         }
     }
 }
