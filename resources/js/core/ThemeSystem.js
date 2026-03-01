@@ -132,6 +132,9 @@ class ThemeSystem {
         if (!isInitial) {
             this.announceThemeChange(theme);
         }
+
+        // Dispatch event for Alpine.js and other components
+        window.dispatchEvent(new CustomEvent('theme-changed', { detail: shouldBeDark }));
     }
 
     toggleTheme() {
@@ -143,10 +146,8 @@ class ThemeSystem {
         const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
         mediaQuery.addEventListener("change", (e) => {
-            // Only auto-switch if user hasn't set a preference
-            if (!localStorage.getItem("theme")) {
-                this.applyTheme(e.matches ? "dark" : "light");
-            }
+            // Always auto-switch to match system preference if it changes
+            this.applyTheme(e.matches ? "dark" : "light");
         });
     }
 

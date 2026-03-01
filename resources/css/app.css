@@ -24,6 +24,8 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* Note: APM dashboard health-score banner uses dynamic classes - ensure these are present in template content for Tailwind to detect them */
+
 /* Configure dark mode to use class-based strategy (requires .dark class on html element) */
 @variant dark (&:where(.dark, .dark *));
 
@@ -245,6 +247,43 @@
 
 html {
     scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+    .animate-fade-in-delay-1 {
+        animation: fadeIn 0.5s ease-out 0.1s forwards;
+        opacity: 0;
+    }
+    .animate-fade-in-delay-2 {
+        animation: fadeIn 0.5s ease-out 0.2s forwards;
+        opacity: 0;
+    }
+    .animate-fade-in-delay-3 {
+        animation: fadeIn 0.5s ease-out 0.3s forwards;
+        opacity: 0;
+    }
+    .animate-fade-in-delay-4 {
+        animation: fadeIn 0.5s ease-out 0.4s forwards;
+        opacity: 0;
+    }
+    .animate-fade-in-delay-5 {
+        animation: fadeIn 0.5s ease-out 0.5s forwards;
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 body {

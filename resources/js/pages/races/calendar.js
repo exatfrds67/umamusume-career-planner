@@ -1,39 +1,59 @@
 /**
  * Race Calendar Page Script
- * Handles race carousel navigation, filtering, and selection
+ * Handles race carousel navigation, filtering, and selection.
+ *
+ * Data contract (per SPEC-003 §14.1):
+ *   race.surface          — "turf" | "dirt"
+ *   race.distanceCategory — "sprint" | "mile" | "medium" | "long" | "super_long"
+ *   race.phase            — "junior" | "classic" | "senior" | "all"
+ *   race.month            — in-game month label string (e.g. "April")
+ *   race.year             — year_in_scenario integer (1 = Junior, 2 = Classic, 3 = Senior)
+ *   race.fansReward       — fans awarded on win
+ *   race.spReward         — SP awarded on win
+ *   race.fanRequirement   — minimum fans required to enter
+ *   race.isUraFinale      — boolean
  */
 
 // Access data from data island (injected by Blade)
 const dataElement = document.getElementById("race-calendar-data");
-const { races } = dataElement ? JSON.parse(dataElement.textContent) : {};
+const calendarRaces = dataElement ? JSON.parse(dataElement.textContent) : [];
 
 // Initialize Alpine component
 document.addEventListener("alpine:init", () => {
     Alpine.data("raceCarouselView", () => ({
         // State
-        races: races || [],
+        races: calendarRaces || [],
         currentRaceIndex: 0,
-        activeTypeFilter: null,
+        activeSurfaceFilter: null,
+        activeDistanceFilter: null,
+        activePhaseFilter: null,
         activeMonthFilter: null,
         touchStartX: 0,
         touchEndX: 0,
 
-        // Constants
-        raceTypes: ["turf", "dirt", "short", "mile", "medium", "long"],
-        months: [
-            { num: 1, name: "January" },
-            { num: 2, name: "February" },
-            { num: 3, name: "March" },
-            { num: 4, name: "April" },
-            { num: 5, name: "May" },
-            { num: 6, name: "June" },
-            { num: 7, name: "July" },
-            { num: 8, name: "August" },
-            { num: 9, name: "September" },
-            { num: 10, name: "October" },
-            { num: 11, name: "November" },
-            { num: 12, name: "December" },
-        ],
+        // Filter option constants (game-accurate values)
+        surfaces: ["turf", "dirt"],
+        distanceCategories: ["sprint", "mile", "medium", "long", "super_long"],
+        phases: ["junior", "classic", "senior", "all"],
+
+        /** Unique in-game month labels derived from actual race data, in scenario order. */
+        get months() {
+            const seen = new Set();
+            const result = [];
+            const sorted = [...this.races].sort((a, b) => {
+                if (a.year !== b.year) {
+                    return (a.year ?? 99) - (b.year ?? 99);
+                }
+                return 0;
+            });
+            for (const r of sorted) {
+                if (r.month && !seen.has(r.month)) {
+                    seen.add(r.month);
+                    result.push(r.month);
+                }
+            }
+            return result;
+        },
 
         // Computed properties
         get currentRace() {
@@ -43,15 +63,27 @@ document.addEventListener("alpine:init", () => {
         get filteredRaces() {
             let filtered = this.races;
 
-            if (this.activeTypeFilter) {
+            if (this.activeSurfaceFilter) {
                 filtered = filtered.filter(
-                    (r) => r.type === this.activeTypeFilter,
+                    (r) => r.surface === this.activeSurfaceFilter,
+                );
+            }
+
+            if (this.activeDistanceFilter) {
+                filtered = filtered.filter(
+                    (r) => r.distanceCategory === this.activeDistanceFilter,
+                );
+            }
+
+            if (this.activePhaseFilter) {
+                filtered = filtered.filter(
+                    (r) => r.phase === this.activePhaseFilter,
                 );
             }
 
             if (this.activeMonthFilter) {
                 filtered = filtered.filter(
-                    (r) => r.month === parseInt(this.activeMonthFilter),
+                    (r) => r.month === this.activeMonthFilter,
                 );
             }
 
@@ -140,36 +172,52 @@ document.addEventListener("alpine:init", () => {
             );
         },
 
-        filterByType(type) {
-            this.activeTypeFilter =
-                this.activeTypeFilter === type ? null : type;
+        filterBySurface(surface) {
+            this.activeSurfaceFilter =
+                this.activeSurfaceFilter === surface ? null : surface;
             this.currentRaceIndex = 0;
-            this.$dispatch("filter-changed", { type: this.activeTypeFilter });
+            this.$dispatch("filter-changed", { surface: this.activeSurfaceFilter });
+        },
+
+        filterByDistance(distanceCategory) {
+            this.activeDistanceFilter =
+                this.activeDistanceFilter === distanceCategory ? null : distanceCategory;
+            this.currentRaceIndex = 0;
+            this.$dispatch("filter-changed", { distance: this.activeDistanceFilter });
+        },
+
+        filterByPhase(phase) {
+            this.activePhaseFilter =
+                this.activePhaseFilter === phase ? null : phase;
+            this.currentRaceIndex = 0;
+            this.$dispatch("filter-changed", { phase: this.activePhaseFilter });
         },
 
         filterByMonth(month) {
-            this.activeMonthFilter = month;
+            // month is already an in-game label string (e.g. "April")
+            this.activeMonthFilter = this.activeMonthFilter === month ? null : month;
             this.currentRaceIndex = 0;
             this.$dispatch("month-filter-changed", {
                 month: this.activeMonthFilter,
             });
         },
 
-        getMonthName(monthNum) {
-            return (
-                this.months.find((m) => m.num === parseInt(monthNum))?.name ||
-                ""
-            );
+        /** Month is already a label string in race data — return it directly. */
+        getMonthName(month) {
+            return month || "";
         },
 
         getRaceTypeLabel(type) {
             const labels = {
-                turf: "Turf Race",
-                dirt: "Dirt Race",
-                short: "Short Distance",
-                mile: "Mile Race",
-                medium: "Medium Distance",
-                long: "Long Distance",
+                // Surface labels
+                turf: "Turf",
+                dirt: "Dirt",
+                // Distance category labels
+                sprint: "Sprint",
+                mile: "Mile",
+                medium: "Medium",
+                long: "Long",
+                super_long: "Super Long",
             };
             return labels[type] || type;
         },
@@ -183,6 +231,15 @@ document.addEventListener("alpine:init", () => {
             return icons[status] || "❓";
         },
 
+        getRaceStatusLabel(status) {
+            const labels = {
+                completed: "Completed",
+                upcoming: "Upcoming",
+                current: "Available",
+            };
+            return labels[status] || "Unknown";
+        },
+
         getRaceStatusMessage(status) {
             const messages = {
                 completed: "Already completed in career",
@@ -193,8 +250,10 @@ document.addEventListener("alpine:init", () => {
         },
 
         getRaceDescription(race) {
-            if (!race) return "";
-            return `${race.grade} race on ${race.type} surface. Prize pool attracts ${race.fanCount.toLocaleString()} fans.`;
+            if (!race) { return ""; }
+            const fans = (race.fansReward ?? 0).toLocaleString();
+            const sp = race.spReward ?? 0;
+            return `${race.grade} race on ${race.surface} surface. Win: ${fans} fans, ${sp} SP.`;
         },
 
         // Touch gesture handlers

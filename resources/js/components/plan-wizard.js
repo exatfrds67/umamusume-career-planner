@@ -36,6 +36,7 @@ export default function planWizard(config = {}) {
         plan: {
             character_id: null,
             character_name: '',
+            star_level: 3,
             goals: {
                 target_speed: null,
                 target_stamina: null,
@@ -124,6 +125,9 @@ export default function planWizard(config = {}) {
                     if (!this.plan.character_id) {
                         errors.push('Please select a character');
                     }
+                    if (this.plan.star_level < 1 || this.plan.star_level > 5) {
+                        errors.push('Star level must be between 1 and 5');
+                    }
                     break;
                     
                 case 'goals':
@@ -189,6 +193,16 @@ export default function planWizard(config = {}) {
                     this.nextStep();
                 }
             }, 300);
+        },
+        
+        // Star Level Methods
+        setStarLevel(level) {
+            this.plan.star_level = Math.max(1, Math.min(5, level));
+            this.validateStep(0);
+        },
+        
+        get starLevelLabel() {
+            return '★'.repeat(this.plan.star_level) + '☆'.repeat(5 - this.plan.star_level);
         },
         
         // Goals Methods

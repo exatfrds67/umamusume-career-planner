@@ -1,10 +1,13 @@
 // Line chart component (Chart.js wrapper with computed summary stats)
+import Chart from 'chart.js/auto';
+
 export default function lineChart(
     data = [],
     labels = [],
     colors = ["#3B82F6"],
     animated = true,
     responsive = true,
+    datasetLabels = [],
 ) {
     const flatData = Array.isArray(data[0]) ? data[0] : data;
 
@@ -28,14 +31,14 @@ export default function lineChart(
 
         initChart(chartData, chartLabels, chartColors, isAnimated, isResponsive) {
             const canvas = this.$el.querySelector("canvas");
-            if (!canvas || !window.Chart) {
+            if (!canvas) {
                 return;
             }
 
             const ctx = canvas.getContext("2d");
             const datasets = Array.isArray(chartData[0])
                 ? chartData.map((dataset, i) => ({
-                      label: `Dataset ${i + 1}`,
+                      label: datasetLabels[i] || `Dataset ${i + 1}`,
                       data: dataset,
                       borderColor: chartColors[i] || chartColors[0],
                       backgroundColor: (chartColors[i] || chartColors[0]) + "20",

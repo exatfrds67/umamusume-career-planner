@@ -88,6 +88,7 @@ export default function externalDataBrowser() {
          * Initialize the component and load data
          */
         init() {
+            window.__externalDataBrowser = this;
             this.loadData();
         },
 

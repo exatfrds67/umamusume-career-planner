@@ -18,6 +18,7 @@ document.addEventListener("alpine:init", () => {
         character: null,
         skills: [],
         acquiredSkills: [],
+        plannedSkills: [],
         hints: [],
         evolutionOpportunities: [],
         spStats: {},
@@ -53,6 +54,14 @@ document.addEventListener("alpine:init", () => {
         // Modal state
         showSkillModal: false,
         selectedSkill: null,
+
+        // Action confirmation modal state
+        showActionModal: false,
+        actionModalSkill: null,
+
+        // Remove confirmation modal state
+        showRemoveModal: false,
+        removeModalSkill: null,
 
         // Initialize
         init() {
@@ -133,8 +142,11 @@ document.addEventListener("alpine:init", () => {
             const data = await response.json();
             this.skills = data.data;
 
-            // Separate acquired skills
+            // Separate acquired and planned skills
             this.acquiredSkills = this.skills.filter((s) => s.is_acquired);
+            this.plannedSkills = this.skills.filter(
+                (s) => !s.is_acquired && s.is_planned,
+            );
         },
 
         // Load hints
@@ -321,6 +333,14 @@ document.addEventListener("alpine:init", () => {
                 );
             }
 
+            // Sort: acquired first → planned second → untracked last
+            const priority = (s) => {
+                if (s.is_acquired) return 0;
+                if (s.is_planned) return 1;
+                return 2;
+            };
+            filtered = [...filtered].sort((a, b) => priority(a) - priority(b));
+
             return filtered;
         },
 
@@ -352,12 +372,40 @@ document.addEventListener("alpine:init", () => {
             this.currentPage = 1;
         },
 
-        // Acquire skill
-        async acquireSkill(skill) {
+        // Acquire skill — opens the in-app action modal instead of browser confirm()
+        acquireSkill(skill) {
             if (!this.selectedCharacterId) {
                 this.showError("Please select a character first");
                 return;
             }
+
+            // Metadata-only skills (from career history) cannot be acquired via the catalog
+            if (skill.is_metadata_only) {
+                this.showError(
+                    `"${skill.name}" is a career-history skill and cannot be acquired through the catalog.`,
+                );
+                return;
+            }
+
+            this.openActionModal(skill);
+        },
+
+        // Open the action choice modal
+        openActionModal(skill) {
+            this.actionModalSkill = skill;
+            this.showActionModal = true;
+        },
+
+        // Close the action choice modal
+        closeActionModal() {
+            this.showActionModal = false;
+            this.actionModalSkill = null;
+        },
+
+        // Called when the user clicks "Acquire Now" inside the action modal
+        async confirmAcquire() {
+            const skill = this.actionModalSkill;
+            if (!skill) return;
 
             // Check SP availability (skip for admin)
             if (!this.isAdmin) {
@@ -372,15 +420,7 @@ document.addEventListener("alpine:init", () => {
                 }
             }
 
-            // Confirm acquisition
-            if (
-                !confirm(
-                    `Acquire "${skill.name}" for ${skill.discounted_cost || skill.base_sp_cost} SP?`,
-                )
-            ) {
-                return;
-            }
-
+            this.closeActionModal();
             this.loading = true;
             try {
                 const response = await fetch("/api/skills/acquire", {
@@ -410,11 +450,101 @@ document.addEventListener("alpine:init", () => {
                     `Successfully acquired "${skill.name}"! ${data.data.sp_saved > 0 ? `Saved ${data.data.sp_saved} SP with hints.` : ""}`,
                 );
 
-                // Reload data
                 await this.loadCharacterData();
             } catch (error) {
                 console.error("Error acquiring skill:", error);
                 this.showError(error.message || "Failed to acquire skill");
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        // Called when the user clicks "Mark as Planned" inside the action modal
+        async confirmPlan() {
+            const skill = this.actionModalSkill;
+            if (!skill) return;
+
+            this.closeActionModal();
+            this.loading = true;
+            try {
+                const response = await fetch("/api/skills/plan", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                    body: JSON.stringify({
+                        character_id: this.selectedCharacterId,
+                        skill_id: skill.id,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || "Failed to plan skill");
+                }
+
+                const data = await response.json();
+                this.showSuccess(data.message || `"${skill.name}" added to career plan.`);
+
+                await this.loadCharacterData();
+            } catch (error) {
+                console.error("Error planning skill:", error);
+                this.showError(error.message || "Failed to plan skill");
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        openRemoveModal(skill) {
+            this.removeModalSkill = skill;
+            this.showRemoveModal = true;
+        },
+
+        closeRemoveModal() {
+            this.showRemoveModal = false;
+            this.removeModalSkill = null;
+        },
+
+        async confirmRemove() {
+            const skill = this.removeModalSkill;
+            if (!skill) return;
+
+            this.closeRemoveModal();
+            this.loading = true;
+            try {
+                const response = await fetch("/api/skills/remove", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                    body: JSON.stringify({
+                        character_id: this.selectedCharacterId,
+                        skill_id: skill.id,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || "Failed to remove skill");
+                }
+
+                const data = await response.json();
+                this.showSuccess(
+                    data.message || `"${skill.name}" removed from career plan.`
+                );
+
+                await this.loadCharacterData();
+            } catch (error) {
+                console.error("Error removing skill:", error);
+                this.showError(error.message || "Failed to remove skill");
             } finally {
                 this.loading = false;
             }
