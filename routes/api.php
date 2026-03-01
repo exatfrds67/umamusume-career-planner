@@ -225,6 +225,12 @@ Route::prefix('skills')->name('api.skills.')->group(function () {
     Route::post('/acquire', [App\Http\Controllers\Api\SkillManagementController::class, 'acquire'])
         ->name('acquire');
 
+    Route::post('/plan', [App\Http\Controllers\Api\SkillManagementController::class, 'plan'])
+        ->name('plan');
+
+    Route::delete('/remove', [App\Http\Controllers\Api\SkillManagementController::class, 'remove'])
+        ->name('remove');
+
     Route::post('/evolve', [App\Http\Controllers\Api\SkillManagementController::class, 'evolve'])
         ->name('evolve');
 
@@ -737,6 +743,27 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('neuron')->name('ap
     });
 });
 
+// Legacy compatibility routes (kept for test and client backward compatibility)
+Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
+    Route::prefix('training-advisor')->name('api.training-advisor.')->group(function () {
+        Route::post('/advice', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getAdvice'])
+            ->name('advice');
+        Route::post('/advice/stream', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getAdviceStreaming'])
+            ->name('advice.stream');
+        Route::get('/history/{characterId}', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getHistory'])
+            ->name('history');
+    });
+
+    Route::prefix('career-planning')->name('api.career-planning.')->group(function () {
+        Route::post('/plan', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getPlan'])
+            ->name('plan');
+        Route::post('/plan/stream', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getPlanStreaming'])
+            ->name('plan.stream');
+        Route::get('/history/{characterId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getHistory'])
+            ->name('history');
+    });
+});
+
 // V1 API Routes for Characters
 Route::middleware('auth:sanctum')->prefix('v1')->name('api.v1.')->group(function () {
     // User endpoint
@@ -1210,74 +1237,6 @@ Route::prefix('connectivity')->name('api.connectivity.')->group(function () {
     // Get comprehensive connectivity report
     Route::get('/report', [\App\Http\Controllers\Api\ConnectivityController::class, 'report'])
         ->name('report');
-});
-
-// Training Advisor API Routes (Neuron AI Integration - Task 12.1)
-Route::middleware('auth:sanctum')->prefix('training-advisor')->name('api.training-advisor.')->group(function () {
-    // Get training advice
-    Route::post('/advice', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getAdvice'])
-        ->name('advice');
-
-    // Get streaming training advice (SSE)
-    Route::post('/advice/stream', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getAdviceStreaming'])
-        ->name('advice.stream');
-
-    // Get training advice history
-    Route::get('/history/{characterId}', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getHistory'])
-        ->name('history');
-});
-
-// Race Strategy API Routes (Neuron AI Integration - Task 12.2)
-Route::middleware('auth:sanctum')->prefix('race-strategy')->name('api.race-strategy.')->group(function () {
-    // Get race strategy
-    Route::post('/strategy', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getStrategy'])
-        ->name('strategy');
-
-    // Get streaming race strategy (SSE)
-    Route::post('/streaming', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getStrategyStreaming'])
-        ->name('streaming');
-
-    // Get race strategy history
-    Route::get('/history/{characterId}', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getHistory'])
-        ->name('history');
-
-    // Get recommended skills for a race
-    Route::post('/recommended-skills', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getRecommendedSkills'])
-        ->name('recommended-skills');
-});
-
-// Skill Recommendation API Routes (Neuron AI Integration - Task 12.3)
-Route::middleware('auth:sanctum')->prefix('skill-recommendations')->name('api.skill-recommendations.')->group(function () {
-    // Get skill recommendations
-    Route::post('/recommendations', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getRecommendations'])
-        ->name('recommendations');
-
-    // Get streaming skill recommendations (SSE)
-    Route::post('/streaming', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getRecommendationsStreaming'])
-        ->name('streaming');
-
-    // Get skill acquisition history
-    Route::get('/history/{characterId}', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getHistory'])
-        ->name('history');
-
-    // Get skill synergies
-    Route::get('/synergies/{characterId}', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getSynergies'])
-        ->name('synergies');
-});
-
-// Career Planning API Routes (Neuron AI Integration - Task 12.4)
-Route::middleware('auth:sanctum')->prefix('career-planning')->name('api.career-planning.')->group(function () {
-    // Get career planning guidance
-    Route::post('/plan', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getPlan'])
-        ->name('plan');
-
-    // Get streaming career plan (SSE)
-    Route::post('/plan/stream', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getPlanStreaming'])
-        ->name('plan.stream');
-
-    // Get career planning history
-    Route::get('/history/{characterId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getHistory'])
-        ->name('history');
 });
 
 // External Data API Routes (umapyoi.net, umamusumedb.com)
