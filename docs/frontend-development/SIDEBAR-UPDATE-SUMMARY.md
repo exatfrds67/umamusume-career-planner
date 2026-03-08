@@ -110,7 +110,7 @@ x-data="{ showToggle: false }"
         </button>
     </div>
 </div>
-```
+```text
 
 ### CSS Classes Used
 
@@ -181,7 +181,7 @@ x-data="{ showToggle: false }"
 
 ### Minimized State
 
-```
+```text
 
 ┌────┐
 │[🏇]│ ← Logo always visible

@@ -48,7 +48,7 @@ flowchart LR
     C --> D[Review AI Recommendation]
     D --> E[Select Training]
     E --> F[View Results]
-```
+```text
 
 **Key Interactions to Prototype**:
 
@@ -131,7 +131,7 @@ flowchart LR
     D --> E[Select Card]
     E --> F[See Deck Score Update]
     F --> G[Save Deck]
-```
+```text
 
 **Key Interactions to Prototype**:
 
@@ -332,7 +332,7 @@ flowchart LR
 
 ### 5.2 File Structure
 
-```
+```text
 prototypes/
 ├── components/
 │   ├── stat-bar.blade.php

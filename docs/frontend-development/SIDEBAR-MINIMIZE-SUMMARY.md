@@ -76,7 +76,7 @@ Alpine.store('sidebar', {
         localStorage.setItem('sidebarMinimized', this.minimized);
     }
 });
-```
+```text
 
 ### Component Structure
 
@@ -216,7 +216,7 @@ app.blade.php (Layout)
         <!-- Icon -->
     </button>
 </nav>
-```
+```text
 
 ## Responsive Breakpoints
 
@@ -296,7 +296,7 @@ it('maintains navigation functionality when minimized', function () {
         ->assertUrl('/characters')
         ->assertNoJavascriptErrors();
 });
-```
+```text
 
 ### Accessibility Tests
 
@@ -347,7 +347,7 @@ When the sidebar is minimized, hover over navigation icons to see their labels i
         New Page
     </span>
 </a>
-```
+```text
 
 ### Customizing Transition Duration
 
@@ -367,7 +367,7 @@ toggle() {
     this.minimized = !this.minimized;
     // localStorage.setItem('sidebarMinimized', this.minimized); // Remove this
 }
-```
+```text
 
 ## Known Limitations
 
@@ -557,7 +557,7 @@ document.addEventListener('alpine:init', () => {
         aria-atomic="true"
     ></div>
 </aside>
-```
+```text
 
 ## Appendix B: Related Resources
 

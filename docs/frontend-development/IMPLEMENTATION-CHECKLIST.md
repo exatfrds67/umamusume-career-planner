@@ -241,7 +241,7 @@ Message: "fix: Add semantic HTML and accessibility to character wizard
 - Add multi-modal selection feedback (text+icon+border)
 
 Fixes WCAG 2.2 AA violations per UI-UX-FIXES-SUMMARY.md"
-```
+```text
 
 ### Commit 2: Layout Implementation
 
@@ -267,7 +267,7 @@ Message: "feat: Add form validation and error messaging
 - Add auto-focus to first error field
 
 Improves UX and form reliability"
-```
+```text
 
 ---
 

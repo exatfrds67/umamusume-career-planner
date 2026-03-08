@@ -42,7 +42,7 @@ WCAG 2.2 AA compliance.
         <!-- content -->
     </div>
 </section>
-```
+```text
 
 ### Changes Made
 
@@ -128,7 +128,7 @@ WCAG 2.2 AA compliance.
     aria-required="true"
     aria-invalid="false"
     @invalid="onFieldInvalid($event)">
-```
+```text
 
 ### Changes Made - Required Fields
 
@@ -243,7 +243,7 @@ button:focus,
         <!-- button content -->
     </button>
 </div>
-```
+```text
 
 ### Changes Made - Multi-Modal Feedback
 
@@ -448,7 +448,7 @@ nextStep() {
         </div>
     </div>
 </template>
-```
+```text
 
 ### Changes Made - Step Validation
 

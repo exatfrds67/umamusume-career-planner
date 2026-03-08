@@ -112,7 +112,7 @@ resources/views/characters/create.blade.php
 resources/css/app.css
   - Lines: Add new section for focus indicators
   - Changes: Focus-visible styles, contrast improvements
-```
+```text
 
 ### New Elements
 

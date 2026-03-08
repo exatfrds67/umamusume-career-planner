@@ -120,7 +120,7 @@
 
 **Decision**: Use exact game-aligned stat colors throughout
 
-```
+```text
 Speed:    #EF4444 (Red-500)
 Stamina:  #3B82F6 (Blue-500)
 Power:    #EAB308 (Yellow-500)
@@ -196,7 +196,7 @@ Wit:      #A855F7 (Purple-500)
 
 ### 👨‍🎨 For Designers
 
-```
+```text
 1. Read: GAME_ALIGNMENT_STRATEGIC_PLAN.md § 3-4
 2. Check: GAME_VISUAL_INTERACTION_PATTERNS.md (specs)
 3. Create: Figma library with § 3.2 hierarchy
@@ -206,7 +206,7 @@ Wit:      #A855F7 (Purple-500)
 
 ### 👨‍💻 For Developers
 
-```
+```text
 1. Read: IMPLEMENTATION_PLAN.md (phases)
 2. Check: GAME_VISUAL_INTERACTION_PATTERNS.md (specs)
 3. Reference: game-mechanics-research-report.md (validation)
@@ -216,7 +216,7 @@ Wit:      #A855F7 (Purple-500)
 
 ### 📊 For Product/PMs
 
-```
+```text
 1. Read: GAME_ALIGNMENT_STRATEGIC_PLAN.md § 1-2
 2. Review: § 5 (User Workflows) & § 8 (Roadmap)
 3. Understand: § 8 (6 phases, 12 weeks)
@@ -228,7 +228,7 @@ Wit:      #A855F7 (Purple-500)
 
 ## Implementation Roadmap
 
-```
+```text
 PHASE 1 (Weeks 1-2): Foundation
 ├─ Colors & design tokens
 ├─ Layout components

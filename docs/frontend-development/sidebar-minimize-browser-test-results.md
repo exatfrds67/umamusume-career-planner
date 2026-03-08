@@ -191,7 +191,7 @@ After toggle:
   "success": true,
   "minimized": true
 }
-```
+```text
 
 ### DOM Structure
 

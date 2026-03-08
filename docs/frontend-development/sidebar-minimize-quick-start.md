@@ -32,7 +32,7 @@ export default {
 ```javascript
 import sidebarStore from './stores/sidebar';
 Alpine.store('sidebar', sidebarStore);
-```
+```text
 
 ---
 
@@ -64,7 +64,7 @@ Alpine.store('sidebar', sidebarStore);
 ```blade
 <div class="flex flex-col min-h-screen transition-all duration-300 ..."
      :class="$store.sidebar.minimized ? 'lg:pl-20' : 'lg:pl-72'">
-```
+```text
 
 ---
 
@@ -145,7 +145,7 @@ Alpine.store('sidebar', sidebarStore);
         <span x-show="!$store.sidebar.minimized" x-transition>Dashboard</span>
     </a>
 </li>
-```
+```text
 
 **Repeat for all primary navigation items**:
 

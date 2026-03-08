@@ -42,7 +42,7 @@ and **diverge from WF-002 wireframe specifications**. This document outlines all
 ```blade
 <label for="trainee-search" class="form-label">Search</label>
 <input id="trainee-search" type="text" x-model="filters.query">
-```
+```text
 
 ### 2. Focus Indicators
 
@@ -75,7 +75,7 @@ and **diverge from WF-002 wireframe specifications**. This document outlines all
 ```blade
 :class="selected ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-200'"
 <!-- Plus checkmark badge + "Selected" text -->
-```
+```text
 
 ### 4. Required Field Indication
 
@@ -120,7 +120,7 @@ and **diverge from WF-002 wireframe specifications**. This document outlines all
     </header>
     <div class="card-body">...</div>
 </section>
-```
+```text
 
 ---
 

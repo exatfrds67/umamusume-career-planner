@@ -70,7 +70,7 @@ Three-tab system observed:
 
 **Stats Display Format:**
 
-```
+```text
 Speed:    1350/2000 [!] (Soft Cap 1200)
 Stamina:  930/2000
 Power:    850/2000
@@ -531,7 +531,7 @@ From game screenshots:
 
 ### 5.2 Character Card Component
 
-```
+```text
 ┌─────────────────────────────┐
 │ [Portrait]  Character Name  │
 │             ★★★★☆           │
@@ -548,7 +548,7 @@ From game screenshots:
 
 ### 5.3 Training Turn Component
 
-```
+```text
 ┌─────────────────────────────┐
 │ Turn 15 │ Junior - December │
 │─────────────────────────────│
@@ -566,7 +566,7 @@ From game screenshots:
 
 ### 5.4 Skill Acquisition Planner
 
-```
+```text
 ┌─────────────────────────────┐
 │ Skill Shop                  │
 │─────────────────────────────│
@@ -689,7 +689,7 @@ colors: {
 }
 }
 
-```
+```text
 
 ### 9.2 Component Library
 

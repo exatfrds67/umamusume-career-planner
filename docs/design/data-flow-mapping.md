@@ -58,7 +58,7 @@ flowchart TB
     Controllers --> Pages
     Pages --> Components
     Components --> Alpine
-```
+```text
 
 ---
 
@@ -117,7 +117,7 @@ flowchart TB
         'epithets_count' => int,
     ],
 ]
-```
+```text
 
 **Data Source**: `CharacterService::getFullProfile()`
 
@@ -155,7 +155,7 @@ function calculateGrade(int $value): string {
         default => 'G',
     };
 }
-```
+```text
 
 #### ConditionBadge Component
 
@@ -193,7 +193,7 @@ function calculateGrade(int $value): string {
     'is_race_day' => bool,
     'is_finished' => bool,
 ]
-```
+```text
 
 **Stage Calculation**:
 
@@ -218,7 +218,7 @@ function getCareerStage(int $turn): array {
     'trend' => string,          // 'increasing', 'stable', 'decreasing'
     'recovery_rate' => int,     // Per-turn recovery
 ]
-```
+```text
 
 ---
 
@@ -275,7 +275,7 @@ function getCareerStage(int $turn): array {
     'deck_score' => float,
     'synergy_bonuses' => Collection,
 ]
-```
+```text
 
 ---
 
@@ -316,7 +316,7 @@ function calculateHintDiscount(int $baseСost, int $hintLevel): int {
 
     return (int) round($baseCost * (1 - $discountRate));
 }
-```
+```text
 
 ---
 
@@ -362,7 +362,7 @@ function calculateHintDiscount(int $baseСost, int $hintLevel): int {
     'next_class' => string,
     'fans_to_next' => int,
 ]
-```
+```text
 
 ---
 
@@ -433,7 +433,7 @@ protected $listeners = [
     'training-completed' => 'handleTrainingCompleted',
     'stats-changed' => 'updateStats',
 ];
-```
+```text
 
 ---
 
@@ -504,7 +504,7 @@ class AIAdvisorService
     public function analyzeTraining(Character $character): TrainingAdvice;
     public function analyzeRaceStrategry(Character $character, Race $race): RaceAdvice;
 }
-```
+```text
 
 ---
 
@@ -554,7 +554,7 @@ sequenceDiagram
         User->>App: Manual corrections
         App->>Database: Save corrected data
     end
-```
+```text
 
 ---
 
@@ -614,7 +614,7 @@ Alpine.data("deckBuilder", () => ({
         this.isSaving = false;
     },
 }));
-```
+```text
 
 ---
 
@@ -677,7 +677,7 @@ class CharacterStatsValidator
         return Validator::make($stats, $rules);
     }
 }
-```
+```text
 
 ### 8.2 Fallback Data
 

@@ -160,7 +160,7 @@ This project maintains comprehensive documentation aligned with actual Umamusume
 
 ### Document Relationship Map
 
-```
+```text
 GAME_ALIGNMENT_STRATEGIC_PLAN.md (PRIMARY)
 ├─ References game-mechanics-research-report.md
 ├─ References game-alignment-analysis.md

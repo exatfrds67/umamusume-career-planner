@@ -60,7 +60,7 @@ integrates seamlessly with the advisory panel.
 
 {{-- Large --}}
 <x-ai.critical-alert-badge :alert-count="5" size="lg" />
-```
+```text
 
 ### Custom Attributes
 
@@ -121,7 +121,7 @@ Or use Alpine's `@open-advisory-panel` directive:
      @open-advisory-panel.window="panelOpen = true; activeSection = $event.detail.section">
     <!-- Advisory Panel -->
 </div>
-```
+```text
 
 ## Props
 

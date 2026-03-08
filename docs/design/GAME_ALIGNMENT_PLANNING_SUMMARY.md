@@ -170,7 +170,7 @@ Navigation and reference guide covering:
 
 **Decision**: Use 3 screen types (Grid, Detail, Execution) instead of game's 2 (Grid, Modal)
 
-```
+```text
 Type A: Grid/List Views
 ├─ Character selection
 ├─ Race list
@@ -234,7 +234,7 @@ Type C: Execution Flow
 
 ### 5. Information Density (20/30/50 Rule)
 
-```
+```text
 Top 20%: CRITICAL STATUS
 ├─ Current turn
 ├─ SP available

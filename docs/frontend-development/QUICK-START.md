@@ -99,7 +99,7 @@
 Open: .agents/phase-backend-integration-plan.md
 Time: 10 minutes
 Goal: Understand full scope + dependencies
-```
+```text
 
 **Step 2**: Start Phase 1
 
@@ -114,7 +114,7 @@ Action: Check existing store() implementation
 ```text
 Complete phases in order: 1→2→3→5→4
 (Test during 5, build UI in 4)
-```
+```text
 
 ---
 

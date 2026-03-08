@@ -50,7 +50,7 @@ sidebar on desktop screens, improving screen real estate management.
 ```blade
 <!-- Main Column -->
 <div class="lg:pl-72 flex flex-col min-h-screen ...">
-```
+```text
 
 ---
 
@@ -176,7 +176,7 @@ Alpine.store('sidebar', sidebarStore);
         </svg>
     </button>
 </div>
-```
+```text
 
 1. **Update navigation items** (show/hide labels):
 
@@ -249,7 +249,7 @@ Alpine.store('sidebar', sidebarStore);
      :class="$store.sidebar.minimized ? 'lg:pl-20' : 'lg:pl-72'">
     <!-- Content -->
 </div>
-```
+```text
 
 ---
 
@@ -369,7 +369,7 @@ Add keyboard shortcut documentation to the help modal.
      class="sr-only">
     <span x-text="$store.sidebar.minimized ? 'Sidebar minimized' : 'Sidebar expanded'"></span>
 </div>
-```
+```text
 
 ---
 
@@ -529,7 +529,7 @@ test.describe('Sidebar Visual States', () => {
         await page.waitForTimeout(300);
     });
 });
-```
+```text
 
 ---
 

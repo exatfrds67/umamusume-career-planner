@@ -57,7 +57,7 @@ This document provides a comprehensive inventory of all UI components required f
 --color-uma-power: #f97316; /* orange-500 */
 --color-uma-guts: #fbbf24; /* amber-400 */
 --color-uma-wit: #0ea5e9; /* sky-500 */
-```
+```text
 
 ### 2.2 Character Components
 

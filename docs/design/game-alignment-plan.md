@@ -66,7 +66,7 @@ This document translates the game UI analysis into concrete implementation tasks
     <x-menu-dropdown />
   </x-slot:right>
 </x-layouts.app-header>
-```
+```text
 
 **Tasks:**
 
@@ -221,7 +221,7 @@ This document translates the game UI analysis into concrete implementation tasks
 
 **Layout:**
 
-```
+```text
 ┌─────────────────────────────────────┐
 │ Header (persistent)                 │
 ├─────────┬───────────────────────────┤
@@ -387,7 +387,7 @@ export default {
         },
     },
 };
-```
+```text
 
 **Tasks:**
 
@@ -603,7 +603,7 @@ it('displays stat bar correctly', function () {
         ->assertElementExists('.stat-bar-speed')
         ->assertNoJavascriptErrors();
 });
-```
+```text
 
 **Tasks:**
 

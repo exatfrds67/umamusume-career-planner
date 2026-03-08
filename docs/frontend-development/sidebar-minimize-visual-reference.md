@@ -54,7 +54,7 @@ This document provides visual representations of the sidebar minimize feature in
 │  Width: 288px    │  Width: calc(100vw - 288px)                      │
 │  (w-72)          │  (lg:pl-72)                                       │
 └──────────────────┴──────────────────────────────────────────────────┘
-```
+```text
 
 ### Minimized State
 
@@ -104,7 +104,7 @@ This document provides visual representations of the sidebar minimize feature in
 │  │ [Logo] Umamusume Career Planner│◄─┤  ← Toggle Button
 │  └────────────────────────────────┘  │     (Chevron Double Left)
 └──────────────────────────────────────┘
-```
+```text
 
 #### Minimized Toggle State
 
@@ -124,7 +124,7 @@ This document provides visual representations of the sidebar minimize feature in
 ┌────────────────────────────────┐
 │  📊  Dashboard                 │  ← Icon + Label
 └────────────────────────────────┘
-```
+```text
 
 #### Minimized Navigation Item (with Tooltip)
 
@@ -142,7 +142,7 @@ This document provides visual representations of the sidebar minimize feature in
 ┌────────────────────────────────┐
 │  💾  Data Management        ▶  │  ← Chevron indicates closed
 └────────────────────────────────┘
-```
+```text
 
 #### Expanded - Group Open
 
@@ -167,7 +167,7 @@ This document provides visual representations of the sidebar minimize feature in
            │  • Import        │
            │  • Export        │
            └──────────────────┘
-```
+```text
 
 ---
 
@@ -211,7 +211,7 @@ When menu opened:
 │  ⭐ Characters│                  │
 │  ...         │                  │
 └──────────────┴──────────────────┘
-```
+```text
 
 ### Desktop (≥1024px) - Fixed Sidebar with Minimize
 
@@ -231,7 +231,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 │ 📊 Dash  │  ───► │ 📊 Da  │  ───►   │ 📊 │
 └──────────┘       └────────┘         └────┘
   288px              154px              80px
-```
+```text
 
 ### Expand Animation (300ms)
 
@@ -254,7 +254,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 │ 📊 │────►┌──────────────┐
 └────┘     │  Dashboard   │
            └──────────────┘
-```
+```text
 
 ### Tooltip with Arrow
 
@@ -279,7 +279,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 │  Hover: #F9FAFB                │
 │  Active: #EFF6FF (blue-50)     │
 └────────────────────────────────┘
-```
+```text
 
 ### Dark Mode
 
@@ -305,7 +305,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 │  │ 📊  Dashboard            │  │  ← 2px blue outline
 │  └──────────────────────────┘  │     + 4px shadow
 └────────────────────────────────┘
-```
+```text
 
 ### Screen Reader Announcements
 

@@ -140,7 +140,7 @@ This document provides a comprehensive, actionable implementation plan for align
   show-percentage
   show-soft-cap
 />
-```
+```text
 
 **Deliverables**:
 
@@ -311,7 +311,7 @@ function calculateHintDiscount(int $baseCost, int $hintLevel): int {
     };
     return (int) round($baseCost * (1 - $discountRate));
 }
-```
+```text
 
 **Additional Discount Sources** (from research):
 
@@ -403,7 +403,7 @@ Desktop (3 columns):
 ├───────────────────────────────────────┤
 │ Recent Activity                       │
 └───────────────────────────────────────┘
-```
+```text
 
 **Deliverables**:
 

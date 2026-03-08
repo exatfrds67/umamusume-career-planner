@@ -187,7 +187,7 @@ formData: {
     // ... 4 more slots
   ]
 }
-```
+```text
 
 ### Database Operations Required
 
@@ -240,7 +240,7 @@ php artisan tinker  # Quick debugging
 
 # Verify database
 php artisan db:seed --class=FactorInheritanceSeeder
-```
+```text
 
 **Final Verification**:
 

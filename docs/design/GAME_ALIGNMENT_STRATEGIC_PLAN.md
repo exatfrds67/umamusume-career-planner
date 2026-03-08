@@ -1,10 +1,10 @@
 # Umamusume Career Planner: Game Alignment Strategic Plan
 
-**Document Version**: 1.0.0  
-**Date**: January 29, 2026  
+**Document Version**: 1.1.0  
+**Date**: March 3, 2026  
 **Status**: Strategic Planning & Design Reference  
 **Purpose**: Comprehensive game-to-app alignment planning without 1:1 copying  
-**Based On**: 120+ game screenshots (July 2025 - January 2026), game mechanics research, existing design analysis
+**Based On**: 130+ game screenshots (July 2025 - March 2026), game mechanics research, existing design analysis
 
 ---
 
@@ -25,11 +25,11 @@ This document provides a strategic framework for aligning the Umamusume Career P
 
 **Observation**: The game uses a **5-tier top-level navigation** pattern that appears consistently:
 
-```
+```text
 ┌─────────────────────────────────────────────┐
 │ MAIN MENU → Training → Races → Shop → Other │
 └─────────────────────────────────────────────┘
-```
+```text
 
 This is further subdivided into contextual sections:
 
@@ -48,7 +48,7 @@ This is further subdivided into contextual sections:
 
 **Observation**: The game consistently uses this information density pattern:
 
-```
+```text
 Level 1 (Top 20% of screen):  CRITICAL STATUS
                               ├─ Health/Stamina gauge
                               ├─ Turn number
@@ -99,7 +99,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 
 **Screen Type A: Grid/List Views** (Character selection, Race list)
 
-```
+```text
 ┌─ Search/Filter bar (sticky) ─────────────────┐
 ├─ Sorting/View toggle options                   │
 ├─────────────────────────────────────────────┤
@@ -107,11 +107,11 @@ Level 3 (Remaining 50%):      DETAILED DATA
 │ [Card] [Card] [Card]  ← Grid responsive     │
 │ [Card] [Card] [Card]                        │
 └─────────────────────────────────────────────┘
-```
+```text
 
 **Screen Type B: Detail/Tabbed Views** (Character profile, Stat details)
 
-```
+```text
 ┌─ Tab Navigation (Speed/Stamina/Power...) ───┐
 ├─ Detail header (back button, share) ───────┤
 ├─────────────────────────────────────────────┤
@@ -123,7 +123,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 
 **Screen Type C: Execution Flow** (Training screen, Race prediction)
 
-```
+```text
 ┌─ Progress indicator (Turn 15/78) ──────────┐
 ├─ Primary decision area (6-9 options) ──────┤
 ├─ Effect preview area ──────────────────────┤
@@ -167,7 +167,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 
 **Game Flow**:
 
-```
+```text
 [Select Facility] → [Select Trainee] → [Show Stats Gained] → [Confirm] → [Update Status]
 ```
 
@@ -180,7 +180,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 
 **Career Planner Adaptation**:
 
-```
+```text
 [Select Training Focus] → [Show Recommended Actions] → [Preview SP Impact] → [Allocate] → [Confirm]
 ```
 
@@ -202,7 +202,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 
 **Game Flow**:
 
-```
+```text
 [Character Grid] → [Select Character] → [View Details with Tabs] → [Manage Skills/Gear]
 ```
 
@@ -216,7 +216,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 
 **Career Planner Adaptation**:
 
-```
+```text
 [Character Grid/List] → [Select for Plan] → [View with Tabs] → [Configure Training Path]
 ```
 
@@ -248,7 +248,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 
 **Career Planner Adaptation**:
 
-```
+```text
 Current Turn 1:
 ├─ Speed: 750/2000 (50 from factor)
 ├─ Stamina: 620/2000 (40 from factor)
@@ -278,7 +278,7 @@ Turn 20 Projection:
 
 **Game Flow Observed**:
 
-```
+```text
 [Character Detail] → [Skills Tab] → [Available Skills List] → [Select Skill] → [Preview Cost] → [Purchase]
 ```
 
@@ -293,7 +293,7 @@ Turn 20 Projection:
 
 **Career Planner Adaptation**:
 
-```
+```text
 [Plan Detail] → [Skills Tab] → [Skills Grid/List] → [Drag to Allocate] → [SP Impact Preview] → [Save]
 ```
 
@@ -329,14 +329,14 @@ Turn 20 Projection:
 
 **Career Planner Adaptation**:
 
-```
+```text
 Race Planning Tab:
 ├─ Upcoming races (calendar view)
 ├─ Race targets (select races for plan)
 ├─ Stat requirements to win
 ├─ Current vs required stats comparison
 └─ Training path to meet targets
-```
+```text
 
 **Design Elements to Use**:
 
@@ -353,7 +353,7 @@ Race Planning Tab:
 
 ### 3.1 Proposed App Layout Structure
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ TOP STATUS BAR                                          │
 │ ├─ Turn: 15/78  │  SP Available: 300/500  │ Mode: Account
@@ -438,17 +438,17 @@ Align with Tailwind default breakpoints:
 
 **Stat Colors** (Primary palette):
 
-```
+```text
 Speed:    #EF4444 (Red-500)      [Game: Crimson]
 Stamina:  #3B82F6 (Blue-500)     [Game: Azure]
 Power:    #EAB308 (Yellow-500)   [Game: Amber]
 Guts:     #22C55E (Green-500)    [Game: Emerald]
 Wit:      #A855F7 (Purple-500)   [Game: Violet]
-```
+```text
 
 **Condition Colors** (Status):
 
-```
+```text
 GREAT:    #10B981 (Emerald-500)  [Upward arrow, strong]
 GOOD:     #84CC16 (Lime-500)     [Slightly up, positive]
 NORMAL:   #6B7280 (Gray-500)     [Neutral, baseline]
@@ -457,12 +457,12 @@ BAD:      #EF4444 (Red-500)      [Downward arrow, warning]
 
 **Resource Colors**:
 
-```
+```text
 SP (Training Points):    #F59E0B (Amber-500)    [Primary resource]
 Training Focus Color:    #06B6D4 (Cyan-500)     [Current focus]
 Target Color:            #8B5CF6 (Violet-500)   [Goals/targets]
 Progress:                #10B981 (Green-500)    [Completed/achieved]
-```
+```text
 
 **Semantic Colors**:
 
@@ -472,11 +472,11 @@ Warning:  #F59E0B (Amber)
 Danger:   #EF4444 (Red)
 Info:     #3B82F6 (Blue)
 Neutral:  #6B7280 (Gray)
-```
+```text
 
 ### 4.2 Typography Scale
 
-```
+```text
 Heading 1 (h1):  32px / 2rem   Bold      Page titles
 Heading 2 (h2):  24px / 1.5rem Bold      Section headers
 Heading 3 (h3):  20px / 1.25rem SemiBold  Card titles
@@ -490,7 +490,7 @@ Mono (code):     12px / 0.75rem Monospace Data values
 
 Use Tailwind's default spacing scale (4px base unit):
 
-```
+```text
 xs: 0.25rem (4px)
 sm: 0.5rem (8px)
 md: 1rem (16px)
@@ -498,7 +498,7 @@ lg: 1.5rem (24px)
 xl: 2rem (32px)
 2xl: 2.5rem (40px)
 3xl: 3rem (48px)
-```
+```text
 
 ### 4.4 Component Sizing
 
@@ -531,7 +531,7 @@ xl: 2rem (32px)
 
 **Current App Implementation** → **Improved Alignment**:
 
-```
+```text
 User wants to plan a character run:
 
 CURRENT:
@@ -543,18 +543,23 @@ CURRENT:
 
 IMPROVED:
 1. Click "New Plan" (FAB button, prominent)
-2. Character selection grid with filters
+2. Enter pre-career setup state (aligned with game flow)
+  ├─ Home/menu context
+  ├─ Trainee Select entry point
+  └─ Display Settings accessibility from selection view
+3. Character selection grid with filters
    ├─ Filter by race level (Easy/Normal/Hard)
-   ├─ Sort by growth rate or potential
+  ├─ Sort by growth rate or potential level
+  ├─ Group aptitude filters: Track / Distance / Style
    └─ Show tier star rating
-3. Plan setup wizard (card-based):
+4. Plan setup wizard (card-based):
    ├─ Card 1: Career info (type: NuramaRace/TrainingEvent)
    ├─ Card 2: Career goal (win/place/consistent)
    ├─ Card 3: Stat targets (6 input fields with sliders)
    ├─ Card 4: Race schedule (select 3-5 target races)
    └─ Card 5: Review & confirm
-4. Plan created, automatically navigate to training tab
-5. Show "Training timeline" with first turn highlighted
+5. Plan created, automatically navigate to training tab
+6. Show "Training timeline" with first turn highlighted
 ```
 
 **Design Pattern**: Multi-step wizard using card progression (similar to game's facility selection flow)
@@ -563,7 +568,7 @@ IMPROVED:
 
 **Game Training Loop** → **App Planning Loop**:
 
-```
+```text
 GAME:
 [Facility Selection] → [Trainee Selection] → [Training Executed]
         ↓                     ↓                      ↓
@@ -590,7 +595,7 @@ APP:
 
 **Observation**: Game shows races in a list with upcoming race highlighted.
 
-```
+```text
 USER FLOW:
 1. User navigates to "Races" tab
 2. Sees calendar or list of upcoming races
@@ -627,7 +632,7 @@ Race cards in horizontal scroll or grid:
 
 **Game doesn't show this**, but app should (planning advantage):
 
-```
+```text
 Multi-turn projection (radar chart):
 
      Wit (1000)
@@ -651,7 +656,7 @@ Display options:
 
 Similar to game's turn counter, but expanded:
 
-```
+```text
 Turn 15 / 78 (19% complete)
 
 Progress bars per facility group:
@@ -669,7 +674,7 @@ Remaining SP: 200 (40%)
 
 Show skill acquisition timeline:
 
-```
+```text
 Turn   Skill Acquired         SP Cost   New Total Stats
 ────────────────────────────────────────────────────────
 15     Speed Boost (Lvl 1)    50 SP    Speed +50 → 850
@@ -936,8 +941,10 @@ This plan analyzes screenshots from:
 - **October-November 2025**: Character management & training UI (35 screenshots)
 - **December 2025**: Race mechanics & predictions (25 screenshots)
 - **January 2026**: Recent career flows & detailed stat views (40 screenshots)
+- **March 2026**: Career pre-training setup flow (26 screenshots; Trainee Select, goals/scenario records, support effects, and final confirmation states)
+- **March 2026 (archive)**: Earlier pre-career setup flow (10 screenshots in `images/game_screenshots_030326/pre-career`)
 
-**Total Analyzed**: 120+ screenshots covering:
+**Total Analyzed**: 140+ screenshots covering:
 
 - Main menu & navigation
 - Character selection & profile
@@ -978,7 +985,7 @@ const resourceColors = {
   target: '#8B5CF6',   // violet-500
   progress: '#10B981', // green-500
 };
-```
+```text
 
 ---
 
