@@ -105,7 +105,7 @@ mindmap
       UmamusumeDB API
       Community Sources
       Real-time Updates
-```
+```text
 
 ---
 
@@ -347,7 +347,7 @@ pie title Requirements by Priority
     "P0 - Critical" : 32
     "P1 - High" : 33
     "P2 - Medium" : 11
-```
+```text
 
 ---
 
@@ -436,7 +436,7 @@ flowchart TD
     Receive --> ScoreConfidence[Score Confidence]
     ScoreConfidence --> TrackCost[Track Token Usage/Cost]
     TrackCost --> ReturnUser[Return to User]
-```
+```text
 
 ### 6.3 External Data Sync Flow
 
@@ -476,7 +476,7 @@ flowchart TD
     UserReview --> Confirm{Confirm Import?}
     Confirm -->|Yes| SaveData[Save to Career Run]
     Confirm -->|No| Discard[Discard Changes]
-```
+```text
 
 ---
 

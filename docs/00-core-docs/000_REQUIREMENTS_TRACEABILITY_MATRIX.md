@@ -61,7 +61,7 @@ flowchart LR
     style Functional fill:#f3e5f5
     style Technical fill:#fff3e0
     style Implementation fill:#e8f5e9
-```
+```text
 
 ### 1.3 Coverage Summary
 
@@ -100,7 +100,7 @@ flowchart TD
     L3 --> L4
     L4 --> L5
     L5 -.feedback.-> L1
-```
+```text
 
 - **Level**: **Level 1**; **From**: Business Requirements (BRS); **To**: Functional Requirements (SRS); **Purpose**: Ensure business needs are captured
 - **Level**: **Level 2**; **From**: Functional Requirements (SRS); **To**: Technical Specs (SPEC/PRD); **Purpose**: Map requirements to design
@@ -288,7 +288,7 @@ flowchart LR
     FR07 --> PRD006
     FR08 --> SPEC007
     FR08 --> PRD007
-```
+```text
 
 ### 4.2 Detailed Functional to Technical Mapping
 
@@ -426,7 +426,7 @@ flowchart LR
 
     Requirements --> Tests
     Tests --> Coverage
-```
+```text
 
 ### 6.2 Test Case Mapping
 
@@ -538,7 +538,7 @@ flowchart TD
     G2 --> I2 --> M2
     G3 --> I3 --> M3
     G4 --> I4 --> M4
-```
+```text
 
 ### 7.2 Gap Analysis Table
 
@@ -592,7 +592,7 @@ xychart-beta
     x-axis [Week 1, Week 4, Week 8, Week 12, Week 16, Week 20]
     y-axis "Coverage %" 0 --> 100
     line [25, 45, 68, 82, 94, 97]
-```
+```text
 
 ### 8.4 Test Distribution by Type
 

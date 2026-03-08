@@ -57,7 +57,7 @@ mindmap
       Vite
       NPM
       Composer
-```
+```text
 
 ---
 
@@ -131,7 +131,7 @@ flowchart TB
 │  └─────────────┘    └─────────────┘    └─────────────┘         │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 2.3 Critical Integration Interfaces
 
@@ -177,7 +177,7 @@ flowchart TB
     style P3 fill:#f8bbd9
     style P4 fill:#ffe0b2
     style P5 fill:#e1bee7
-```
+```text
 
 **ASCII Diagram:**
 
@@ -256,7 +256,7 @@ gantt
     section Phase 5
     E2E Testing                :p5a, after p4b, 5d
     Polish & Documentation     :p5b, after p5a, 5d
-```
+```text
 
 ---
 
@@ -318,7 +318,7 @@ class PlanEdit extends Component
         $this->dispatch('plan-saved');
     }
 }
-```
+```text
 
 ### 4.2 Livewire ↔ Alpine.js
 
@@ -372,7 +372,7 @@ sequenceDiagram
         </form>
     </div>
 </div>
-```
+```text
 
 ### 4.3 Livewire ↔ localStorage
 
@@ -437,7 +437,7 @@ document.addEventListener('alpine:init', () => {
         },
     });
 });
-```
+```text
 
 ### 4.4 Alpine.js ↔ localStorage
 
@@ -521,7 +521,7 @@ User clicks "Create Plan"
 │ Alpine: toast       │
 │ dispatch('toast')   │
 └─────────────────────┘
-```
+```text
 
 ### 5.2 Plan Creation Flow (Local Mode)
 
@@ -585,7 +585,7 @@ User clicks "Create Plan"
 │ Alpine: Navigate    │
 │ window.location     │
 └─────────────────────┘
-```
+```text
 
 ### 5.3 Storage Mode Comparison
 
@@ -649,7 +649,7 @@ flowchart TB
     style Dev fill:#e3f2fd
     style CI fill:#f3e5f5
     style Staging fill:#e8f5e9
-```
+```text
 
 ### 6.3 Test Data Strategy
 
@@ -688,7 +688,7 @@ flowchart TD
     
     style Account fill:#e8f5e9
     style Local fill:#fff3e0
-```
+```text
 
 **Integration Logic:**
 
@@ -754,7 +754,7 @@ sequenceDiagram
     LW->>User: Show recovered data
     
     Note over User,LW: Data preserved!
-```
+```text
 
 **Integration Logic:**
 
@@ -817,7 +817,7 @@ flowchart LR
     NPM --> Vite
     
     Git --> GitHub --> CI
-```
+```text
 
 - **Composer:** Manage PHP dependencies (Laravel, Livewire)
 - **NPM:** Manage JS dependencies (Alpine, Tailwind)
@@ -870,7 +870,7 @@ flowchart LR
     Review -->|"Approved"| Main
     Review -->|"Changes"| Dev
     Main --> Deploy
-```
+```text
 
 ---
 

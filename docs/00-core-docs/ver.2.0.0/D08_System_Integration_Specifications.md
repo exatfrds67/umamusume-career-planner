@@ -66,7 +66,7 @@ flowchart TB
     style Frontend fill:#e3f2fd
     style Backend fill:#f3e5f5
     style Storage fill:#e8f5e9
-```
+```text
 
 ---
 
@@ -122,7 +122,7 @@ classDiagram
     }
     
     PlanEditor --> CareerRun : manages
-```
+```text
 
 | Property | Type | Description |
 | --- | --- | --- |
@@ -200,7 +200,7 @@ flowchart LR
     "query": "concentration"
   }
 }
-```
+```text
 
 ---
 
@@ -268,7 +268,7 @@ erDiagram
         int turn_number
         json stats
     }
-```
+```text
 
 **JSON Schema:**
 
@@ -338,7 +338,7 @@ flowchart LR
     Load --> Check
     Check --> Store
     Store --> Restore
-```
+```text
 
 **JSON Schema:**
 
@@ -370,7 +370,7 @@ flowchart LR
   "show_japanese_names": true,
   "compact_view": false
 }
-```
+```text
 
 ---
 
@@ -424,7 +424,7 @@ sequenceDiagram
     Window->>Form: Event received
     Form->>Form: Clear dirty state
     Form->>Form: Update UI
-```
+```text
 
 | Event Name | Payload | Source | Target | Description |
 | --- | --- | --- | --- | --- |
@@ -470,7 +470,7 @@ public function save(): void
     $this->dispatch('plan-saved', id: $this->plan->id, mode: 'account');
     $this->dispatch('toast', type: 'success', message: 'Plan saved!');
 }
-```
+```text
 
 **Listening in Alpine:**
 
@@ -516,7 +516,7 @@ flowchart TD
     AuthCheck --> API
     Sanitize --> LW
     CSP --> Protected
-```
+```text
 
 ### 5.2 CSRF Protection
 
@@ -541,7 +541,7 @@ sequenceDiagram
 
 ```html
 <meta name="csrf-token" content="{{ csrf_token() }}">
-```
+```text
 
 ```javascript
 // Automatic for Livewire
@@ -580,7 +580,7 @@ flowchart LR
     Style --> Self
     Style --> Inline
     Img --> Self
-```
+```text
 
 | Directive | Value | Reason |
 | --- | --- | --- |
@@ -639,7 +639,7 @@ stateDiagram-v2
     Dirty --> DraftSaved: Auto-save
     DraftSaved --> Dirty: Continue Editing
     DraftSaved --> Clean: Manual Save
-```
+```text
 
 ### 6.2 Offline-First Pattern
 
@@ -685,7 +685,7 @@ flowchart TB
     C1 -->|"$dispatch"| State
     C2 -->|"$dispatch"| State
     C3 -->|"$dispatch"| State
-```
+```text
 
 ---
 

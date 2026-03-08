@@ -154,7 +154,7 @@ flowchart TB
     MCPClient --> MemoryServer
     MCPClient --> FilesystemServer
     MCPClient --> FetchServer
-```
+```text
 
 ### 3.2 Component Dependencies
 
@@ -217,7 +217,7 @@ gantt
     section Phase 6: Testing
     Integration Testing        :done, p6a, after p5b, 7d
     Performance Testing        :active, p6b, after p6a, 5d
-```
+```text
 
 ### 4.2 Integration Approach
 
@@ -287,7 +287,7 @@ flowchart TD
     CareerAgent --> CharacterTool
 
     Agents --> Providers
-```
+```text
 
 ### 5.3 MCP Server Integration
 
@@ -338,7 +338,7 @@ flowchart TD
     Parser --> Validator
     Validator --> Transformer
     CircuitBreaker --> Fallback
-```
+```text
 
 ### 5.5 OCR Pipeline Integration
 
@@ -397,7 +397,7 @@ sequenceDiagram
     Agent-->>Controller: Structured advice
     Controller-->>UI: JSON response
     UI-->>User: Display recommendation
-```
+```text
 
 ### 6.2 External Data Sync Flow
 
@@ -448,7 +448,7 @@ sequenceDiagram
     else Invalid
         Controller-->>User: Errors + manual correction
     end
-```
+```text
 
 ---
 
@@ -520,7 +520,7 @@ stateDiagram-v2
     CachedResponse --> Fallback: Cache miss
     Success --> [*]
     Fallback --> [*]: Graceful degradation
-```
+```text
 
 ### 8.2 MCP Tool Execution Scenario
 
@@ -567,7 +567,7 @@ flowchart TD
     ProbeCall -->|Failure| KeepOpen["Keep Open"]
     
     UpdateCache --> ReturnResponse["Return Response"]
-```
+```text
 
 ---
 
@@ -646,7 +646,7 @@ flowchart TD
 
     Services --> Monitoring
     Monitoring --> Alerts
-```
+```text
 
 ---
 

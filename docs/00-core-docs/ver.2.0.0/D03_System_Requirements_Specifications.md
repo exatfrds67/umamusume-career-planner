@@ -71,7 +71,7 @@ mindmap
       Entities
       Validation
       Retention
-```
+```text
 
 **ASCII Diagram:**
 
@@ -126,7 +126,7 @@ flowchart LR
     F --> C
     E --> G[Redirect to Plan]
     G --> H[Show Success Toast]
-```
+```text
 
 **ASCII Diagram:**
 
@@ -236,7 +236,7 @@ flowchart TD
     F --> M[Confirm Delete]
     M --> N[Remove from Table]
     K --> O[Update SP Totals]
-```
+```text
 
 | ID | Requirement | Acceptance Criteria |
 | -- | ----------- | ------------------- |
@@ -369,7 +369,7 @@ flowchart TD
     K -->|No| M[Execute Import]
     L --> M
     M --> N[Show Results Report]
-```
+```text
 
 | ID | Requirement | Acceptance Criteria |
 | -- | ----------- | ------------------- |
@@ -422,7 +422,7 @@ flowchart TD
 │              ▼     ▼                                             │
 │         localStorage  Database                                   │
 └─────────────────────────────────────────────────────────────────┘
-```
+```text
 
 | ID | Requirement | Acceptance Criteria |
 | -- | ----------- | ------------------- |
@@ -518,7 +518,7 @@ flowchart TD
     H --> I{User Authorized?}
     I -->|No| J[Reject 401/403]
     I -->|Yes| K[Execute Action]
-```
+```text
 
 | ID | Requirement |
 | -- | ----------- |
@@ -697,7 +697,7 @@ erDiagram
         int sp_cost
         enum tier
     }
-```
+```text
 
 **ASCII Diagram:**
 
@@ -830,7 +830,7 @@ flowchart LR
     BR8 --> SR8
     BR9 --> SR9
     BR10 --> SR10
-```
+```text
 
 | Business Req | System Req | Priority |
 | ------------ | ---------- | -------- |

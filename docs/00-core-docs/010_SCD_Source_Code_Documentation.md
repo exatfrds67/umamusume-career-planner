@@ -81,7 +81,7 @@ flowchart TB
     style AI fill:#fff3e0
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fce4ec
-```
+```text
 
 ---
 
@@ -174,7 +174,7 @@ umamusume-career-planner/
     ├── Feature/            # Feature Tests
     └── Unit/               # Unit Tests
     (3,316+ tests, 11,563+ assertions across 300+ test files)
-```
+```text
 
 ---
 
@@ -311,7 +311,7 @@ classDiagram
         Local
         Account
     }
-```
+```text
 
 ---
 
@@ -439,7 +439,7 @@ class CharacterService
         )->toArray();
     }
 }
-```
+```text
 
 #### TrainingPredictionService
 
@@ -540,7 +540,7 @@ flowchart TD
     Agents --> NeuronServices
     Agents --> Providers
     Agents --> Responses
-```
+```text
 
 #### Agent Implementation
 
@@ -597,7 +597,7 @@ sequenceDiagram
     Server-->>MCP: Response
     MCP->>MCP: Log usage metrics
     MCP-->>Agent: Processed result
-```
+```text
 
 #### MCP Configuration
 
@@ -674,7 +674,7 @@ class HybridAIService
         return $complexity <= config('ai.local_complexity_threshold', 70);
     }
 }
-```
+```text
 
 ---
 
@@ -743,7 +743,7 @@ class ApmService
         return new Transaction($name, microtime(true));
     }
 }
-```
+```text
 
 **Key Methods**:
 
@@ -859,7 +859,7 @@ class QueryOptimizationService
         return $suggestions;
     }
 }
-```
+```text
 
 **Key Methods**:
 
@@ -982,7 +982,7 @@ flowchart TD
     Init --> Components
     Init --> Events
     Stores --> StoresList
-```
+```text
 
 ### 6.2 Livewire Components
 
@@ -1027,7 +1027,7 @@ app/Livewire/
   --text-primary: #eaeaea;
   --text-secondary: #a0a0a0;
 }
-```
+```text
 
 ---
 
@@ -1126,7 +1126,7 @@ mindmap
       Pest PHP
       Feature Tests
       Unit Tests
-```
+```text
 
 ### 8.2 Naming Conventions
 
@@ -1208,7 +1208,7 @@ tests/
     ├── CharacterEditorTest.php
     ├── TrainingSelectorTest.php
     └── SkillCatalogTest.php
-```
+```text
 
 ### 9.3 Test Examples
 

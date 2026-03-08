@@ -273,7 +273,7 @@ pie title Requirements by Priority
     "P1 - High" : 18
     "P2 - Medium" : 8
     "P3 - Low" : 5
-```
+```text
 
 ---
 
@@ -367,7 +367,7 @@ For each plan:
     ▼
 Show results report
 
-```
+```text
 
 ### 6.4 Local to Account Conversion Flow (Mermaid)
 

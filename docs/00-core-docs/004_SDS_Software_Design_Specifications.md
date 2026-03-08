@@ -101,7 +101,7 @@ flowchart TB
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fff3e0
-```
+```text
 
 ### 2.2 Key Directories
 
@@ -195,7 +195,7 @@ flowchart TD
     WebControllers --> Services
     APIControllers --> Services
     AdminControllers --> Services
-```
+```text
 
 ### 3.2 Livewire Components
 
@@ -313,7 +313,7 @@ erDiagram
         json bonuses
         string meta_tier
     }
-```
+```text
 
 ### 4.2 Core Model Definitions
 
@@ -395,7 +395,7 @@ class CareerRun extends Model
         return $this->belongsTo(SupportDeck::class);
     }
 }
-```
+```text
 
 ### 4.3 Enum Definitions
 
@@ -518,7 +518,7 @@ flowchart TD
     CoreServices --> IntegrationServices
     CoreServices --> TrainingServices
     AdminServices --> CoreServices
-```
+```text
 
 ### 5.2 Core Service Implementations
 
@@ -626,7 +626,7 @@ class AIAdvisoryService
         }
     }
 }
-```
+```text
 
 ---
 
@@ -717,7 +717,7 @@ class TrainingAdvisorAgent extends Agent
         PROMPT;
     }
 }
-```
+```text
 
 ### 6.3 MCP Tools Integration
 
@@ -788,7 +788,7 @@ flowchart TD
     Validate2 --> Map
     Map --> Review
     Review --> Save
-```
+```text
 
 ### 7.2 OCR Service Implementation
 
@@ -857,7 +857,7 @@ flowchart LR
         OCRCallback["/webhooks/ocr"]
         SyncCallback["/webhooks/sync"]
     end
-```
+```text
 
 ### 8.2 API Endpoints
 
@@ -940,7 +940,7 @@ flowchart TD
     Import --> Processing
     Processing --> Storage
     Storage --> Export
-```
+```text
 
 ### 9.2 Import/Export Service
 
@@ -1012,7 +1012,7 @@ flowchart LR
     
     Backup --> Storage
     Storage --> Restore
-```
+```text
 
 ---
 

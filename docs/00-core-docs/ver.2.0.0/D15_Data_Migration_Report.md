@@ -58,7 +58,7 @@ flowchart LR
     Transform --> Validate
     Validate --> Load
     Load --> DB
-```
+```text
 
 ### 1.3 Status Summary
 
@@ -104,7 +104,7 @@ gantt
     section Verification
     Data Verification    :verify, after load, 15m
     Report Generation    :report, after verify, 5m
-```
+```text
 
 ### 2.3 Records by Source
 
@@ -143,7 +143,7 @@ flowchart TD
     Critical --> ManualFix["Manual Remediation Required"]
     Warning --> AutoFix["Auto-corrected"]
     Info --> NoAction["No Action Needed"]
-```
+```text
 
 ### 3.2 Critical Failures (Records Not Migrated)
 
@@ -203,7 +203,7 @@ flowchart TD
     Count -->|"Fail"| CountFail["❌ Count Mismatch"]
     Integrity -->|"Fail"| IntegrityFail["❌ Data Corruption"]
     Relations -->|"Fail"| RelationsFail["❌ Broken Links"]
-```
+```text
 
 ### 4.2 Checklist
 

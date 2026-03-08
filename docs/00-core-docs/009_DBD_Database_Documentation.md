@@ -77,7 +77,7 @@ mindmap
       ucp_external_data
       ucp_ocr_extractions
       ucp_ocr_extracted_skills
-```
+```text
 
 ---
 
@@ -286,7 +286,7 @@ erDiagram
         timestamp fetched_at
         timestamp expires_at
     }
-```
+```text
 
 ---
 
@@ -461,7 +461,7 @@ flowchart TD
     ucp_characters -->|"CASCADE"| ucp_skill_acquisitions["ucp_skill_acquisitions"]
 
     ucp_careers -->|"CASCADE"| ucp_training_sessions["ucp_training_sessions"]
-```
+```text
 
 ### 6.2 Relationship Summary
 
@@ -507,7 +507,7 @@ flowchart LR
     M14["14. ucp_mcp_tool_usages"]
     M15["15. ucp_external_data"]
     M16["16. ucp_ocr_extractions"]
-```
+```text
 
 ### 7.3 Rollback Considerations
 

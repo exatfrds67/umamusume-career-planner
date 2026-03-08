@@ -39,7 +39,7 @@ pie title Data Volume by Source Application
     "uma-tracker" : 150
     "uma-run-tracker" : 100
     "uma-tracker-form" : 50
-```
+```text
 
 | Source Application | Data Volume (Est.) | Priority |
 | ------------------ | ------------------ | -------- |
@@ -206,7 +206,7 @@ gantt
     Generate migration reports   :p4b, after p4a, 1d
     Archive source data          :p4c, after p4b, 1d
     Decommission legacy systems  :p4d, after p4c, 2d
-```
+```text
 
 **ASCII Diagram:**
 
@@ -263,7 +263,7 @@ flowchart TD
         C2[CSV Bulk Import]
         C3[Manual Verification]
     end
-```
+```text
 
 ---
 
@@ -355,7 +355,7 @@ class FormatDetector
         return ImportFormat::JsonGeneric;
     }
 }
-```
+```text
 
 ---
 
@@ -440,7 +440,7 @@ class MigrationValidator
         return Validator::make($plan, $rules);
     }
 }
-```
+```text
 
 ---
 
@@ -489,7 +489,7 @@ flowchart TD
 │ [Skip] [Overwrite] [Import as Copy]             │
 │                                                 │
 └─────────────────────────────────────────────────┘
-```
+```text
 
 ---
 
@@ -551,7 +551,7 @@ flowchart TD
     D --> E[Verify data integrity]
     E --> F[Notify stakeholders]
     F --> G[Root cause analysis]
-```
+```text
 
 ### 9.3 Rollback Window
 

@@ -45,7 +45,7 @@ This Data Migration Plan defines the strategy for migrating data from legacy sou
 
 ### 2.2 Source System Analysis
 
-```
+```text
 
 Legacy Applications
 ├── uma_musume_race_planner (PHP + MySQL)
@@ -102,7 +102,7 @@ All imports include `schema_version` field for forward compatibility and migrati
 
 ### 4.1 Migration Workflow
 
-```
+```text
 
 ┌─────────────────────────────────────────────────────────────┐
 │                    MIGRATION WORKFLOW                        │
@@ -151,7 +151,7 @@ All imports include `schema_version` field for forward compatibility and migrati
 
 ### 4.2 Service Layer Integration
 
-```
+```text
 
 app/Services/
 ├── DataMigrationService.php
@@ -247,7 +247,7 @@ Duplicates are detected by:
 
 ### 6.3 User Interface for Conflict Resolution
 
-```
+```text
 
 ┌─────────────────────────────────────────────────┐
 │ Conflict Detected                               │
@@ -272,7 +272,7 @@ Duplicates are detected by:
 
 ### 7.1 Validation Layers
 
-```
+```text
 
 Input Data
     │
@@ -330,7 +330,7 @@ Input Data
 
 ### 8.2 Rollback Procedure
 
-```
+```text
 
 Rollback Triggered
         │

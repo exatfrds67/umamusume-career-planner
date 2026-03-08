@@ -45,7 +45,7 @@ mindmap
       Schema Validation
       Business Rules
       Integrity Checks
-```
+```text
 
 ### 1.2 Canonical Field Names Reference
 
@@ -145,7 +145,7 @@ flowchart LR
     }
   ]
 }
-```
+```text
 
 ### 2.3 JSON Schema Structure
 
@@ -206,7 +206,7 @@ erDiagram
 ```csv
 title,character_name,status,career_stage,current_turn,speed,stamina,power,guts,wit,mood,energy,total_sp_available,notes,created_at
 "Speed Build Attempt","Special Week","in_progress","senior",65,1150,800,750,600,700,"good",75,450,"Focusing on speed","2025-12-15T08:00:00Z"
-```
+```text
 
 | Column | Type | Required | Description |
 | --- | --- | --- | --- |
@@ -270,7 +270,7 @@ pie title Import Source Distribution
     "CSV Files" : 25
     "Legacy App Export" : 10
     "Clipboard Paste" : 5
-```
+```text
 
 | Source | Format | Supported Features |
 | --- | --- | --- |
@@ -347,7 +347,7 @@ sequenceDiagram
     else Invalid
         UI->>User: Show errors
     end
-```
+```text
 
 ---
 
@@ -425,7 +425,7 @@ flowchart TD
     S --> R3 --> DATE
     O --> R4 --> JSON
     A --> R4 --> JSON
-```
+```text
 
 ### 4.4 Enum Normalization
 
@@ -493,7 +493,7 @@ flowchart TD
     L1 -->|"Fail"| Invalid["❌ Invalid"]
     L2 -->|"Fail"| Invalid
     L3 -->|"Fail"| Invalid
-```
+```text
 
 ### 5.2 Schema Validation Rules
 
@@ -559,7 +559,7 @@ flowchart TD
     "total_warnings": 2
   }
 }
-```
+```text
 
 ---
 
@@ -595,7 +595,7 @@ flowchart TD
     Report --> Next["Process Next Record"]
     
     Continue --> Next
-```
+```text
 
 ### 6.3 Recovery Strategies
 
@@ -666,7 +666,7 @@ class ExportService
         ];
     }
 }
-```
+```text
 
 ### 7.2 Import Script (PHP)
 
@@ -729,7 +729,7 @@ flowchart TD
     E1 --> E2 --> E3 --> E4
     E4 -.->|"File Transfer"| I1
     I1 --> I2 --> I3 --> I4 --> I5 --> I6
-```
+```text
 
 ### 7.4 Batch Import Process
 
@@ -773,7 +773,7 @@ gantt
     "default_storage_mode": "local"
   }
 }
-```
+```text
 
 ### 8.2 Local to Account Migration
 

@@ -46,7 +46,7 @@ mindmap
       Stats Charts
       Turn History
       Race Predictions
-```
+```text
 
 ### 1.2 Key Features
 
@@ -119,7 +119,7 @@ flowchart TD
     Stats --> List
     Recent --> List
     Filters --> List
-```
+```text
 
 The **Dashboard** is your home base:
 
@@ -175,7 +175,7 @@ flowchart LR
     end
     
     General --> Attributes --> Skills --> Turns
-```
+```text
 
 | Tab | Purpose |
 | --- | --- |
@@ -225,7 +225,7 @@ pie title SP Distribution Example
     "Spent SP" : 450
     "Remaining SP" : 200
     "Planned SP" : 350
-```
+```text
 
 ---
 
@@ -287,7 +287,7 @@ sequenceDiagram
     Server-->>LocalData: Success
     LocalData->>LocalStorage: Remove local copy
     LocalData-->>User: Redirect to /plans/{id}
-```
+```text
 
 **Steps:**
 
@@ -339,7 +339,7 @@ stateDiagram-v2
     Online --> SyncPrompt: Draft detected
     SyncPrompt --> Online: Save draft
     SyncPrompt --> Online: Discard draft
-```
+```text
 
 When your internet connection drops:
 

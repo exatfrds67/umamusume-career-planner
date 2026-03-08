@@ -248,7 +248,7 @@ Week 5-6:  ████████ Phase 5: UI/UX Polish
 Week 6-7:  ████████ Phase 6: API Layer (Optional)
 Week 7-8:  ████████ Phase 7: Testing
 Week 8:    ████ Phase 8: Documentation & Deployment
-```
+```text
 
 ### 5.2 Gantt Chart (Mermaid)
 

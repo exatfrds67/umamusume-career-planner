@@ -63,7 +63,7 @@ flowchart TB
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fff3e0
-```
+```text
 
 ---
 
@@ -125,7 +125,7 @@ flowchart TD
 └── tests/
     ├── Feature/        # Feature Tests
     └── Unit/           # Unit Tests
-```
+```text
 
 ---
 
@@ -221,7 +221,7 @@ classDiagram
     CareerRunService --> SkillService : uses
     ImportService --> LocalRunStorageService : uses
     ImportService --> CareerRunService : uses
-```
+```text
 
 #### Service Descriptions
 
@@ -323,7 +323,7 @@ classDiagram
     CareerRun "1" --> "*" StatProgress
     CareerRun "*" --> "*" Skill
     UmaMusume "1" --> "*" CareerRun
-```
+```text
 
 ---
 
@@ -379,7 +379,7 @@ window.addEventListener('toast', (e) => { /* ... */ });
 window.addEventListener('connection-lost', () => { /* ... */ });
 
 Alpine.start();
-```
+```text
 
 ### 4.3 `resources/css/app.css`
 
@@ -426,7 +426,7 @@ flowchart TD
     Check -->|"No"| Return1["Return raw value"]
     Check -->|"Yes"| Calculate["1200 + floor((raw - 1200) / 2)"]
     Calculate --> Return2["Return calculated value"]
-```
+```text
 
 | Property | Value |
 | --- | --- |
@@ -472,7 +472,7 @@ flowchart LR
         Import["/api/plans/import"]
         Export["/api/plans/export"]
     end
-```
+```text
 
 | Route | Method | Controller/Component | Description |
 | --- | --- | --- | --- |
@@ -528,7 +528,7 @@ flowchart LR
         Tables["Tables: snake_case plural<br/>career_runs"]
         Columns["Columns: snake_case<br/>turn_number"]
     end
-```
+```text
 
 | Context | Convention | Example |
 | --- | --- | --- |

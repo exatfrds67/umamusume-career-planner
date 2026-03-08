@@ -75,7 +75,7 @@ pie title Implementation Status by Module
     "Data Management" : 100
     "Performance & Monitoring" : 85
     "Accessibility & PWA" : 90
-```
+```text
 
 ### 1.5 Compliance Summary
 
@@ -148,7 +148,7 @@ flowchart LR
 
     Implemented --> Complete[97% Complete]
     InProgress --> Ongoing[3% In Progress]
-```
+```text
 
 ### 3.2 Feature Verification Table
 
@@ -313,7 +313,7 @@ flowchart TB
     style Application fill:#bbdefb
     style Domain fill:#fff9c4
     style Infrastructure fill:#ffccbc
-```
+```text
 
 **Verification**: All layers implemented according to SDS §2.1. ✅
 
@@ -518,7 +518,7 @@ erDiagram
         timestamp first_hint_at "✅ NEW Jan 2026"
         timestamp last_hint_at "✅ NEW Jan 2026"
     }
-```
+```text
 
 **Verification**: All 35 tables implemented with schema enhancements from January 2026 migrations. ✅
 
@@ -605,7 +605,7 @@ flowchart LR
   "data": { ... },
   "meta": { ... }
 }
-```
+```text
 
 **Verified Implementation**: ✅ All API responses follow standard JSON:API structure with `success`, `data`, and `meta` fields.
 
@@ -684,7 +684,7 @@ flowchart TD
     style A11y fill:#fff9c4
     style OpenCV fill:#e0e0e0
     style MCPConnector fill:#e0e0e0
-```
+```text
 
 ### 10.2 Gap Analysis Table
 
@@ -830,7 +830,7 @@ gantt
 
 **Last Test Run**: February 21, 2026
 
-```
+```text
 Tests:    189 passed (1 skipped)
 Duration: 3m 42s
 Coverage: 90.2%

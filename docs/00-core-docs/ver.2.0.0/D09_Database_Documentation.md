@@ -48,7 +48,7 @@ mindmap
       race_predictions
       goals
       activity_logs
-```
+```text
 
 ---
 
@@ -144,7 +144,7 @@ pie title Tables by Category
     "Reference Data" : 2
     "Core Transactional" : 4
     "Supporting" : 2
-```
+```text
 
 ---
 
@@ -205,7 +205,7 @@ classDiagram
         +enum aptitude_sashi
         +enum aptitude_oikomi
     }
-```
+```text
 
 - **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
 - **Column**: `name`; **Type**: String(255); **Constraints**: Not Null; **Description**: English name (e.g., "Special Week")
@@ -282,7 +282,7 @@ classDiagram
         +text notes
         +timestamp deleted_at
     }
-```
+```text
 
 - **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
 - **Column**: `uuid`; **Type**: UUID; **Constraints**: Unique; **Description**: Global identifier (aligns with localStorage)
@@ -358,7 +358,7 @@ classDiagram
         +timestamp created_at
         +timestamp updated_at
     }
-```
+```text
 
 - **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
 - **Column**: `career_run_id`; **Type**: BigInt; **Constraints**: FK → career_runs; **Description**: Parent plan
@@ -411,7 +411,7 @@ classDiagram
         +boolean completed
         +int sort_order
     }
-```
+```text
 
 - **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
 - **Column**: `career_run_id`; **Type**: BigInt; **Constraints**: FK → career_runs; **Description**: Parent plan
@@ -472,7 +472,7 @@ flowchart TD
     PK --> FK2
     FK1 --> Q1
     FK3 --> Q3
-```
+```text
 
 ### 4.2 Index Definitions
 
@@ -536,7 +536,7 @@ flowchart LR
 
     style Legacy fill:#ffcdd2
     style Canonical fill:#c8e6c9
-```
+```text
 
 - **Legacy Name**: `run_id`, `plan_id`; **Canonical Name**: `career_run_id`; **Context**: Foreign key references
 - **Legacy Name**: `turn`, `current_turn`; **Canonical Name**: `turn_number`; **Context**: In history/progress tables
@@ -614,7 +614,7 @@ flowchart TD
     User["users<br/>(Soft Delete)"]
     User -->|"SET NULL"| CareerRun
     User -->|"SET NULL"| ActivityLogs["activity_logs"]
-```
+```text
 
 - **Parent**: `career_runs`; **Child**: `stat_progress`; **On Delete**: CASCADE
 - **Parent**: `career_runs`; **Child**: `skill_career_runs`; **On Delete**: CASCADE

@@ -78,7 +78,7 @@ mindmap
       Entities
       Validation
       Retention
-```
+```text
 
 ### 1.5 Reference Documents
 
@@ -160,7 +160,7 @@ erDiagram
         int energy
         int current_turn
     }
-```
+```text
 
 ### 2.3 Training and Predictions [FR-03]
 
@@ -233,11 +233,11 @@ flowchart LR
     
     Analyze --> Readiness --> Strategy
     Strategy --> Register --> Execute --> Result
-```
+```text
 
 ### 2.5 Skill Management [FR-05]
 
-**Description:** Skill catalog, acquisition tracking, and SP optimization.
+**Description:** Skill catalog, acquisition tracking, phase-aware recommendations, and SP optimization.
 
 **Related Artifacts:**
 
@@ -252,13 +252,13 @@ flowchart LR
 | FR-05.2 | Track skill acquisitions per character | P0 | Complete |
 | FR-05.3 | Track hints and SP cost reductions (5 levels: 10%/20%/30%/35%/40% max) | P0 | Complete |
 | FR-05.4 | Support skill evolution paths (Normal → Rare) | P1 | Complete |
-| FR-05.5 | Provide skill recommendations based on race targets | P1 | Complete |
+| FR-05.5 | Provide skill recommendations based on race targets, running style phases, and Wit reliability | P1 | Complete |
 | FR-05.6 | Calculate SP budget optimization | P1 | Complete |
 | FR-05.7 | Support skill loadout management | P1 | Complete |
 
 ### 2.6 Support Card Management [FR-06]
 
-**Description:** Support card inventory, deck building, and meta rankings.
+**Description:** Support card inventory, deck building, bond progression, and friendship activation analysis.
 
 **Related Artifacts:**
 
@@ -271,7 +271,7 @@ flowchart LR
 | --- | --- | --- | --- |
 | FR-06.1 | Maintain support card inventory (200+ cards) | P0 | Complete |
 | FR-06.2 | Build and validate 6-card decks (5 owned + 1 borrowed) | P0 | Complete |
-| FR-06.3 | Track limit break levels and bond progression | P0 | Complete |
+| FR-06.3 | Track limit break levels, bond progression, and friendship activation thresholds | P0 | Complete |
 | FR-06.4 | Provide synergy scoring and deck recommendations | P1 | Complete |
 | FR-06.5 | Sync meta tier rankings from external sources | P1 | Complete |
 | FR-06.6 | Support deck comparison and optimization | P1 | Complete |
@@ -289,7 +289,7 @@ flowchart LR
 
 | ID | Requirement | Priority | Status |
 | --- | --- | --- | --- |
-| FR-07.1 | Provide training advice via Neuron agents | P0 | Complete |
+| FR-07.1 | Provide training advice via Neuron agents with support deck, Wit, inheritance, and calendar context | P0 | Complete |
 | FR-07.2 | Provide race strategy recommendations | P0 | Complete |
 | FR-07.3 | Provide skill build recommendations | P0 | Complete |
 | FR-07.4 | Track AI conversations and context | P1 | Complete |
@@ -366,7 +366,7 @@ stateDiagram-v2
     Offline --> Online: Connection restored
     Online --> SyncPrompt: Draft detected
     SyncPrompt --> Online: Save/Discard draft
-```
+```text
 
 ### 2.11 Dashboard and Navigation [FR-11]
 
@@ -432,7 +432,7 @@ flowchart TD
     Input -->|Yes| Auth{Authorized?}
     Auth -->|No| Reject401[Reject 401/403]
     Auth -->|Yes| Process([Process Request])
-```
+```text
 
 | ID | Requirement | Status |
 | --- | --- | --- |
@@ -593,7 +593,7 @@ flowchart LR
         CharacterChannel["character.{id}"]
         NotificationChannel["user.{id}"]
     end
-```
+```text
 
 #### 4.2.1 Core API Endpoints
 
@@ -783,7 +783,7 @@ flowchart LR
     BR5 --> FR6 --> SPEC5
     BR6 --> FR7 --> SPEC6
     BR7 --> FR8 --> SPEC7
-```
+```text
 
 ### 7.1 Requirements to Specifications Mapping
 

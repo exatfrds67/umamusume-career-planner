@@ -74,7 +74,7 @@ flowchart TB
     LWServer --> Services
     Services --> Models
     Models --> DB
-```
+```text
 
 **ASCII Diagram:**
 
@@ -131,7 +131,7 @@ flowchart TD
     D -->|Account| F[(Database)]
     E --> G[UUID Routes<br/>/plans/local/uuid]
     F --> H[ID Routes<br/>/plans/id]
-```
+```text
 
 **ASCII Diagram:**
 
@@ -172,7 +172,7 @@ sequenceDiagram
     D-->>S: Return Data
     S-->>L: Return Result
     L-->>U: DOM Update
-```
+```text
 
 **ASCII Diagram:**
 
@@ -277,7 +277,7 @@ flowchart TD
     Navbar --> NavbarComponents
     MainContent --> DashboardPage
     MainContent --> PlanEditorPage
-```
+```text
 
 **ASCII Diagram:**
 
@@ -356,7 +356,7 @@ resources/views/components/
     ├── badge.blade.php           # Status badge
     ├── toast.blade.php           # Notification toast
     └── empty-state.blade.php     # Empty state display
-```
+```text
 
 ---
 
@@ -499,7 +499,7 @@ erDiagram
 │ guts      │
 │ wit       │
 └───────────┘
-```
+```text
 
 ### 4.2 Model Definitions
 
@@ -578,7 +578,7 @@ class CareerRun extends Model
             : "/plans/{$this->id}{$suffix}";
     }
 }
-```
+```text
 
 #### 4.2.3 SkillCareerRun Pivot Model
 
@@ -667,7 +667,7 @@ classDiagram
         Awful : -4%
         +modifier() int
     }
-```
+```text
 
 ```php
 enum StorageMode: string {
@@ -818,7 +818,7 @@ interface LocalRunsStore {
 }
 
 type RunKey = `local:${string}` | `account:${number}`;
-```
+```text
 
 ---
 
@@ -868,7 +868,7 @@ app/Services/
 ├── ActivityLogService.php        # Activity logging
 ├── ImageProcessingService.php    # Image upload handling
 └── ChartDataService.php          # Chart data preparation
-```
+```text
 
 ### 5.2 Core Service Implementations
 
@@ -966,7 +966,7 @@ class LocalRunStorageService
         return $data;
     }
 }
-```
+```text
 
 #### 5.2.3 ImportService
 
@@ -1032,7 +1032,7 @@ pie title Stat Color Distribution
     "Power (Red)" : 20
     "Guts (Orange)" : 20
     "Wit (Purple)" : 20
-```
+```text
 
 ```javascript
 // tailwind.config.js
@@ -1101,7 +1101,7 @@ module.exports = {
   --text-secondary: #a0a0a0;
   --border-color: #334155;
 }
-```
+```text
 
 ### 6.3 Responsive Breakpoints
 
@@ -1157,7 +1157,7 @@ module.exports = {
     {{ __('Account') }}
   @endif
 </span>
-```
+```text
 
 #### 6.4.3 Skill Status Badge
 
@@ -1195,7 +1195,7 @@ flowchart TD
     G --> I[Save to localStorage]
     I --> J[Navigate to /plans/local/uuid/edit]
     H --> K[Navigate to /plans/id/edit]
-```
+```text
 
 **ASCII Diagram:**
 
@@ -1253,7 +1253,7 @@ flowchart TD
     M --> O[Results Report]
     N --> O
     I --> O
-```
+```text
 
 **ASCII Diagram:**
 
@@ -1316,7 +1316,7 @@ sequenceDiagram
     S-->>L: Return results
     L-->>A: Update dropdown
     A-->>U: Display matches with keyboard nav
-```
+```text
 
 **ASCII Diagram:**
 

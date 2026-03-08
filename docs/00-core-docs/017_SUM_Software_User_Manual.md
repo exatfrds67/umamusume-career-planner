@@ -78,7 +78,7 @@ mindmap
       Dual Storage
       OCR Processing
       External API Sync
-```
+```text
 
 ### 1.3 Key Features
 
@@ -153,7 +153,7 @@ flowchart TB
     end
 
     Local -->|"Convert"| Account
-```
+```text
 
 - **Mode**: **Local**; **Pros**: Instant start, no account needed, works offline; **Cons**: Data stays on this browser/device only; **Best For**: Quick tests, anonymous usage
 - **Mode**: **Account**; **Pros**: Cross-device sync, secure cloud backup; **Cons**: Requires internet connection; **Best For**: Long-term tracking, multi-device access
@@ -166,7 +166,7 @@ flowchart TB
 
 ### 3.1 Dashboard Layout
 
-```
+```text
 ┌──────────────────────���─────────────────────────────────────────┐
 │  App Header: Logo | Run Selector | Notifications 🔔 | User Menu │
 ├────────────────────────────────────────────────────────────────┤
@@ -225,11 +225,11 @@ flowchart LR
     B --> C[Step 3: Build Support Deck]
     C --> D[Step 4: Review & Confirm]
     D --> E[Character Created]
-```
+```text
 
 #### Step 1: Select Trainee & Scenario
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Create New Character - Step 1 of 4                        │
 ├──────────────────────────────────────────────��─────────────┤
@@ -279,7 +279,7 @@ flowchart LR
 
 View and manage your character's current state:
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Mejiro Ardan (Turn 45)                       [Edit] [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -301,7 +301,7 @@ View and manage your character's current state:
 │  │ • Late Surger: S       │  Turn 42: Power +35          ││
 │  └────────────────────────┴──────────────────────────────┘│
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 4.3 Stat System
 
@@ -381,7 +381,7 @@ flowchart TD
     F --> G
     G --> H[Advance Turn]
     H --> I[Next Turn]
-```
+```text
 
 ### 5.3 Goal Management
 
@@ -403,7 +403,7 @@ Set and track training objectives:
 
 ### 6.1 Training Selection Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Select Training (Turn 46)                            [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -462,7 +462,7 @@ flowchart TD
     E --> F[Build Prediction]
     F --> G[Rank Options]
     G --> H[Return to UI]
-```
+```text
 
 ### Prediction Components
 
@@ -489,17 +489,22 @@ Risk levels are color-coded:
 
 ### 6.5 Friendship Training
 
-When bond level reaches 80%+, Friendship Training activates:
+When support cards build bond, each card becomes rainbow-ready at bond 80+. In this application's planner logic, Friendship Training is treated as active once 3 or more cards simultaneously reach bond 80+:
 
 ```mermaid
 flowchart TD
-    A[Bond Check] --> B{Bond >= 80%?}
-    B -->|No| C[Normal Training]
-    B -->|Yes| D[Apply Friendship Bonus]
-    D --> E[+2 to +5 per stat]
-    E --> F[Update Gains]
+    A[Check all support cards] --> B{3 or more cards at bond 80+?}
+    B -->|No| C[Normal training + bond building]
+    B -->|Yes| D[Apply friendship multiplier]
+    D --> E[Use 1.2x friendship state in planner]
+    E --> F[Update gains and recommendation priority]
     C --> F
 ```
+
+- **Bond Gain**: Matching training actions raise participating card bond by 5 per session in the planner
+- **Rainbow-Ready State**: Individual card reaches bond 80+
+- **Active Friendship Training**: Planner marks it active at 3 cards with bond 80+
+- **UI Surface**: Training predictions display friendship status, cards at threshold, and estimated turns until activation
 
 ---
 
@@ -507,7 +512,9 @@ flowchart TD
 
 ### 7.1 Race Calendar
 
-```
+The planner models a full **72-turn** career structure with two turns per month across three in-game years. Stage planning follows Pre-Debut, Junior, Classic, and Senior. Mandatory races, fan thresholds, and the late-March Inspiration Events are surfaced as planning constraints.
+
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Race Calendar | Filter: [All Grades ▼] [All Distances ▼]  │
 ├────────────────────────────────────────────────────────────┤
@@ -526,11 +533,11 @@ flowchart TD
 │                                                            │
 │  [VIEW DETAILS] [ENTER RACE]                              │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 7.2 Race Preparation
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Upcoming Race: Kanto Okami Cup                       [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -570,7 +577,7 @@ flowchart TD
     H -->|70-84| J[Good]
     H -->|55-69| K[Fair]
     H -->|<55| L[Poor]
-```
+```text
 
 ### 7.4 Running Styles
 
@@ -593,7 +600,7 @@ flowchart TD
 
 ### 8.1 Skill Shop Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Skill Management                                     [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -643,8 +650,16 @@ Hints reduce SP cost progressively:
 - Training sessions
 - Race rewards
 - Support card events
+- Inheritance / Inspiration Events
 
-### 8.4 Skill Evolution
+### 8.4 Skill Reliability and Wit
+
+- **Wit Function**: Wit controls skill activation reliability and reduces the risk of race mishaps such as kakari
+- **Planner Threshold**: 400+ Wit is treated as the reliable floor for most builds
+- **API Surface**: Training predictions expose a `wit_adequacy` block with current Wit, estimated activation chance, status text, and whether the 400+ threshold is met
+- **Advisory Behavior**: AI advice calls out low-Wit runs when phase-critical skills are likely to misfire
+
+### 8.5 Skill Evolution
 
 Some Normal skills can evolve to Rare versions:
 
@@ -655,14 +670,14 @@ flowchart LR
     B -->|No| D[Show Requirements]
     C --> E[Replace Skill]
     E --> F[Log History]
-```
+```text
 
 ### Example Evolution
 
 - **Normal Skill**: Go with the Flow; **Rare Evolution**: Lane Legerdemain
 - **Normal Skill**: Stamina Boost; **Rare Evolution**: Endurance Master
 
-### 8.5 Skill Status Types
+### 8.6 Skill Status Types
 
 - **Status**: Acquired; **Icon**: ✅; **Description**: Skill purchased and owned
 - **Status**: Skipped; **Icon**: ❌; **Description**: Decided not to acquire
@@ -674,7 +689,7 @@ flowchart LR
 
 ### 9.1 Support Card Collection
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Support Card Collection                              [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -696,7 +711,7 @@ flowchart LR
 
 Build your 6-card support deck:
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Configure Support Deck (6 Cards)                     [≡]   │
 ├─────────────────────────────────────────────��──────────────┤
@@ -724,14 +739,15 @@ Build your 6-card support deck:
 │                                                            │
 │                          [SAVE DECK] [RECOMMEND OPTIMAL]   │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 9.3 Deck Rules
 
 - **Rule**: Deck Size; **Description**: Exactly 6 cards
 - **Rule**: Ownership; **Description**: 5 owned + 1 borrowed allowed
 - **Rule**: Type Balance; **Description**: Recommended mix of stat types
-- **Rule**: Synergy; **Description**: Cards should complement training goals
+- **Rule**: Synergy; **Description**: Cards should complement training goals and bond-building plans
+- **Rule**: Friendship Planning; **Description**: Planner highlights when 3 cards are approaching the bond-80 threshold
 
 ### 9.4 Meta Tiers
 
@@ -747,7 +763,7 @@ Cards are rated by the community:
 ```mermaid
 flowchart TD
     A[Training Session] --> B[Identify Participating Cards]
-    B --> C[Add Bond +3 base]
+    B --> C[Add Bond +5 base]
     C --> D{Reached Milestone?}
     D -->|Yes| E[Grant Reward]
     D -->|No| F[Continue]
@@ -757,10 +773,9 @@ flowchart TD
 
 ### Bond Milestones
 
-- **Level**: 20%; **Reward**: Small stat bonus
-- **Level**: 40%; **Reward**: Skill hint
-- **Level**: 60%; **Reward**: Special event
-- **Level**: 80%; **Reward**: Friendship Training unlocked
+- **Level**: 0-79%; **Reward**: Standard card bonuses and bond-building events
+- **Level**: 80%+; **Reward**: Card becomes rainbow-ready
+- **Deck Threshold**: 3 cards at 80%+; **Reward**: Friendship Training status becomes active in predictions and AI advice
 
 ---
 
@@ -768,7 +783,7 @@ flowchart TD
 
 ### 10.1 AI Advisor Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  AI Advisor                                           [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -798,7 +813,7 @@ flowchart TD
 │  │                                         [Send] 📤     ││
 │  └────────────────────────────────────────────────────────┘│
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 10.2 AI System Architecture
 
@@ -819,7 +834,7 @@ flowchart TD
 - **Topic**: Training; **Description**: Optimal training selection; **Example Questions**: "What should I train next?"
 - **Topic**: Race Strategy; **Description**: Pre-race preparation; **Example Questions**: "Am I ready for the upcoming G1?"
 - **Topic**: Skill Build; **Description**: Skill acquisition planning; **Example Questions**: "Which skills should I prioritize?"
-- **Topic**: Career Planning; **Description**: Long-term strategy; **Example Questions**: "How can I reach A+ grade by turn 60?"
+- **Topic**: Career Planning; **Description**: Long-term strategy with inheritance timing and calendar awareness; **Example Questions**: "How can I reach A+ grade by turn 60?"
 
 ### 10.4 AI Response Components
 
@@ -828,6 +843,9 @@ flowchart TD
 - **Component**: Confidence; **Description**: AI's certainty level (0-100%)
 - **Component**: Risks; **Description**: Potential downsides
 - **Component**: Alternatives; **Description**: Other options to consider
+- **Component**: Friendship Status; **Description**: Whether friendship training is active or how many turns remain until activation
+- **Component**: Wit Adequacy; **Description**: Current Wit reliability for skill activation
+- **Component**: Calendar / Inheritance Context; **Description**: Upcoming races, seasonal camp windows, and late-March Inspiration Events when relevant
 
 ### 10.5 AI Providers
 
@@ -860,11 +878,11 @@ flowchart LR
     G --> H{Action}
     H -->|Download| I[Download File]
     H -->|Copy| J[Copy to Clipboard]
-```
+```text
 
 ### 11.3 Import Wizard
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Import Data - Step 2 of 4: Preview                   [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -916,7 +934,7 @@ flowchart TD
     G -->|Yes| H[Apply to Character]
     G -->|No| I[Manual Correction]
     I --> H
-```
+```text
 
 ### Supported Data
 
@@ -1058,7 +1076,7 @@ flowchart TD
     Data --> DataFix[Check browser<br/>Same browser?<br/>Incognito?]
     Search --> SearchFix[Try Japanese name<br/>Check spelling]
     Perf --> PerfFix[Clear cache<br/>Archive old plans]
-```
+```text
 
 ### 14.2 Issue Solutions
 
@@ -1176,7 +1194,7 @@ flowchart LR
     Help --> FAQ[❓ FAQ<br/>Common questions]
     Help --> GitHub[🐙 GitHub<br/>Report bugs]
     Help --> Contact[📧 Contact<br/>Email support]
-```
+```text
 
 ### 17.2 Resources
 

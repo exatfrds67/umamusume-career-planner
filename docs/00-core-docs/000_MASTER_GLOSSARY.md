@@ -141,13 +141,15 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 - **Legacy Effect**: Bonuses granted to new trainees when selecting two legacy Uma Musume in setup (after retiring a career run). These grant bonus stats and sometimes skills to new runs.
 - **Bond/Bonding**: Represents support card "friendship" (bond) level; higher bond unlocks improved training bonuses and special events. Distinct from raw support card stats.
+- **Inspiration Event**: One of three inheritance checkpoints in a career run: career start, Year 2 late March, and Year 3 late March. Parent sparks are applied at these points.
+- **Spark**: Inheritance bonus category. Blue = stat bonus, Pink = skill inheritance, Green = growth-rate bonus, White = SP bonus.
+- **Friendship Training**: In this application's planner logic, the boosted friendship state becomes active when 3 or more support cards simultaneously reach Bond 80 or higher.
 
 ### Bond Milestones
 
-- **Level**: 20%; **Reward**: Small stat bonus
-- **Level**: 40%; **Reward**: Skill hint
-- **Level**: 60%; **Reward**: Special event
-- **Level**: 80%; **Reward**: Friendship Training unlocked
+- **Level**: 0-79; **Reward**: Standard support-card bonuses and bond-building events
+- **Level**: 80+; **Reward**: Card becomes rainbow-ready for friendship checks
+- **Planner Threshold**: 3 cards at 80+; **Reward**: Friendship Training status becomes active in training predictions and AI advice
 
 ### 2.10 Conditions
 
@@ -164,7 +166,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 - **Term**: Character; **Canonical Field**: `ucp_characters`; **Definition**: Uma Musume trainee (player-controlled); **Storage**: Database
 - **Term**: Career Run / Plan; **Canonical Field**: `ucp_careers`; **Definition**: A single "career mode" progression; **Storage**: DB/localStore
-- **Term**: Turn; **Canonical Field**: `turn_number`; **Definition**: One in-game week; each runs a selection round; **Storage**: DB/localStore
+- **Term**: Turn; **Canonical Field**: `turn_number`; **Definition**: One half-month career action window (Early or Late); 72 turns span a full 3-year career; **Storage**: DB/localStore
 - **Term**: Support Deck; **Canonical Field**: `ucp_support_decks`; **Definition**: Set of 6 support cards for training; **Storage**: Database
 - **Term**: Support Card Definition; **Canonical Field**: `ucp_support_card_definitions`; **Definition**: Canonical support card definition from external sources; **Storage**: Database
 - **Term**: Skill Build; **Canonical Field**: `ucp_skill_builds`; **Definition**: Saved skill loadout configuration for a career; **Storage**: Database

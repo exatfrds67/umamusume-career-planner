@@ -68,7 +68,7 @@ flowchart TD
     Index --> Integration
     Index --> Migration
     Index --> User
-```
+```text
 
 - **Core Docs**: Authoritative, implementation-aligned documents in `docs/00-core-docs/`
 - **Product/Specs**: Detailed PRDs and specs in `docs/02-prds/` and `docs/02-specs/`
@@ -566,7 +566,7 @@ flowchart TB
 
 Archived documents live in `docs/archive/`:
 
-```
+```text
 docs/archive/
 ├── versions/                      # Superseded document versions
 │   ├── 001_SDP_v1.0.0.md
@@ -624,7 +624,7 @@ Each document includes a "Document Control" section:
 | 2.1.0 | 2026-01-23 | Development Team | Updated for v2.0.0 implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Major revision |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
-```
+```text
 
 ### 6.3 Review and Approval Process
 

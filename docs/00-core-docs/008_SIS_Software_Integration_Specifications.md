@@ -83,7 +83,7 @@ return [
         'retry_attempts' => env('AI_RETRY_ATTEMPTS', 3),
     ],
 ];
-```
+```text
 
 ### 2.2 Neuron AI Integration
 
@@ -116,7 +116,7 @@ app/Neuron/
 └── Support/
     ├── McpConnectorFactory.php
     └── McpToolIntegration.php
-```
+```text
 
 **Neuron Service Layer**: `app/Services/Neuron/`
 
@@ -127,7 +127,7 @@ app/Services/Neuron/
 ├── RaceStrategyService.php
 ├── SkillRecommendationService.php
 └── CareerPlanningService.php
-```
+```text
 
 ### 2.3 AI Service Architecture
 
@@ -149,7 +149,7 @@ app/Services/Neuron/
 │  └─────────────────┘  └─────────────────┘  └─────────────────┘  │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 2.4 Provider Cost Tracking
 
@@ -205,7 +205,7 @@ The Model Context Protocol (MCP) integration enables tool-based AI interactions.
 │  └─────────────────┘  └─────────────────┘  └─────────────────┘  │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 3.4 Monitoring Integration
 
@@ -254,7 +254,7 @@ app/Services/ExternalAPI/
 ├── PerformanceOptimizationService.php
 ├── ResponseTransformer.php
 └── ResponseValidator.php
-```
+```text
 
 ### 4.3 Resilience Patterns
 
@@ -276,7 +276,7 @@ app/Services/ExternalAPI/
 
 ### 4.4 Data Sync Workflow
 
-```
+```text
 External API Request Flow:
 
  Request ──► Circuit ──► Rate ──► API ──► Response ──► Cache
@@ -309,7 +309,7 @@ The OCR integration enables screenshot-based data import for character stats and
 
 ### 5.2 Pipeline Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    OCR PROCESSING PIPELINE                      │
 ├─────────────────────────────────────────────────────────────────┤
@@ -379,7 +379,7 @@ class AIAdvisoryRequest extends FormRequest
         ];
     }
 }
-```
+```text
 
 ### 6.3 Rate Limiting Configuration
 
@@ -463,7 +463,7 @@ class AIAdvisoryRequest extends FormRequest
 │      └── CareerPlanningService.php                               │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 7.2 Dependency Injection
 
@@ -494,7 +494,7 @@ public function register(): void
 
 ### 8.1 AI Advisory Request Flow
 
-```
+```text
 User Query ──► Controller ──► AIAdvisoryService
                                     │
                     ┌───────────────┼───────────────┐
@@ -515,7 +515,7 @@ User Query ──► Controller ──► AIAdvisoryService
 
 ### 8.2 External Data Sync Flow
 
-```
+```text
 Scheduler Trigger ──► ExternalAPIService
                             │
                     ┌───────┴───────┐
@@ -543,7 +543,7 @@ Scheduler Trigger ──► ExternalAPIService
 
 ### 8.3 OCR Processing Flow
 
-```
+```text
 Image Upload ──► Validation ──► Storage
                                    │
                                    ▼

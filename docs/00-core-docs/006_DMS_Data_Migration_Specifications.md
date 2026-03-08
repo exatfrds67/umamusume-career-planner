@@ -54,7 +54,7 @@ mindmap
       Training Sessions
       Skills
       Support Cards
-```
+```text
 
 ### 1.2 Source References
 
@@ -122,7 +122,7 @@ public function detectLegacyFormat(array $data): string
     
     return 'custom';
 }
-```
+```text
 
 ---
 
@@ -237,7 +237,7 @@ flowchart LR
     L5 --> C5
     L6 --> C6
     L7 --> C7
-```
+```text
 
 ### 4.2 Stat Value Normalization
 
@@ -319,7 +319,7 @@ private function migrateSchema(array $data, string $fromVersion): array
     
     return $data;
 }
-```
+```text
 
 ---
 
@@ -390,7 +390,7 @@ public function transform(array $rawData): array
     
     return $data;
 }
-```
+```text
 
 ---
 
@@ -473,7 +473,7 @@ public function validateRecord(array $record): ValidationResult
     
     return new ValidationResult($errors, $warnings);
 }
-```
+```text
 
 ---
 
@@ -531,7 +531,7 @@ pie title Error Distribution by Category
         }
     ]
 }
-```
+```text
 
 ---
 
@@ -594,7 +594,7 @@ flowchart TD
     
     Rollback --> Delete[DELETE WHERE batch_id = ?]
     Delete --> Report[Generate rollback report]
-```
+```text
 
 ### 9.4 CLI Commands
 

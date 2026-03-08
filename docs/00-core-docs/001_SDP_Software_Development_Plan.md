@@ -96,7 +96,7 @@ This SDP provides:
 
 The project follows an **iterative delivery model** with short milestones:
 
-```
+```text
 
 ┌─────────────────────────────────────────────────────────────────┐
 │                    ITERATIVE DELIVERY MODEL                      │
@@ -146,7 +146,7 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 4.1 High-Level Architecture
 
-```
+```text
 
 ┌─────────────────────────────────────────────────────────────────┐
 │                        SYSTEM ARCHITECTURE                       │
@@ -194,7 +194,7 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 5.1 Phase Overview
 
-```
+```text
 
 ┌─────────────────────────────────────────────────────────────────┐
 │                      DEVELOPMENT PHASES                          │
@@ -347,7 +347,7 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 8.1 Team Structure
 
-```
+```text
 
 ┌─────────────────────────────────────────────────────────────────┐
 │                        TEAM STRUCTURE                            │
@@ -390,7 +390,7 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 9.2 Risk Matrix
 
-```
+```text
 
 ┌─────────────────────────────────────────────────────────────────┐
 │                         RISK MATRIX                              │
