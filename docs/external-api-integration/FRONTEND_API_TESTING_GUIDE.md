@@ -121,7 +121,7 @@ Press `F12` or right-click anywhere on the page and select "Inspect"
   ],
   "source": "api"
 }
-```
+```text
 
 ### Example Error Response
 
@@ -170,7 +170,7 @@ Disallow: /api/
 
 When testing UmamusumeDB.com, you'll see:
 
-```
+```text
 
 Note: no-cors mode - limited response info available
 CORS prevents reading response. Check Network tab in DevTools.
@@ -208,7 +208,7 @@ has been blocked by CORS policy
 
 **Symptom:**
 
-```
+```text
 
 HTTP 404: Not Found
 
@@ -384,7 +384,7 @@ async function testCustomCharacter(id) {
 }
 
 testCustomCharacter(5);
-```
+```text
 
 ### Testing with Custom Headers
 

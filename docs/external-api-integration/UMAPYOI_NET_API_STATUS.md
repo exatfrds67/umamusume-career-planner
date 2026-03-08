@@ -186,7 +186,7 @@ php artisan test --filter UmapyoiLiveApiTest --group=live
 
 # Run configuration tests
 php artisan test --filter UmapyoiLiveApiTest --group=config
-```
+```text
 
 ---
 
@@ -356,7 +356,7 @@ Log::warning('[UmapyoiApiClient] Request failed', [
     'max_retries' => 3,
     'error' => $errorMessage,
 ]);
-```
+```text
 
 ### Cache Keys
 

@@ -48,7 +48,7 @@ filterData() {
     
     // Similar implementation for support cards and skills
 }
-```
+```text
 
 **Features Verified**:
 
@@ -200,7 +200,7 @@ sortData() {
         });
     });
 }
-```
+```text
 
 **Sort Options Available**:
 
@@ -507,7 +507,7 @@ filterData() {
     });
     this.sortData();
 }
-```
+```text
 
 ### Filter Implementation
 
@@ -568,7 +568,7 @@ sortData() {
         return 0;
     });
 }
-```
+```text
 
 ## Appendix B: Test Data
 

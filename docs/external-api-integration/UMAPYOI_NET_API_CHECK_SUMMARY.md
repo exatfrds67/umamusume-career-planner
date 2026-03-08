@@ -81,7 +81,7 @@ application.
 
 ### Unit/Feature Tests (Mocked)
 
-```
+```text
 
 File: tests/Feature/ExternalAPI/UmapyoiApiClientTest.php
 Status: ✅ ALL PASSING
@@ -143,7 +143,7 @@ Fetches all Uma Musume characters from umapyoi.net.
     'source' => string,     // 'api', 'cache', or 'error'
     'error' => string       // error message (if failed)
 ]
-```
+```text
 
 ### 2. `getCharacter(string $characterId, bool $forceRefresh = false): array`
 

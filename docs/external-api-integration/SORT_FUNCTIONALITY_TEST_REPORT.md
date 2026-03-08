@@ -277,7 +277,7 @@ sortData() {
         });
     });
 }
-```
+```text
 
 #### 3.6 Sort by Rarity (Low to High)
 

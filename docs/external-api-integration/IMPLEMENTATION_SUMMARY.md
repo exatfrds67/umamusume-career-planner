@@ -75,7 +75,7 @@ MCPClientService
 ├── createAgent($config)
 ├── executeAgent($agent, $task)
 └── monitorHealth()
-```
+```text
 
 ### Background Jobs
 
@@ -143,7 +143,7 @@ Authentication: None (public API)
 
 ### UmamusumeDB.com (Secondary - Requires Verification)
 
-```
+```text
 
 Base URL: <https://umamusumedb.com/api>
 
@@ -167,7 +167,7 @@ Authentication: Unknown
 
 ### umamusumecalculator.com (Calculations - Requires Verification)
 
-```
+```text
 
 Base URL: To be verified
 

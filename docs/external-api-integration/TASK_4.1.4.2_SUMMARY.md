@@ -81,7 +81,7 @@ if (this.filters.skillRarity.length > 0 && !this.filters.skillRarity.includes(sk
 if (this.filters.skillType && skill.type !== this.filters.skillType) {
     return false;
 }
-```
+```text
 
 **Status**: ✅ FIXED
 

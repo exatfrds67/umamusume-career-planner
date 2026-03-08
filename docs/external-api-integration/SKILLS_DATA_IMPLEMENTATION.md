@@ -76,7 +76,7 @@ public function getSkills(): JsonResponse
         'note' => 'umapyoi.net API does not provide skills endpoint',
     ]);
 }
-```
+```text
 
 #### 2. Frontend Notice
 
@@ -126,7 +126,7 @@ it('fetches skills from local database', function () {
     ]);
     expect($response->json('data'))->toBeArray();
 });
-```
+```text
 
 ### Database Seeding
 
@@ -205,7 +205,7 @@ Requires authentication (`web` + `auth` middleware)
     "cached": false,
     "note": "umapyoi.net API does not provide skills endpoint"
 }
-```
+```text
 
 ---
 

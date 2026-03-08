@@ -14,7 +14,7 @@ console:
 Alpine Warning: Duplicate key on x-for
 Alpine Expression Error: Cannot read properties of undefined (reading 'after')
 Expression: "news"
-```
+```text
 
 The page loaded but the news section failed to render properly.
 
@@ -117,7 +117,7 @@ $ids = array_column($result['data'], 'id');
 //   ...
 // ]
 // has_duplicates: false ✅
-```
+```text
 
 ## Testing Results
 

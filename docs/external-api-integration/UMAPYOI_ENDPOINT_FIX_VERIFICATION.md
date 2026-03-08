@@ -56,7 +56,7 @@ Testing umapyoi.net API endpoints:
   "preferred_url": "admire-groove",
   "thumb_img": "https://images.microcms-assets.io/..."
 }
-```
+```text
 
 ---
 

@@ -227,7 +227,7 @@ if ($mcpClient->isFetchAvailable()) {
     'url' => 'https://api.example.com/data',
     'method' => 'GET',
 ]
-```
+```text
 
 ## Integration Points
 

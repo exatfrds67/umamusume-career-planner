@@ -142,7 +142,7 @@ the build is production-ready.
 ✓ Configuration cache cleared successfully
 ✓ Route cache cleared successfully
 ✓ Compiled views cleared successfully
-```
+```text
 
 #### 5.3.3 Verify deployment ✅
 

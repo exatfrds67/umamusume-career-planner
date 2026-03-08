@@ -93,7 +93,7 @@ if ($client->isAvailable()) {
         // Process characters...
     }
 }
-```
+```text
 
 ### Running Tests
 

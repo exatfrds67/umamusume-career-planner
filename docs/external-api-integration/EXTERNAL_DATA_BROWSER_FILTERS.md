@@ -122,7 +122,7 @@ skills are sourced from the local database (umapyoi.net does not provide a skill
 ├─────────────────────────────────────────────────────────────┤
 │ Active filters: 3 filter(s) applied • 45 of 487 cards shown│
 └─────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### Visual Feedback
 

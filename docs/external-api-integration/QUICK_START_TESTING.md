@@ -11,7 +11,7 @@
 
 ```bash
 php artisan serve
-```
+```text
 
 ### Step 2: Open the Test Page
 
@@ -54,7 +54,7 @@ Press **F12** or **Right-click → Inspect**
 │                                         │
 │  [Results displayed here]               │
 └─────────────────────────────────────────┘
-```
+```text
 
 ### Chrome DevTools Layout
 
@@ -77,7 +77,7 @@ Press **F12** or **Right-click → Inspect**
 │  │ Response Data: {...}              │  │
 │  └───────────────────────────────────┘  │
 └─────────────────────────────────────────┘
-```
+```text
 
 ---
 
@@ -162,7 +162,7 @@ The site blocks API access via robots.txt:
 
 ```
 Disallow: /api/
-```
+```text
 
 ### Test 1: Character Page
 
@@ -238,7 +238,7 @@ Disallow: /api/
 ✅ Response: Valid JSON
 ✅ Data: Array or Object with expected fields
 ✅ Console: No errors
-```
+```text
 
 ### Example Success Response
 
@@ -264,7 +264,7 @@ Disallow: /api/
 
 #### 404 Not Found
 
-```
+```text
 ❌ Status: 404
 ❌ Error: Endpoint doesn't exist
 ❌ Action: Verify URL structure
@@ -272,7 +272,7 @@ Disallow: /api/
 
 #### CORS Error
 
-```
+```text
 ❌ Error: Blocked by CORS policy
 ❌ Note: Expected for UmamusumeDB.com
 ❌ Action: Check Network tab for actual response
@@ -280,7 +280,7 @@ Disallow: /api/
 
 #### Network Error
 
-```
+```text
 ❌ Error: Failed to fetch
 ❌ Cause: API server down or network issue
 ❌ Action: Check internet connection
@@ -288,7 +288,7 @@ Disallow: /api/
 
 #### Timeout
 
-```
+```text
 ❌ Error: Request timeout
 ❌ Cause: API is slow or overloaded
 ❌ Action: Try again later

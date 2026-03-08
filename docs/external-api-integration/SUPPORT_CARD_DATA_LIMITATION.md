@@ -61,7 +61,7 @@ values:
 'skills' => [],        // Always empty from API
 'unique_effect' => null, // Always null from API
 'friendship_bonus' => 0, // Always 0 from API
-```
+```text
 
 ### External Data Browser Display
 
@@ -187,7 +187,7 @@ and skills. Or view complete details on GameTora.
 
 ```text
 GET https://api.umapyoi.net/api/v1/support
-```
+```text
 
 ### Response Structure
 

@@ -103,7 +103,7 @@ successfully and displays data from umapyoi.net without errors.
 ```text
 Alpine Warning: Duplicate key on x-for
 Alpine Expression Error: Cannot read properties of undefined (reading 'after')
-```
+```text
 
 **Solution**: Modified `ResponseTransformer::transformNews()` to generate unique IDs
 
@@ -159,7 +159,7 @@ const [charactersRes, supportCardsRes, skillsRes, newsRes] = await Promise.all([
 [TTFB] 123.00 (good)
 [ImageOptimization] Initialized {avif: false, webp: true}
 [Service Worker] v3 Loaded with advanced caching strategies
-```
+```text
 
 **No Alpine.js errors!** ✅
 

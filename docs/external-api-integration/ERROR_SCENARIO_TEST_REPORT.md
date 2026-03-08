@@ -118,7 +118,7 @@ mechanisms are functioning correctly, including:
     "news": 0
   }
 }
-```
+```text
 
 **Key Observations**:
 
@@ -458,7 +458,7 @@ in web applications.
 
 ### HTTP 503 Error
 
-```
+```text
 
 HTTP 503: Service Unavailable
 
@@ -474,7 +474,7 @@ HTTP 500: Internal Server Error
 
 ### HTTP 404 Error
 
-```
+```text
 
 HTTP 404: Not Found
 
@@ -490,7 +490,7 @@ Network error occurred
 
 ### Invalid Response
 
-```
+```text
 
 Invalid response format: expected object
 
@@ -555,4 +555,4 @@ Invalid response format: expected object
     "news": "live"
   }
 }
-```
+```text

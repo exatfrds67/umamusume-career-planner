@@ -69,7 +69,7 @@ Route::middleware(['web', 'auth', 'throttle:api'])->prefix('external')->group(fu
 
 ```php
 Route::get('/external-data/browse', fn () => view('external-data.browse'))->name('external-data.browse');
-```
+```text
 
 ### 4. Navigation Integration
 
@@ -232,7 +232,7 @@ if ($result['success']) {
 if ($client->isAvailable()) {
     // API is working
 }
-```
+```text
 
 ---
 
@@ -317,7 +317,7 @@ if ($client->isAvailable()) {
     "source": "umapyoi.net",
     "cached": false
 }
-```
+```text
 
 ---
 
@@ -399,7 +399,7 @@ if ($client->isAvailable()) {
          │
          ├─ Yes ──> apiAvailable = true
          └─ No  ──> apiAvailable = false
-```
+```text
 
 ---
 

@@ -16,7 +16,7 @@ http://localhost:8000/test-api
 
 # 3. Open DevTools
 Press F12 → Network + Console tabs
-```
+```text
 
 ---
 
@@ -56,7 +56,7 @@ Press F12 → Network + Console tabs
 ✅ Response: Valid JSON
 ✅ Console: No errors
 ✅ Data: Expected structure
-```
+```text
 
 ---
 
@@ -67,7 +67,7 @@ Press F12 → Network + Console tabs
 ❌ CORS: Cross-origin blocked
 ❌ Network: Connection failed
 ❌ Timeout: Request too slow
-```
+```text
 
 ---
 

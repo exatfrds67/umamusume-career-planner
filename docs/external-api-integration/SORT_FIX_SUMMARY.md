@@ -105,7 +105,7 @@ sortData() {
         });
     });
 }
-```
+```text
 
 ### Implementation Details
 

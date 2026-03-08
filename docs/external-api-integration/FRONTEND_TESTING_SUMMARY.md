@@ -45,7 +45,7 @@ The frontend correctly calls:
 
 ### Architecture
 
-```
+```text
 
 Frontend (Alpine.js)
     ↓ fetch()
@@ -194,7 +194,7 @@ JSON Response to Frontend
 }
 ```text
 
-```
+```text
 
 ## Caching Strategy
 
@@ -263,7 +263,7 @@ curl http://localhost/api/external/news?limit=10
 
 # Status
 curl http://localhost/api/external/status
-```
+```text
 
 ## Conclusion
 
@@ -330,4 +330,4 @@ $uniqueId = 'news_' . md5(($item['title'] ?? '') . $index);
 $client = app(\App\Services\ExternalAPI\UmapyoiApiClient::class);
 $result = $client->getNews(10, true);
 // Result: All IDs are unique, no duplicates
-```
+```text

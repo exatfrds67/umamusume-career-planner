@@ -197,7 +197,7 @@
 
 ```bash
 php artisan test --filter="External Data Browser - Error Scenarios"
-```
+```text
 
 **Note**: Browser tests require Pest 4 browser testing setup.
 

@@ -124,7 +124,7 @@ Sitemap: https://www.umamusumecalculator.com/sitemap.xml
 # Uma Musume Calculator - Training, Affinity, Legacy & Support Card Calculator
 # Professional Uma Musume Pretty Derby calculator suite
 # https://www.umamusumecalculator.com
-```
+```text
 
 **Key Findings**:
 

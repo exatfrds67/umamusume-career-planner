@@ -60,7 +60,7 @@ the frontend or backend components.
     "source": "umapyoi.net",
     "cached": false
 }
-```
+```text
 
 ### Search and Filtering
 

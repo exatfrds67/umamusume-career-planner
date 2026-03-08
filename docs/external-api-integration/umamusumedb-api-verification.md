@@ -112,7 +112,7 @@ From `/characters/special_week_2025/`:
     "effect": "Stamina recovery when surrounded"
   }
 }
-```
+```text
 
 ### Support Card Data Structure
 

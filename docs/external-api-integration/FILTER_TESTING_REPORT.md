@@ -72,7 +72,7 @@ this.filteredSupportCards = this.supportCards.filter((card) => {
     }
     return true;
 });
-```
+```text
 
 **UI Elements:**
 
@@ -462,7 +462,7 @@ if (this.filters.skillRarity.length > 0 && !this.filters.skillRarity.includes(sk
 if (this.filters.skillType && skill.type !== this.filters.skillType) {
     return false;
 }
-```
+```text
 
 **Result**: Skills rarity and type filters now functional.
 

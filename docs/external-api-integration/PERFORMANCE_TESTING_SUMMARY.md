@@ -139,7 +139,7 @@ Average response time: 206ms
 Min response time:     127ms
 Max response time:     358ms
 All targets met:       ✓ Yes
-```
+```text
 
 ### Test Run 2: Fresh Data (Cache Cleared)
 
@@ -267,7 +267,7 @@ All targets met:       ✓ Yes
 
 ```bash
 php artisan test:api-performance
-```
+```text
 
 **Test with fresh data:**
 

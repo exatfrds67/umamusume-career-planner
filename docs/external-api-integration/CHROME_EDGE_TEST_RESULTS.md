@@ -65,7 +65,7 @@ const [charactersRes, supportCardsRes, skillsRes, newsRes] = await Promise.all([
     this.fetchEndpoint("/api/external/skills"),
     this.fetchEndpoint("/api/external/news")
 ]);
-```
+```text
 
 - Parallel API calls for optimal performance
 - Proper destructuring assignment
@@ -115,7 +115,7 @@ error: `HTTP ${response.status}: ${response.statusText}`
 this.filteredCharacters = this.characters.filter((char) => {
     // ... filtering logic
 });
-```
+```text
 
 - Modern array methods (filter, map, includes)
 - Arrow functions
@@ -370,7 +370,7 @@ Based on code review and implementation:
 
 ```javascript
 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.content || ""
-```
+```text
 
 - CSRF token included in all requests
 - Laravel CSRF middleware protection

@@ -14,7 +14,7 @@ Implemented **rarity inference based on card ID ranges**, which follows the Uma 
 
 ### Card ID Range Pattern
 
-```
+```text
 10001-19999: R (Rare)
 20001-29999: SR (Super Rare)
 30001-39999: SSR (Super Super Rare)
@@ -52,7 +52,7 @@ protected function inferRarityFromId(int $cardId): string
         return 'R';
     }
 }
-```
+```text
 
 ## Results
 
@@ -134,7 +134,7 @@ Or via Artisan:
 
 ```bash
 php artisan cache:forget umapyoi:support_cards
-```
+```text
 
 ## Testing
 

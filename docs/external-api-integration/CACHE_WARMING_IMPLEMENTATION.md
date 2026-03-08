@@ -84,7 +84,7 @@ WarmCacheJob::dispatch('high');
 
 // Or with different priority
 WarmCacheJob::dispatch('all');
-```
+```text
 
 ### 3. Artisan Command
 
@@ -256,7 +256,7 @@ public function boot(): void
         WarmCacheJob::dispatch('high');
     }
 }
-```
+```text
 
 ### Scheduled Warming
 
@@ -360,7 +360,7 @@ curl http://localhost/api/external-cache/statistics
 curl -X POST http://localhost/api/external-cache/warm \
   -H "Content-Type: application/json" \
   -d '{"priority": "high", "async": false}'
-```
+```text
 
 ## Documentation
 
