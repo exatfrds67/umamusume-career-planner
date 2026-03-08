@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Models\User;
+use App\Services\ExternalAPI\UmapyoiApiClient;
 use Illuminate\Support\Facades\Cache;
 
 describe('External Data Browse Performance', function () {
@@ -10,8 +12,38 @@ describe('External Data Browse Performance', function () {
         Cache::flush();
 
         // Create and authenticate a test user
-        $this->user = \App\Models\User::factory()->create();
+        $this->user = User::factory()->create();
         $this->actingAs($this->user);
+
+        /** @var UmapyoiApiClient&Mockery\MockInterface $client */
+        $client = \Mockery::mock(UmapyoiApiClient::class);
+        $client->shouldReceive('getCharacters')->andReturn([
+            'success' => true,
+            'data' => [
+                ['id' => 1, 'name_en' => 'Special Week'],
+            ],
+            'source' => 'cache',
+        ]);
+        $client->shouldReceive('getSupportCards')->andReturn([
+            'success' => true,
+            'data' => [
+                ['id' => 1, 'title_en' => 'Kitasan Black [SSR]'],
+            ],
+            'source' => 'cache',
+        ]);
+        $client->shouldReceive('getNews')->andReturn([
+            'success' => true,
+            'data' => [
+                ['id' => 1, 'title' => 'News'],
+            ],
+            'source' => 'cache',
+        ]);
+
+        $this->app->instance(UmapyoiApiClient::class, $client);
+    });
+
+    afterEach(function () {
+        \Mockery::close();
     });
 
     it('loads the page within 2 seconds', function () {
@@ -66,10 +98,7 @@ describe('External Data Browse Performance', function () {
                 );
             }
         }
-    })->group('performance')->skip(
-        env('SKIP_EXTERNAL_API_TESTS', false),
-        'Skipping external API performance tests'
-    );
+    })->group('performance');
 
     it('measures database query performance', function () {
         // Enable query logging
@@ -163,8 +192,5 @@ describe('External Data Browse Performance', function () {
             30000,
             'Concurrent API requests should complete in < 30s, got '.round($totalTime, 2).'ms'
         );
-    })->group('performance')->skip(
-        env('SKIP_EXTERNAL_API_TESTS', false),
-        'Skipping external API performance tests'
-    );
+    })->group('performance');
 });

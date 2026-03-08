@@ -16,7 +16,7 @@
         'friend' => 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
     ];
 
-    $colorClass = $typeColors[strtolower($type)] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    $colorClass = $typeColors[strtolower($type)] ?? 'bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-200';
     $sizeClass = $sizeClasses[$size] ?? $sizeClasses['sm'];
 @endphp
 

@@ -6,18 +6,29 @@
     {{-- Breadcrumb Navigation --}}
     <x-breadcrumb :items="[['label' => 'Data Management', 'url' => route('data-management.index')], ['label' => 'Import Data']]" />
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8 page-stack">
         {{-- Page Header --}}
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Data Import</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">
+        <div class="page-hero">
+            <div class="page-hero__content">
+            <div>
+                <div class="page-hero__eyebrow">
+                    <span>Ingestion Pipeline</span>
+                </div>
+            <h1 class="page-hero__title">Data Import</h1>
+            <p class="page-hero__body text-sm sm:text-base">
                 Import your career data from various formats including CSV, JSON, or copy-paste text.
             </p>
         </div>
+            <div class="page-hero__meta">
+                <span class="hero-chip">Preview before commit</span>
+                <span class="hero-chip">CSV, JSON, TXT</span>
+            </div>
+            </div>
+        </div>
 
         {{-- Import Type Selection --}}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div class="filter-surface p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                 <span class="inline-flex items-center">
                     <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -28,35 +39,35 @@
                 </span>
             </h2>
 
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4" role="group" aria-label="Import type selection">
                 @foreach ($importTypes as $type => $label)
                     <button type="button"
-                        class="import-type-btn p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-primary-500 dark:hover:border-primary-400 transition-colors text-center focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                        class="import-type-btn p-4 rounded-lg border-2 border-neutral-200 dark:border-neutral-600 hover:border-primary-500 dark:hover:border-primary-400 transition-colors text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                         data-type="{{ $type }}" aria-pressed="false">
-                        <div class="text-2xl mb-2">
+                        <div class="flex justify-center mb-2" aria-hidden="true">
                             @switch($type)
                                 @case('character')
-                                    👤
+                                    <svg class="w-7 h-7 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                 @break
 
                                 @case('career')
-                                    📊
+                                    <svg class="w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                                 @break
 
                                 @case('training_session')
-                                    🏃
+                                    <svg class="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                 @break
 
                                 @case('skill')
-                                    ⚡
+                                    <svg class="w-7 h-7 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                                 @break
 
                                 @case('support_card')
-                                    🃏
+                                    <svg class="w-7 h-7 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                                 @break
                             @endswitch
                         </div>
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                        <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">{{ $label }}</span>
                     </button>
                 @endforeach
             </div>
@@ -64,8 +75,8 @@
         </div>
 
         {{-- Input Method Selection --}}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div class="filter-surface p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                 <span class="inline-flex items-center">
                     <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -76,29 +87,29 @@
             </h2>
 
             {{-- Tab Navigation --}}
-            <div class="border-b border-gray-200 dark:border-gray-700 mb-4">
-                <nav class="-mb-px flex space-x-8" aria-label="Input method tabs">
+            <div class="border-b border-neutral-200 dark:border-neutral-700 mb-4">
+                <nav class="-mb-px flex space-x-8" aria-label="Input method tabs" role="tablist">
                     <button type="button"
                         class="input-tab active border-primary-500 text-primary-600 dark:text-primary-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                        data-tab="paste" aria-selected="true">
-                        Copy & Paste
+                        id="tab-paste" data-tab="paste" role="tab" aria-selected="true" aria-controls="paste-tab" tabindex="0">
+                        Copy &amp; Paste
                     </button>
                     <button type="button"
-                        class="input-tab border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                        data-tab="file" aria-selected="false">
+                        class="input-tab border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300 dark:text-neutral-400 dark:hover:text-neutral-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                        id="tab-file" data-tab="file" role="tab" aria-selected="false" aria-controls="file-tab" tabindex="-1">
                         File Upload
                     </button>
                 </nav>
             </div>
 
             {{-- Paste Tab Content --}}
-            <div id="paste-tab" class="tab-content">
+            <div id="paste-tab" class="tab-content" role="tabpanel" aria-labelledby="tab-paste">
                 <div class="mb-4">
-                    <label for="paste-content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label for="paste-content" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                         Paste your data (CSV, JSON, or key-value format)
                     </label>
                     <textarea id="paste-content" name="content" rows="10"
-                        class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
+                        class="w-full px-4 py-3 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
                         placeholder="Paste your data here...
 
 Examples:
@@ -109,7 +120,7 @@ Key-Value: Name: Character
                 </div>
 
                 {{-- Format Detection Info --}}
-                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                <div class="flex items-center text-sm text-neutral-500 dark:text-neutral-400">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -119,37 +130,37 @@ Key-Value: Name: Character
             </div>
 
             {{-- File Upload Tab Content --}}
-            <div id="file-tab" class="tab-content hidden">
+            <div id="file-tab" class="tab-content hidden" role="tabpanel" aria-labelledby="tab-file">
                 <div
-                    class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-primary-500 dark:hover:border-primary-400 transition-colors">
+                    class="border-2 border-dashed border-neutral-300 dark:border-neutral-600 rounded-lg p-8 text-center hover:border-primary-500 dark:hover:border-primary-400 transition-colors">
                     <input type="file" id="file-input" name="file" accept=".csv,.json,.txt" class="hidden">
                     <label for="file-input" class="cursor-pointer">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
+                        <svg class="mx-auto h-12 w-12 text-neutral-400" stroke="currentColor" fill="none"
                             viewBox="0 0 48 48">
                             <path
                                 d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
                             <span class="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">Click to
                                 upload</span>
                             or drag and drop
                         </p>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                        <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-500">
                             CSV, JSON, or TXT up to 10MB
                         </p>
                     </label>
                 </div>
                 <div id="file-info" class="mt-4 hidden">
-                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-700 rounded-lg">
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor"
+                            <svg class="w-5 h-5 text-neutral-400 mr-2" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                 </path>
                             </svg>
-                            <span id="file-name" class="text-sm text-gray-700 dark:text-gray-300"></span>
+                            <span id="file-name" class="text-sm text-neutral-700 dark:text-neutral-300"></span>
                         </div>
                         <button type="button" id="clear-file" class="text-red-500 hover:text-red-700">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,9 +191,8 @@ Key-Value: Name: Character
 
         {{-- Preview Results Section --}}
         <div id="preview-section" class="hidden">
-            <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <div class="filter-surface p-6">
+                <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                     <span class="inline-flex items-center">
                         <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
@@ -196,9 +206,9 @@ Key-Value: Name: Character
 
                 {{-- Preview Summary --}}
                 <div id="preview-summary" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Total Records</div>
-                        <div id="total-records" class="text-2xl font-bold text-gray-900 dark:text-white">0</div>
+                    <div class="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4">
+                        <div class="text-sm text-neutral-500 dark:text-neutral-400">Total Records</div>
+                        <div id="total-records" class="text-2xl font-bold text-neutral-900 dark:text-white">0</div>
                     </div>
                     <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
                         <div class="text-sm text-green-600 dark:text-green-400">Valid Records</div>
@@ -237,14 +247,14 @@ Key-Value: Name: Character
 
                 {{-- Preview Table --}}
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
+                    <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
+                        <thead class="bg-neutral-50 dark:bg-neutral-700">
                             <tr id="preview-headers">
                                 {{-- Headers will be populated dynamically --}}
                             </tr>
                         </thead>
                         <tbody id="preview-body"
-                            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            class="bg-white dark:bg-neutral-800 divide-y divide-neutral-200 dark:divide-neutral-700">
                             {{-- Rows will be populated dynamically --}}
                         </tbody>
                     </table>
@@ -253,7 +263,7 @@ Key-Value: Name: Character
                 {{-- Import Button --}}
                 <div class="mt-6 flex justify-end gap-4">
                     <button type="button" id="cancel-btn"
-                        class="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 font-medium rounded-lg transition-colors">
+                        class="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-600 dark:hover:bg-neutral-500 text-neutral-700 dark:text-neutral-200 font-medium rounded-lg transition-colors">
                         Cancel
                     </button>
                     <button type="button" id="import-btn"
@@ -271,7 +281,7 @@ Key-Value: Name: Character
 
         {{-- Import Results Section --}}
         <div id="results-section" class="hidden">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
                 <div id="results-success" class="hidden">
                     <div class="text-center py-8">
                         <div
@@ -282,8 +292,8 @@ Key-Value: Name: Character
                                 </path>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Import Successful!</h3>
-                        <p id="results-message" class="text-gray-600 dark:text-gray-400"></p>
+                        <h3 class="text-lg font-medium text-neutral-900 dark:text-white mb-2">Import Successful!</h3>
+                        <p id="results-message" class="text-neutral-600 dark:text-neutral-400"></p>
                         <div class="mt-6">
                             <a href="{{ route('dashboard') }}"
                                 class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors">
@@ -302,8 +312,8 @@ Key-Value: Name: Character
                                     d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Import Failed</h3>
-                        <p id="error-message" class="text-gray-600 dark:text-gray-400 mb-4"></p>
+                        <h3 class="text-lg font-medium text-neutral-900 dark:text-white mb-2">Import Failed</h3>
+                        <p id="error-message" class="text-neutral-600 dark:text-neutral-400 mb-4"></p>
                         <ul id="error-list"
                             class="text-sm text-red-600 dark:text-red-400 text-left max-w-md mx-auto list-disc list-inside">
                         </ul>
@@ -319,8 +329,8 @@ Key-Value: Name: Character
         </div>
 
         {{-- Templates Section --}}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                 <span class="inline-flex items-center">
                     <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -332,7 +342,7 @@ Key-Value: Name: Character
             </h2>
 
             <div class="prose dark:prose-invert max-w-none">
-                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                <p class="text-neutral-600 dark:text-neutral-400 mb-4">
                     Use these templates as a starting point for your import data. Select an import type above to see
                     specific templates.
                 </p>
@@ -340,8 +350,8 @@ Key-Value: Name: Character
                 <div id="template-content" class="hidden">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">CSV Format</h4>
-                            <pre id="csv-template" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-sm overflow-x-auto"></pre>
+                            <h4 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">CSV Format</h4>
+                            <pre id="csv-template" class="bg-neutral-50 dark:bg-neutral-700 p-4 rounded-lg text-sm overflow-x-auto"></pre>
                             <button type="button"
                                 class="copy-template mt-2 text-sm text-primary-600 dark:text-primary-400 hover:underline"
                                 data-format="csv">
@@ -349,8 +359,8 @@ Key-Value: Name: Character
                             </button>
                         </div>
                         <div>
-                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">JSON Format</h4>
-                            <pre id="json-template" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-sm overflow-x-auto"></pre>
+                            <h4 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">JSON Format</h4>
+                            <pre id="json-template" class="bg-neutral-50 dark:bg-neutral-700 p-4 rounded-lg text-sm overflow-x-auto"></pre>
                             <button type="button"
                                 class="copy-template mt-2 text-sm text-primary-600 dark:text-primary-400 hover:underline"
                                 data-format="json">
@@ -360,8 +370,8 @@ Key-Value: Name: Character
                     </div>
                 </div>
 
-                <div id="template-placeholder" class="text-center py-8 text-gray-500 dark:text-gray-400">
-                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor"
+                <div id="template-placeholder" class="text-center py-8 text-neutral-500 dark:text-neutral-400">
+                    <svg class="mx-auto h-12 w-12 text-neutral-400 mb-4" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">

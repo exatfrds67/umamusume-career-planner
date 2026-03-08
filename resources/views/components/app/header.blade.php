@@ -2,14 +2,14 @@
 <div class="flex flex-1 gap-x-4 self-stretch items-center lg:gap-x-6">
     <div class="relative flex flex-1">
         <label for="search-field" class="sr-only">Search</label>
-        <svg class="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-gray-400" viewBox="0 0 20 20"
+        <svg class="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-neutral-400" viewBox="0 0 20 20"
             fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd"
                 d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z"
                 clip-rule="evenodd" />
         </svg>
         <input id="search-field"
-            class="block h-full w-full border-0 py-0 pl-8 pr-0 text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-0 bg-transparent sm:text-sm"
+            class="block h-full w-full border-0 py-0 pl-8 pr-0 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:ring-0 bg-transparent sm:text-sm"
             placeholder="Search..." type="search" name="search">
     </div>
 
@@ -19,7 +19,7 @@
         <button type="button" id="theme-toggle"
             x-data="{ isDark: document.documentElement.classList.contains('dark') }" 
             @theme-changed.window="isDark = $event.detail"
-            class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200"
+            class="-m-2.5 p-2.5 text-neutral-400 hover:text-neutral-500 dark:text-neutral-300 dark:hover:text-neutral-100 transition-colors duration-200"
             aria-label="Toggle theme" :aria-pressed="isDark.toString()" title="Toggle light/dark theme">
             <span class="sr-only">Toggle theme</span>
             <!-- Sun icon (shown in dark mode) -->
@@ -43,7 +43,7 @@
         <livewire:notification-dropdown />
 
         <!-- Separator -->
-        <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200 dark:lg:bg-gray-700" aria-hidden="true"></div>
+        <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-neutral-200 dark:lg:bg-neutral-700" aria-hidden="true"></div>
 
         <!-- Profile dropdown -->
         <div x-data="{ open: false }" class="relative z-20" 
@@ -53,11 +53,11 @@
                 @click="open = !open; if(open) $dispatch('popover-opened', 'user-menu')"
                 @click.away="open = false">
                 <span class="sr-only">Open user menu</span>
-                <img class="h-8 w-8 rounded-full bg-gray-50"
+                <img class="h-8 w-8 rounded-full bg-neutral-50"
                     src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'User') }}&background=3b82f6&color=fff"
                     loading="lazy" decoding="async" alt="{{ Auth::user()->name ?? 'User' }}">
                 <span class="hidden lg:flex lg:items-center">
-                    <span class="ml-4 text-sm font-semibold leading-6 text-gray-900 dark:text-white" aria-hidden="true">
+                    <span class="ml-4 text-sm font-semibold leading-6 text-neutral-900 dark:text-white" aria-hidden="true">
                         {{ Auth::user()->name ?? 'User' }}
                         @if (Auth::user()?->isAdmin())
                             <span
@@ -66,7 +66,7 @@
                             </span>
                         @endif
                     </span>
-                    <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <svg class="ml-2 h-5 w-5 text-neutral-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd"
                             d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
                             clip-rule="evenodd" />
@@ -80,15 +80,15 @@
                 x-transition:leave="transition ease-in duration-75"
                 x-transition:leave-start="transform opacity-100 scale-100"
                 x-transition:leave-end="transform opacity-0 scale-95"
-                class="absolute right-0 z-10 mt-2.5 w-40 origin-top-right rounded-md bg-white dark:bg-gray-800 py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-hidden"
+                class="absolute right-0 z-10 mt-2.5 w-40 origin-top-right rounded-md bg-white dark:bg-neutral-800 py-2 shadow-lg ring-1 ring-neutral-900/5 focus:outline-hidden"
                 role="menu" aria-orientation="vertical">
                 <a href="{{ route('profile.show') }}"
-                    class="block px-3 py-1 text-sm leading-6 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="block px-3 py-1 text-sm leading-6 text-neutral-900 dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-700"
                     role="menuitem">Your profile</a>
                 <form method="POST" action="{{ route('logout') }}" id="logout-form">
                     @csrf
                     <button type="submit" id="logout-btn"
-                        class="block w-full text-left px-3 py-1 text-sm leading-6 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
+                        class="block w-full text-left px-3 py-1 text-sm leading-6 text-neutral-900 dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-700"
                         role="menuitem">Sign out</button>
                 </form>
             </div>

@@ -2,16 +2,16 @@
     {{-- Header --}}
     <div class="mb-6 flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">APM Dashboard</h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Real-time application performance monitoring</p>
+            <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">APM Dashboard</h1>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Real-time application performance monitoring</p>
         </div>
         <div class="flex items-center gap-3">
             {{-- Time Range Selector --}}
-            <div role="group" aria-label="Select time range" class="flex rounded-lg border border-gray-300 dark:border-gray-600">
+            <div role="group" aria-label="Select time range" class="flex rounded-lg border border-neutral-300 dark:border-neutral-600">
                 @foreach (['1h', '6h', '24h', '7d', '30d'] as $range)
                     <button wire:click="setTimeRange('{{ $range }}')"
                         aria-pressed="{{ $timeRange === $range ? 'true' : 'false' }}"
-                        class="px-3 py-1.5 text-sm font-medium {{ $timeRange === $range ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700' }} {{ $loop->first ? 'rounded-l-lg' : '' }} {{ $loop->last ? 'rounded-r-lg' : '' }}">
+                        class="px-3 py-1.5 text-sm font-medium {{ $timeRange === $range ? 'bg-indigo-600 text-white' : 'text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-700' }} {{ $loop->first ? 'rounded-l-lg' : '' }} {{ $loop->last ? 'rounded-r-lg' : '' }}">
                         {{ $range }}
                     </button>
                 @endforeach
@@ -35,7 +35,7 @@
             'poor' => 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
             'critical' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
         ];
-        $bannerColor = $statusColors[$status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+        $bannerColor = $statusColors[$status] ?? 'bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-300';
     @endphp
     <div class="mb-6 rounded-lg {{ $bannerColor }} p-4">
         <div class="flex items-center justify-between">
@@ -58,11 +58,11 @@
                 ? (int) $overviewMetrics['total_requests']
                 : 0;
         @endphp
-        <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
+        <div class="rounded-lg bg-white p-5 shadow dark:bg-neutral-800">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Request Throughput</p>
-                    <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($throughput) }}
+                    <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Request Throughput</p>
+                    <p class="mt-1 text-2xl font-bold text-neutral-900 dark:text-white">{{ number_format($throughput) }}
                     </p>
                 </div>
                 <div class="rounded-full bg-blue-100 p-3 dark:bg-blue-900/30">
@@ -73,7 +73,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Total requests tracked</p>
+            <p class="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Total requests tracked</p>
         </div>
 
         {{-- Average Response Time --}}
@@ -94,10 +94,10 @@
                         ? 'text-yellow-600 dark:text-yellow-400'
                         : 'text-green-600 dark:text-green-400');
         @endphp
-        <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
+        <div class="rounded-lg bg-white p-5 shadow dark:bg-neutral-800">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Avg Response Time</p>
+                    <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Avg Response Time</p>
                     <p class="mt-1 text-2xl font-bold {{ $rtColor }}">{{ number_format($avgResponseTime, 0) }}ms
                     </p>
                 </div>
@@ -109,7 +109,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Threshold: warn
+            <p class="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Threshold: warn
                 >{{ number_format($rtWarning, 0) }}ms, critical >{{ number_format($rtCritical, 0) }}ms</p>
         </div>
 
@@ -131,10 +131,10 @@
                         ? 'text-yellow-600 dark:text-yellow-400'
                         : 'text-green-600 dark:text-green-400');
         @endphp
-        <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
+        <div class="rounded-lg bg-white p-5 shadow dark:bg-neutral-800">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Error Rate</p>
+                    <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Error Rate</p>
                     <p class="mt-1 text-2xl font-bold {{ $erColor }}">{{ number_format($errorRate, 2) }}%</p>
                 </div>
                 <div class="rounded-full bg-red-100 p-3 dark:bg-red-900/30">
@@ -145,7 +145,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Threshold: warn
+            <p class="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Threshold: warn
                 >{{ number_format($erWarning, 1) }}%, critical >{{ number_format($erCritical, 1) }}%</p>
         </div>
 
@@ -165,10 +165,10 @@
                         ? 'text-yellow-600 dark:text-yellow-400'
                         : 'text-green-600 dark:text-green-400');
         @endphp
-        <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
+        <div class="rounded-lg bg-white p-5 shadow dark:bg-neutral-800">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Cache Hit Rate</p>
+                    <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Cache Hit Rate</p>
                     <p class="mt-1 text-2xl font-bold {{ $chColor }}">{{ number_format($cacheHitRate, 1) }}%</p>
                 </div>
                 <div class="rounded-full bg-purple-100 p-3 dark:bg-purple-900/30">
@@ -179,7 +179,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Threshold: warn
+            <p class="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Threshold: warn
                 &lt;{{ number_format($chWarning, 0) }}%, critical &lt;{{ number_format($chCritical, 0) }}%</p>
         </div>
     </div>
@@ -187,30 +187,30 @@
     {{-- System & Database Metrics --}}
     <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {{-- System Metrics --}}
-        <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
-            <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">System Metrics</h2>
+        <div class="rounded-lg bg-white p-5 shadow dark:bg-neutral-800">
+            <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">System Metrics</h2>
             <dl class="space-y-3">
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Memory Usage</dt>
-                    <dd class="text-sm font-medium text-gray-900 dark:text-white">
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Memory Usage</dt>
+                    <dd class="text-sm font-medium text-neutral-900 dark:text-white">
                         {{ number_format(is_numeric($systemMetrics['memory_usage_percent'] ?? null) ? (float) $systemMetrics['memory_usage_percent'] : 0, 1) }}%
                     </dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Memory Used</dt>
-                    <dd class="text-sm font-medium text-gray-900 dark:text-white">
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Memory Used</dt>
+                    <dd class="text-sm font-medium text-neutral-900 dark:text-white">
                         {{ is_string($systemMetrics['memory_used'] ?? null) ? $systemMetrics['memory_used'] : 'N/A' }}
                     </dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">PHP Version</dt>
-                    <dd class="text-sm font-medium text-gray-900 dark:text-white">
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">PHP Version</dt>
+                    <dd class="text-sm font-medium text-neutral-900 dark:text-white">
                         {{ is_string($systemMetrics['php_version'] ?? null) ? $systemMetrics['php_version'] : 'N/A' }}
                     </dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Uptime</dt>
-                    <dd class="text-sm font-medium text-gray-900 dark:text-white">
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Uptime</dt>
+                    <dd class="text-sm font-medium text-neutral-900 dark:text-white">
                         {{ number_format(is_numeric($systemMetrics['uptime_hours'] ?? null) ? (float) $systemMetrics['uptime_hours'] : 0, 1) }}h
                     </dd>
                 </div>
@@ -218,30 +218,30 @@
         </div>
 
         {{-- Database Metrics --}}
-        <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
-            <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Database Metrics</h2>
+        <div class="rounded-lg bg-white p-5 shadow dark:bg-neutral-800">
+            <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Database Metrics</h2>
             <dl class="space-y-3">
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Active Connections</dt>
-                    <dd class="text-sm font-medium text-gray-900 dark:text-white">
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Active Connections</dt>
+                    <dd class="text-sm font-medium text-neutral-900 dark:text-white">
                         {{ is_numeric($databaseMetrics['active_connections'] ?? null) ? $databaseMetrics['active_connections'] : 'N/A' }}
                     </dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Slow Queries</dt>
-                    <dd class="text-sm font-medium text-gray-900 dark:text-white">
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Slow Queries</dt>
+                    <dd class="text-sm font-medium text-neutral-900 dark:text-white">
                         {{ is_numeric($databaseMetrics['slow_queries'] ?? null) ? $databaseMetrics['slow_queries'] : 0 }}
                     </dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Avg Query Time</dt>
-                    <dd class="text-sm font-medium text-gray-900 dark:text-white">
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Avg Query Time</dt>
+                    <dd class="text-sm font-medium text-neutral-900 dark:text-white">
                         {{ number_format(is_numeric($databaseMetrics['avg_query_time'] ?? null) ? (float) $databaseMetrics['avg_query_time'] : 0, 2) }}ms
                     </dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Total Queries</dt>
-                    <dd class="text-sm font-medium text-gray-900 dark:text-white">
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Total Queries</dt>
+                    <dd class="text-sm font-medium text-neutral-900 dark:text-white">
                         {{ number_format(is_numeric($databaseMetrics['total_queries'] ?? null) ? (int) $databaseMetrics['total_queries'] : 0) }}
                     </dd>
                 </div>
@@ -252,8 +252,8 @@
     {{-- Alert Statistics & Recent Alerts --}}
     <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         {{-- Alert Statistics --}}
-        <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
-            <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Alert Statistics</h2>
+        <div class="rounded-lg bg-white p-5 shadow dark:bg-neutral-800">
+            <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Alert Statistics</h2>
             @php
                 $totalAlerts = is_numeric($alertStatistics['total'] ?? null) ? (int) $alertStatistics['total'] : 0;
                 $unacknowledged = is_numeric($alertStatistics['unacknowledged'] ?? null)
@@ -263,27 +263,27 @@
             @endphp
             <dl class="space-y-3">
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Total Alerts</dt>
-                    <dd class="text-sm font-bold text-gray-900 dark:text-white">{{ $totalAlerts }}</dd>
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Total Alerts</dt>
+                    <dd class="text-sm font-bold text-neutral-900 dark:text-white">{{ $totalAlerts }}</dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Unacknowledged</dt>
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Unacknowledged</dt>
                     <dd
                         class="text-sm font-bold {{ $unacknowledged > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }}">
                         {{ $unacknowledged }}</dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Critical</dt>
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Critical</dt>
                     <dd class="text-sm font-medium text-red-600 dark:text-red-400">
                         {{ is_numeric($bySeverity['critical'] ?? null) ? $bySeverity['critical'] : 0 }}</dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Warning</dt>
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Warning</dt>
                     <dd class="text-sm font-medium text-yellow-600 dark:text-yellow-400">
                         {{ is_numeric($bySeverity['warning'] ?? null) ? $bySeverity['warning'] : 0 }}</dd>
                 </div>
                 <div class="flex justify-between">
-                    <dt class="text-sm text-gray-500 dark:text-gray-400">Info</dt>
+                    <dt class="text-sm text-neutral-500 dark:text-neutral-400">Info</dt>
                     <dd class="text-sm font-medium text-blue-600 dark:text-blue-400">
                         {{ is_numeric($bySeverity['info'] ?? null) ? $bySeverity['info'] : 0 }}</dd>
                 </div>
@@ -297,10 +297,10 @@
         </div>
 
         {{-- Recent Alerts --}}
-        <div class="rounded-lg bg-white p-5 shadow lg:col-span-2 dark:bg-gray-800">
-            <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Recent Alerts</h2>
+        <div class="rounded-lg bg-white p-5 shadow lg:col-span-2 dark:bg-neutral-800">
+            <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Recent Alerts</h2>
             @if (empty($recentAlerts))
-                <p class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">No alerts recorded</p>
+                <p class="py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">No alerts recorded</p>
             @else
                 <div class="max-h-96 space-y-2 overflow-y-auto">
                     <ul class="space-y-2" role="list">
@@ -318,14 +318,14 @@
                             };
                         @endphp
                         <li
-                            class="flex items-start gap-3 rounded-lg border p-3 {{ $isAcknowledged ? 'border-gray-200 bg-gray-50 opacity-60 dark:border-gray-700 dark:bg-gray-900/30' : 'border-gray-200 dark:border-gray-700' }}">
+                            class="flex items-start gap-3 rounded-lg border p-3 {{ $isAcknowledged ? 'border-neutral-200 bg-neutral-50 opacity-60 dark:border-neutral-700 dark:bg-neutral-900/30' : 'border-neutral-200 dark:border-neutral-700' }}">
                             <span
                                 class="mt-0.5 inline-flex shrink-0 rounded-full px-2 py-0.5 text-xs font-medium {{ $severityBadge }}">
                                 {{ ucfirst($alertSeverity) }}
                             </span>
                             <div class="min-w-0 flex-1">
-                                <p class="text-sm text-gray-900 dark:text-white">{{ $alertMessage }}</p>
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                <p class="text-sm text-neutral-900 dark:text-white">{{ $alertMessage }}</p>
+                                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
                                     {{ $alertTimestamp ? \Carbon\Carbon::parse($alertTimestamp)->diffForHumans() : '' }}
                                     @if ($isAcknowledged)
                                         <span class="ml-2 text-green-600 dark:text-green-400">&#10003; Acknowledged</span>
@@ -348,52 +348,52 @@
     </div>
 
     {{-- Configured Thresholds --}}
-    <div class="rounded-lg bg-white p-5 shadow dark:bg-gray-800">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Configured Thresholds</h2>
+    <div class="rounded-lg bg-white p-5 shadow dark:bg-neutral-800">
+        <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Configured Thresholds</h2>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <caption class="sr-only">Configured alerting thresholds</caption>
                 <thead>
-                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <th scope="col" class="pb-3 font-medium text-gray-500 dark:text-gray-400">Metric</th>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <th scope="col" class="pb-3 font-medium text-neutral-500 dark:text-neutral-400">Metric</th>
                         <th scope="col" class="pb-3 font-medium text-yellow-600 dark:text-yellow-400">Warning</th>
                         <th scope="col" class="pb-3 font-medium text-red-600 dark:text-red-400">Critical</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700">
                     <tr>
-                        <td class="py-2 text-gray-900 dark:text-white">Response Time</td>
-                        <td class="py-2 text-gray-700 dark:text-gray-300">
+                        <td class="py-2 text-neutral-900 dark:text-white">Response Time</td>
+                        <td class="py-2 text-neutral-700 dark:text-neutral-300">
                             <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['response_time_warning'] ?? null) ? (float) $thresholds['response_time_warning'] : 0, 0) }}ms
                         </td>
-                        <td class="py-2 text-gray-700 dark:text-gray-300">
+                        <td class="py-2 text-neutral-700 dark:text-neutral-300">
                             <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['response_time_critical'] ?? null) ? (float) $thresholds['response_time_critical'] : 0, 0) }}ms
                         </td>
                     </tr>
                     <tr>
-                        <td class="py-2 text-gray-900 dark:text-white">Error Rate</td>
-                        <td class="py-2 text-gray-700 dark:text-gray-300">
+                        <td class="py-2 text-neutral-900 dark:text-white">Error Rate</td>
+                        <td class="py-2 text-neutral-700 dark:text-neutral-300">
                             <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['error_rate_warning'] ?? null) ? (float) $thresholds['error_rate_warning'] : 0, 1) }}%
                         </td>
-                        <td class="py-2 text-gray-700 dark:text-gray-300">
+                        <td class="py-2 text-neutral-700 dark:text-neutral-300">
                             <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['error_rate_critical'] ?? null) ? (float) $thresholds['error_rate_critical'] : 0, 1) }}%
                         </td>
                     </tr>
                     <tr>
-                        <td class="py-2 text-gray-900 dark:text-white">Cache Hit Rate</td>
-                        <td class="py-2 text-gray-700 dark:text-gray-300">
+                        <td class="py-2 text-neutral-900 dark:text-white">Cache Hit Rate</td>
+                        <td class="py-2 text-neutral-700 dark:text-neutral-300">
                             <span class="sr-only">less than </span>&lt;{{ number_format(is_numeric($thresholds['cache_hit_warning'] ?? null) ? (float) $thresholds['cache_hit_warning'] : 0, 0) }}%
                         </td>
-                        <td class="py-2 text-gray-700 dark:text-gray-300">
+                        <td class="py-2 text-neutral-700 dark:text-neutral-300">
                             <span class="sr-only">less than </span>&lt;{{ number_format(is_numeric($thresholds['cache_hit_critical'] ?? null) ? (float) $thresholds['cache_hit_critical'] : 0, 0) }}%
                         </td>
                     </tr>
                     <tr>
-                        <td class="py-2 text-gray-900 dark:text-white">Memory Usage</td>
-                        <td class="py-2 text-gray-700 dark:text-gray-300">
+                        <td class="py-2 text-neutral-900 dark:text-white">Memory Usage</td>
+                        <td class="py-2 text-neutral-700 dark:text-neutral-300">
                             <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['memory_warning'] ?? null) ? (float) $thresholds['memory_warning'] : 0, 0) }}%
                         </td>
-                        <td class="py-2 text-gray-700 dark:text-gray-300">
+                        <td class="py-2 text-neutral-700 dark:text-neutral-300">
                             <span class="sr-only">greater than </span>&gt;{{ number_format(is_numeric($thresholds['memory_critical'] ?? null) ? (float) $thresholds['memory_critical'] : 0, 0) }}%
                         </td>
                     </tr>

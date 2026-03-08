@@ -8,6 +8,7 @@ use App\Services\AI\HybridAIService;
 use App\Services\AI\RecommendationParser;
 use App\Services\Neuron\NeuronAIService;
 use App\ValueObjects\Recommendation;
+use Illuminate\Support\Facades\Config;
 
 describe('NeuronAIService', function () {
     beforeEach(function () {

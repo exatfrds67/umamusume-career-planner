@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "text-blue-600",
                     "dark:text-blue-400",
                 );
-                b.classList.add("border-transparent", "text-gray-500");
+                b.classList.add("border-transparent", "text-neutral-500");
             });
             this.classList.add(
                 "active",
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "text-blue-600",
                 "dark:text-blue-400",
             );
-            this.classList.remove("border-transparent", "text-gray-500");
+            this.classList.remove("border-transparent", "text-neutral-500");
 
             // Show/hide content
             document.querySelectorAll(".tab-content").forEach((content) => {
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
                         <p class="text-green-800 dark:text-green-200">Successfully converted ${data.data.statistics?.converted_records || 0} records</p>
                     </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                    <div class="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4">
                         <h4 class="font-medium mb-2">Converted Data:</h4>
                         <pre class="text-sm overflow-auto max-h-96">${JSON.stringify(data.data.converted_data, null, 2)}</pre>
                     </div>

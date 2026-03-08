@@ -189,11 +189,11 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation
     
     {{-- Filter Panel (Collapsible) --}}
     @if($showFilters)
-        <div x-ref="filterPanel" class="hidden border-t border-gray-200 dark:border-gray-700 pt-4">
+        <div x-ref="filterPanel" class="hidden border-t border-neutral-200 dark:border-neutral-700 pt-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {{-- Skill Type Filters --}}
                 <div class="flex flex-col gap-2">
-                    <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <label class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
                         Skill Type
                     </label>
                     <div class="flex flex-wrap gap-2">
@@ -201,7 +201,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation
                             <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-colors"
                                 :class="filters.type.includes('{{ $type }}') 
                                     ? 'bg-primary-50 border-primary-500 text-primary-700 dark:bg-primary-900/20 dark:border-primary-600 dark:text-primary-300' 
-                                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'"
+                                    : 'bg-white border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700'"
                             >
                                 <input 
                                     type="checkbox" 
@@ -217,7 +217,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation
                 
                 {{-- Tier Filters --}}
                 <div class="flex flex-col gap-2">
-                    <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <label class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
                         Tier
                     </label>
                     <div class="flex flex-wrap gap-2">
@@ -225,7 +225,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation
                             <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-colors"
                                 :class="filters.tier.includes('{{ $tier }}') 
                                     ? 'bg-primary-50 border-primary-500 text-primary-700 dark:bg-primary-900/20 dark:border-primary-600 dark:text-primary-300' 
-                                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'"
+                                    : 'bg-white border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700'"
                             >
                                 <input 
                                     type="checkbox" 
@@ -241,13 +241,13 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation
                 
                 {{-- SP Cost Range --}}
                 <div class="flex flex-col gap-2">
-                    <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <label class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
                         SP Cost
                     </label>
                     <select 
                         x-model="filters.spCost"
                         @change="applyFilters()"
-                        class="form-select rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                        class="form-select rounded-lg border-neutral-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
                     >
                         <option value="all">All Costs</option>
                         <option value="low">Low (0-100)</option>
@@ -293,7 +293,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation
     @endif
     
     {{-- Results Summary --}}
-    <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+    <div class="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400">
         <p>
             <span class="font-semibold" x-text="filteredSkills.length"></span>
             <span x-text="filteredSkills.length === 1 ? 'skill' : 'skills'"></span>
@@ -320,7 +320,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation
             <div 
                 class="skill-item p-4 rounded-lg border transition-all"
                 :class="{
-                    'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md': !selectedSkills.includes(skill.id),
+                    'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:shadow-md': !selectedSkills.includes(skill.id),
                     'border-primary-500 bg-primary-50 dark:bg-primary-900/20': selectedSkills.includes(skill.id) && {{ $selectable ? 'true' : 'false' }}
                 }"
                 @if($selectable)
@@ -334,26 +334,26 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation
                 <div class="flex items-start justify-between gap-4">
                     <div class="flex-1">
                         <div class="flex items-center gap-3 mb-2">
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100" x-text="skill.name"></h3>
+                            <h3 class="text-lg font-bold text-neutral-900 dark:text-neutral-100" x-text="skill.name"></h3>
                             <span 
                                 class="px-2 py-0.5 text-xs font-bold rounded uppercase"
                                 :class="{
                                     'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300': skill.tier === 'S',
                                     'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300': skill.tier === 'A',
                                     'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300': skill.tier === 'B',
-                                    'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300': skill.tier === 'C'
+                                    'bg-neutral-100 text-neutral-800 dark:bg-neutral-900/30 dark:text-neutral-300': skill.tier === 'C'
                                 }"
                                 x-text="skill.tier"
                             ></span>
                         </div>
                         
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3" x-text="skill.description"></p>
+                        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-3" x-text="skill.description"></p>
                         
                         <div class="flex flex-wrap gap-3 text-xs">
-                            <span class="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                            <span class="inline-flex items-center gap-1 text-neutral-500 dark:text-neutral-400">
                                 <span class="font-semibold capitalize" x-text="skill.type"></span>
                             </span>
-                            <span class="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                            <span class="inline-flex items-center gap-1 text-neutral-500 dark:text-neutral-400">
                                 <span class="font-semibold">SP:</span>
                                 <span x-text="skill.sp_cost"></span>
                             </span>
@@ -366,7 +366,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation
                                 class="w-6 h-6 rounded border-2 flex items-center justify-center transition-all"
                                 :class="selectedSkills.includes(skill.id) 
                                     ? 'border-primary-500 bg-primary-500' 
-                                    : 'border-gray-300 dark:border-gray-600'"
+                                    : 'border-neutral-300 dark:border-neutral-600'"
                             >
                                 <svg 
                                     x-show="selectedSkills.includes(skill.id)"
@@ -390,13 +390,13 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation
         x-show="filteredSkills.length === 0"
         class="text-center py-12"
     >
-        <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="mx-auto h-12 w-12 text-neutral-400 dark:text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
         </svg>
-        <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">
+        <h3 class="mt-4 text-lg font-medium text-neutral-900 dark:text-neutral-100">
             No skills found
         </h3>
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
             Try adjusting your search or filters
         </p>
         <button 

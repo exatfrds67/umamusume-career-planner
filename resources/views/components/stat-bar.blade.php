@@ -11,14 +11,13 @@
     'size',
 ])
 
-<div {{ $attributes->merge(['class' => 'stat-bar-container']) }}>
+<div {{ $attributes->merge(['class' => 'stat-bar-container']) }} style="{{ $getStatStyle() }}">
     {{-- Label and Value --}}
     @if ($showLabel)
         <div class="flex items-center justify-between mb-2">
             <div class="flex items-center gap-2">
                 @if ($showIcon)
-                    <div
-                        class="stat-icon-{{ $getStatColor() }} w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                    <div class="stat-bar-icon w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold">
                         {{ strtoupper(substr($getStatLabel(), 0, 1)) }}
                     </div>
                 @endif
@@ -59,16 +58,15 @@
 
         {{-- Target Indicator --}}
         @if ($getTargetPercentage() !== null)
-            <div class="absolute top-0 bottom-0 w-0.5 bg-{{ $getStatColor() }}-600 dark:bg-{{ $getStatColor() }}-400 z-10 opacity-50"
+            <div class="stat-bar-target-indicator absolute top-0 bottom-0 w-0.5 z-10 opacity-50"
                 style="left: {{ $getTargetPercentage() }}%" title="Target: {{ number_format($target) }}">
-                <div
-                    class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-{{ $getStatColor() }}-600 dark:bg-{{ $getStatColor() }}-400 rounded-full opacity-50">
+                <div class="stat-bar-target-dot absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full opacity-50">
                 </div>
             </div>
         @endif
 
         {{-- Progress Fill --}}
-        <div class="h-full bg-linear-to-r from-{{ $getStatColor() }}-400 to-{{ $getStatColor() }}-500 rounded-full transition-all duration-300 ease-out relative overflow-hidden"
+        <div class="stat-bar-fill h-full rounded-full transition-all duration-300 ease-out relative overflow-hidden"
             style="width: {{ min(100, $getPercentage()) }}%">
             {{-- Shine effect --}}
             <div class="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent animate-shimmer">
@@ -76,7 +74,7 @@
 
             {{-- Above soft cap indicator (different color) --}}
             @if ($isAboveSoftCap())
-                <div class="absolute top-0 right-0 bottom-0 bg-{{ $getStatColor() }}-600/50 dark:bg-{{ $getStatColor() }}-700/50"
+                <div class="stat-bar-overcap absolute top-0 right-0 bottom-0"
                     style="width: {{ (($current - 1200) / $current) * 100 }}%"
                     title="Diminishing returns (50% effectiveness)"></div>
             @endif
@@ -85,8 +83,7 @@
 
     {{-- Factor Bonus Indicator --}}
     @if ($factorBonus && $factorBonus > 0)
-        <div
-            class="mt-1 flex items-center gap-1 text-xs text-{{ $getStatColor() }}-600 dark:text-{{ $getStatColor() }}-400">
+        <div class="stat-factor-bonus mt-1 flex items-center gap-1 text-xs">
             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path
                     d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
@@ -97,7 +94,5 @@
 </div>
 
 @once
-    @push('styles')
-        @vite(['resources/css/components/stat-bar.css'])
-    @endpush
+    {{-- Styles are imported globally via resources/css/app.css --}}
 @endonce

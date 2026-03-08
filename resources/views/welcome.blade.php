@@ -30,17 +30,17 @@
                                 height="96" loading="eager" fetchpriority="high" decoding="async">
 
                             <h1 id="hero-heading"
-                                class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300 animate-fade-in-delay-2">
+                                class="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white mb-2 transition-colors duration-300 animate-fade-in-delay-2">
                                 Umamusume<br>Career Planner
                             </h1>
 
                             <p
-                                class="text-lg sm:text-xl text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300 animate-fade-in-delay-2">
+                                class="text-lg sm:text-xl text-neutral-700 dark:text-neutral-300 mb-2 transition-colors duration-300 animate-fade-in-delay-2">
                                 Advanced Optimization for Umamusume Pretty Derby
                             </p>
 
                             <p
-                                class="text-sm sm:text-base text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-6 animate-fade-in-delay-2">
+                                class="text-sm sm:text-base text-neutral-700 dark:text-neutral-300 max-w-2xl mx-auto mb-6 animate-fade-in-delay-2">
                                 Leverage modern web technologies, machine learning, and community integration to reach
                                 S-rank aptitudes and achieve Grade 1 victories in both URA Finale and Unity Cup scenarios
                             </p>
@@ -48,7 +48,7 @@
                             {{-- Primary CTA Button --}}
                             @auth
                                 <a href="{{ route('dashboard') }}"
-                                    class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
+                                    class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
                                     aria-label="Go to your dashboard">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                         aria-hidden="true">
@@ -60,7 +60,7 @@
                             @else
                                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
                                     <a href="{{ route('login') }}"
-                                        class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
+                                        class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
                                         aria-label="Sign in to your account">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                             aria-hidden="true">
@@ -70,7 +70,7 @@
                                         Sign In
                                     </a>
                                     <a href="{{ route('register') }}"
-                                        class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-primary-700 bg-white hover:bg-gray-50 active:bg-gray-100 dark:bg-gray-800 dark:text-primary-300 dark:hover:bg-gray-700 dark:active:bg-gray-600 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
+                                        class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-primary-700 bg-white hover:bg-neutral-50 active:bg-neutral-100 dark:bg-neutral-800 dark:text-primary-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
                                         aria-label="Create a new account">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                             aria-hidden="true">
@@ -93,8 +93,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
-                                <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-1">Training</h3>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">Turn-by-turn AI predictions</p>
+                                <h3 class="text-xs font-semibold text-neutral-900 dark:text-white mb-1">Training</h3>
+                                <p class="text-xs text-neutral-700 dark:text-neutral-300">Turn-by-turn AI predictions</p>
                             </div>
 
                             {{-- Race Strategy --}}
@@ -104,8 +104,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
-                                <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-1">Race Strategy</h3>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">Readiness & running style scoring</p>
+                                <h3 class="text-xs font-semibold text-neutral-900 dark:text-white mb-1">Race Strategy</h3>
+                                <p class="text-xs text-neutral-700 dark:text-neutral-300">Readiness & running style scoring</p>
                             </div>
 
                             {{-- Skill Management --}}
@@ -115,8 +115,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-1">Skills</h3>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">SP optimization</p>
+                                <h3 class="text-xs font-semibold text-neutral-900 dark:text-white mb-1">Skills</h3>
+                                <p class="text-xs text-neutral-700 dark:text-neutral-300">SP optimization</p>
                             </div>
 
                             {{-- AI Advisory --}}
@@ -126,8 +126,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                                 </svg>
-                                <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-1">AI Advisory</h3>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">Hybrid AI system</p>
+                                <h3 class="text-xs font-semibold text-neutral-900 dark:text-white mb-1">AI Advisory</h3>
+                                <p class="text-xs text-neutral-700 dark:text-neutral-300">Hybrid AI system</p>
                             </div>
 
                             {{-- Support Deck Builder --}}
@@ -137,8 +137,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
-                                <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-1">Support Deck</h3>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">6-card optimizer</p>
+                                <h3 class="text-xs font-semibold text-neutral-900 dark:text-white mb-1">Support Deck</h3>
+                                <p class="text-xs text-neutral-700 dark:text-neutral-300">6-card optimizer</p>
                             </div>
 
                             {{-- Career Tracking --}}
@@ -148,8 +148,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
-                                <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-1">Career Tracking</h3>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">60-70 turn analysis</p>
+                                <h3 class="text-xs font-semibold text-neutral-900 dark:text-white mb-1">Career Tracking</h3>
+                                <p class="text-xs text-neutral-700 dark:text-neutral-300">72-turn career analysis</p>
                             </div>
 
                             {{-- Privacy First --}}
@@ -159,8 +159,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
-                                <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-1">Privacy First</h3>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">Local storage</p>
+                                <h3 class="text-xs font-semibold text-neutral-900 dark:text-white mb-1">Privacy First</h3>
+                                <p class="text-xs text-neutral-700 dark:text-neutral-300">Local storage</p>
                             </div>
 
                             {{-- Modern Tech Stack --}}
@@ -170,14 +170,14 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                                 </svg>
-                                <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-1">Modern Tech</h3>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">Laravel 12 + AI</p>
+                                <h3 class="text-xs font-semibold text-neutral-900 dark:text-white mb-1">Modern Tech</h3>
+                                <p class="text-xs text-neutral-700 dark:text-neutral-300">Laravel 12 + AI</p>
                             </div>
                         </div>
 
                         {{-- Technology Highlights --}}
                         <div class="mb-6 p-3 glass-card-inner rounded-lg animate-fade-in-delay-4">
-                            <p class="text-xs text-center text-gray-700 dark:text-gray-300">
+                            <p class="text-xs text-center text-neutral-700 dark:text-neutral-300">
                                 <span class="font-semibold">Built with:</span> Laravel 12 • Tailwind CSS v4 • Hybrid AI
                                 (Ollama + AWS Bedrock) • Redis • PWA
                             </p>
@@ -187,7 +187,7 @@
                         <div
                             class="flex flex-col sm:flex-row items-center justify-center gap-4 text-center animate-fade-in-delay-4">
                             <a href="{{ route('about') }}"
-                                class="inline-flex items-center min-h-11 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
+                                class="inline-flex items-center min-h-11 text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-800 rounded px-2"
                                 aria-label="Learn more about Umamusume Career Planner">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     aria-hidden="true">
@@ -198,7 +198,7 @@
                             </a>
                             <a href="https://github.com/exatfrds67/umamusume-career-planner" target="_blank"
                                 rel="noopener noreferrer"
-                                class="inline-flex items-center min-h-11 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
+                                class="inline-flex items-center min-h-11 text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-800 rounded px-2"
                                 aria-label="View on GitHub (opens in new tab)">
                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path fill-rule="evenodd"
@@ -209,7 +209,7 @@
                             </a>
                             @if (app()->environment('local', 'development'))
                                 <a href="{{ route('dev.demos') }}"
-                                    class="inline-flex items-center min-h-11 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
+                                    class="inline-flex items-center min-h-11 text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2 dark:focus:ring-offset-neutral-800 rounded px-2"
                                     aria-label="Developer demos and testing tools">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                         aria-hidden="true">
@@ -239,14 +239,14 @@
                     <div class="glass-card-alt rounded-xl p-8 animate-fade-in-delay-5"
                         role="region" aria-labelledby="scenario-support-heading">
                         <h2 id="scenario-support-heading"
-                            class="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">Comprehensive
+                            class="text-2xl font-bold text-neutral-900 dark:text-white text-center mb-6">Comprehensive
                             Scenario
                             Support</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="glass-card-inner rounded-lg p-6">
                                 <h3 class="text-lg font-semibold text-primary-700 dark:text-primary-400 mb-3">URA Finale
                                 </h3>
-                                <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                                <ul class="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
                                     <li class="flex items-start gap-2">
                                         <svg class="w-5 h-5 text-success-600 dark:text-success-300 shrink-0 mt-0.5"
                                             fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -284,7 +284,7 @@
                             <div class="glass-card-inner rounded-lg p-6">
                                 <h3 class="text-lg font-semibold text-secondary-700 dark:text-secondary-400 mb-3">Unity Cup
                                 </h3>
-                                <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                                <ul class="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
                                     <li class="flex items-start gap-2">
                                         <svg class="w-5 h-5 text-success-600 dark:text-success-300 shrink-0 mt-0.5"
                                             fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -324,7 +324,7 @@
 
                     {{-- BOTTOM: Advanced Game Mechanics --}}
                     <div class="glass-card-alt rounded-xl p-8 animate-fade-in-delay-5">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">Advanced Game
+                        <h2 class="text-2xl font-bold text-neutral-900 dark:text-white text-center mb-6">Advanced Game
                             Mechanics
                         </h2>
                         <div class="grid grid-cols-2 gap-4">
@@ -332,8 +332,8 @@
                                 <svg class="w-8 h-8 mx-auto mb-2 text-primary-600 dark:text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                                 </svg>
-                                <div class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Skill Evolution</div>
-                                <div class="text-xs text-gray-700 dark:text-gray-300">Track evolution chains and upgrade
+                                <div class="text-sm font-semibold text-neutral-900 dark:text-white mb-1">Skill Evolution</div>
+                                <div class="text-xs text-neutral-700 dark:text-neutral-300">Track evolution chains and upgrade
                                     paths
                                 </div>
                             </div>
@@ -341,26 +341,26 @@
                                 <svg class="w-8 h-8 mx-auto mb-2 text-secondary-600 dark:text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                 </svg>
-                                <div class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Hint Optimization
+                                <div class="text-sm font-semibold text-neutral-900 dark:text-white mb-1">Hint Optimization
                                 </div>
-                                <div class="text-xs text-gray-700 dark:text-gray-300">5-level system, up to 40% SP cost reduction
+                                <div class="text-xs text-neutral-700 dark:text-neutral-300">5-level system, up to 40% SP cost reduction
                                 </div>
                             </div>
                             <div class="text-center p-4 glass-card-inner rounded-lg">
                                 <svg class="w-8 h-8 mx-auto mb-2 text-sky-500 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
                                 </svg>
-                                <div class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Weather System</div>
-                                <div class="text-xs text-gray-700 dark:text-gray-300">Condition-based performance
+                                <div class="text-sm font-semibold text-neutral-900 dark:text-white mb-1">Weather System</div>
+                                <div class="text-xs text-neutral-700 dark:text-neutral-300">Condition-based performance
                                     optimization
                                 </div>
                             </div>
                             <div class="text-center p-4 glass-card-inner rounded-lg">
-                                <svg class="w-8 h-8 mx-auto mb-2 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <svg class="w-8 h-8 mx-auto mb-2 text-neutral-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <div class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Turn Economy</div>
-                                <div class="text-xs text-gray-700 dark:text-gray-300">Optimize 60-70 turn career
+                                <div class="text-sm font-semibold text-neutral-900 dark:text-white mb-1">Turn Economy</div>
+                                <div class="text-xs text-neutral-700 dark:text-neutral-300">Optimize 60-70 turn career
                                     progression
                                 </div>
                             </div>
@@ -374,7 +374,7 @@
     {{-- Theme toggle button (Requirements 13.1, 13.2) --}}
     <div class="fixed bottom-4 right-4 z-40" x-data="{ isDark: document.documentElement.classList.contains('dark') }" @theme-changed.window="isDark = $event.detail">
         <button type="button" id="theme-toggle"
-            class="inline-flex items-center justify-center min-h-11 min-w-11 p-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+            class="inline-flex items-center justify-center min-h-11 min-w-11 p-3 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-hidden focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
             aria-label="Toggle theme" :aria-pressed="isDark.toString()">
             <svg class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 aria-hidden="true">

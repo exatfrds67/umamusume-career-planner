@@ -1,15 +1,15 @@
-<div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+<div class="bg-white dark:bg-neutral-800 shadow rounded-lg">
     <div class="px-4 py-5 sm:p-6">
-        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Application Preferences</h2>
+        <h2 class="text-lg font-medium text-neutral-900 dark:text-white mb-4">Application Preferences</h2>
 
         <div class="space-y-6">
             <!-- Theme -->
             <div>
-                <label for="theme" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label for="theme" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     Theme
                 </label>
                 <select name="preferences[theme]" id="theme"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                     <option value="light"
                         {{ old('preferences.theme', $user->preferences['theme'] ?? 'auto') === 'light' ? 'selected' : '' }}>
                         Light</option>
@@ -24,11 +24,11 @@
 
             <!-- Language -->
             <div>
-                <label for="language" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label for="language" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     Language
                 </label>
                 <select name="preferences[language]" id="language"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                     <option value="en"
                         {{ old('preferences.language', $user->preferences['language'] ?? 'en') === 'en' ? 'selected' : '' }}>
                         English</option>
@@ -40,11 +40,11 @@
 
             <!-- Timezone -->
             <div>
-                <label for="timezone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label for="timezone" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     Timezone
                 </label>
                 <select name="preferences[timezone]" id="timezone"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                     <option value="UTC"
                         {{ old('preferences.timezone', $user->preferences['timezone'] ?? 'UTC') === 'UTC' ? 'selected' : '' }}>
                         UTC</option>
@@ -77,11 +77,11 @@
 
             <!-- Time Format -->
             <div>
-                <label for="time_format" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label for="time_format" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     Time Format
                 </label>
                 <select name="preferences[time_format]" id="time_format"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                     <option value="12h"
                         {{ old('preferences.time_format', $user->preferences['time_format'] ?? '12h') === '12h' ? 'selected' : '' }}>
                         12-hour (2:30 PM)</option>
@@ -92,51 +92,51 @@
             </div>
 
             <!-- Accessibility Settings -->
-            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h3 class="text-base font-medium text-gray-900 dark:text-white mb-4">Accessibility</h3>
+            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                <h3 class="text-base font-medium text-neutral-900 dark:text-white mb-4">Accessibility</h3>
 
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <div>
-                            <label for="high_contrast" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="high_contrast" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                 High Contrast Mode
                             </label>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Increase contrast for better visibility
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Increase contrast for better visibility
                             </p>
                         </div>
                         <input type="hidden" name="accessibility_settings[high_contrast]" value="0">
                         <input type="checkbox" name="accessibility_settings[high_contrast]" id="high_contrast"
                             value="1"
                             {{ old('accessibility_settings.high_contrast', $user->accessibility_settings['high_contrast'] ?? false) ? 'checked' : '' }}
-                            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                            class="h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500">
                     </div>
 
                     <div class="flex items-center justify-between">
                         <div>
-                            <label for="large_text" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="large_text" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                 Large Text
                             </label>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Increase font size throughout the app
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Increase font size throughout the app
                             </p>
                         </div>
                         <input type="hidden" name="accessibility_settings[large_text]" value="0">
                         <input type="checkbox" name="accessibility_settings[large_text]" id="large_text" value="1"
                             {{ old('accessibility_settings.large_text', $user->accessibility_settings['large_text'] ?? false) ? 'checked' : '' }}
-                            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                            class="h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500">
                     </div>
 
                     <div class="flex items-center justify-between">
                         <div>
-                            <label for="reduce_motion" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="reduce_motion" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                 Reduce Motion
                             </label>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Minimize animations and transitions</p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Minimize animations and transitions</p>
                         </div>
                         <input type="hidden" name="accessibility_settings[reduce_motion]" value="0">
                         <input type="checkbox" name="accessibility_settings[reduce_motion]" id="reduce_motion"
                             value="1"
                             {{ old('accessibility_settings.reduce_motion', $user->accessibility_settings['reduce_motion'] ?? false) ? 'checked' : '' }}
-                            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                            class="h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500">
                     </div>
                 </div>
             </div>

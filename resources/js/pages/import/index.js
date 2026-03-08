@@ -58,10 +58,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     "text-primary-600",
                     "dark:text-primary-400",
                 );
-                t.classList.add("border-transparent", "text-gray-500");
+                t.classList.add("border-transparent", "text-neutral-500");
                 t.setAttribute("aria-selected", "false");
             });
-            this.classList.remove("border-transparent", "text-gray-500");
+            this.classList.remove("border-transparent", "text-neutral-500");
             this.classList.add(
                 "border-primary-500",
                 "text-primary-600",

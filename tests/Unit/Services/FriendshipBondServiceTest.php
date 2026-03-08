@@ -152,7 +152,7 @@ it('calculates training bonus with friendship multipliers', function () use (&$s
         'character_id' => $character->id,
         'support_card_id' => $supportCard->id,
         'position_slot' => 4,
-        'friendship_level' => 70, // Below threshold
+        'friendship_level' => 70, // Below threshold — only 2 rainbow, not enough for activation
         'limit_break_level' => 0,
         'is_friend_card' => false,
     ]);
@@ -162,12 +162,113 @@ it('calculates training bonus with friendship multipliers', function () use (&$s
         10
     );
 
+    // Only 2 rainbow cards — friendship training requires 3, so not activated
     expect($result['base_bonus'])->toBe(10)
-        ->and($result['friendship_bonus'])->toBe(2) // 2 participants at 80%+
-        ->and($result['total_bonus'])->toBe(12)
+        ->and($result['friendship_bonus'])->toBe(0)
+        ->and($result['total_bonus'])->toBe(10)
         ->and($result['rainbow_count'])->toBe(2)
-        ->and($result['is_rainbow_training'])->toBeTrue()
+        ->and($result['is_rainbow_training'])->toBeFalse()
+        ->and($result['friendship_multiplier'])->toBe(1.0)
         ->and($result['rainbow_participants'])->toHaveCount(2);
+});
+
+it('activates friendship training with 3 or more rainbow cards', function () use (&$service, &$character, &$supportCard) {
+    $card1 = CharacterSupportCard::create([
+        'character_id' => $character->id,
+        'support_card_id' => $supportCard->id,
+        'position_slot' => 2,
+        'friendship_level' => 85,
+        'limit_break_level' => 0,
+        'is_friend_card' => false,
+    ]);
+
+    $card2 = CharacterSupportCard::create([
+        'character_id' => $character->id,
+        'support_card_id' => $supportCard->id,
+        'position_slot' => 3,
+        'friendship_level' => 90,
+        'limit_break_level' => 0,
+        'is_friend_card' => false,
+    ]);
+
+    $card3 = CharacterSupportCard::create([
+        'character_id' => $character->id,
+        'support_card_id' => $supportCard->id,
+        'position_slot' => 4,
+        'friendship_level' => 80, // At threshold — now 3 rainbow cards
+        'limit_break_level' => 0,
+        'is_friend_card' => false,
+    ]);
+
+    $result = $service->calculateTrainingBonusWithFriendship(
+        [$card1->id, $card2->id, $card3->id],
+        10
+    );
+
+    // 3 rainbow cards — friendship training activates: 20% bonus on base 10 = +2 bonus
+    expect($result['is_rainbow_training'])->toBeTrue()
+        ->and($result['friendship_multiplier'])->toBe(1.2)
+        ->and($result['rainbow_count'])->toBe(3)
+        ->and($result['friendship_bonus'])->toBe(2) // round(10 * (1.2 - 1.0)) = 2
+        ->and($result['total_bonus'])->toBe(12);
+});
+
+it('calculates bond points gained per training session', function () use (&$service) {
+    // Base: +5 pts per training session
+    expect($service->calculateBondPointsGained())->toBe(5);
+
+    // With Charm status active: +7 pts (+5 base +2 Charm bonus)
+    expect($service->calculateBondPointsGained(charmActive: true))->toBe(7);
+});
+
+it('reports deck friendship training inactive with fewer than 3 rainbow cards', function () use (&$service, &$character, &$supportCard) {
+    CharacterSupportCard::create([
+        'character_id' => $character->id,
+        'support_card_id' => $supportCard->id,
+        'position_slot' => 2,
+        'friendship_level' => 85,
+        'limit_break_level' => 0,
+        'is_friend_card' => false,
+    ]);
+
+    CharacterSupportCard::create([
+        'character_id' => $character->id,
+        'support_card_id' => $supportCard->id,
+        'position_slot' => 3,
+        'friendship_level' => 90,
+        'limit_break_level' => 0,
+        'is_friend_card' => false,
+    ]);
+
+    // Only 2 cards at bond >= 80 — threshold not met
+    expect($service->isDeckFriendshipTrainingActive($character->id))->toBeFalse();
+});
+
+it('reports deck friendship training active with 3 or more rainbow cards', function () use (&$service, &$character, &$supportCard, &$characterSupportCard) {
+    // The beforeEach card is at friendship_level=0, raise it to 80+
+    $characterSupportCard->friendship_level = 80;
+    $characterSupportCard->save();
+
+    CharacterSupportCard::create([
+        'character_id' => $character->id,
+        'support_card_id' => $supportCard->id,
+        'position_slot' => 2,
+        'friendship_level' => 85,
+        'limit_break_level' => 0,
+        'is_friend_card' => false,
+    ]);
+
+    CharacterSupportCard::create([
+        'character_id' => $character->id,
+        'support_card_id' => $supportCard->id,
+        'position_slot' => 3,
+        'friendship_level' => 90,
+        'limit_break_level' => 0,
+        'is_friend_card' => false,
+    ]);
+
+    // 3 cards at bond >= 80 — threshold met
+    expect($service->isDeckFriendshipTrainingActive($character->id))->toBeTrue();
 });
 
 it('calculates skill hint provision rate based on bond level', function () use (&$service) {

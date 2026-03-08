@@ -2,10 +2,10 @@
 
 <div x-data="teamMemberSelector({{ $characterId }}, {{ $maxTeammates }})" class="glass-card rounded-xl p-6">
     <div class="mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-2 transition-colors duration-300">
             Team Member Selection
         </h3>
-        <p class="text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">
+        <p class="text-sm text-neutral-700 dark:text-neutral-300 transition-colors duration-300">
             Select teammates for training (2 participants = +2 bonus, 3 participants = +3 bonus)
         </p>
     </div>
@@ -13,7 +13,7 @@
     <!-- Selected Teammates Display -->
     <div class="mb-4">
         <div class="flex items-center gap-2 mb-2">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
+            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300 transition-colors duration-300">
                 Selected: <span x-text="selectedTeammates.length"></span>/{{ $maxTeammates }}
             </span>
             <template x-if="selectedTeammates.length >= 2">
@@ -39,8 +39,8 @@
                             <span class="text-lg" x-text="teammate.icon || '👤'"></span>
                         </div>
                         <div>
-                            <div class="text-sm font-medium text-gray-900 dark:text-white" x-text="teammate.name"></div>
-                            <div class="text-xs text-gray-600 dark:text-gray-400" x-text="teammate.specialty"></div>
+                            <div class="text-sm font-medium text-neutral-900 dark:text-white" x-text="teammate.name"></div>
+                            <div class="text-xs text-neutral-600 dark:text-neutral-400" x-text="teammate.specialty"></div>
                         </div>
                     </div>
                     <button @click="removeTeammate(teammate.id)"
@@ -56,8 +56,8 @@
             <!-- Empty Slots -->
             <template x-for="i in ({{ $maxTeammates }} - selectedTeammates.length)" :key="'empty-' + i">
                 <div
-                    class="glass-card-inner rounded-lg p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Empty Slot</span>
+                    class="glass-card-inner rounded-lg p-3 border-2 border-dashed border-neutral-300 dark:border-neutral-600 flex items-center justify-center">
+                    <span class="text-sm text-neutral-500 dark:text-neutral-400">Empty Slot</span>
                 </div>
             </template>
         </div>
@@ -65,7 +65,7 @@
 
     <!-- Available Teammates -->
     <div>
-        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 transition-colors duration-300">
+        <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3 transition-colors duration-300">
             Available Teammates
         </h4>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
@@ -83,9 +83,9 @@
                             <span class="text-xl" x-text="teammate.icon || '👤'"></span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate"
+                            <div class="text-sm font-medium text-neutral-900 dark:text-white truncate"
                                 x-text="teammate.name"></div>
-                            <div class="text-xs text-gray-600 dark:text-gray-400 truncate" x-text="teammate.specialty">
+                            <div class="text-xs text-neutral-600 dark:text-neutral-400 truncate" x-text="teammate.specialty">
                             </div>
                             <template x-if="teammate.bond_level >= 80">
                                 <div class="flex items-center gap-1 mt-1">

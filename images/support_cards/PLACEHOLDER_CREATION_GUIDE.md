@@ -105,13 +105,13 @@ Each placeholder should include:
 
 **Placeholder.com**:
 
-```
+```text
 https://via.placeholder.com/400x600/FFD700/FFFFFF?text=SSR+Support+Card
 ```
 
 **DummyImage.com**:
 
-```
+```text
 https://dummyimage.com/400x600/ffd700/ffffff&text=SSR
 ```
 
@@ -187,7 +187,7 @@ Create placeholders programmatically:
 </div>
 </body>
 </html>
-```
+```text
 
 Then screenshot and save as PNG.
 
@@ -316,4 +316,4 @@ If you need help creating placeholders:
 
 ---
 
-**End of Guide**
+## End of Guide

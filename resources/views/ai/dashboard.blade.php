@@ -1,22 +1,28 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-            {{ __('AI Management Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
+
+@section('title', 'AI Management Dashboard')
+
+@section('content')
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[['label' => 'AI & Tools']]" />
 
     <div class="py-12" x-data="aiDashboard()">
         <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-            <!-- Summary Cards -->
+            {{-- Page Header --}}
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">AI Management Dashboard</h1>
+                <p class="mt-2 text-neutral-600 dark:text-neutral-400">Monitor AI provider performance, costs, and server health</p>
+            </div>
+
             <!-- Summary Cards -->
             <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4" aria-label="Summary Statistics">
                 <!-- Total Requests Card -->
-                <article class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-xs dark:bg-neutral-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Requests (24h)</h3>
-                                <p class="mt-2 text-3xl font-semibold text-gray-900 dark:text-white"
+                                <h3 class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Total Requests (24h)</h3>
+                                <p class="mt-2 text-3xl font-semibold text-neutral-900 dark:text-white"
                                     x-text="summary.total_requests_24h">0</p>
                             </div>
                             <div class="rounded-full bg-blue-100 p-3 dark:bg-blue-900" aria-hidden="true">
@@ -28,7 +34,7 @@
                             </div>
                         </div>
                         <div class="mt-4">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Success Rate: </span>
+                            <span class="text-sm text-neutral-600 dark:text-neutral-400">Success Rate: </span>
                             <span class="font-semibold text-green-600 dark:text-green-400"
                                 x-text="summary.success_rate + '%'">0%</span>
                         </div>
@@ -36,12 +42,12 @@
                 </article>
 
                 <!-- Average Response Time Card -->
-                <article class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-xs dark:bg-neutral-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Response Time</h3>
-                                <p class="mt-2 text-3xl font-semibold text-gray-900 dark:text-white"
+                                <h3 class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Avg Response Time</h3>
+                                <p class="mt-2 text-3xl font-semibold text-neutral-900 dark:text-white"
                                     x-text="summary.avg_response_time + 's'">0s</p>
                             </div>
                             <div class="rounded-full bg-purple-100 p-3 dark:bg-purple-900" aria-hidden="true">
@@ -56,12 +62,12 @@
                 </article>
 
                 <!-- Total Cost Card -->
-                <article class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-xs dark:bg-neutral-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Cost (24h)</h3>
-                                <p class="mt-2 text-3xl font-semibold text-gray-900 dark:text-white"
+                                <h3 class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Total Cost (24h)</h3>
+                                <p class="mt-2 text-3xl font-semibold text-neutral-900 dark:text-white"
                                     x-text="'$' + summary.total_cost_24h">$0</p>
                             </div>
                             <div class="rounded-full bg-green-100 p-3 dark:bg-green-900" aria-hidden="true">
@@ -77,12 +83,12 @@
                 </article>
 
                 <!-- Server Health Card -->
-                <article class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-xs dark:bg-neutral-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Server Health</h3>
-                                <p class="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">
+                                <h3 class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Server Health</h3>
+                                <p class="mt-2 text-3xl font-semibold text-neutral-900 dark:text-white">
                                     <span x-text="summary.healthy_servers">0</span>/<span
                                         x-text="summary.total_servers">0</span>
                                 </p>
@@ -101,25 +107,25 @@
             </section>
 
             <!-- MCP Server Status -->
-            <section class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg" aria-labelledby="mcp-server-status-title">
+            <section class="overflow-hidden bg-white shadow-xs dark:bg-neutral-800 sm:rounded-lg" aria-labelledby="mcp-server-status-title">
                 <div class="p-6">
-                    <h2 id="mcp-server-status-title" class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">MCP Server Status</h2>
+                    <h2 id="mcp-server-status-title" class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">MCP Server Status</h2>
                     <div class="space-y-4">
                         <template x-for="(server, name) in servers" :key="name">
                             <div
-                                class="flex items-center justify-between rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+                                class="flex items-center justify-between rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
                                 <div class="flex items-center space-x-4">
                                     <div class="flex h-10 w-10 items-center justify-center rounded-full"
                                         :class="{
                                             'bg-green-100 dark:bg-green-900': server.status === 'healthy',
                                             'bg-red-100 dark:bg-red-900': server.status === 'unhealthy',
-                                            'bg-gray-100 dark:bg-gray-700': server.status === 'disabled'
+                                            'bg-neutral-100 dark:bg-neutral-700': server.status === 'disabled'
                                         }">
                                         <svg class="h-6 w-6"
                                             :class="{
                                                 'text-green-600 dark:text-green-300': server.status === 'healthy',
                                                 'text-red-600 dark:text-red-300': server.status === 'unhealthy',
-                                                'text-gray-600 dark:text-gray-400': server.status === 'disabled'
+                                                'text-neutral-600 dark:text-neutral-400': server.status === 'disabled'
                                             }"
                                             fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -128,8 +134,8 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-gray-900 dark:text-white" x-text="server.name"></p>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        <p class="font-semibold text-neutral-900 dark:text-white" x-text="server.name"></p>
+                                        <p class="text-sm text-neutral-600 dark:text-neutral-400">
                                             <span x-text="server.status"></span>
                                             <span x-show="server.consecutive_failures > 0"
                                                 class="ml-2 text-red-600 dark:text-red-400">
@@ -157,43 +163,43 @@
             </section>
 
             <!-- Performance Comparison -->
-            <section class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg" aria-labelledby="performance-comparison-title">
+            <section class="overflow-hidden bg-white shadow-xs dark:bg-neutral-800 sm:rounded-lg" aria-labelledby="performance-comparison-title">
                 <div class="p-6">
-                    <h2 id="performance-comparison-title" class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">AI Provider Performance
+                    <h2 id="performance-comparison-title" class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">AI Provider Performance
                         Comparison</h2>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-900">
+                        <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
+                            <thead class="bg-neutral-50 dark:bg-neutral-900">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                                         Provider</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                                         Requests</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                                         Success Rate</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                                         Avg Response</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                                         Total Cost</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                            <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-800">
                                 <template x-for="(provider, name) in performance.providers" :key="name">
                                     <tr>
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white"
+                                        <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-neutral-900 dark:text-white"
                                             x-text="provider.name"></td>
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400"
+                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400"
                                             x-text="provider.requests_24h"></td>
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400"
+                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400"
                                             x-text="provider.success_rate + '%'"></td>
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400"
+                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400"
                                             x-text="provider.avg_response_time + 's'"></td>
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400"
+                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400"
                                             x-text="'$' + provider.total_cost"></td>
                                     </tr>
                                 </template>
@@ -204,29 +210,29 @@
             </div>
 
             <!-- Cost Summary -->
-            <section class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg" aria-labelledby="cost-summary-title">
+            <section class="overflow-hidden bg-white shadow-xs dark:bg-neutral-800 sm:rounded-lg" aria-labelledby="cost-summary-title">
                 <div class="p-6">
-                    <h2 id="cost-summary-title" class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Cost Summary</h2>
+                    <h2 id="cost-summary-title" class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Cost Summary</h2>
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                         <div>
-                            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Daily Cost</h3>
-                            <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+                            <h3 class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Daily Cost</h3>
+                            <p class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white"
                                 x-text="'$' + costs.daily_cost">$0</p>
                         </div>
                         <div>
-                            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Weekly Cost</h3>
-                            <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+                            <h3 class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Weekly Cost</h3>
+                            <p class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white"
                                 x-text="'$' + costs.weekly_cost">$0</p>
                         </div>
                         <div>
-                            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Monthly Cost</h3>
-                            <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+                            <h3 class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Monthly Cost</h3>
+                            <p class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white"
                                 x-text="'$' + costs.monthly_cost">$0</p>
                         </div>
                     </div>
                     <div class="mt-6">
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Budget Utilization</span>
+                            <span class="text-sm text-neutral-600 dark:text-neutral-400">Budget Utilization</span>
                             <span class="text-sm font-semibold"
                                 :class="{
                                     'text-green-600 dark:text-green-400': costs.budget_status?.budget_utilization < 75,
@@ -236,7 +242,7 @@
                                 }"
                                 x-text="(costs.budget_status?.budget_utilization ?? 0) + '%'">0%</span>
                         </div>
-                        <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700" role="progressbar" :aria-valuenow="costs.budget_status?.budget_utilization || 0" aria-valuemin="0" aria-valuemax="100" aria-label="Budget status">
+                        <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700" role="progressbar" :aria-valuenow="costs.budget_status?.budget_utilization || 0" aria-valuemin="0" aria-valuemax="100" aria-label="Budget status">
                             <div class="h-full transition-all duration-300"
                                 :class="{
                                     'bg-green-600': costs.budget_status?.budget_utilization < 75,
@@ -252,8 +258,5 @@
         </div>
     </div>
 
-    @push('scripts')
-        {{-- Extracted: JS logic moved to resources/js/pages/ai/dashboard.js --}}
-        @vite('resources/js/pages/ai/dashboard.js')
-    @endpush
-</x-app-layout>
+    @vite('resources/js/pages/ai/dashboard.js')
+@endsection

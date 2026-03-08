@@ -5,8 +5,8 @@
     @if ($showLabel || $showPercentage)
         <div class="flex items-center justify-between mb-1.5">
             @if ($showLabel)
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                    <svg class="w-4 h-4 {{ $isThresholdReached() ? 'text-pink-500' : 'text-gray-400' }}"
+                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 {{ $isThresholdReached() ? 'text-pink-500' : 'text-neutral-400' }}"
                         fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                             d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
@@ -28,7 +28,7 @@
     @endif
 
     {{-- Progress Bar --}}
-    <div class="relative {{ $getSizeClasses() }} bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+    <div class="relative {{ $getSizeClasses() }} bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
         {{-- Progress Fill --}}
         <div class="{{ $getProgressColorClasses() }} h-full rounded-full transition-all duration-500 ease-out relative"
             style="width: {{ $value }}%" role="progressbar" aria-valuenow="{{ $value }}" aria-valuemin="0"
@@ -43,12 +43,12 @@
 
         {{-- Threshold Marker --}}
         @if ($threshold > 0 && $threshold < 100)
-            <div class="absolute top-0 bottom-0 w-0.5 {{ $value >= $threshold ? 'bg-white/50' : 'bg-gray-400 dark:bg-gray-500' }}"
+            <div class="absolute top-0 bottom-0 w-0.5 {{ $value >= $threshold ? 'bg-white/50' : 'bg-neutral-400 dark:bg-neutral-500' }}"
                 style="left: {{ $threshold }}%" title="Skill unlock threshold: {{ $threshold }}%">
                 {{-- Threshold Label (for larger sizes) --}}
                 @if ($size === 'lg')
                     <div
-                        class="absolute -top-5 left-1/2 -translate-x-1/2 text-xs font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        class="absolute -top-5 left-1/2 -translate-x-1/2 text-xs font-medium text-neutral-600 dark:text-neutral-400 whitespace-nowrap">
                         {{ $threshold }}%
                     </div>
                 @endif
@@ -67,7 +67,7 @@
             Skills unlocked!
         </p>
     @elseif($value > 0)
-        <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+        <p class="mt-1.5 text-xs text-neutral-500 dark:text-neutral-400">
             {{ $threshold - $value }}% until skill unlock
         </p>
     @endif

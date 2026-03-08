@@ -8,7 +8,7 @@ describe('CriticalAlertBadge Component', function () {
 
         expect($html)
             ->toContain('No critical alerts')
-            ->toContain('text-gray-400')
+            ->toContain('text-neutral-400')
             ->not->toContain('critical-alert-badge');
     });
 
@@ -166,10 +166,10 @@ describe('CriticalAlertBadge Component', function () {
         $html = Blade::render('<x-ai.critical-alert-badge :alert-count="0" />');
 
         expect($html)
-            ->toContain('text-gray-400')
-            ->toContain('hover:text-gray-500')
-            ->toContain('dark:text-gray-300')
-            ->toContain('dark:hover:text-gray-100');
+            ->toContain('text-neutral-400')
+            ->toContain('hover:text-neutral-500')
+            ->toContain('dark:text-neutral-300')
+            ->toContain('dark:hover:text-neutral-100');
     });
 
     it('includes SVG alert icon', function () {
@@ -194,6 +194,6 @@ describe('CriticalAlertBadge Component', function () {
             ->toContain('font-bold')
             ->toContain('shadow-lg')
             ->toContain('ring-2 ring-white')
-            ->toContain('dark:ring-gray-800');
+            ->toContain('dark:ring-neutral-800');
     });
 });

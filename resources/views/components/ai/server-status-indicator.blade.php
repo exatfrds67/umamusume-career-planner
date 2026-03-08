@@ -4,10 +4,10 @@
 
     {{-- Refresh Button --}}
     <div class="flex items-center justify-between mb-4">
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">MCP Servers</span>
-        <button @click="refreshStatus()" class="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+        <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">MCP Servers</span>
+        <button @click="refreshStatus()" class="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded transition-colors"
             :class="{ 'animate-spin': isRefreshing }" aria-label="Refresh server status">
-            <svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor"
+            <svg class="w-4 h-4 text-neutral-600 dark:text-neutral-400" fill="none" stroke="currentColor"
                 viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -18,7 +18,7 @@
     {{-- Server List --}}
     <div class="space-y-2">
         <template x-for="server in servers" :key="server.name">
-            <div class="p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+            <div class="p-3 bg-white dark:bg-neutral-700 rounded-lg border border-neutral-200 dark:border-neutral-600">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-2">
                         {{-- Status Indicator --}}
@@ -35,12 +35,12 @@
                                     'bg-green-500': server.status === 'healthy',
                                     'bg-yellow-500': server.status === 'degraded',
                                     'bg-red-500': server.status === 'unhealthy',
-                                    'bg-gray-500': server.status === 'offline'
+                                    'bg-neutral-500': server.status === 'offline'
                                 }"></span>
                         </span>
 
                         {{-- Server Name --}}
-                        <span class="font-medium text-sm text-gray-900 dark:text-white"
+                        <span class="font-medium text-sm text-neutral-900 dark:text-white"
                             x-text="server.display_name"></span>
                     </div>
 
@@ -52,14 +52,14 @@
                             'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300': server
                                 .status === 'degraded',
                             'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300': server.status === 'unhealthy',
-                            'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300': server
+                            'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300': server
                                 .status === 'offline'
                         }"
                         x-text="server.status"></span>
                 </div>
 
                 {{-- Server Details --}}
-                <div class="space-y-1 text-xs text-gray-600 dark:text-gray-400">
+                <div class="space-y-1 text-xs text-neutral-600 dark:text-neutral-400">
                     <div class="flex items-center justify-between">
                         <span>Response Time:</span>
                         <span class="font-medium"
@@ -99,7 +99,7 @@
 
         {{-- No Servers Message --}}
         <template x-if="servers.length === 0">
-            <div class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div class="p-4 text-center text-sm text-neutral-500 dark:text-neutral-400">
                 <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
@@ -110,9 +110,9 @@
     </div>
 
     {{-- Overall Health Summary --}}
-    <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <div class="mt-4 p-3 bg-neutral-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
         <div class="flex items-center justify-between text-sm">
-            <span class="text-gray-700 dark:text-gray-300">Overall Health:</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Overall Health:</span>
             <span class="font-medium"
                 :class="{
                     'text-green-600 dark:text-green-400': overallHealth === 'healthy',
@@ -121,7 +121,7 @@
                 }"
                 x-text="overallHealth"></span>
         </div>
-        <div class="mt-2 text-xs text-gray-600 dark:text-gray-400">
+        <div class="mt-2 text-xs text-neutral-600 dark:text-neutral-400">
             <span x-text="`${healthyCount}/${servers.length} servers healthy`"></span>
         </div>
     </div>

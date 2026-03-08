@@ -63,7 +63,7 @@
         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         @click.away="show = false; {{ $cancelAction ? $cancelAction . '()' : '' }}"
-        class="relative w-full max-w-lg mx-4 bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden"
+        class="relative w-full max-w-lg mx-4 bg-white dark:bg-neutral-800 rounded-lg shadow-xl overflow-hidden"
     >
         <div class="p-6">
             <div class="flex items-start gap-4">
@@ -76,19 +76,19 @@
                 
                 {{-- Content --}}
                 <div class="flex-1">
-                    <h3 id="confirm-dialog-title" class="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h3 id="confirm-dialog-title" class="text-lg font-semibold text-neutral-900 dark:text-white">
                         {{ $title }}
                     </h3>
                     
                     @if($message)
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
                             {{ $message }}
                         </p>
                     @endif
                     
                     {{-- Custom Slot Content --}}
                     @if($slot->isNotEmpty())
-                        <div class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                        <div class="mt-3 text-sm text-neutral-600 dark:text-neutral-400">
                             {{ $slot }}
                         </div>
                     @endif
@@ -97,11 +97,11 @@
         </div>
         
         {{-- Actions --}}
-        <div class="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-900/50">
+        <div class="flex items-center justify-end gap-3 px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50">
             <button 
                 type="button"
                 @click="show = false; {{ $cancelAction ? $cancelAction . '()' : '' }}"
-                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-colors duration-200"
+                class="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-600 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900 transition-colors duration-200"
             >
                 {{ $cancelText }}
             </button>
@@ -109,7 +109,7 @@
             <button 
                 type="button"
                 @click="show = false; {{ $confirmAction ? $confirmAction . '()' : '' }}"
-                class="px-4 py-2 text-sm font-medium rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition-all duration-200 {{ $confirmButtonClasses }}"
+                class="px-4 py-2 text-sm font-medium rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900 transition-all duration-200 {{ $confirmButtonClasses }}"
             >
                 {{ $confirmText }}
             </button>

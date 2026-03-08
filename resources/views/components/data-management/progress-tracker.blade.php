@@ -9,7 +9,7 @@
 
 @php
     $statusColors = [
-        'pending' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+        'pending' => 'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300',
         'in_progress' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
         'completed' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
         'failed' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
@@ -37,7 +37,7 @@
     };
 @endphp
 
-<div {{ $attributes->merge(['class' => 'progress-tracker rounded-lg border border-gray-200 dark:border-gray-700 p-4']) }}
+<div {{ $attributes->merge(['class' => 'progress-tracker rounded-lg border border-neutral-200 dark:border-neutral-700 p-4']) }}
     data-operation-id="{{ $operationId }}" data-status="{{ $status }}">
 
     {{-- Header --}}
@@ -48,11 +48,11 @@
                 {!! $statusIcons[$status] ?? $statusIcons['pending'] !!}
             </span>
             <div>
-                <h4 class="font-medium text-gray-900 dark:text-white capitalize">
+                <h4 class="font-medium text-neutral-900 dark:text-white capitalize">
                     {{ str_replace('_', ' ', $operationType) }}
                 </h4>
                 @if ($message)
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $message }}</p>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ $message }}</p>
                 @endif
             </div>
         </div>
@@ -65,11 +65,11 @@
     {{-- Progress Bar --}}
     @if ($status === 'in_progress' || $progress > 0)
         <div class="mb-3">
-            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+            <div class="flex justify-between text-sm text-neutral-600 dark:text-neutral-400 mb-1">
                 <span>Progress</span>
                 <span class="progress-percentage">{{ $progress }}%</span>
             </div>
-            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+            <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2.5">
                 <div class="progress-bar {{ $progressBarColor }} h-2.5 rounded-full transition-all duration-300"
                     style="width: {{ $progress }}%"></div>
             </div>
@@ -78,7 +78,7 @@
 
     {{-- Details Slot --}}
     @if ($showDetails && $slot->isNotEmpty())
-        <div class="progress-details mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+        <div class="progress-details mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700">
             {{ $slot }}
         </div>
     @endif

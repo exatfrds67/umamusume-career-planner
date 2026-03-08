@@ -145,7 +145,7 @@ document.addEventListener("alpine:init", () => {
             return {
                 "border-primary-500 bg-primary-50 dark:bg-primary-900/20":
                     card !== null,
-                "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50":
+                "border-neutral-300 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800/50":
                     card === null,
                 "border-secondary-500 bg-secondary-50 dark:bg-secondary-900/20":
                     isFriendSlot && card !== null,

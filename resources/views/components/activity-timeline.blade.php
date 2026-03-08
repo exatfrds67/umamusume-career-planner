@@ -38,11 +38,11 @@ Accessibility: WCAG 2.2 AA compliant
     'maxEvents' => 10,
 ])
 
-<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+<div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-6 space-y-4">
     {{-- Header --}}
     <div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $title }}</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">Recent milestones and achievements</p>
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">{{ $title }}</h3>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">Recent milestones and achievements</p>
     </div>
 
     {{-- Timeline Variant (Default) --}}
@@ -60,19 +60,19 @@ Accessibility: WCAG 2.2 AA compliant
                     <div class="relative pl-16 pb-8 last:pb-0">
                         {{-- Timeline Dot --}}
                         <div class="absolute left-0 w-9 h-9 rounded-full flex items-center justify-center text-lg"
-                            :class="getEventColor(event.type) + ' ring-4 ring-white dark:ring-gray-800'">
+                            :class="getEventColor(event.type) + ' ring-4 ring-white dark:ring-neutral-800'">
                             <span x-text="getEventIcon(event.type)"></span>
                         </div>
 
                         {{-- Event Card --}}
-                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-colors"
+                        <div class="bg-neutral-50 dark:bg-neutral-700/50 rounded-lg p-4 border border-neutral-200 dark:border-neutral-600 hover:border-blue-300 dark:hover:border-blue-500 transition-colors"
                             role="article" :aria-label="`${event.title} on ${formatDate(event.timestamp)}`">
 
                             {{-- Event Header --}}
                             <div class="flex items-start justify-between mb-2">
-                                <h4 class="font-semibold text-gray-900 dark:text-white" x-text="event.title">
+                                <h4 class="font-semibold text-neutral-900 dark:text-white" x-text="event.title">
                                 </h4>
-                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400"
+                                <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400"
                                     x-text="getTimeAgo(event.timestamp)">
                                 </span>
                             </div>
@@ -85,12 +85,12 @@ Accessibility: WCAG 2.2 AA compliant
                             </div>
 
                             {{-- Event Description --}}
-                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-3" x-text="event.description">
+                            <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-3" x-text="event.description">
                             </p>
 
                             {{-- Event Metadata (if available) --}}
                             <template x-if="event.metadata && Object.keys(event.metadata).length">
-                                <div class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                                <div class="text-xs text-neutral-600 dark:text-neutral-400 space-y-1">
                                     <template x-for="(value, key) in event.metadata" :key="key">
                                         <div>
                                             <span class="font-medium" x-text="key + ':'"></span>
@@ -118,7 +118,7 @@ Accessibility: WCAG 2.2 AA compliant
             <template x-if="events.length === 0">
                 <div class="text-center py-12">
                     <div class="text-4xl mb-4 opacity-20">📋</div>
-                    <p class="text-gray-600 dark:text-gray-400">No events yet</p>
+                    <p class="text-neutral-600 dark:text-neutral-400">No events yet</p>
                 </div>
             </template>
         </div>
@@ -127,7 +127,7 @@ Accessibility: WCAG 2.2 AA compliant
     @elseif ($variant === 'feed')
         <div class="space-y-3" x-data="activityTimeline({{ json_encode($events) }})">
             <template x-for="(event, index) in displayedEvents" :key="event.id">
-                <div class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                <div class="flex gap-3 p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
                     role="article">
 
                     {{-- Icon --}}
@@ -138,11 +138,11 @@ Accessibility: WCAG 2.2 AA compliant
 
                     {{-- Content --}}
                     <div class="flex-1 min-w-0">
-                        <p class="font-medium text-gray-900 dark:text-white text-sm" x-text="event.title">
+                        <p class="font-medium text-neutral-900 dark:text-white text-sm" x-text="event.title">
                         </p>
-                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1" x-text="event.description">
+                        <p class="text-xs text-neutral-600 dark:text-neutral-400 mt-1" x-text="event.description">
                         </p>
-                        <span class="text-xs text-gray-500 dark:text-gray-500 mt-2 block"
+                        <span class="text-xs text-neutral-500 dark:text-neutral-500 mt-2 block"
                             x-text="getTimeAgo(event.timestamp)">
                         </span>
                     </div>
@@ -155,13 +155,13 @@ Accessibility: WCAG 2.2 AA compliant
         <div class="space-y-2" x-data="activityTimeline({{ json_encode($events) }})">
             <template x-for="(event, index) in displayedEvents.slice(0, 5)" :key="event.id">
                 <div
-                    class="flex items-center justify-between text-xs p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded transition-colors">
+                    class="flex items-center justify-between text-xs p-2 hover:bg-neutral-50 dark:hover:bg-neutral-700/50 rounded transition-colors">
                     <div class="flex items-center gap-2 flex-1 min-w-0">
                         <span class="text-lg shrink-0" x-text="getEventIcon(event.type)"></span>
-                        <span class="text-gray-900 dark:text-white font-medium truncate" x-text="event.title">
+                        <span class="text-neutral-900 dark:text-white font-medium truncate" x-text="event.title">
                         </span>
                     </div>
-                    <span class="text-gray-500 dark:text-gray-400 shrink-0" x-text="getTimeAgo(event.timestamp)">
+                    <span class="text-neutral-500 dark:text-neutral-400 shrink-0" x-text="getTimeAgo(event.timestamp)">
                     </span>
                 </div>
             </template>
@@ -169,24 +169,24 @@ Accessibility: WCAG 2.2 AA compliant
     @endif
 
     {{-- Event Type Legend --}}
-    <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <h4 class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-3">Event Types</h4>
+    <div class="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+        <h4 class="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-3">Event Types</h4>
         <div class="grid grid-cols-2 gap-2 text-xs">
             <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-red-400"></span>
-                <span class="text-gray-600 dark:text-gray-400">Race</span>
+                <span class="text-neutral-600 dark:text-neutral-400">Race</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-purple-400"></span>
-                <span class="text-gray-600 dark:text-gray-400">Skill</span>
+                <span class="text-neutral-600 dark:text-neutral-400">Skill</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-blue-400"></span>
-                <span class="text-gray-600 dark:text-gray-400">Milestone</span>
+                <span class="text-neutral-600 dark:text-neutral-400">Milestone</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
-                <span class="text-gray-600 dark:text-gray-400">Achievement</span>
+                <span class="text-neutral-600 dark:text-neutral-400">Achievement</span>
             </div>
         </div>
     </div>

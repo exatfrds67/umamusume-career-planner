@@ -1,22 +1,22 @@
 {{-- Skill Inventory Tab --}}
 <div class="space-y-6">
     {{-- Filters --}}
-    <div class="card bg-white dark:bg-gray-800">
+    <div class="filter-surface">
         <div class="card-body">
             <fieldset>
                 <legend class="sr-only">Filter skills</legend>
             <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <div>
-                    <label for="search-skills" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label for="search-skills" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                         Search Skills
                     </label>
                     <div class="relative">
                         <input type="text" id="search-skills" name="search_skills" x-model="filters.searchQuery"
                             @input="resetPagination()" placeholder="Search by name..."
-                            class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white pr-8">
+                            class="form-input w-full rounded-lg border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white pr-8">
                         <button x-show="filters.searchQuery" @click="filters.searchQuery = ''; resetPagination()"
                             type="button"
-                            class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                            class="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
                             aria-label="Clear search">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -26,12 +26,12 @@
                 </div>
                 <div>
                     <label for="filter-stat-affinity"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                         Stat Affinity
                     </label>
                     <select id="filter-stat-affinity" name="stat_affinity" x-model="filters.statAffinity"
                         @change="resetPagination()"
-                        class="form-select w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        class="form-select w-full rounded-lg border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white">
                         <option value="all">All Stats</option>
                         <option value="speed">🏃 SPD</option>
                         <option value="stamina">💪 STA</option>
@@ -41,11 +41,11 @@
                     </select>
                 </div>
                 <div>
-                    <label for="filter-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label for="filter-type" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                         Skill Type
                     </label>
                     <select id="filter-type" name="skill_type" x-model="filters.skillType" @change="resetPagination()"
-                        class="form-select w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        class="form-select w-full rounded-lg border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white">
                         <option value="all">All Types</option>
                         <option value="speed">Speed</option>
                         <option value="passive">Passive</option>
@@ -55,11 +55,11 @@
                     </select>
                 </div>
                 <div>
-                    <label for="filter-rarity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label for="filter-rarity" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                         Rarity
                     </label>
                     <select id="filter-rarity" name="rarity" x-model="filters.rarity" @change="resetPagination()"
-                        class="form-select w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        class="form-select w-full rounded-lg border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white">
                         <option value="all">All Rarities</option>
                         <option value="normal">Normal</option>
                         <option value="rare">Rare</option>
@@ -68,12 +68,12 @@
                 </div>
                 <div>
                     <label for="filter-hint-level"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                         Hint Level
                     </label>
                     <select id="filter-hint-level" name="hint_level" x-model="filters.hintLevel"
                         @change="resetPagination()"
-                        class="form-select w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        class="form-select w-full rounded-lg border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white">
                         <option value="all">All Levels</option>
                         <option value="0">No Hints (0)</option>
                         <option value="1">Level 1 (10% off)</option>
@@ -85,12 +85,12 @@
                 </div>
                 <div>
                     <label for="filter-meta-tier"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                         Grade
                     </label>
                     <select id="filter-meta-tier" name="meta_tier" x-model="filters.metaTier"
                         @change="resetPagination()"
-                        class="form-select w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        class="form-select w-full rounded-lg border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white">
                         <option value="all">All Grades</option>
                         <option value="S+">S+</option>
                         <option value="S">S</option>
@@ -105,7 +105,7 @@
     </div>
 
     {{-- Results Summary --}}
-    <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400"
+    <div class="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400"
         role="status" aria-live="polite" aria-atomic="true">
         <div>
             Showing <span class="font-semibold" x-text="((currentPage - 1) * itemsPerPage) + 1"></span>
@@ -125,10 +125,10 @@
     </div>
 
     {{-- Skills List --}}
-    <div id="skills-list" class="card bg-white dark:bg-gray-800">
+    <div id="skills-list" class="filter-surface">
         <div class="card-body">
-            <div x-show="paginatedSkills.length === 0" class="text-center py-12 text-gray-500 dark:text-gray-400">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div x-show="paginatedSkills.length === 0" class="text-center py-12 text-neutral-500 dark:text-neutral-400">
+                <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -139,9 +139,9 @@
                 <template x-for="skill in paginatedSkills" :key="skill.id">
                     <div class="relative p-4 border-2 rounded-lg transition-all duration-200 hover:shadow-lg cursor-pointer"
                         :class="{
-                            'border-success-500 bg-success-50 dark:bg-gray-800 dark:border-success-400': skill.is_acquired,
-                            'border-amber-400 bg-amber-50 dark:bg-gray-800 dark:border-amber-400': !skill.is_acquired && skill.is_planned,
-                            'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-primary-500 dark:hover:border-primary-400':
+                            'border-success-500 bg-success-50 dark:bg-neutral-800 dark:border-success-400': skill.is_acquired,
+                            'border-amber-400 bg-amber-50 dark:bg-neutral-800 dark:border-amber-400': !skill.is_acquired && skill.is_planned,
+                            'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:border-primary-500 dark:hover:border-primary-400':
                                 !skill.is_acquired && !skill.is_planned
                         }"
                         @click="viewSkillDetails(skill)"
@@ -154,7 +154,7 @@
                         {{-- Header: Name, Grade, Type --}}
                         <div class="flex items-start justify-between gap-3 mb-3">
                             <div class="flex-1 min-w-0">
-                                <h4 class="text-base font-bold text-gray-900 dark:text-white truncate mb-1"
+                                <h4 class="text-base font-bold text-neutral-900 dark:text-white truncate mb-1"
                                     x-text="skill.name"></h4>
                                 <div class="flex items-center gap-2 flex-wrap">
                                     {{-- Stat Affinity Badge (Primary) --}}
@@ -186,7 +186,7 @@
                                                 skill) === 'A',
                                             'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300': getSkillGrade(
                                                 skill) === 'B',
-                                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': getSkillGrade(
+                                            'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300': getSkillGrade(
                                                 skill) === 'C'
                                         }"
                                         x-text="getSkillGrade(skill)">
@@ -198,7 +198,7 @@
                                         :class="{
                                             'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300': skill
                                                 .skill_type === 'speed',
-                                            'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300': skill
+                                            'bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300': skill
                                                 .skill_type === 'passive',
                                             'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300': skill
                                                 .skill_type === 'recovery',
@@ -251,20 +251,20 @@
                         </div>
 
                         {{-- Description --}}
-                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-2"
+                        <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-3 line-clamp-2"
                             x-text="skill.description || 'No description available'"></p>
 
                         {{-- Footer: SP Cost, Hints, Action Button --}}
                         <div
-                            class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                            class="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-700">
                             {{-- SP Cost with Hint Discount --}}
                             <div class="flex flex-col gap-1">
                                 <template x-if="skill.available_hints > 0">
                                     <div class="flex items-center gap-2">
                                         <span
-                                            class="text-xs text-gray-500 dark:text-gray-400 line-through tabular-nums"
+                                            class="text-xs text-neutral-500 dark:text-neutral-400 line-through tabular-nums"
                                             x-text="skill.base_sp_cost + ' SP'"></span>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400">→</span>
+                                        <span class="text-xs text-neutral-500 dark:text-neutral-400">→</span>
                                         <span
                                             class="font-bold text-lg text-success-600 dark:text-success-400 tabular-nums"
                                             x-text="skill.discounted_cost + ' SP'"></span>
@@ -275,9 +275,9 @@
                                 </template>
                                 <template x-if="!skill.available_hints || skill.available_hints === 0">
                                     <div class="flex items-center gap-1">
-                                        <span class="font-bold text-lg text-gray-900 dark:text-white tabular-nums"
+                                        <span class="font-bold text-lg text-neutral-900 dark:text-white tabular-nums"
                                             x-text="skill.base_sp_cost"></span>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400">SP</span>
+                                        <span class="text-xs text-neutral-500 dark:text-neutral-400">SP</span>
                                     </div>
                                 </template>
                                 <template x-if="skill.available_hints > 0">
@@ -302,8 +302,8 @@
 
                         {{-- Activation Condition --}}
                         <template x-if="getActivationCondition(skill)">
-                            <div class="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                                <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                            <div class="mt-2 pt-2 border-t border-neutral-200 dark:border-neutral-700">
+                                <div class="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
                                     <span class="text-yellow-500">⚡</span>
                                     <span x-text="getActivationCondition(skill)"></span>
                                 </div>
@@ -312,10 +312,10 @@
 
                         {{-- Evolution Path --}}
                         <template x-if="getEvolutionInfo(skill)">
-                            <div class="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <div class="mt-2 pt-2 border-t border-neutral-200 dark:border-neutral-700">
                                 <div class="flex items-center gap-2 text-xs">
                                     <span class="text-purple-500">🔄</span>
-                                    <span class="text-gray-600 dark:text-gray-400">Can evolve to:</span>
+                                    <span class="text-neutral-600 dark:text-neutral-400">Can evolve to:</span>
                                     <span class="font-semibold text-purple-600 dark:text-purple-400"
                                         x-text="getEvolutionInfo(skill).targetName"></span>
                                 </div>
@@ -342,29 +342,29 @@
 
     {{-- Pagination --}}
     <div x-show="totalPages > 1" class="flex items-center justify-between">
-        <div class="text-sm text-gray-600 dark:text-gray-400">
+        <div class="text-sm text-neutral-600 dark:text-neutral-400">
             Page <span class="font-semibold" x-text="currentPage"></span> of <span class="font-semibold"
                 x-text="totalPages"></span>
         </div>
         <div class="flex items-center gap-2">
             <button @click="goToPage(1)" :disabled="currentPage === 1"
                 aria-label="Go to first page"
-                class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700">
+                class="px-3 py-1 rounded border border-neutral-300 dark:border-neutral-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50 dark:hover:bg-neutral-700">
                 First
             </button>
             <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1"
                 aria-label="Go to previous page"
-                class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700">
+                class="px-3 py-1 rounded border border-neutral-300 dark:border-neutral-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50 dark:hover:bg-neutral-700">
                 Previous
             </button>
             <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages"
                 aria-label="Go to next page"
-                class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700">
+                class="px-3 py-1 rounded border border-neutral-300 dark:border-neutral-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50 dark:hover:bg-neutral-700">
                 Next
             </button>
             <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages"
                 aria-label="Go to last page"
-                class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700">
+                class="px-3 py-1 rounded border border-neutral-300 dark:border-neutral-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50 dark:hover:bg-neutral-700">
                 Last
             </button>
         </div>

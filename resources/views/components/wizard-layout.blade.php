@@ -35,9 +35,9 @@ Accessibility: WCAG 2.2 AA compliant, ARIA progress indicators, keyboard navigat
     @if($title || isset($header))
         <div class="wizard-header mb-6">
             @if(isset($header))
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $header }}</h2>
+                <h2 class="text-2xl font-bold text-neutral-900 dark:text-white">{{ $header }}</h2>
             @elseif($title)
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $title }}</h2>
+                <h2 class="text-2xl font-bold text-neutral-900 dark:text-white">{{ $title }}</h2>
             @endif
         </div>
     @endif
@@ -45,14 +45,14 @@ Accessibility: WCAG 2.2 AA compliant, ARIA progress indicators, keyboard navigat
     {{-- Progress Bar --}}
     <div class="wizard-progress mb-8" role="progressbar" aria-valuenow="{{ $currentStep + 1 }}" aria-valuemin="1" aria-valuemax="{{ $totalSteps }}" aria-label="Step {{ $currentStep + 1 }} of {{ $totalSteps }}">
         <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                 Step {{ $currentStep + 1 }} of {{ $totalSteps }}
             </span>
-            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <span class="text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 {{ round($progressPercent) }}%
             </span>
         </div>
-        <div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div class="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
             <div 
                 class="h-full bg-primary-600 rounded-full transition-all duration-300 ease-out"
                 style="width: {{ $progressPercent }}%"
@@ -73,13 +73,13 @@ Accessibility: WCAG 2.2 AA compliant, ARIA progress indicators, keyboard navigat
                         $stepClasses = match(true) {
                             $isCompleted => 'bg-primary-600 text-white',
                             $isCurrent => 'bg-primary-600 text-white ring-2 ring-primary-300 ring-offset-2',
-                            default => 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
+                            default => 'bg-neutral-200 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400',
                         };
                         
                         $labelClasses = match(true) {
                             $isCompleted => 'text-primary-600 dark:text-primary-400',
                             $isCurrent => 'text-primary-600 dark:text-primary-400 font-semibold',
-                            default => 'text-gray-500 dark:text-gray-400',
+                            default => 'text-neutral-500 dark:text-neutral-400',
                         };
                     @endphp
                     
@@ -106,7 +106,7 @@ Accessibility: WCAG 2.2 AA compliant, ARIA progress indicators, keyboard navigat
                         
                         {{-- Connector Line --}}
                         @if($index < count($steps) - 1)
-                            <div class="absolute top-5 left-1/2 w-full h-0.5 {{ $isCompleted ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-700' }}" style="transform: translateX(50%); width: calc(100% - 2.5rem);"></div>
+                            <div class="absolute top-5 left-1/2 w-full h-0.5 {{ $isCompleted ? 'bg-primary-600' : 'bg-neutral-200 dark:bg-neutral-700' }}" style="transform: translateX(50%); width: calc(100% - 2.5rem);"></div>
                         @endif
                     </li>
                 @endforeach
@@ -115,7 +115,7 @@ Accessibility: WCAG 2.2 AA compliant, ARIA progress indicators, keyboard navigat
     @endif
 
     {{-- Main Content --}}
-    <div class="wizard-content bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
+    <div class="wizard-content bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6 sm:p-8">
         {{ $slot }}
     </div>
 

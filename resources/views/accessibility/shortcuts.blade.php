@@ -6,8 +6,8 @@
     <section class="py-16 md:py-24">
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto">
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">Keyboard Shortcuts</h1>
-                <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+                <h1 class="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white">Keyboard Shortcuts</h1>
+                <p class="mt-4 text-lg text-neutral-600 dark:text-neutral-300">
                     Use these shortcuts to navigate quickly throughout the application.
                 </p>
 

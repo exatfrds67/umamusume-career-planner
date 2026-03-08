@@ -144,7 +144,7 @@ export function trainingTimeline() {
         getTurnStatusColor(turn) {
             if (turn.completed) return 'bg-green-100 dark:bg-green-900/30';
             if (turn.turn === this.currentTurn) return 'bg-blue-100 dark:bg-blue-900/30';
-            return 'bg-gray-100 dark:bg-gray-700/30';
+            return 'bg-neutral-100 dark:bg-neutral-700/30';
         },
         
         getTurnStatusText(turn) {
@@ -157,7 +157,7 @@ export function trainingTimeline() {
             const colors = {
                 'great': 'text-green-600 dark:text-green-400',
                 'good': 'text-lime-600 dark:text-lime-400',
-                'normal': 'text-gray-600 dark:text-gray-400',
+                'normal': 'text-neutral-600 dark:text-neutral-400',
                 'bad': 'text-red-600 dark:text-red-400'
             };
             return colors[condition] || colors['normal'];
@@ -166,7 +166,7 @@ export function trainingTimeline() {
         getStatChangeColor(stat) {
             if (stat > 0) return 'text-green-600 dark:text-green-400';
             if (stat < 0) return 'text-red-600 dark:text-red-400';
-            return 'text-gray-500 dark:text-gray-400';
+            return 'text-neutral-500 dark:text-neutral-400';
         }
     };
 }

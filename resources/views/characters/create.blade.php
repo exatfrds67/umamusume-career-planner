@@ -4,59 +4,15 @@
     {{-- Breadcrumb Navigation --}}
     <x-breadcrumb :items="[['label' => 'Characters', 'url' => route('characters.index')], ['label' => 'Create Character']]" />
 
-    <!-- Desktop Sidebar Stepper (lg+ screens, WF-002 Spec) -->
-    <aside
-        class="hidden lg:block fixed left-0 top-16 h-[calc(100%-4rem)] w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-xs z-40 overflow-y-auto"
-        x-data="{ steps: ['Basic Info', 'Stats', 'Aptitudes', 'Review'], descriptions: ['Name & scenario', 'Initial stats setup', 'Distance, surface, style', 'Review & confirm'] }">
-        <nav class="space-y-2 p-4" role="navigation" aria-label="Wizard steps">
-            <template x-for="(step, index) in steps" :key="index">
-                <button type="button" @click="$root.goToStep && $root.goToStep(index + 1)"
-                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-                    :class="$root.currentStep === index + 1 ?
-                        'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-300 font-semibold' :
-                        'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
-                    :aria-current="$root.currentStep === index + 1 ? 'step' : false"
-                    :aria-label="`Step ${index + 1}: ${step} ${$root.currentStep === index + 1 ? '(current)' : ($root.currentStep > index + 1 ? '(completed)' : '')}`">
-
-                    <!-- Step number circle -->
-                    <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors"
-                        :class="$root.currentStep === index + 1 ?
-                            'bg-primary-500 text-white' :
-                            $root.currentStep > index + 1 ?
-                            'bg-success-500 text-white' :
-                            'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'">
-
-                        <!-- Checkmark for completed steps -->
-                        <svg x-show="$root.currentStep > index + 1" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
-                            aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-
-                        <!-- Step number for current/future steps -->
-                        <span x-show="$root.currentStep <= index + 1" x-text="index + 1"></span>
-                    </div>
-
-                    <!-- Step label -->
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium truncate" x-text="step"></p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate" x-text="descriptions[index]"></p>
-                    </div>
-                </button>
-            </template>
-        </nav>
-    </aside>
-
-    <div class="lg:ml-60 max-w-5xl mx-auto space-y-6" x-data="characterWizard()">
+    <div class="max-w-5xl mx-auto space-y-6" x-data="characterWizard()">
         <!-- Header -->
         <div class="sm:flex sm:items-center sm:justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
+                    class="text-2xl font-bold leading-7 text-neutral-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
                     Create New Character
                 </h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                     Set up your Umamusume for career training
                 </p>
             </div>
@@ -107,7 +63,7 @@
                                 <div class="absolute inset-0 flex items-center" aria-hidden="true">
                                     <div class="h-0.5 w-full"
                                         :class="currentStep > {{ $step['id'] }} ? 'bg-primary-600' :
-                                            'bg-gray-200 dark:bg-gray-700'">
+                                            'bg-neutral-200 dark:bg-neutral-700'">
                                     </div>
                                 </div>
                             @endif
@@ -116,11 +72,11 @@
                                 :class="currentStep === {{ $step['id'] }} ?
                                     'bg-primary-600 ring-4 ring-primary-100 dark:ring-primary-900/30' :
                                     currentStep > {{ $step['id'] }} ? 'bg-primary-600' :
-                                    'bg-gray-200 dark:bg-gray-700'"
+                                    'bg-neutral-200 dark:bg-neutral-700'"
                                 :aria-current="currentStep === {{ $step['id'] }} ? 'step' : null">
                                 <svg class="w-5 h-5"
                                     :class="currentStep >= {{ $step['id'] }} ? 'text-white' :
-                                        'text-gray-500 dark:text-gray-400'"
+                                        'text-neutral-500 dark:text-neutral-400'"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="{{ $step['icon'] }}" />
@@ -129,7 +85,7 @@
                             </button>
                             <span class="absolute top-12 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-medium"
                                 :class="currentStep === {{ $step['id'] }} ? 'text-primary-600 dark:text-primary-400' :
-                                    'text-gray-500 dark:text-gray-400'">
+                                    'text-neutral-500 dark:text-neutral-400'">
                                 {{ $step['name'] }}
                             </span>
                         </li>
@@ -141,12 +97,12 @@
         <!-- Mobile Progress Bar (WF-002 Spec) -->
         <div class="lg:hidden glass-card rounded-xl p-4">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-gray-900 dark:text-white"
+                <span class="text-sm font-medium text-neutral-900 dark:text-white"
                     x-text="'Step ' + currentStep + ' of 4: ' + getStepName(currentStep)"></span>
-                <span class="text-xs text-gray-500 dark:text-gray-400"
+                <span class="text-xs text-neutral-500 dark:text-neutral-400"
                     x-text="Math.round((currentStep / 4) * 100) + '% complete'"></span>
             </div>
-            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden" role="progressbar"
+            <div class="h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden" role="progressbar"
                 :aria-valuenow="currentStep" aria-valuemin="1" aria-valuemax="4"
                 :aria-label="'Step ' + currentStep + ' of 4'">
                 <div class="h-full bg-primary-600 transition-all duration-300 rounded-full"
@@ -213,9 +169,9 @@
             <section x-show="currentStep === 1" x-transition class="card rounded-xl" role="region"
                 aria-labelledby="step-1-heading" aria-live="polite">
                 <header class="card-header">
-                    <h2 id="step-1-heading" class="text-lg font-medium text-gray-900 dark:text-white">Basic Information
+                    <h2 id="step-1-heading" class="text-lg font-medium text-neutral-900 dark:text-white">Basic Information
                     </h2>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter your character's name and select a
+                    <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Enter your character's name and select a
                         scenario</p>
                 </header>
                 <div class="card-body space-y-6">
@@ -248,7 +204,7 @@
                     <div
                         class="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-100 dark:border-primary-800">
                         <div class="flex items-center gap-3">
-                            <div class="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-xs">
+                            <div class="p-2 bg-white dark:bg-neutral-800 rounded-lg shadow-xs">
                                 <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -256,8 +212,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Character Database</h4>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                <h4 class="text-sm font-semibold text-neutral-900 dark:text-white">Character Database</h4>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400">
                                     <span x-show="!showDatabase">Find and autofill from 60+ characters</span>
                                     <span x-show="showDatabase">Select a character to autofill details</span>
                                 </p>
@@ -283,56 +239,38 @@
                         </button>
                     </div>
 
-                    <!-- Database Search Grid - Hidden by Default -->
+                    <!-- Database Search Panel - Hidden by Default -->
                     <div x-show="showDatabase" x-transition
-                        class="grid grid-cols-1 xl:grid-cols-3 gap-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/50">
-                        <div class="xl:col-span-2 space-y-4">
+                        class="space-y-4 p-4 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-neutral-50/50 dark:bg-neutral-800/50">
+
+                        {{-- Selected Character Banner (shown when a trainee is selected) --}}
+                        <div x-show="formData.trainee" x-transition
+                            class="flex items-center gap-3 p-3 rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800">
+                            <div class="shrink-0 w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center overflow-hidden border border-primary-200 dark:border-primary-700">
+                                <img :src="formData.trainee?.image" :alt="formData.trainee?.name"
+                                    loading="lazy" decoding="async"
+                                    x-on:error="$el.style.display='none'; $el.nextElementSibling.style.display='flex'"
+                                    class="w-10 h-10 object-cover">
+                                <span class="text-xs font-bold text-primary-600 dark:text-primary-300 hidden items-center justify-center w-full h-full"
+                                    x-text="formData.trainee?.name ? formData.trainee.name.substring(0, 2).toUpperCase() : '??'"></span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-primary-900 dark:text-primary-100 truncate"
+                                    x-text="'Selected: ' + (formData.trainee?.name || '')"></p>
+                                <p class="text-xs text-primary-700 dark:text-primary-300"
+                                    x-text="(formData.trainee?.distance || '') + ' · ' + (formData.trainee?.surface || '') + ' · ' + (formData.trainee?.style || '')"></p>
+                            </div>
+                            <svg class="w-5 h-5 text-primary-500 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+
+                        {{-- Search & Grid --}}
+                        <div class="space-y-3">
                             @include('characters.partials.database-search')
                         </div>
 
-                        <div class="space-y-4">
-                            <div
-                                class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800">
-                                <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Selected Preview</h4>
-                                <div x-show="formData.trainee" class="space-y-3">
-                                    <div class="flex items-center gap-3">
-                                        <img :src="formData.trainee?.image" :alt="formData.trainee?.name" loading="lazy"
-                                            decoding="async"
-                                            x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.trainee?.name || 'Chk') + '&background=random&color=fff'"
-                                            class="w-16 h-16 rounded-lg object-cover border border-gray-200 dark:border-gray-700">
-                                        <div>
-                                            <p class="text-sm font-semibold text-gray-900 dark:text-white"
-                                                x-text="formData.trainee?.name"></p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400"
-                                                x-text="formData.trainee?.rarity + ' • ' + formData.trainee?.distance"></p>
-                                        </div>
-                                    </div>
-                                    <div class="grid grid-cols-5 gap-2">
-                                        <template x-for="(value, stat) in formData.trainee?.baseStats || {}"
-                                            :key="stat">
-                                            <div class="text-center">
-                                                <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase"
-                                                    x-text="stat"></div>
-                                                <div class="text-sm font-semibold text-gray-900 dark:text-white"
-                                                    x-text="value"></div>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    <div class="flex flex-wrap gap-2 text-xs">
-                                        <template x-for="aptitude in formData.trainee?.aptitudes || []"
-                                            :key="aptitude">
-                                            <span
-                                                class="px-2 py-0.5 rounded-full bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-200"
-                                                x-text="aptitude"></span>
-                                        </template>
-                                    </div>
-                                </div>
-                                <div x-show="!formData.trainee" class="text-sm text-gray-500 dark:text-gray-400">
-                                    Select a trainee to see the preview.
-                                </div>
-                                <input type="hidden" name="trainee_id" :value="formData.trainee?.id || ''">
-                            </div>
-                        </div>
+                        <input type="hidden" name="trainee_id" :value="formData.trainee?.id || ''">
                     </div>
 
                     <!-- Manual Input Fields -->
@@ -362,8 +300,8 @@
             <section x-show="currentStep === 2" x-transition class="card rounded-xl" role="region"
                 aria-labelledby="step-2-heading" aria-live="polite">
                 <header class="card-header">
-                    <h2 id="step-2-heading" class="text-lg font-medium text-gray-900 dark:text-white">Current Stats</h2>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Set initial stat values (soft cap at 1,200 — stats can exceed with diminishing returns)</p>
+                    <h2 id="step-2-heading" class="text-lg font-medium text-neutral-900 dark:text-white">Current Stats</h2>
+                    <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Set initial stat values (soft cap at 1,200 — stats can exceed with diminishing returns)</p>
                 </header>
                 <div class="card-body">
                     @php
@@ -409,7 +347,7 @@
                                         <span class="text-xs text-primary-500"
                                             title="Priority">{{ $info['priority'] }}</span>
                                     </label>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ $info['desc'] }}</span>
+                                    <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ $info['desc'] }}</span>
                                 </div>
                                 <div class="relative">
                                     <input type="number" id="stat_{{ $stat }}"
@@ -423,7 +361,7 @@
                                             x-text="getGrade(formData.stats.{{ $stat }})"></span>
                                     </div>
                                 </div>
-                                <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                                     <div class="h-full bg-{{ $info['color'] }}-500 transition-all duration-300"
                                         :style="`width: ${Math.min((formData.stats.{{ $stat }} / 1200) * 100, 100)}%`"></div>
                                 </div>
@@ -466,8 +404,8 @@
             <section x-show="currentStep === 3" x-transition class="card rounded-xl" role="region"
                 aria-labelledby="step-3-heading" aria-live="polite">
                 <header class="card-header">
-                    <h2 id="step-3-heading" class="text-lg font-medium text-gray-900 dark:text-white">Aptitudes</h2>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Select aptitude grades for distance, surface,
+                    <h2 id="step-3-heading" class="text-lg font-medium text-neutral-900 dark:text-white">Aptitudes</h2>
+                    <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Select aptitude grades for distance, surface,
                         and running style</p>
                 </header>
                 <div class="card-body">
@@ -482,7 +420,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                 </svg>
-                                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                                <h4 class="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
                                     Distance</h4>
                             </div>
                             <div class="space-y-3">
@@ -510,7 +448,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                                <h4 class="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
                                     Surface</h4>
                             </div>
                             <div class="space-y-3">
@@ -538,7 +476,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
-                                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                                <h4 class="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
                                     Running Style</h4>
                             </div>
                             <div class="space-y-3">
@@ -580,22 +518,22 @@
             <section x-show="currentStep === 4" x-transition class="card rounded-xl" role="region"
                 aria-labelledby="step-4-heading" aria-live="polite">
                 <header class="card-header">
-                    <h2 id="step-4-heading" class="text-lg font-medium text-gray-900 dark:text-white">Review & Confirm
+                    <h2 id="step-4-heading" class="text-lg font-medium text-neutral-900 dark:text-white">Review & Confirm
                     </h2>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Review your character details before creating
+                    <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Review your character details before creating
                     </p>
                 </header>
                 <div class="card-body space-y-6">
                     <!-- Basic Info Summary -->
-                    <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Basic Information</h4>
+                    <div class="p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-neutral-900 dark:text-white mb-3">Basic Information</h4>
                         <dl class="grid grid-cols-1 gap-4">
                             <!-- Avatar Preview -->
                             <div x-show="formData.avatar_preview" class="flex items-center gap-4">
-                                <dt class="text-xs text-gray-500 dark:text-gray-400">Avatar</dt>
+                                <dt class="text-xs text-neutral-500 dark:text-neutral-400">Avatar</dt>
                                 <dd>
                                     <div
-                                        class="w-24 h-24 rounded-full border-2 border-primary-400 dark:border-primary-500 overflow-hidden relative bg-gray-200 dark:bg-gray-700">
+                                        class="w-24 h-24 rounded-full border-2 border-primary-400 dark:border-primary-500 overflow-hidden relative bg-neutral-200 dark:bg-neutral-700">
                                         <!-- Replicate the editor's 256px container scaled down to 96px (96/256 = 0.375) -->
                                         <div class="absolute"
                                             style="width: 256px; height: 256px; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.375); transform-origin: center center;">
@@ -611,8 +549,8 @@
                                 </dd>
                             </div>
                             <div>
-                                <dt class="text-xs text-gray-500 dark:text-gray-400">Full Character Name</dt>
-                                <dd class="text-base font-bold text-gray-900 dark:text-white">
+                                <dt class="text-xs text-neutral-500 dark:text-neutral-400">Full Character Name</dt>
+                                <dd class="text-base font-bold text-neutral-900 dark:text-white">
                                     <span x-show="formData.title" class="text-primary-600 dark:text-primary-400"
                                         x-text="'[' + formData.title + '] '"></span>
                                     <span x-text="formData.name || 'Not set'"></span>
@@ -620,8 +558,8 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <dt class="text-xs text-gray-500 dark:text-gray-400">Scenario</dt>
-                                    <dd class="text-sm font-medium text-gray-900 dark:text-white"
+                                    <dt class="text-xs text-neutral-500 dark:text-neutral-400">Scenario</dt>
+                                    <dd class="text-sm font-medium text-neutral-900 dark:text-white"
                                         x-text="formData.scenario_type === 'ura_finale' ? 'URA Finale' : 'Unity Cup'"></dd>
                                 </div>
                             </div>
@@ -629,14 +567,14 @@
                     </div>
 
                     <!-- Stats Summary -->
-                    <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Stats</h4>
+                    <div class="p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-neutral-900 dark:text-white mb-3">Stats</h4>
                         <div class="grid grid-cols-5 gap-3">
                             <template x-for="(value, stat) in formData.stats" :key="stat">
                                 <div class="text-center">
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1" x-text="stat">
+                                    <div class="text-xs text-neutral-500 dark:text-neutral-400 uppercase mb-1" x-text="stat">
                                     </div>
-                                    <div class="text-lg font-bold text-gray-900 dark:text-white" x-text="value"></div>
+                                    <div class="text-lg font-bold text-neutral-900 dark:text-white" x-text="value"></div>
                                     <div class="text-xs font-medium px-2 py-0.5 rounded inline-block mt-1"
                                         :class="getGradeColor(value)" x-text="getGrade(value)"></div>
                                 </div>
@@ -645,36 +583,36 @@
                     </div>
 
                     <!-- Aptitudes Summary -->
-                    <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Aptitudes</h4>
+                    <div class="p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-neutral-900 dark:text-white mb-3">Aptitudes</h4>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                             <div>
-                                <div class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Distance</div>
+                                <div class="font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Distance</div>
                                 <template x-for="(value, key) in formData.aptitudes.distance" :key="key">
                                     <div class="flex justify-between py-1">
-                                        <span class="text-gray-600 dark:text-gray-400 capitalize" x-text="key"></span>
-                                        <span class="font-medium text-gray-900 dark:text-white"
+                                        <span class="text-neutral-600 dark:text-neutral-400 capitalize" x-text="key"></span>
+                                        <span class="font-medium text-neutral-900 dark:text-white"
                                             x-text="value || '-'"></span>
                                     </div>
                                 </template>
                             </div>
                             <div>
-                                <div class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Surface</div>
+                                <div class="font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Surface</div>
                                 <template x-for="(value, key) in formData.aptitudes.surface" :key="key">
                                     <div class="flex justify-between py-1">
-                                        <span class="text-gray-600 dark:text-gray-400 capitalize" x-text="key"></span>
-                                        <span class="font-medium text-gray-900 dark:text-white"
+                                        <span class="text-neutral-600 dark:text-neutral-400 capitalize" x-text="key"></span>
+                                        <span class="font-medium text-neutral-900 dark:text-white"
                                             x-text="value || '-'"></span>
                                     </div>
                                 </template>
                             </div>
                             <div>
-                                <div class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Running Style</div>
+                                <div class="font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Running Style</div>
                                 <template x-for="(value, key) in formData.aptitudes.style" :key="key">
                                     <div class="flex justify-between py-1">
-                                        <span class="text-gray-600 dark:text-gray-400 capitalize"
+                                        <span class="text-neutral-600 dark:text-neutral-400 capitalize"
                                             x-text="key.replace('_', ' ')"></span>
-                                        <span class="font-medium text-gray-900 dark:text-white"
+                                        <span class="font-medium text-neutral-900 dark:text-white"
                                             x-text="value || '-'"></span>
                                     </div>
                                 </template>

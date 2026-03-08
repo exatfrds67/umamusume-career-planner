@@ -14,6 +14,8 @@ describe('Keyboard Navigation Property Tests', function () {
      */
     it('ensures no positive tabindex values in page output', function () {
         $user = \App\Models\User::factory()->create();
+        $checkedPages = 0;
+        $tabindexAssertions = 0;
 
         $pages = [
             '/' => false,
@@ -32,6 +34,8 @@ describe('Keyboard Navigation Property Tests', function () {
                 continue;
             }
 
+            $checkedPages++;
+
             $content = $response->getContent();
 
             preg_match_all('/tabindex=["\'](\d+)["\']/i', $content, $matches);
@@ -39,8 +43,12 @@ describe('Keyboard Navigation Property Tests', function () {
             foreach ($matches[1] as $value) {
                 $intValue = (int) $value;
                 expect($intValue)->toBeLessThanOrEqual(0, "Page {$page} has positive tabindex={$intValue} which disrupts natural tab order");
+                $tabindexAssertions++;
             }
         }
+
+        expect($checkedPages)->toBeGreaterThan(0, 'Expected at least one accessible page to be checked for tabindex values');
+        expect($tabindexAssertions)->toBeGreaterThanOrEqual(0);
     })->group('property');
 
     it('ensures buttons and links have accessible text content', function () {
@@ -96,10 +104,7 @@ describe('Keyboard Navigation Property Tests', function () {
         $user = \App\Models\User::factory()->create();
 
         $response = $this->actingAs($user)->get('/dashboard');
-
-        if ($response->getStatusCode() !== 200) {
-            $this->markTestSkipped('Dashboard not accessible');
-        }
+        $response->assertSuccessful();
 
         $content = $response->getContent();
 
@@ -114,10 +119,7 @@ describe('Keyboard Navigation Property Tests', function () {
 
     it('ensures form controls in Blade components have proper structure', function () {
         $componentDir = resource_path('views/components');
-
-        if (! is_dir($componentDir)) {
-            $this->markTestSkipped('Components directory not found');
-        }
+        expect(is_dir($componentDir))->toBeTrue('Components directory not found');
 
         $componentFiles = glob($componentDir.'/*.blade.php') ?: [];
         $testedCount = 0;

@@ -41,10 +41,10 @@ Accessibility: WCAG 2.2 AA compliant, aria-describedby for errors/hints, visible
         'focus:outline-hidden focus:ring-2 focus:ring-offset-0 ' .
         ($hasError 
             ? 'border-error-500 text-error-900 placeholder-error-400 focus:border-error-500 focus:ring-error-500/20 bg-error-50 dark:bg-error-900/10 dark:text-error-400 dark:border-error-500' 
-            : 'border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500/20 bg-white dark:bg-gray-800'
+            : 'border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:border-primary-500 focus:ring-primary-500/20 bg-white dark:bg-neutral-800'
         ) .
-        ($disabled ? ' opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-700' : '') .
-        ($readonly ? ' bg-gray-50 dark:bg-gray-700/50' : '');
+        ($disabled ? ' opacity-50 cursor-not-allowed bg-neutral-100 dark:bg-neutral-700' : '') .
+        ($readonly ? ' bg-neutral-50 dark:bg-neutral-700/50' : '');
     
     $ariaDescribedBy = collect([
         $hasError ? $errorId : null,
@@ -55,7 +55,7 @@ Accessibility: WCAG 2.2 AA compliant, aria-describedby for errors/hints, visible
 <div {{ $attributes->only('class')->merge(['class' => 'form-group']) }}>
     {{-- Label --}}
     @if($label)
-        <label for="{{ $inputId }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        <label for="{{ $inputId }}" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
             {{ $label }}
             @if($required)
                 <span class="text-error-500 ml-0.5" aria-hidden="true">*</span>
@@ -92,7 +92,7 @@ Accessibility: WCAG 2.2 AA compliant, aria-describedby for errors/hints, visible
     
     {{-- Hint Text --}}
     @if($hint && !$hasError)
-        <p id="{{ $hintId }}" class="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+        <p id="{{ $hintId }}" class="mt-1.5 text-sm text-neutral-500 dark:text-neutral-400">
             {{ $hint }}
         </p>
     @endif

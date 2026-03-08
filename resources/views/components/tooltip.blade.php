@@ -76,14 +76,14 @@
         class="absolute z-50 {{ $tooltipPositionClasses }} {{ $maxWidthClasses }}"
         style="pointer-events: none;"
     >
-        <div class="relative px-3 py-2 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-lg shadow-lg">
+        <div class="relative px-3 py-2 text-sm text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg">
             {{-- Tooltip Content --}}
             <div class="relative z-10">
                 {{ $content }}
             </div>
             
             {{-- Arrow --}}
-            <div class="absolute w-2 h-2 bg-gray-900 dark:bg-gray-700 {{ $arrowClasses }}" aria-hidden="true"></div>
+            <div class="absolute w-2 h-2 bg-neutral-900 dark:bg-neutral-700 {{ $arrowClasses }}" aria-hidden="true"></div>
         </div>
     </div>
 </div>

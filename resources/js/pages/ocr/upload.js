@@ -251,19 +251,19 @@ class OCRUploadManager {
         const fileSize = (file.size / 1024).toFixed(1);
 
         const itemHTML = `
-            <div id="queue-item-${fileId}" class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div id="queue-item-${fileId}" class="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center flex-1 min-w-0">
-                        <svg class="w-8 h-8 text-gray-400 dark:text-gray-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 text-neutral-400 dark:text-neutral-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">${file.name}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">${fileSize} KB</p>
+                            <p class="text-sm font-medium text-neutral-900 dark:text-white truncate">${file.name}</p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">${fileSize} KB</p>
                         </div>
                     </div>
                     <div class="flex items-center ml-4">
-                        <span id="status-${fileId}" class="px-2 py-1 text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
+                        <span id="status-${fileId}" class="px-2 py-1 text-xs font-medium bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded">
                             Queued
                         </span>
                         <button type="button" 
@@ -277,10 +277,10 @@ class OCRUploadManager {
                     </div>
                 </div>
                 <div id="progress-${fileId}" class="hidden">
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
                         <div id="progress-bar-${fileId}" class="bg-primary-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
-                    <p id="progress-text-${fileId}" class="text-xs text-gray-600 dark:text-gray-400 mt-1">Processing...</p>
+                    <p id="progress-text-${fileId}" class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">Processing...</p>
                 </div>
             </div>
         `;
@@ -389,7 +389,7 @@ class OCRUploadManager {
         if (!statusEl) return;
 
         const statusClasses = {
-            queued: "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300",
+            queued: "bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300",
             processing:
                 "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
             completed:
@@ -442,11 +442,11 @@ class OCRUploadManager {
                   : "text-red-600";
 
         const resultHTML = `
-            <div class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg p-4">
                 <div class="flex items-start justify-between">
                     <div class="flex-1">
-                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">${item.file.name}</h4>
-                        <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+                        <h4 class="text-sm font-semibold text-neutral-900 dark:text-white mb-1">${item.file.name}</h4>
+                        <div class="flex items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400">
                             <span>Screen Type: <strong>${data.screen_type || "Unknown"}</strong></span>
                             <span class="${confidenceClass}">Confidence: <strong>${(data.confidence * 100).toFixed(1)}%</strong></span>
                         </div>

@@ -51,10 +51,7 @@ describe('Screen Reader Property Tests', function () {
 
     it('ensures error/alert components use assertive live regions', function () {
         $componentDir = resource_path('views/components');
-
-        if (! is_dir($componentDir)) {
-            $this->markTestSkipped('Components directory not found');
-        }
+        expect(is_dir($componentDir))->toBeTrue('Components directory not found');
 
         $alertFiles = glob($componentDir.'/*alert*') ?: [];
         $errorFiles = glob($componentDir.'/*error*') ?: [];
@@ -77,10 +74,7 @@ describe('Screen Reader Property Tests', function () {
 
     it('ensures form validation errors use aria-invalid', function () {
         $componentDir = resource_path('views/components');
-
-        if (! is_dir($componentDir)) {
-            $this->markTestSkipped('Components directory not found');
-        }
+        expect(is_dir($componentDir))->toBeTrue('Components directory not found');
 
         $formComponents = array_filter(array_merge(
             glob($componentDir.'/*input*') ?: [],
@@ -112,10 +106,7 @@ describe('Screen Reader Property Tests', function () {
 
     it('ensures dynamic loading states have aria-busy', function () {
         $livewireDir = resource_path('views/livewire');
-
-        if (! is_dir($livewireDir)) {
-            $this->markTestSkipped('Livewire views directory not found');
-        }
+        expect(is_dir($livewireDir))->toBeTrue('Livewire views directory not found');
 
         $livewireFiles = glob($livewireDir.'/*.blade.php') ?: [];
         $subDirFiles = glob($livewireDir.'/**/*.blade.php') ?: [];

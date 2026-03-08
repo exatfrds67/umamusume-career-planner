@@ -9,25 +9,25 @@
         ['label' => 'Performance Dashboard'],
     ]" />
 
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900" x-data="apmDashboard()">
+    <div class="min-h-screen bg-neutral-100 dark:bg-neutral-900" x-data="apmDashboard()">
         {{-- Header --}}
-        <header class="bg-white dark:bg-gray-800 shadow">
+        <header class="bg-white dark:bg-neutral-800 shadow">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between flex-wrap gap-4">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                        <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">
                             Performance Dashboard
                         </h1>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                             Real-time application performance monitoring
                         </p>
                     </div>
                     <div class="flex items-center gap-4 flex-wrap">
                         <!-- Time Window Selector (SPEC-008) -->
                         <div class="flex items-center gap-2">
-                            <label for="time-window" class="text-sm text-gray-500 dark:text-gray-400">Window:</label>
+                            <label for="time-window" class="text-sm text-neutral-500 dark:text-neutral-400">Window:</label>
                             <select id="time-window" x-model="timeWindow" @change="refreshDashboard()"
-                                class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                class="px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-600 rounded-md bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                 <option value="5m">5 min</option>
                                 <option value="15m">15 min</option>
                                 <option value="1h">1 hour</option>
@@ -38,9 +38,9 @@
 
                         <!-- Live Polling Toggle (SPEC-008) -->
                         <div class="flex items-center gap-2">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">Live:</span>
+                            <span class="text-sm text-neutral-500 dark:text-neutral-400">Live:</span>
                             <button @click="togglePolling()"
-                                :class="isPolling ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'"
+                                :class="isPolling ? 'bg-green-500' : 'bg-neutral-300 dark:bg-neutral-600'"
                                 class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                 role="switch" :aria-checked="isPolling">
                                 <span :class="isPolling ? 'translate-x-5' : 'translate-x-0'"
@@ -58,9 +58,9 @@
 
                         <!-- Polling Interval Selector -->
                         <div x-show="isPolling" class="flex items-center gap-2">
-                            <label for="poll-interval" class="text-sm text-gray-500 dark:text-gray-400">Interval:</label>
+                            <label for="poll-interval" class="text-sm text-neutral-500 dark:text-neutral-400">Interval:</label>
                             <select id="poll-interval" x-model.number="pollInterval" @change="restartPolling()"
-                                class="px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                class="px-2 py-1.5 text-sm border border-neutral-300 dark:border-neutral-600 rounded-md bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                                 <option value="5000">5s</option>
                                 <option value="10000">10s</option>
                                 <option value="30000">30s</option>
@@ -68,13 +68,13 @@
                             </select>
                         </div>
 
-                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                        <span class="text-sm text-neutral-500 dark:text-neutral-400">
                             Last updated: <span id="last-updated" x-text="lastUpdated">{{ now()->format('H:i:s') }}</span>
                         </span>
                         <button @click="refreshDashboard()" :disabled="isLoading"
                             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-xs text-white bg-blue-600 hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50">
                             <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': isLoading }" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
+                                aria-hidden="true" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
@@ -88,12 +88,12 @@
         <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             {{-- Health Score Card --}}
             <div class="mb-6">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h2 class="text-lg font-medium text-gray-900 dark:text-white">Application Health Score</h2>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Overall system health based on key
+                                <h2 class="text-lg font-medium text-neutral-900 dark:text-white">Application Health Score</h2>
+                                <p class="text-sm text-neutral-500 dark:text-neutral-400">Overall system health based on key
                                     metrics</p>
                             </div>
                             <div class="text-right">
@@ -111,15 +111,15 @@
                         {{-- Health Components --}}
                         <div class="mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                             @foreach ($data['health_score']['components'] as $name => $component)
-                                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                                <div class="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4">
+                                    <div class="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase">
                                         {{ str_replace('_', ' ', $name) }}
                                     </div>
                                     <div
                                         class="mt-1 text-2xl font-semibold {{ $component['status'] === 'excellent' ? 'text-green-500' : ($component['status'] === 'good' ? 'text-blue-500' : ($component['status'] === 'warning' ? 'text-yellow-500' : 'text-red-500')) }}">
                                         {{ $component['score'] }}
                                     </div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    <div class="text-xs text-neutral-500 dark:text-neutral-400">
                                         {{ is_numeric($component['value']) ? number_format($component['value'], 2) : $component['value'] }}
                                     </div>
                                 </div>
@@ -132,20 +132,20 @@
             {{-- Overview Metrics --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 {{-- Total Requests --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="shrink-0">
-                                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-6 w-6 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                 </svg>
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Requests
+                                    <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400 truncate">Total Requests
                                     </dt>
-                                    <dd class="text-lg font-semibold text-gray-900 dark:text-white">
+                                    <dd class="text-lg font-semibold text-neutral-900 dark:text-white">
                                         {{ number_format($data['overview']['total_requests']) }}</dd>
                                 </dl>
                             </div>
@@ -154,20 +154,20 @@
                 </div>
 
                 {{-- Avg Response Time --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="shrink-0">
-                                <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-6 w-6 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Avg Response
+                                    <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400 truncate">Avg Response
                                         Time</dt>
-                                    <dd class="text-lg font-semibold text-gray-900 dark:text-white">
+                                    <dd class="text-lg font-semibold text-neutral-900 dark:text-white">
                                         {{ number_format($data['overview']['avg_response_time_ms'], 2) }}ms</dd>
                                 </dl>
                             </div>
@@ -176,22 +176,22 @@
                 </div>
 
                 {{-- Error Rate --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="shrink-0">
-                                <svg class="h-6 w-6 {{ $data['overview']['error_rate'] > 5 ? 'text-red-400' : 'text-gray-400' }}"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-6 w-6 {{ $data['overview']['error_rate'] > 5 ? 'text-red-400' : 'text-neutral-400' }}"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Error Rate
+                                    <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400 truncate">Error Rate
                                     </dt>
                                     <dd
-                                        class="text-lg font-semibold {{ $data['overview']['error_rate'] > 5 ? 'text-red-500' : 'text-gray-900 dark:text-white' }}">
+                                        class="text-lg font-semibold {{ $data['overview']['error_rate'] > 5 ? 'text-red-500' : 'text-neutral-900 dark:text-white' }}">
                                         {{ number_format($data['overview']['error_rate'], 2) }}%</dd>
                                 </dl>
                             </div>
@@ -200,23 +200,23 @@
                 </div>
 
                 {{-- Cache Hit Rate --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="shrink-0">
-                                <svg class="h-6 w-6 {{ $data['overview']['cache_hit_rate'] < 70 ? 'text-yellow-400' : 'text-gray-400' }}"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-6 w-6 {{ $data['overview']['cache_hit_rate'] < 70 ? 'text-yellow-400' : 'text-neutral-400' }}"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
                                 </svg>
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Cache Hit
+                                    <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400 truncate">Cache Hit
                                         Rate
                                     </dt>
                                     <dd
-                                        class="text-lg font-semibold {{ $data['overview']['cache_hit_rate'] < 70 ? 'text-yellow-500' : 'text-gray-900 dark:text-white' }}">
+                                        class="text-lg font-semibold {{ $data['overview']['cache_hit_rate'] < 70 ? 'text-yellow-500' : 'text-neutral-900 dark:text-white' }}">
                                         {{ number_format($data['overview']['cache_hit_rate'], 2) }}%</dd>
                                 </dl>
                             </div>
@@ -228,32 +228,32 @@
             {{-- Main Content Grid --}}
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {{-- Database Metrics --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Database Performance</h3>
-                        <div class="mt-5 grid grid-cols-2 gap-4">
+                        <h3 class="text-lg leading-6 font-medium text-neutral-900 dark:text-white">Database Performance</h3>
+                        <dl class="mt-5 grid grid-cols-2 gap-4">
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Queries</dt>
-                                <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Total Queries</dt>
+                                <dd class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">
                                     {{ number_format($data['database']['total_queries']) }}</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Slow Queries</dt>
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Slow Queries</dt>
                                 <dd
-                                    class="mt-1 text-2xl font-semibold {{ $data['database']['slow_queries'] > 10 ? 'text-red-500' : 'text-gray-900 dark:text-white' }}">
+                                    class="mt-1 text-2xl font-semibold {{ $data['database']['slow_queries'] > 10 ? 'text-red-500' : 'text-neutral-900 dark:text-white' }}">
                                     {{ $data['database']['slow_queries'] }}</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Avg Query Time</dt>
-                                <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Avg Query Time</dt>
+                                <dd class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">
                                     {{ number_format($data['database']['avg_query_time_ms'], 2) }}ms</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Cache Hit Rate</dt>
-                                <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Cache Hit Rate</dt>
+                                <dd class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">
                                     {{ number_format($data['database']['cache_hit_rate'], 2) }}%</dd>
                             </div>
-                        </div>
+                        </dl>
                         @if ($data['database']['recommendations_count'] > 0)
                             <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
                                 <p class="text-sm text-yellow-700 dark:text-yellow-300">
@@ -266,34 +266,34 @@
                 </div>
 
                 {{-- Cache Metrics --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Cache Performance</h3>
-                        <div class="mt-5 grid grid-cols-2 gap-4">
+                        <h3 class="text-lg leading-6 font-medium text-neutral-900 dark:text-white">Cache Performance</h3>
+                        <dl class="mt-5 grid grid-cols-2 gap-4">
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Status</dt>
                                 <dd
                                     class="mt-1 text-2xl font-semibold {{ $data['cache']['healthy'] ? 'text-green-500' : 'text-red-500' }}">
                                     {{ $data['cache']['healthy'] ? 'Healthy' : 'Unhealthy' }}
                                 </dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Latency</dt>
-                                <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Latency</dt>
+                                <dd class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">
                                     {{ number_format($data['cache']['latency_ms'], 2) }}ms</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Memory Used</dt>
-                                <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Memory Used</dt>
+                                <dd class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">
                                     {{ $data['cache']['memory']['used'] }}</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Memory Usage</dt>
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Memory Usage</dt>
                                 <dd
-                                    class="mt-1 text-2xl font-semibold {{ $data['cache']['memory']['usage_percent'] > 80 ? 'text-red-500' : 'text-gray-900 dark:text-white' }}">
+                                    class="mt-1 text-2xl font-semibold {{ $data['cache']['memory']['usage_percent'] > 80 ? 'text-red-500' : 'text-neutral-900 dark:text-white' }}">
                                     {{ number_format($data['cache']['memory']['usage_percent'], 1) }}%</dd>
                             </div>
-                        </div>
+                        </dl>
                         @if (!empty($data['cache']['recommendations']))
                             <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
                                 <p class="text-sm text-blue-700 dark:text-blue-300">
@@ -306,32 +306,32 @@
                 </div>
 
                 {{-- API Performance --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">API Performance</h3>
-                        <div class="mt-5 grid grid-cols-2 gap-4">
+                        <h3 class="text-lg leading-6 font-medium text-neutral-900 dark:text-white">API Performance</h3>
+                        <dl class="mt-5 grid grid-cols-2 gap-4">
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">P95 Response Time</dt>
-                                <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">P95 Response Time</dt>
+                                <dd class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">
                                     {{ number_format($data['api']['overview']['p95_response_time_ms'], 2) }}ms</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">P99 Response Time</dt>
-                                <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">P99 Response Time</dt>
+                                <dd class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">
                                     {{ number_format($data['api']['overview']['p99_response_time_ms'], 2) }}ms</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Slow Request Rate</dt>
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Slow Request Rate</dt>
                                 <dd
-                                    class="mt-1 text-2xl font-semibold {{ $data['api']['overview']['slow_request_rate'] > 10 ? 'text-red-500' : 'text-gray-900 dark:text-white' }}">
+                                    class="mt-1 text-2xl font-semibold {{ $data['api']['overview']['slow_request_rate'] > 10 ? 'text-red-500' : 'text-neutral-900 dark:text-white' }}">
                                     {{ number_format($data['api']['overview']['slow_request_rate'], 2) }}%</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Requests/min</dt>
-                                <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Requests/min</dt>
+                                <dd class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">
                                     {{ number_format($data['api']['overview']['requests_per_minute'], 2) }}</dd>
                             </div>
-                        </div>
+                        </dl>
                         @if (!empty($data['api']['bottlenecks']))
                             <div class="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-md">
                                 <p class="text-sm text-red-700 dark:text-red-300">
@@ -343,36 +343,36 @@
                 </div>
 
                 {{-- System Resources --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">System Resources</h3>
-                        <div class="mt-5 grid grid-cols-2 gap-4">
+                        <h3 class="text-lg leading-6 font-medium text-neutral-900 dark:text-white">System Resources</h3>
+                        <dl class="mt-5 grid grid-cols-2 gap-4">
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Memory Usage</dt>
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Memory Usage</dt>
                                 <dd
-                                    class="mt-1 text-2xl font-semibold {{ $data['system']['memory']['usage_percent'] > 80 ? 'text-red-500' : 'text-gray-900 dark:text-white' }}">
+                                    class="mt-1 text-2xl font-semibold {{ $data['system']['memory']['usage_percent'] > 80 ? 'text-red-500' : 'text-neutral-900 dark:text-white' }}">
                                     {{ number_format($data['system']['memory']['usage_percent'], 1) }}%</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Memory Used</dt>
-                                <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                                <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Memory Used</dt>
+                                <dd class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">
                                     {{ number_format($data['system']['memory']['current_mb'], 1) }}MB</dd>
                             </div>
                             @if ($data['system']['disk'])
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Disk Usage</dt>
+                                    <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Disk Usage</dt>
                                     <dd
-                                        class="mt-1 text-2xl font-semibold {{ $data['system']['disk']['usage_percent'] > 80 ? 'text-red-500' : 'text-gray-900 dark:text-white' }}">
+                                        class="mt-1 text-2xl font-semibold {{ $data['system']['disk']['usage_percent'] > 80 ? 'text-red-500' : 'text-neutral-900 dark:text-white' }}">
                                         {{ number_format($data['system']['disk']['usage_percent'], 1) }}%</dd>
                                 </div>
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Disk Free</dt>
-                                    <dd class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                                    <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Disk Free</dt>
+                                    <dd class="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">
                                         {{ number_format($data['system']['disk']['free_gb'], 1) }}GB</dd>
                                 </div>
                             @endif
-                        </div>
-                        <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                        </dl>
+                        <div class="mt-4 text-sm text-neutral-500 dark:text-neutral-400">
                             PHP {{ $data['system']['php']['version'] }} | Memory Limit:
                             {{ $data['system']['php']['memory_limit'] }}
                         </div>
@@ -383,34 +383,34 @@
             {{-- Alerts and Regressions --}}
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                 {{-- Recent Alerts --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Recent Alerts</h3>
+                        <h3 class="text-lg leading-6 font-medium text-neutral-900 dark:text-white mb-4">Recent Alerts</h3>
                         @if (empty($data['alerts']))
-                            <p class="text-sm text-gray-500 dark:text-gray-400">No recent alerts</p>
+                            <p class="text-sm text-neutral-500 dark:text-neutral-400">No recent alerts</p>
                         @else
-                            <div class="space-y-3 max-h-64 overflow-y-auto">
+                            <div class="space-y-3 max-h-64 overflow-y-auto" role="list">
                                 @foreach ($data['alerts'] as $alert)
-                                    <div
+                                    <div role="listitem"
                                         class="flex items-start p-3 rounded-md {{ $alert['severity'] === 'critical' ? 'bg-red-50 dark:bg-red-900/20' : ($alert['severity'] === 'warning' ? 'bg-yellow-50 dark:bg-yellow-900/20' : 'bg-blue-50 dark:bg-blue-900/20') }}">
                                         <div class="shrink-0">
                                             @if ($alert['severity'] === 'critical')
                                                 <svg class="h-5 w-5 text-red-400" fill="currentColor"
-                                                    viewBox="0 0 20 20">
+                                                    viewBox="0 0 20 20" aria-hidden="true">
                                                     <path fill-rule="evenodd"
                                                         d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             @elseif($alert['severity'] === 'warning')
                                                 <svg class="h-5 w-5 text-yellow-400" fill="currentColor"
-                                                    viewBox="0 0 20 20">
+                                                    viewBox="0 0 20 20" aria-hidden="true">
                                                     <path fill-rule="evenodd"
                                                         d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             @else
                                                 <svg class="h-5 w-5 text-blue-400" fill="currentColor"
-                                                    viewBox="0 0 20 20">
+                                                    viewBox="0 0 20 20" aria-hidden="true">
                                                     <path fill-rule="evenodd"
                                                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
                                                         clip-rule="evenodd" />
@@ -435,18 +435,18 @@
                 </div>
 
                 {{-- Recent Regressions --}}
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white dark:bg-neutral-800 overflow-hidden shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Performance
+                        <h3 class="text-lg leading-6 font-medium text-neutral-900 dark:text-white mb-4">Performance
                             Regressions</h3>
                         @if (empty($data['regressions']))
-                            <p class="text-sm text-gray-500 dark:text-gray-400">No performance regressions detected</p>
+                            <p class="text-sm text-neutral-500 dark:text-neutral-400">No performance regressions detected</p>
                         @else
-                            <div class="space-y-3 max-h-64 overflow-y-auto">
+                            <div class="space-y-3 max-h-64 overflow-y-auto" role="list">
                                 @foreach ($data['regressions'] as $regression)
-                                    <div class="flex items-start p-3 rounded-md bg-orange-50 dark:bg-orange-900/20">
+                                    <div role="listitem" class="flex items-start p-3 rounded-md bg-orange-50 dark:bg-orange-900/20">
                                         <div class="shrink-0">
-                                            <svg class="h-5 w-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg class="h-5 w-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                                 <path fill-rule="evenodd"
                                                     d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
                                                     clip-rule="evenodd" />

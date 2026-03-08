@@ -24,7 +24,7 @@
     <!-- Skills List -->
     <div>
         <div class="flex items-center justify-between mb-3">
-            <h3 class="text-md font-semibold text-gray-900 dark:text-white">Extracted Skills</h3>
+            <h3 class="text-md font-semibold text-neutral-900 dark:text-white">Extracted Skills</h3>
             <button type="button" id="add-skill-button"
                 class="px-3 py-1 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-hidden focus:ring-2 focus:ring-primary-500 transition-colors">
                 + Add Skill
@@ -34,43 +34,43 @@
         <div id="skills-container" class="space-y-3">
             @forelse($data['skills'] ?? [] as $index => $skill)
                 <div
-                    class="skill-item bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    class="skill-item bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg p-4">
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
                         <!-- Skill Name -->
                         <div class="md:col-span-5">
                             <label for="skill_name_{{ $index }}"
-                                class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                                 Skill Name
                             </label>
                             <input type="text" id="skill_name_{{ $index }}"
                                 name="skills[{{ $index }}][name]" value="{{ $skill['name'] ?? '' }}"
-                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:text-white"
+                                class="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-800 dark:text-white"
                                 placeholder="Skill name" aria-label="Skill name">
                         </div>
 
                         <!-- SP Cost -->
                         <div class="md:col-span-2">
                             <label for="skill_sp_{{ $index }}"
-                                class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                                 SP Cost
                             </label>
                             <input type="number" id="skill_sp_{{ $index }}"
                                 name="skills[{{ $index }}][sp_cost]" value="{{ $skill['sp_cost'] ?? '' }}"
                                 min="0" max="500"
-                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:text-white"
+                                class="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-800 dark:text-white"
                                 placeholder="0" aria-label="Skill SP cost">
                         </div>
 
                         <!-- Hint Level -->
                         <div class="md:col-span-2">
                             <label for="skill_hint_{{ $index }}"
-                                class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                                 Hint Level
                             </label>
                             <input type="number" id="skill_hint_{{ $index }}"
                                 name="skills[{{ $index }}][hint_level]" value="{{ $skill['hint_level'] ?? 0 }}"
                                 min="0" max="5"
-                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:text-white"
+                                class="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-800 dark:text-white"
                                 placeholder="0" aria-label="Skill hint level">
                         </div>
 
@@ -79,8 +79,8 @@
                             <label class="flex items-center">
                                 <input type="checkbox" name="skills[{{ $index }}][is_acquired]" value="1"
                                     {{ $skill['is_acquired'] ?? false ? 'checked' : '' }}
-                                    class="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700">
-                                <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Acquired</span>
+                                    class="w-4 h-4 text-primary-500 border-neutral-300 rounded focus:ring-primary-500 dark:border-neutral-600 dark:bg-neutral-700">
+                                <span class="ml-2 text-xs text-neutral-700 dark:text-neutral-300">Acquired</span>
                             </label>
                         </div>
 
@@ -99,7 +99,7 @@
                     </div>
                 </div>
             @empty
-                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                <div class="text-center py-8 text-neutral-500 dark:text-neutral-400">
                     <p>No skills extracted. Click "Add Skill" to add manually.</p>
                 </div>
             @endforelse
@@ -115,7 +115,7 @@
 
 @if (isset($data['errors']) && !empty($data['errors']))
     <div class="mt-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-        <h4 class="text-sm font-semibold text-yellow-800 dark:text-yellow-200 mb-2">⚠️ Validation Warnings</h4>
+        <h4 class="text-sm font-semibold text-yellow-800 dark:text-yellow-200 mb-2"><span aria-hidden="true">⚠️</span> Validation Warnings</h4>
         <ul class="list-disc list-inside text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
             @foreach ($data['errors'] as $error)
                 <li>{{ $error }}</li>

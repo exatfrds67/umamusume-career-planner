@@ -2,18 +2,18 @@
     'refreshInterval' => 5000, // 5 seconds for real-time updates
 ])
 
-<div class="agent-progress-tracker bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6" x-data="agentProgressTracker({
+<div class="agent-progress-tracker bg-white dark:bg-neutral-800 rounded-lg shadow-xs p-6" x-data="agentProgressTracker({
     refreshInterval: {{ $refreshInterval }}
 })">
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
             Agent Workflow Progress
         </h3>
         <div class="flex items-center gap-2">
             <span class="text-xs px-2 py-1 rounded-full font-medium"
                 :class="{
-                    'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': progress?.status === 'idle',
+                    'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300': progress?.status === 'idle',
                     'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': progress?.status === 'running',
                     'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': progress
                         ?.status === 'completed',
@@ -26,14 +26,14 @@
 
     {{-- No Active Workflow --}}
     <div x-show="!progress?.workflow_id" class="text-center py-12">
-        <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" stroke="currentColor"
+        <svg class="w-16 h-16 mx-auto text-neutral-400 dark:text-neutral-600 mb-4" fill="none" stroke="currentColor"
             viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
             </path>
         </svg>
-        <p class="text-gray-500 dark:text-gray-400">No active workflow</p>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Agent workflows will appear here when active</p>
+        <p class="text-neutral-500 dark:text-neutral-400">No active workflow</p>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Agent workflows will appear here when active</p>
     </div>
 
     {{-- Active Workflow --}}
@@ -68,11 +68,11 @@
         {{-- Overall Progress Bar --}}
         <div>
             <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Overall Progress</span>
+                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Overall Progress</span>
                 <span class="text-sm font-semibold text-primary-600 dark:text-primary-400"
                     x-text="(progress?.progress_percentage || 0).toFixed(1) + '%'"></span>
             </div>
-            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+            <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-3 overflow-hidden">
                 <div class="bg-linear-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-500 ease-out"
                     :style="'width: ' + (progress?.progress_percentage || 0) + '%'">
                 </div>
@@ -91,17 +91,17 @@
 
         {{-- Agent List --}}
         <div>
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Agents</h4>
+            <h4 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">Agents</h4>
             <div class="space-y-2">
                 <template x-for="(agent, index) in progress?.agents || []" :key="agent.agent_id">
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                    <div class="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4">
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
                                 {{-- Status Indicator --}}
                                 <div class="relative">
                                     <div class="w-3 h-3 rounded-full"
                                         :class="{
-                                            'bg-gray-400': agent.status === 'idle',
+                                            'bg-neutral-400': agent.status === 'idle',
                                             'bg-blue-500 animate-pulse': agent.status === 'running',
                                             'bg-green-500': agent.status === 'completed',
                                             'bg-red-500': agent.status === 'failed'
@@ -111,12 +111,12 @@
                                         class="absolute inset-0 w-3 h-3 bg-blue-500 rounded-full animate-ping opacity-75">
                                     </div>
                                 </div>
-                                <span class="text-sm font-medium text-gray-900 dark:text-white capitalize"
+                                <span class="text-sm font-medium text-neutral-900 dark:text-white capitalize"
                                     x-text="agent.agent_type"></span>
                             </div>
                             <span class="text-xs px-2 py-1 rounded-full font-medium"
                                 :class="{
-                                    'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300': agent
+                                    'bg-neutral-100 text-neutral-800 dark:bg-neutral-600 dark:text-neutral-300': agent
                                         .status === 'idle',
                                     'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': agent
                                         .status === 'running',
@@ -131,7 +131,7 @@
 
                         {{-- Agent Progress Bar --}}
                         <div x-show="agent.status === 'running' || agent.status === 'completed'" class="mb-2">
-                            <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 overflow-hidden">
+                            <div class="w-full bg-neutral-200 dark:bg-neutral-600 rounded-full h-2 overflow-hidden">
                                 <div class="bg-primary-500 h-2 rounded-full transition-all duration-300"
                                     :style="'width: ' + (agent.progress || 0) + '%'">
                                 </div>
@@ -139,7 +139,7 @@
                         </div>
 
                         {{-- Agent Details --}}
-                        <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+                        <div class="flex items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400">
                             <div x-show="agent.started_at">
                                 <span>Started:</span>
                                 <span class="ml-1" x-text="formatTime(agent.started_at)"></span>

@@ -135,7 +135,7 @@ export default (config) => ({
         };
         return (
             classes[scenario] ||
-            "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+            "bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300"
         );
     },
 
@@ -150,7 +150,7 @@ export default (config) => ({
         };
         return (
             classes[status] ||
-            "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+            "bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300"
         );
     },
 

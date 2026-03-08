@@ -139,6 +139,10 @@ describe('TrainingAdvisorAgent - Instantiation and Configuration', function () {
         expect($instructions)->toContain('training');
         expect($instructions)->toContain('aptitudes');
         expect($instructions)->toContain('support card');
+        expect($instructions)->toContain('Wit');
+        expect($instructions)->toContain('inheritance');
+        expect($instructions)->toContain('Inspiration Event');
+        expect($instructions)->toContain('72 turns');
     });
 
     it('uses Anthropic provider', function () {

@@ -35,7 +35,7 @@ Accessibility: WCAG 2.2 AA compliant
 <div {{ $attributes->merge(['class' => 'flex items-center gap-2']) }}>
     {{-- Label --}}
     @if($label)
-        <label for="{{ $sortId }}" class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+        <label for="{{ $sortId }}" class="text-sm font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap">
             {{ $label }}
         </label>
     @endif
@@ -46,7 +46,7 @@ Accessibility: WCAG 2.2 AA compliant
             name="{{ $name }}"
             id="{{ $sortId }}"
             value="{{ $selectedValue }}"
-            class="appearance-none bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg px-3 py-2 pr-8 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-150 cursor-pointer"
+            class="appearance-none bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-white rounded-lg px-3 py-2 pr-8 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-150 cursor-pointer"
         >
             @foreach($normalizedOptions as $option)
                 <option 
@@ -60,7 +60,7 @@ Accessibility: WCAG 2.2 AA compliant
         
         {{-- Dropdown Icon --}}
         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-            <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <svg class="h-4 w-4 text-neutral-500 dark:text-neutral-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
             </svg>
         </div>

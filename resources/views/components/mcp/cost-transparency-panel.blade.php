@@ -1,10 +1,10 @@
 @props(['costs' => []])
 
-<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-xs dark:border-gray-700 dark:bg-gray-800">
+<div class="rounded-lg border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-700 dark:bg-neutral-800">
     <div class="mb-4 flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Cost Transparency</h3>
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Cost Transparency</h3>
         <button @click="$dispatch('refresh-costs')"
-            class="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+            class="rounded-md p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-300"
             title="Refresh Costs">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -54,8 +54,8 @@
     <div class="mt-6">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Budget Utilization</p>
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Budget Utilization</p>
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
                     <span x-text="'$' + (costs.budget_status?.spent || 0).toFixed(2)"></span> of
                     <span x-text="'$' + (costs.budget_status?.limit || 0).toFixed(2)"></span>
                 </p>
@@ -69,7 +69,7 @@
                 }"
                 x-text="(costs.budget_status?.utilization || 0).toFixed(1) + '%'"></span>
         </div>
-        <div class="mt-2 h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+        <div class="mt-2 h-3 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
             <div class="h-full transition-all duration-500"
                 :class="{
                     'bg-green-600': costs.budget_status?.utilization < 75,
@@ -97,26 +97,26 @@
 
     <!-- Cost Breakdown by Provider -->
     <div class="mt-6">
-        <h4 class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">Cost by Provider</h4>
+        <h4 class="mb-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">Cost by Provider</h4>
         <div class="space-y-3">
             <template x-for="(provider, name) in costs.by_provider" :key="name">
-                <div class="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-900/50">
+                <div class="flex items-center justify-between rounded-lg bg-neutral-50 p-3 dark:bg-neutral-900/50">
                     <div class="flex items-center space-x-3">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-white dark:bg-gray-800">
-                            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300"
+                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-white dark:bg-neutral-800">
+                            <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-300"
                                 x-text="name.substring(0, 2).toUpperCase()"></span>
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-900 dark:text-white" x-text="provider.name"></p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <p class="text-sm font-medium text-neutral-900 dark:text-white" x-text="provider.name"></p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">
                                 <span x-text="provider.requests"></span> requests
                             </p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm font-semibold text-gray-900 dark:text-white"
+                        <p class="text-sm font-semibold text-neutral-900 dark:text-white"
                             x-text="'$' + (provider.cost || 0).toFixed(4)"></p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400"
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400"
                             x-text="(provider.percentage || 0).toFixed(1) + '%'"></p>
                     </div>
                 </div>
@@ -126,19 +126,19 @@
 
     <!-- Cost Breakdown by Tool -->
     <div class="mt-6">
-        <h4 class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">Top MCP Tools by Cost</h4>
+        <h4 class="mb-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">Top MCP Tools by Cost</h4>
         <div class="space-y-2">
             <template x-for="(tool, index) in costs.top_tools" :key="index">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2">
                         <span
-                            class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                            class="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-xs font-semibold text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300"
                             x-text="index + 1"></span>
-                        <span class="text-sm text-gray-700 dark:text-gray-300" x-text="tool.name"></span>
+                        <span class="text-sm text-neutral-700 dark:text-neutral-300" x-text="tool.name"></span>
                     </div>
                     <div class="flex items-center space-x-3">
-                        <span class="text-xs text-gray-500 dark:text-gray-400" x-text="tool.calls + ' calls'"></span>
-                        <span class="text-sm font-semibold text-gray-900 dark:text-white"
+                        <span class="text-xs text-neutral-500 dark:text-neutral-400" x-text="tool.calls + ' calls'"></span>
+                        <span class="text-sm font-semibold text-neutral-900 dark:text-white"
                             x-text="'$' + (tool.cost || 0).toFixed(4)"></span>
                     </div>
                 </div>
@@ -148,7 +148,7 @@
 
     <!-- Cost Optimization Recommendations -->
     <div x-show="costs.recommendations && costs.recommendations.length > 0" class="mt-6">
-        <h4 class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">Cost Optimization Tips</h4>
+        <h4 class="mb-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">Cost Optimization Tips</h4>
         <div class="space-y-2">
             <template x-for="(rec, index) in costs.recommendations" :key="index">
                 <div class="flex items-start space-x-2 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">

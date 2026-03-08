@@ -40,8 +40,8 @@
             'icon' =>
                 '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />',
             'color' => 'gray',
-            'bgLight' => 'bg-gray-100 dark:bg-gray-700',
-            'textColor' => 'text-gray-600 dark:text-gray-400',
+            'bgLight' => 'bg-neutral-100 dark:bg-neutral-700',
+            'textColor' => 'text-neutral-600 dark:text-neutral-400',
         ],
     ];
 @endphp
@@ -59,8 +59,8 @@
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Loading Training Predictions...</h3>
-        <p class="text-gray-700 dark:text-gray-300">Analyzing training facilities and generating AI recommendations</p>
+        <h3 class="text-lg font-medium text-neutral-900 dark:text-white mb-2">Loading Training Predictions...</h3>
+        <p class="text-neutral-700 dark:text-neutral-300">Analyzing training facilities and generating AI recommendations</p>
     </div>
 
     {{-- Error State --}}
@@ -71,8 +71,8 @@
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Unable to Load Predictions</h3>
-        <p id="predictions-error-message" class="text-gray-700 dark:text-gray-300 mb-4">An error occurred while fetching
+        <h3 class="text-lg font-medium text-neutral-900 dark:text-white mb-2">Unable to Load Predictions</h3>
+        <p id="predictions-error-message" class="text-neutral-700 dark:text-neutral-300 mb-4">An error occurred while fetching
             training predictions.</p>
         <button onclick="refreshPredictions()"
             class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
@@ -85,11 +85,11 @@
     <div id="predictions-grid" class="hidden">
         {{-- Section Header with Legend --}}
         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <h2 id="facilities-heading" class="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 id="facilities-heading" class="text-lg font-semibold text-neutral-900 dark:text-white">
                 Training Facilities
-                <span class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">(Levels 1-5)</span>
+                <span class="text-sm font-normal text-neutral-500 dark:text-neutral-400 ml-2">(Levels 1-5)</span>
             </h2>
-            <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400" aria-label="Risk level legend">
+            <div class="flex items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400" aria-label="Risk level legend">
                 <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500" aria-hidden="true"></span> Low Risk
                     (&lt;15%)</span>
                 <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500" aria-hidden="true"></span> Medium
@@ -119,10 +119,10 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-900 dark:text-white capitalize">{{ $facility }}
+                                <h3 class="font-semibold text-neutral-900 dark:text-white capitalize">{{ $facility }}
                                 </h3>
                                 @if ($facility !== 'rest')
-                                    <span class="facility-level text-xs text-gray-500 dark:text-gray-400">Lv --
+                                    <span class="facility-level text-xs text-neutral-500 dark:text-neutral-400">Lv --
                                         (--×)</span>
                                 @endif
                             </div>
@@ -137,7 +137,7 @@
                             </span>
                             {{-- Risk Badge --}}
                             <span
-                                class="risk-badge px-2 py-1 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                                class="risk-badge px-2 py-1 rounded text-xs font-medium bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300"
                                 data-testid="risk-badge-{{ $facility }}">
                                 --
                             </span>
@@ -148,23 +148,23 @@
                         {{-- Stat Gains --}}
                         <div class="facility-stats space-y-2 text-sm mb-4" data-testid="stat-gains">
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Primary Gain:</span>
+                                <span class="text-neutral-600 dark:text-neutral-400">Primary Gain:</span>
                                 <span class="stat-gain font-semibold {{ $config['textColor'] }}">+--</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Secondary:</span>
-                                <span class="secondary-gain font-medium text-gray-700 dark:text-gray-300">+--</span>
+                                <span class="text-neutral-600 dark:text-neutral-400">Secondary:</span>
+                                <span class="secondary-gain font-medium text-neutral-700 dark:text-neutral-300">+--</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Skill Points:</span>
-                                <span class="skill-points font-medium text-gray-700 dark:text-gray-300">+--</span>
+                                <span class="text-neutral-600 dark:text-neutral-400">Skill Points:</span>
+                                <span class="skill-points font-medium text-neutral-700 dark:text-neutral-300">+--</span>
                             </div>
                         </div>
 
                         {{-- Support Cards at Facility --}}
-                        <div class="support-cards-section border-t border-gray-100 dark:border-gray-700 pt-3 mb-3">
+                        <div class="support-cards-section border-t border-neutral-100 dark:border-neutral-700 pt-3 mb-3">
                             <div
-                                class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                class="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 mb-2">
                                 <span>Support Cards:</span>
                                 <span class="support-card-count">0 cards (+0%)</span>
                             </div>
@@ -174,8 +174,8 @@
                         </div>
 
                         {{-- Skill Hints --}}
-                        <div class="skill-hints-section border-t border-gray-100 dark:border-gray-700 pt-3 mb-3 hidden">
-                            <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">Skill Hints:</div>
+                        <div class="skill-hints-section border-t border-neutral-100 dark:border-neutral-700 pt-3 mb-3 hidden">
+                            <div class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Skill Hints:</div>
                             <div class="skill-hints-list space-y-1">
                                 {{-- Populated by JS --}}
                             </div>
@@ -183,33 +183,33 @@
 
                         {{-- Efficiency Rating --}}
                         <div
-                            class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Efficiency:</span>
+                            class="flex items-center justify-between border-t border-neutral-100 dark:border-neutral-700 pt-3">
+                            <span class="text-xs text-neutral-500 dark:text-neutral-400">Efficiency:</span>
                             <div class="efficiency-rating flex items-center gap-1">
                                 <span class="efficiency-stars flex items-center text-yellow-500" aria-hidden="true">
                                     @for($i=0; $i<5; $i++)
-                                        <svg class="w-4 h-4 text-gray-300 dark:text-gray-600" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                        <svg class="w-4 h-4 text-neutral-300 dark:text-neutral-600" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                                     @endfor
                                 </span>
-                                <span class="efficiency-score text-xs text-gray-600 dark:text-gray-400" aria-label="Efficiency rating">(--)</span>
+                                <span class="efficiency-score text-xs text-neutral-600 dark:text-neutral-400" aria-label="Efficiency rating">(--)</span>
                             </div>
                         </div>
                     @else
                         {{-- Rest Option --}}
                         <div class="facility-stats space-y-2 text-sm mb-4">
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Energy Recovery:</span>
+                                <span class="text-neutral-600 dark:text-neutral-400">Energy Recovery:</span>
                                 <span
                                     class="energy-recovery font-semibold text-green-600 dark:text-green-400">+50</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Mood Effect:</span>
-                                <span class="mood-effect font-medium text-gray-700 dark:text-gray-300">Possible
+                                <span class="text-neutral-600 dark:text-neutral-400">Mood Effect:</span>
+                                <span class="mood-effect font-medium text-neutral-700 dark:text-neutral-300">Possible
                                     improvement</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Bad Status Cure:</span>
-                                <span class="cure-chance font-medium text-gray-700 dark:text-gray-300">Chance to
+                                <span class="text-neutral-600 dark:text-neutral-400">Bad Status Cure:</span>
+                                <span class="cure-chance font-medium text-neutral-700 dark:text-neutral-300">Chance to
                                     cure</span>
                             </div>
                         </div>
@@ -218,7 +218,7 @@
                     {{-- Action Button --}}
                     <button
                         class="w-full mt-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2
-                        {{ $facility === 'rest' ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' : 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-200 dark:hover:bg-primary-800' }}"
+                        {{ $facility === 'rest' ? 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600' : 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-200 dark:hover:bg-primary-800' }}"
                         onclick="event.stopPropagation(); selectTraining('{{ $facility }}')"
                         aria-label="{{ $facility === 'rest' ? 'Choose rest this turn' : 'Choose ' . $facility . ' training this turn' }}">
                         {{ $facility === 'rest' ? 'Rest' : 'Train' }}
@@ -231,7 +231,7 @@
         <div id="predictions-summary" class="mt-6 card rounded-xl p-6" role="complementary"
             aria-labelledby="ai-recommendation-heading">
             <h3 id="ai-recommendation-heading"
-                class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                class="text-lg font-semibold text-neutral-900 dark:text-white mb-3 flex items-center gap-2">
                 <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" aria-hidden="true" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -239,26 +239,26 @@
                 </svg>
                 AI Recommendation
             </h3>
-            <p id="ai-recommendation-text" class="text-gray-700 dark:text-gray-300 mb-4">
+            <p id="ai-recommendation-text" class="text-neutral-700 dark:text-neutral-300 mb-4">
                 Analyzing the best training option for your current situation...
             </p>
 
             {{-- Calculation Breakdown (Collapsible) --}}
             <details class="mt-4">
                 <summary
-                    class="text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-white"
+                    class="text-sm font-medium text-neutral-600 dark:text-neutral-400 cursor-pointer hover:text-neutral-900 dark:hover:text-white"
                     aria-label="Toggle calculation breakdown">
                     View Calculation Breakdown
                 </summary>
-                <div id="calculation-breakdown" class="mt-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-sm">
-                    <div class="grid grid-cols-2 gap-2 text-gray-600 dark:text-gray-400">
+                <div id="calculation-breakdown" class="mt-3 p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg text-sm">
+                    <div class="grid grid-cols-2 gap-2 text-neutral-600 dark:text-neutral-400">
                         <span>Base Gain:</span><span class="breakdown-base font-mono">--</span>
                         <span>Growth Rate:</span><span class="breakdown-growth font-mono">×--</span>
                         <span>Mood Modifier:</span><span class="breakdown-mood font-mono">×--</span>
                         <span>Support Cards:</span><span class="breakdown-support font-mono">×--</span>
                         <span>Friendship:</span><span class="breakdown-friendship font-mono">×--</span>
                         <span>Facility Level:</span><span class="breakdown-facility font-mono">×--</span>
-                        <span class="font-semibold text-gray-900 dark:text-white">Total Multiplier:</span>
+                        <span class="font-semibold text-neutral-900 dark:text-white">Total Multiplier:</span>
                         <span
                             class="breakdown-total font-mono font-semibold text-primary-600 dark:text-primary-400">×--</span>
                     </div>

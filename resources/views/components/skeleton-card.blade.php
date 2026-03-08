@@ -20,29 +20,29 @@ Accessibility: WCAG 2.2 AA compliant, aria-hidden, reduced motion support
 
 <div 
     {{ $attributes->merge([
-        'class' => 'animate-pulse rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-xs',
+        'class' => 'animate-pulse rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-4 shadow-xs',
         'aria-hidden' => 'true',
     ]) }}
     role="presentation"
 >
     {{-- Image Placeholder --}}
     @if($showImage)
-        <div class="h-40 w-full rounded-lg bg-gray-200 dark:bg-gray-700 mb-4"></div>
+        <div class="h-40 w-full rounded-lg bg-neutral-200 dark:bg-neutral-700 mb-4"></div>
     @endif
     
     {{-- Header with Avatar --}}
     @if($showAvatar)
         <div class="flex items-center gap-3 mb-4">
-            <div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+            <div class="h-10 w-10 rounded-full bg-neutral-200 dark:bg-neutral-700"></div>
             <div class="flex-1 space-y-2">
-                <div class="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700"></div>
-                <div class="h-3 w-1/2 rounded bg-gray-200 dark:bg-gray-700"></div>
+                <div class="h-4 w-3/4 rounded bg-neutral-200 dark:bg-neutral-700"></div>
+                <div class="h-3 w-1/2 rounded bg-neutral-200 dark:bg-neutral-700"></div>
             </div>
         </div>
     @endif
     
     {{-- Title Placeholder --}}
-    <div class="h-5 w-3/4 rounded bg-gray-200 dark:bg-gray-700 mb-4"></div>
+    <div class="h-5 w-3/4 rounded bg-neutral-200 dark:bg-neutral-700 mb-4"></div>
     
     {{-- Text Lines --}}
     <div class="space-y-3">
@@ -51,15 +51,15 @@ Accessibility: WCAG 2.2 AA compliant, aria-hidden, reduced motion support
                 $widths = ['w-full', 'w-5/6', 'w-4/5', 'w-3/4', 'w-2/3'];
                 $width = $widths[$i % count($widths)];
             @endphp
-            <div class="h-3 {{ $width }} rounded bg-gray-200 dark:bg-gray-700"></div>
+            <div class="h-3 {{ $width }} rounded bg-neutral-200 dark:bg-neutral-700"></div>
         @endfor
     </div>
     
     {{-- Action Buttons Placeholder --}}
     @if($showActions)
-        <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div class="h-9 w-20 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
-            <div class="h-9 w-20 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+        <div class="flex items-center gap-3 mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+            <div class="h-9 w-20 rounded-lg bg-neutral-200 dark:bg-neutral-700"></div>
+            <div class="h-9 w-20 rounded-lg bg-neutral-200 dark:bg-neutral-700"></div>
         </div>
     @endif
 </div>

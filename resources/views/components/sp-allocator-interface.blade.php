@@ -27,8 +27,8 @@ Accessibility: WCAG 2.2 AA compliant
     {{-- Header Section --}}
     <div class="flex items-center justify-between">
         <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">SP Allocation</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Distribute skill points across your character's skills</p>
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">SP Allocation</h3>
+            <p class="text-sm text-neutral-500 dark:text-neutral-400">Distribute skill points across your character's skills</p>
         </div>
         <div class="flex items-center gap-2">
             <button
@@ -37,10 +37,10 @@ Accessibility: WCAG 2.2 AA compliant
                 :disabled="historyIndex <= 0"
                 class="
                     p-2 rounded-lg
-                    bg-white dark:bg-gray-800
-                    border border-gray-200 dark:border-gray-700
-                    text-gray-700 dark:text-gray-300
-                    hover:bg-gray-50 dark:hover:bg-gray-700
+                    bg-white dark:bg-neutral-800
+                    border border-neutral-200 dark:border-neutral-700
+                    text-neutral-700 dark:text-neutral-300
+                    hover:bg-neutral-50 dark:hover:bg-neutral-700
                     disabled:opacity-50 disabled:cursor-not-allowed
                     transition-colors
                     focus:outline-hidden focus:ring-2 focus:ring-blue-500
@@ -58,10 +58,10 @@ Accessibility: WCAG 2.2 AA compliant
                 :disabled="historyIndex >= allocationHistory.length - 1"
                 class="
                     p-2 rounded-lg
-                    bg-white dark:bg-gray-800
-                    border border-gray-200 dark:border-gray-700
-                    text-gray-700 dark:text-gray-300
-                    hover:bg-gray-50 dark:hover:bg-gray-700
+                    bg-white dark:bg-neutral-800
+                    border border-neutral-200 dark:border-neutral-700
+                    text-neutral-700 dark:text-neutral-300
+                    hover:bg-neutral-50 dark:hover:bg-neutral-700
                     disabled:opacity-50 disabled:cursor-not-allowed
                     transition-colors
                     focus:outline-hidden focus:ring-2 focus:ring-blue-500
@@ -90,15 +90,15 @@ Accessibility: WCAG 2.2 AA compliant
                 <span class="text-sm font-semibold" :class="budgetColor" x-text="`${totalBudget} SP`"></span>
             </div>
             
-            <div class="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div class="relative h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                 <div class="absolute h-full bg-linear-to-r from-green-500 to-emerald-500"
                      :style="`width: ${(totalAllocated / totalBudget) * 100}%`">
                 </div>
             </div>
 
             <div class="flex items-center justify-between text-sm">
-                <span class="font-medium text-gray-600 dark:text-gray-400">Allocated</span>
-                <span class="font-semibold text-gray-900 dark:text-white" x-text="`${totalAllocated} / ${totalBudget}`"></span>
+                <span class="font-medium text-neutral-600 dark:text-neutral-400">Allocated</span>
+                <span class="font-semibold text-neutral-900 dark:text-white" x-text="`${totalAllocated} / ${totalBudget}`"></span>
             </div>
         </div>
 
@@ -149,11 +149,11 @@ Accessibility: WCAG 2.2 AA compliant
             @click="clearAllAllocations()"
             class="
                 px-4 py-2 rounded-lg text-sm font-medium
-                bg-gray-100 dark:bg-gray-700
-                text-gray-700 dark:text-gray-300
-                hover:bg-gray-200 dark:hover:bg-gray-600
+                bg-neutral-100 dark:bg-neutral-700
+                text-neutral-700 dark:text-neutral-300
+                hover:bg-neutral-200 dark:hover:bg-neutral-600
                 transition-colors
-                focus:outline-hidden focus:ring-2 focus:ring-gray-500
+                focus:outline-hidden focus:ring-2 focus:ring-neutral-500
             "
         >
             Clear All
@@ -191,26 +191,26 @@ Accessibility: WCAG 2.2 AA compliant
     {{-- Allocated Skills Section --}}
     <template x-if="allocatedSkills.length > 0">
         <div class="space-y-3">
-            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Allocated Skills</h4>
+            <h4 class="text-sm font-semibold text-neutral-900 dark:text-white">Allocated Skills</h4>
             <div class="space-y-2">
                 <template x-for="skill in allocatedSkills" :key="skill.id">
                     <div class="
                         flex items-center justify-between gap-4
-                        bg-white dark:bg-gray-800
-                        border border-gray-200 dark:border-gray-700
+                        bg-white dark:bg-neutral-800
+                        border border-neutral-200 dark:border-neutral-700
                         rounded-lg p-4
                         hover:ring-2 hover:ring-blue-500
                         transition-all
                     ">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1">
-                                <h5 class="font-medium text-gray-900 dark:text-white truncate" x-text="skill.name"></h5>
+                                <h5 class="font-medium text-neutral-900 dark:text-white truncate" x-text="skill.name"></h5>
                                 <span class="inline-flex px-2 py-0.5 rounded text-xs font-bold"
                                     :class="getSkillColor(skill.tier)"
                                     x-text="`Tier ${skill.tier}`"
                                 ></span>
                             </div>
-                            <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                            <div class="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
                                 <span x-text="`Max: ${skill.max_sp}`"></span>
                                 <span>•</span>
                                 <span x-text="`Type: ${skill.type || 'Unknown'}`"></span>
@@ -224,9 +224,9 @@ Accessibility: WCAG 2.2 AA compliant
                                 :disabled="(allocations[skill.id] || 0) <= 0"
                                 class="
                                     p-1.5 rounded
-                                    bg-gray-100 dark:bg-gray-700
-                                    text-gray-600 dark:text-gray-400
-                                    hover:bg-gray-200 dark:hover:bg-gray-600
+                                    bg-neutral-100 dark:bg-neutral-700
+                                    text-neutral-600 dark:text-neutral-400
+                                    hover:bg-neutral-200 dark:hover:bg-neutral-600
                                     disabled:opacity-50 disabled:cursor-not-allowed
                                     transition-colors
                                     focus:outline-hidden focus:ring-2 focus:ring-blue-500
@@ -246,9 +246,9 @@ Accessibility: WCAG 2.2 AA compliant
                                 min="0"
                                 class="
                                     w-16 px-2 py-1 rounded text-center font-semibold
-                                    bg-gray-100 dark:bg-gray-700
-                                    border border-gray-200 dark:border-gray-600
-                                    text-gray-900 dark:text-white
+                                    bg-neutral-100 dark:bg-neutral-700
+                                    border border-neutral-200 dark:border-neutral-600
+                                    text-neutral-900 dark:text-white
                                     focus:outline-hidden focus:ring-2 focus:ring-blue-500
                                 "
                                 aria-label="SP amount"
@@ -301,7 +301,7 @@ Accessibility: WCAG 2.2 AA compliant
     {{-- Unallocated Skills Grid --}}
     <template x-if="unallocatedSkills.length > 0">
         <div class="space-y-3">
-            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Available Skills</h4>
+            <h4 class="text-sm font-semibold text-neutral-900 dark:text-white">Available Skills</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 <template x-for="skill in unallocatedSkills" :key="skill.id">
                     <button
@@ -309,8 +309,8 @@ Accessibility: WCAG 2.2 AA compliant
                         @click="allocateSP(skill.id, Math.min(10, skill.max_sp))"
                         class="
                             text-left p-4 rounded-lg
-                            bg-gray-50 dark:bg-gray-800
-                            border border-gray-200 dark:border-gray-700
+                            bg-neutral-50 dark:bg-neutral-800
+                            border border-neutral-200 dark:border-neutral-700
                             hover:border-blue-400 dark:hover:border-blue-600
                             hover:bg-blue-50 dark:hover:bg-blue-900/20
                             transition-colors
@@ -319,13 +319,13 @@ Accessibility: WCAG 2.2 AA compliant
                         "
                     >
                         <div class="flex items-start justify-between mb-2">
-                            <h5 class="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400" x-text="skill.name"></h5>
+                            <h5 class="font-medium text-neutral-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400" x-text="skill.name"></h5>
                             <span class="inline-flex px-2 py-0.5 rounded text-xs font-bold"
                                 :class="getSkillColor(skill.tier)"
                                 x-text="`Tier ${skill.tier}`"
                             ></span>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400" x-text="`Max SP: ${skill.max_sp}`"></p>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400" x-text="`Max SP: ${skill.max_sp}`"></p>
                     </button>
                 </template>
             </div>
@@ -335,11 +335,11 @@ Accessibility: WCAG 2.2 AA compliant
     {{-- Empty State --}}
     <template x-if="skills.length === 0">
         <div class="py-12 text-center">
-            <svg class="w-12 h-12 text-gray-500 dark:text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-12 h-12 text-neutral-500 dark:text-neutral-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p class="text-gray-600 dark:text-gray-400 font-medium">No skills available</p>
-            <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">Equip skills from your character's skill list to allocate SP</p>
+            <p class="text-neutral-600 dark:text-neutral-400 font-medium">No skills available</p>
+            <p class="text-sm text-neutral-500 dark:text-neutral-500 mt-1">Equip skills from your character's skill list to allocate SP</p>
         </div>
     </template>
 </div>

@@ -65,7 +65,7 @@ describe('AptitudeDisplay Component', function () {
             ->and((new AptitudeDisplay('turf', 'A'))->gradeColor())->toContain('orange')
             ->and((new AptitudeDisplay('turf', 'B'))->gradeColor())->toContain('blue')
             ->and((new AptitudeDisplay('turf', 'C'))->gradeColor())->toContain('green')
-            ->and((new AptitudeDisplay('turf', 'D'))->gradeColor())->toContain('gray')
+            ->and((new AptitudeDisplay('turf', 'D'))->gradeColor())->toContain('neutral')
             ->and((new AptitudeDisplay('turf', 'G'))->gradeColor())->toContain('red');
     });
 

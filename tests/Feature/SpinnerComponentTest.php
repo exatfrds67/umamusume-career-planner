@@ -63,8 +63,8 @@ describe('Spinner Component', function () {
         $html = Blade::render('<x-spinner color="gray" />');
 
         expect($html)
-            ->toContain('text-gray-500')
-            ->toContain('dark:text-gray-400');
+            ->toContain('text-neutral-500')
+            ->toContain('dark:text-neutral-400');
     });
 
     it('renders white color', function () {

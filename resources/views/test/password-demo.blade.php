@@ -7,10 +7,10 @@
         <div class="max-w-md w-full space-y-8">
             <div class="glass-card rounded-2xl p-8">
                 <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h2 class="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
                         Password Toggle Demo
                     </h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">
                         Test the password visibility toggle functionality
                     </p>
                 </div>

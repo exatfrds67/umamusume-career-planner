@@ -1,21 +1,21 @@
 @props(['overview'])
 
-<div class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
+<div class="card bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700">
     <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Friendship Levels</h2>
-        <div class="text-sm text-gray-500 dark:text-gray-400">
+        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">Friendship Levels</h2>
+        <div class="text-sm text-neutral-500 dark:text-neutral-400">
             Avg: <span
-                class="font-medium text-gray-900 dark:text-white">{{ number_format($overview['average_friendship'], 1) }}%</span>
+                class="font-medium text-neutral-900 dark:text-white">{{ number_format($overview['average_friendship'], 1) }}%</span>
         </div>
     </div>
 
     <div class="space-y-3">
         @foreach ($overview['cards'] as $card)
             <div
-                class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 {{ $card['is_rainbow_available'] ? 'bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700' : 'bg-gray-50 dark:bg-gray-900/20' }}">
+                class="p-3 rounded-lg border border-neutral-200 dark:border-neutral-700 {{ $card['is_rainbow_available'] ? 'bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700' : 'bg-neutral-50 dark:bg-neutral-900/20' }}">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-2">
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">
+                        <span class="text-sm font-medium text-neutral-900 dark:text-white">
                             {{ $card['card_name'] }}
                         </span>
                         @if ($card['is_rainbow_available'])
@@ -30,13 +30,13 @@
                         @endif
                     </div>
                     <span
-                        class="text-sm font-semibold {{ $card['is_rainbow_available'] ? 'text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400' }}">
+                        class="text-sm font-semibold {{ $card['is_rainbow_available'] ? 'text-purple-600 dark:text-purple-400' : 'text-neutral-600 dark:text-neutral-400' }}">
                         {{ $card['friendship_level'] }}%
                     </span>
                 </div>
 
                 <!-- Progress Bar -->
-                <div class="relative w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div class="relative w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                     <div class="absolute inset-y-0 left-0 {{ $card['is_rainbow_available'] ? 'bg-linear-to-r from-purple-500 to-pink-500' : 'bg-blue-500' }} rounded-full transition-all duration-300"
                         style="width: {{ $card['friendship_level'] }}%"></div>
 
@@ -44,7 +44,7 @@
                     <div class="absolute inset-y-0 left-[80%] w-0.5 bg-purple-600 dark:bg-purple-400"></div>
                 </div>
 
-                <div class="mt-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <div class="mt-1 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
                     <span>{{ $card['card_type'] }}</span>
                     @if (!$card['is_rainbow_available'])
                         <span>{{ 80 - $card['friendship_level'] }}% to Rainbow</span>

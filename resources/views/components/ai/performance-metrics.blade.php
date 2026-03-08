@@ -2,18 +2,18 @@
     'refreshInterval' => 30000, // 30 seconds
 ])
 
-<div class="performance-metrics bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6" x-data="performanceMetrics({
+<div class="performance-metrics bg-white dark:bg-neutral-800 rounded-lg shadow-xs p-6" x-data="performanceMetrics({
     refreshInterval: {{ $refreshInterval }}
 })">
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
             Performance Metrics
         </h3>
         <div class="flex items-center gap-2">
-            <span class="text-sm text-gray-500 dark:text-gray-400" x-text="lastUpdated"></span>
+            <span class="text-sm text-neutral-500 dark:text-neutral-400" x-text="lastUpdated"></span>
             <button @click="refresh()"
-                class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                class="p-2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
                 <svg class="w-5 h-5" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -33,12 +33,12 @@
     <div x-show="!loading || metrics" class="space-y-6">
         {{-- Provider Comparison --}}
         <div>
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">AI Provider Performance</h4>
+            <h4 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">AI Provider Performance</h4>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <template x-for="(provider, name) in metrics?.providers || {}" :key="name">
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                    <div class="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm font-medium text-gray-900 dark:text-white capitalize"
+                            <span class="text-sm font-medium text-neutral-900 dark:text-white capitalize"
                                 x-text="name"></span>
                             <span class="text-xs px-2 py-1 rounded-full"
                                 :class="{
@@ -54,18 +54,18 @@
                         </div>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between">
-                                <span class="text-gray-600 dark:text-gray-400">Requests:</span>
-                                <span class="font-medium text-gray-900 dark:text-white"
+                                <span class="text-neutral-600 dark:text-neutral-400">Requests:</span>
+                                <span class="font-medium text-neutral-900 dark:text-white"
                                     x-text="provider.total_requests"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-600 dark:text-gray-400">Avg Time:</span>
-                                <span class="font-medium text-gray-900 dark:text-white"
+                                <span class="text-neutral-600 dark:text-neutral-400">Avg Time:</span>
+                                <span class="font-medium text-neutral-900 dark:text-white"
                                     x-text="provider.average_response_time.toFixed(2) + 's'"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-600 dark:text-gray-400">Avg Cost:</span>
-                                <span class="font-medium text-gray-900 dark:text-white"
+                                <span class="text-neutral-600 dark:text-neutral-400">Avg Cost:</span>
+                                <span class="font-medium text-neutral-900 dark:text-white"
                                     x-text="'$' + provider.average_cost.toFixed(4)"></span>
                             </div>
                         </div>
@@ -104,10 +104,10 @@
 
         {{-- Agent Performance --}}
         <div x-show="Object.keys(metrics?.agents || {}).length > 0">
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Agent Performance</h4>
+            <h4 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">Agent Performance</h4>
             <div class="space-y-2">
                 <template x-for="(agent, type) in metrics?.agents || {}" :key="type">
-                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-700 rounded-lg">
                         <div class="flex items-center gap-3">
                             <div class="w-2 h-2 rounded-full"
                                 :class="{
@@ -116,23 +116,23 @@
                                     'bg-red-500': agent.health_status === 'unhealthy'
                                 }">
                             </div>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white capitalize"
+                            <span class="text-sm font-medium text-neutral-900 dark:text-white capitalize"
                                 x-text="type"></span>
                         </div>
                         <div class="flex items-center gap-4 text-sm">
                             <div>
-                                <span class="text-gray-600 dark:text-gray-400">Executions:</span>
-                                <span class="font-medium text-gray-900 dark:text-white ml-1"
+                                <span class="text-neutral-600 dark:text-neutral-400">Executions:</span>
+                                <span class="font-medium text-neutral-900 dark:text-white ml-1"
                                     x-text="agent.total_executions"></span>
                             </div>
                             <div>
-                                <span class="text-gray-600 dark:text-gray-400">Success:</span>
-                                <span class="font-medium text-gray-900 dark:text-white ml-1"
+                                <span class="text-neutral-600 dark:text-neutral-400">Success:</span>
+                                <span class="font-medium text-neutral-900 dark:text-white ml-1"
                                     x-text="agent.success_rate.toFixed(1) + '%'"></span>
                             </div>
                             <div>
-                                <span class="text-gray-600 dark:text-gray-400">Avg Time:</span>
-                                <span class="font-medium text-gray-900 dark:text-white ml-1"
+                                <span class="text-neutral-600 dark:text-neutral-400">Avg Time:</span>
+                                <span class="font-medium text-neutral-900 dark:text-white ml-1"
                                     x-text="agent.average_execution_time.toFixed(2) + 's'"></span>
                             </div>
                         </div>

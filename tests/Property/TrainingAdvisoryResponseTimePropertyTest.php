@@ -94,6 +94,7 @@ describe('Property 2: Response Time Bounds', function () {
                 ->shouldReceive('generateMultipleRecommendations')
                 ->andReturnUsing(function () use ($complexity) {
                     // Simulate realistic local AI processing times
+                    /** @var string $complexity */
                     $processingTime = match ($complexity) {
                         'simple' => rand(100000, 500000),   // 100-500ms
                         'medium' => rand(300000, 1000000),  // 300ms-1s
@@ -165,6 +166,7 @@ describe('Property 2: Response Time Bounds', function () {
                 ->shouldReceive('generateMultipleRecommendations')
                 ->andReturnUsing(function () use ($complexity) {
                     // Simulate realistic cloud AI processing times (includes network latency)
+                    /** @var string $complexity */
                     $processingTime = match ($complexity) {
                         'simple' => rand(500000, 1500000),   // 500ms-1.5s
                         'medium' => rand(1000000, 2500000),  // 1s-2.5s
@@ -231,6 +233,7 @@ describe('Property 2: Response Time Bounds', function () {
                 ->with($context)
                 ->andReturnUsing(function () use ($complexity) {
                     // Simulate minimal rule-based processing time (5ms - 50ms)
+                    /** @var string $complexity */
                     $processingTime = match ($complexity) {
                         'simple' => rand(5000, 15000),    // 5-15ms
                         'medium' => rand(10000, 30000),   // 10-30ms

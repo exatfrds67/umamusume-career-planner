@@ -7,10 +7,10 @@
         <div class="max-w-2xl w-full space-y-8">
             <div class="glass-card rounded-2xl p-8">
                 <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h2 class="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
                         Remember Me Functionality Demo
                     </h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">
                         Testing the "Remember Me" checkbox functionality
                     </p>
                 </div>
@@ -21,11 +21,11 @@
                         @csrf
 
                         <div>
-                            <label for="demo-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label for="demo-email" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                                 Email address
                             </label>
                             <input id="demo-email" name="email" type="email" value="demo@example.com" readonly
-                                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-hidden focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-gray-50 dark:bg-gray-700">
+                                class="appearance-none relative block w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 placeholder-neutral-500 dark:placeholder-neutral-400 text-neutral-900 dark:text-white rounded-md focus:outline-hidden focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-neutral-50 dark:bg-neutral-700">
                         </div>
 
                         <x-password-input id="demo-password" name="password" label="Password" value="demo-password"
@@ -34,9 +34,9 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
                                 <input id="demo-remember" name="remember" type="checkbox"
-                                    class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
+                                    class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 dark:border-neutral-600 rounded"
                                     onchange="updateRememberStatus()">
-                                <label for="demo-remember" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                                <label for="demo-remember" class="ml-2 block text-sm text-neutral-900 dark:text-neutral-300">
                                     Remember me
                                 </label>
                             </div>
@@ -116,12 +116,12 @@
                     </div>
 
                     <!-- How It Works -->
-                    <div class="mt-6 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                    <div class="mt-6 p-6 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
+                        <h3 class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">
                             How Remember Me Works
                         </h3>
 
-                        <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                        <div class="space-y-3 text-sm text-neutral-700 dark:text-neutral-300">
                             <div class="flex items-start">
                                 <span class="text-primary-500 mr-2">1.</span>
                                 <div>User checks "Remember me" checkbox and submits login form</div>

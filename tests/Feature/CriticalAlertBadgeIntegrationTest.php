@@ -58,5 +58,5 @@ test('critical alert badge has correct styling classes', function () {
     $response->assertSuccessful();
     // Check for transition and color classes
     $response->assertSee('transition-colors duration-200', false);
-    $response->assertSee('text-gray-400 hover:text-gray-500', false);
+    $response->assertSee('text-neutral-400 hover:text-neutral-500', false);
 });

@@ -53,13 +53,13 @@ Accessibility: WCAG 2.2 AA compliant, role="switch", 44px touch target
     <div class="flex items-center justify-between gap-4">
         {{-- Label and Description --}}
         <div class="flex flex-col">
-            <label for="{{ $toggleId }}" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
+            <label for="{{ $toggleId }}" class="text-sm font-medium text-neutral-700 dark:text-neutral-300 cursor-pointer {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
                 {{ $label }}
             </label>
             
             {{-- Hint Text --}}
             @if($hint && !$hasError)
-                <p id="{{ $hintId }}" class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                <p id="{{ $hintId }}" class="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">
                     {{ $hint }}
                 </p>
             @endif
@@ -75,8 +75,8 @@ Accessibility: WCAG 2.2 AA compliant, role="switch", 44px touch target
             @if($disabled) disabled aria-disabled="true" @endif
             @if($hasError) aria-invalid="true" @endif
             @if($ariaDescribedBy) aria-describedby="{{ $ariaDescribedBy }}" @endif
-            :class="enabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-700'"
-            class="{{ $sizeConfig['track'] }} relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }} {{ $hasError ? 'ring-2 ring-error-500' : '' }}"
+            :class="enabled ? 'bg-primary-600' : 'bg-neutral-200 dark:bg-neutral-700'"
+            class="{{ $sizeConfig['track'] }} relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }} {{ $hasError ? 'ring-2 ring-error-500' : '' }}"
         >
             <span class="sr-only">{{ $label }}</span>
             <span

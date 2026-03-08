@@ -73,6 +73,8 @@ document.addEventListener("alpine:init", () => {
         isDragging: false,
         dragStartX: 0,
         dragStartY: 0,
+        _boundOnDrag: null,
+        _boundStopDrag: null,
 
         // Search Filters
         filters: {
@@ -145,20 +147,22 @@ document.addEventListener("alpine:init", () => {
 
         // Select a trainee from the database
         selectTrainee(trainee) {
+            const avatarUrl = this.resolveCharacterImageUrl(trainee);
+
             this.formData.trainee = trainee;
             this.formData.name = trainee.name || "";
             this.formData.title = trainee.title || "";
-            this.formData.avatar_url = trainee.image || "";
-            this.formData.avatar_preview = trainee.image || "";
+            this.formData.avatar_url = avatarUrl;
+            this.formData.avatar_preview = avatarUrl;
 
             // Prefill stats if available
             if (trainee.baseStats) {
                 this.formData.stats = { ...trainee.baseStats };
             }
 
-            // Prefill aptitudes if available
-            if (trainee.aptitudes) {
-                this.formData.aptitudes = { ...trainee.aptitudes };
+            // Prefill aptitudes if available (deep merge to preserve structure)
+            if (trainee.aptitudes && typeof trainee.aptitudes === 'object' && !Array.isArray(trainee.aptitudes)) {
+                this.formData.aptitudes = this.deepMerge(this.formData.aptitudes, trainee.aptitudes);
             }
 
             // Close database modal
@@ -182,14 +186,43 @@ document.addEventListener("alpine:init", () => {
             // Auto-save draft every 30 seconds
             setInterval(() => this.saveDraft(), 30000);
 
+            // Bind document-level drag events for image positioning
+            this._boundOnDrag = (e) => this.onDrag(e);
+            this._boundStopDrag = () => this.stopDrag();
+            document.addEventListener('mousemove', this._boundOnDrag);
+            document.addEventListener('mouseup', this._boundStopDrag);
+            document.addEventListener('touchmove', this._boundOnDrag, { passive: false });
+            document.addEventListener('touchend', this._boundStopDrag);
+
             // Check for external prefill
             if (pageData && pageData.externalPrefill) {
+                const avatarUrl = this.resolveCharacterImageUrl(
+                    pageData.externalPrefill,
+                );
+
                 this.showExternalPrefillNotice = true;
                 this.formData.name = pageData.externalPrefill.name || "";
-                this.formData.avatar_url = pageData.externalPrefill.image || "";
-                this.formData.avatar_preview =
-                    pageData.externalPrefill.image || "";
+                this.formData.avatar_url = avatarUrl;
+                this.formData.avatar_preview = avatarUrl;
             }
+        },
+
+        resolveCharacterImageUrl(character) {
+            const candidates = [
+                character?.avatar_url,
+                character?.image,
+                character?.image_url,
+                character?.thumb_img,
+                character?.image_path,
+            ];
+
+            for (const candidate of candidates) {
+                if (typeof candidate === "string" && candidate.trim() !== "") {
+                    return candidate;
+                }
+            }
+
+            return "";
         },
 
         // Step names for mobile progress bar
@@ -273,15 +306,17 @@ document.addEventListener("alpine:init", () => {
 
         isStep3Valid() {
             // Check if at least one aptitude is selected in each category
-            const hasDistance = Object.values(
-                this.formData.aptitudes.distance,
-            ).some((v) => v);
-            const hasSurface = Object.values(
-                this.formData.aptitudes.surface,
-            ).some((v) => v);
-            const hasStyle = Object.values(this.formData.aptitudes.style).some(
-                (v) => v,
-            );
+            const distance = this.formData.aptitudes?.distance;
+            const surface = this.formData.aptitudes?.surface;
+            const style = this.formData.aptitudes?.style;
+
+            if (!distance || !surface || !style) {
+                return false;
+            }
+
+            const hasDistance = Object.values(distance).some((v) => v);
+            const hasSurface = Object.values(surface).some((v) => v);
+            const hasStyle = Object.values(style).some((v) => v);
             return hasDistance && hasSurface && hasStyle;
         },
 
@@ -305,11 +340,11 @@ document.addEventListener("alpine:init", () => {
                 S: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
                 A: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
                 B: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-                C: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
-                D: "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400",
-                E: "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-500",
-                F: "bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-600",
-                G: "bg-gray-100 text-gray-300 dark:bg-gray-700 dark:text-gray-700",
+                C: "bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200",
+                D: "bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400",
+                E: "bg-neutral-100 text-neutral-500 dark:bg-neutral-700 dark:text-neutral-500",
+                F: "bg-neutral-100 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-600",
+                G: "bg-neutral-100 text-neutral-300 dark:bg-neutral-700 dark:text-neutral-700",
             };
             return colors[grade] || colors["G"];
         },
@@ -342,7 +377,8 @@ document.addEventListener("alpine:init", () => {
                     const parsed = JSON.parse(draft);
                     // Only load if less than 24 hours old
                     if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
-                        this.formData = parsed.formData;
+                        const defaults = JSON.parse(JSON.stringify(this.formData));
+                        this.formData = this.deepMerge(defaults, parsed.formData || {});
                         this.currentStep = parsed.currentStep || 1;
                     }
                 }
@@ -357,6 +393,134 @@ document.addEventListener("alpine:init", () => {
             } catch (error) {
                 console.error("Failed to clear draft:", error);
             }
+        },
+
+        deepMerge(target, source) {
+            const result = { ...target };
+            for (const key of Object.keys(source)) {
+                if (
+                    source[key] &&
+                    typeof source[key] === "object" &&
+                    !Array.isArray(source[key]) &&
+                    target[key] &&
+                    typeof target[key] === "object" &&
+                    !Array.isArray(target[key])
+                ) {
+                    result[key] = this.deepMerge(target[key], source[key]);
+                } else {
+                    result[key] = source[key];
+                }
+            }
+            return result;
+        },
+
+        destroy() {
+            if (this._boundOnDrag) {
+                document.removeEventListener('mousemove', this._boundOnDrag);
+                document.removeEventListener('touchmove', this._boundOnDrag);
+            }
+            if (this._boundStopDrag) {
+                document.removeEventListener('mouseup', this._boundStopDrag);
+                document.removeEventListener('touchend', this._boundStopDrag);
+            }
+        },
+
+        // --- Image Editor Methods ---
+
+        handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please upload a valid image file (JPG, PNG, or GIF)');
+                return;
+            }
+
+            const maxSize = 2 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('File size must be less than 2MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.formData.avatar_preview = e.target.result;
+                this.formData.avatar_url = 'custom_upload';
+                this.showGallery = false;
+                this.resetImageEdits();
+            };
+            reader.readAsDataURL(file);
+        },
+
+        selectGalleryImage(imagePath) {
+            this.formData.avatar_url = imagePath;
+            this.formData.avatar_preview = imagePath;
+            this.showGallery = false;
+            this.resetImageEdits();
+        },
+
+        useDefaultAvatar() {
+            this.formData.avatar_url = '';
+            this.formData.avatar_preview = '';
+            this.showGallery = false;
+            this.resetImageEdits();
+        },
+
+        adjustZoom(delta) {
+            const newZoom = this.formData.imageZoom + delta;
+            if (newZoom >= 0.5 && newZoom <= 2) {
+                this.formData.imageZoom = Math.round(newZoom * 10) / 10;
+            }
+        },
+
+        rotateImage(degrees) {
+            this.formData.imageRotation = (this.formData.imageRotation + degrees) % 360;
+            if (this.formData.imageRotation < 0) {
+                this.formData.imageRotation += 360;
+            }
+        },
+
+        flipImageHorizontal() {
+            this.formData.imageFlipH = !this.formData.imageFlipH;
+        },
+
+        resetImageEdits() {
+            this.formData.imageZoom = 1;
+            this.formData.imageRotation = 0;
+            this.formData.imageFlipH = false;
+            this.formData.imageX = 0;
+            this.formData.imageY = 0;
+        },
+
+        moveImage(deltaX, deltaY) {
+            this.formData.imageX += deltaX;
+            this.formData.imageY += deltaY;
+        },
+
+        startDrag(event) {
+            this.isDragging = true;
+            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+            this.dragStartX = clientX - this.formData.imageX;
+            this.dragStartY = clientY - this.formData.imageY;
+        },
+
+        onDrag(event) {
+            if (!this.isDragging) {
+                return;
+            }
+            event.preventDefault();
+            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+            this.formData.imageX = clientX - this.dragStartX;
+            this.formData.imageY = clientY - this.dragStartY;
+        },
+
+        stopDrag() {
+            this.isDragging = false;
         },
     }));
 });

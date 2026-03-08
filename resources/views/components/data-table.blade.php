@@ -80,31 +80,31 @@
                 type="text"
                 x-model="searchQuery"
                 placeholder="Search plans..."
-                class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                class="flex-1 px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500"
             />
-            <span class="text-sm text-gray-500 dark:text-gray-400">
+            <span class="text-sm text-neutral-500 dark:text-neutral-400">
                 <span x-text="filteredRows.length"></span> results
             </span>
         </div>
     @endif
 
     <!-- Table -->
-    <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+    <div class="overflow-x-auto border border-neutral-200 dark:border-neutral-700 rounded-lg">
         <table class="w-full">
             <!-- Header -->
-            <thead class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <thead class="bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700">
                 <tr>
                     @foreach ($columns as $col)
                         <th
                             @if($col['sortable'] ?? false)
                                 @click="toggleSort('{{ $col['key'] }}')"
-                                class="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                                class="cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700 transition"
                             @else
                                 class="bg-inherit"
                             @endif
                             style="@if(isset($col['width']))width: {{ $col['width']}}@endif"
                         >
-                            <div class="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <div class="px-4 py-3 text-left text-sm font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
                                 <span>{{ $col['label'] }}</span>
                                 @if($col['sortable'] ?? false)
                                     <span x-show="sortBy === '{{ $col['key'] }}'" class="text-blue-600">
@@ -115,16 +115,16 @@
                             </div>
                         </th>
                     @endforeach
-                    <th class="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
+                    <th class="px-4 py-3 text-right text-sm font-semibold text-neutral-900 dark:text-white">Actions</th>
                 </tr>
             </thead>
 
             <!-- Body -->
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
                 <template x-for="row in paginatedRows" :key="JSON.stringify(row)">
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
                         @foreach ($columns as $col)
-                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                            <td class="px-4 py-3 text-sm text-neutral-700 dark:text-neutral-300">
                                 <span x-text="row['{{ $col['key'] }}']"></span>
                             </td>
                         @endforeach
@@ -142,7 +142,7 @@
                 <!-- Empty State -->
                 <template x-if="paginatedRows.length === 0">
                     <tr>
-                        <td :colspan="$cols + 1" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                        <td :colspan="$cols + 1" class="px-4 py-8 text-center text-neutral-500 dark:text-neutral-400">
                             <p class="text-sm">No plans found</p>
                         </td>
                     </tr>
@@ -155,21 +155,21 @@
     @if ($paginated)
         <template x-if="totalPages > 1">
             <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-600 dark:text-gray-400">
+                <span class="text-sm text-neutral-600 dark:text-neutral-400">
                     Page <span x-text="currentPage"></span> of <span x-text="totalPages"></span>
                 </span>
                 <div class="flex gap-2">
                     <button
                         @click="goToPage(currentPage - 1)"
                         :disabled="currentPage === 1"
-                        class="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        class="px-3 py-1.5 border border-neutral-300 dark:border-neutral-600 rounded-lg text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
                     >
                         Previous
                     </button>
                     <button
                         @click="goToPage(currentPage + 1)"
                         :disabled="currentPage === totalPages"
-                        class="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        class="px-3 py-1.5 border border-neutral-300 dark:border-neutral-600 rounded-lg text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
                     >
                         Next
                     </button>

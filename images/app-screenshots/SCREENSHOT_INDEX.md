@@ -235,7 +235,7 @@ Landing page with dark theme enabled.
 
 ```markdown
 ![Dashboard](images/app-screenshots/05-dashboard-page.png)
-```
+```text
 
 ### HTML Reference
 
@@ -247,7 +247,7 @@ Landing page with dark theme enabled.
 
 ```markdown
 [![Screenshots](https://img.shields.io/badge/Screenshots-29-blue)](images/app-screenshots/)
-```
+```text
 
 ---
 

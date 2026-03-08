@@ -14,7 +14,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    <span class="font-medium text-gray-900 dark:text-white" x-text="currentWorkflow.name"></span>
+                    <span class="font-medium text-neutral-900 dark:text-white" x-text="currentWorkflow.name"></span>
                 </div>
                 <span class="text-xs px-2 py-1 rounded-full font-medium"
                     :class="{
@@ -24,7 +24,7 @@
                             .status === 'completed',
                         'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300': currentWorkflow
                             .status === 'failed',
-                        'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300': currentWorkflow
+                        'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300': currentWorkflow
                             .status === 'pending'
                     }"
                     x-text="currentWorkflow.status"></span>
@@ -36,17 +36,17 @@
                     <div class="relative">
                         {{-- Connection Line --}}
                         <template x-if="index < currentWorkflow.steps.length - 1">
-                            <div class="absolute left-4 top-10 w-0.5 h-full bg-gray-200 dark:bg-gray-700"
+                            <div class="absolute left-4 top-10 w-0.5 h-full bg-neutral-200 dark:bg-neutral-700"
                                 :class="{ 'bg-blue-500': step.status === 'completed' }"></div>
                         </template>
 
                         {{-- Step Card --}}
-                        <div class="flex items-start gap-3 p-3 bg-white dark:bg-gray-700 rounded-lg border"
+                        <div class="flex items-start gap-3 p-3 bg-white dark:bg-neutral-700 rounded-lg border"
                             :class="{
                                 'border-blue-500 shadow-xs': step.status === 'running',
                                 'border-green-500': step.status === 'completed',
                                 'border-red-500': step.status === 'failed',
-                                'border-gray-200 dark:border-gray-600': step.status === 'pending'
+                                'border-neutral-200 dark:border-neutral-600': step.status === 'pending'
                             }">
 
                             {{-- Step Icon --}}
@@ -55,7 +55,7 @@
                                     'bg-blue-100 dark:bg-blue-900': step.status === 'running',
                                     'bg-green-100 dark:bg-green-900': step.status === 'completed',
                                     'bg-red-100 dark:bg-red-900': step.status === 'failed',
-                                    'bg-gray-100 dark:bg-gray-700': step.status === 'pending'
+                                    'bg-neutral-100 dark:bg-neutral-700': step.status === 'pending'
                                 }">
                                 <template x-if="step.status === 'running'">
                                     <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 animate-spin" fill="none"
@@ -84,7 +84,7 @@
                                     </svg>
                                 </template>
                                 <template x-if="step.status === 'pending'">
-                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400"
+                                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
                                         x-text="index + 1"></span>
                                 </template>
                             </div>
@@ -92,10 +92,10 @@
                             {{-- Step Details --}}
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between mb-1">
-                                    <span class="font-medium text-sm text-gray-900 dark:text-white"
+                                    <span class="font-medium text-sm text-neutral-900 dark:text-white"
                                         x-text="step.name"></span>
                                     <template x-if="step.duration">
-                                        <span class="text-xs text-gray-500 dark:text-gray-400"
+                                        <span class="text-xs text-neutral-500 dark:text-neutral-400"
                                             x-text="`${step.duration}s`"></span>
                                     </template>
                                 </div>
@@ -109,18 +109,18 @@
                                 </template>
 
                                 <template x-if="step.description">
-                                    <p class="text-xs text-gray-600 dark:text-gray-400" x-text="step.description"></p>
+                                    <p class="text-xs text-neutral-600 dark:text-neutral-400" x-text="step.description"></p>
                                 </template>
 
                                 {{-- Step Progress --}}
                                 <template x-if="step.status === 'running' && step.progress">
                                     <div class="mt-2">
                                         <div
-                                            class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                            class="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400 mb-1">
                                             <span>Progress</span>
                                             <span x-text="`${step.progress}%`"></span>
                                         </div>
-                                        <div class="h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                                        <div class="h-1.5 bg-neutral-200 dark:bg-neutral-600 rounded-full overflow-hidden">
                                             <div class="h-full bg-blue-500 transition-all duration-300"
                                                 :style="`width: ${step.progress}%`"></div>
                                         </div>
@@ -141,21 +141,21 @@
             </div>
 
             {{-- Workflow Summary --}}
-            <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-3 bg-neutral-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
                 <div class="grid grid-cols-3 gap-4 text-center text-xs">
                     <div>
-                        <div class="text-gray-500 dark:text-gray-400">Total Steps</div>
-                        <div class="text-lg font-semibold text-gray-900 dark:text-white"
+                        <div class="text-neutral-500 dark:text-neutral-400">Total Steps</div>
+                        <div class="text-lg font-semibold text-neutral-900 dark:text-white"
                             x-text="currentWorkflow.steps.length"></div>
                     </div>
                     <div>
-                        <div class="text-gray-500 dark:text-gray-400">Completed</div>
+                        <div class="text-neutral-500 dark:text-neutral-400">Completed</div>
                         <div class="text-lg font-semibold text-green-600 dark:text-green-400" x-text="completedSteps">
                         </div>
                     </div>
                     <div>
-                        <div class="text-gray-500 dark:text-gray-400">Duration</div>
-                        <div class="text-lg font-semibold text-gray-900 dark:text-white" x-text="totalDuration + 's'">
+                        <div class="text-neutral-500 dark:text-neutral-400">Duration</div>
+                        <div class="text-lg font-semibold text-neutral-900 dark:text-white" x-text="totalDuration + 's'">
                         </div>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
 
     {{-- No Active Workflow --}}
     <template x-if="!currentWorkflow">
-        <div class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div class="p-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
             <svg class="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />

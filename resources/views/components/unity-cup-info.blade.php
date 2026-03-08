@@ -8,12 +8,11 @@
     <div class="space-y-2 text-xs">
         @if (isset($data['spirit_burst_progress']))
             <div class="flex justify-between items-center">
-                <span class="text-purple-700 dark:text-purple-300 transition-colors duration-300">Spirit Burst
-                    Progress</span>
+                <span class="text-purple-700 dark:text-purple-300 transition-colors duration-300">Spirit Burst Progress</span>
                 <div class="flex items-center gap-1">
                     @for ($i = 1; $i <= 4; $i++)
                         <span
-                            class="{{ $i <= ($data['spirit_burst_progress'] ?? 0) ? 'text-yellow-500' : 'text-gray-300 dark:text-gray-600' }}"
+                            class="{{ $i <= ($data['spirit_burst_progress'] ?? 0) ? 'text-yellow-500' : 'text-neutral-300 dark:text-neutral-600' }}"
                             aria-hidden="true">
                             {{ $i <= ($data['spirit_burst_progress'] ?? 0) ? '🔥' : '○' }}
                         </span>

@@ -1,6 +1,6 @@
 <div class="inline-flex {{ $layoutClasses() }}" {{ $attributes }}>
     @if($showLabel)
-        <span class="text-sm text-gray-600 dark:text-gray-400">
+        <span class="text-sm text-neutral-600 dark:text-neutral-400">
             {{ $typeLabel() }}
         </span>
     @endif

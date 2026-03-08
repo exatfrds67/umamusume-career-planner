@@ -1,7 +1,15 @@
 <x-admin-layout title="Queue Monitor">
     <div class="space-y-6">
-        <div class="flex items-center justify-between">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Queue Monitor</h1>
+        <div class="admin-page-hero">
+            <div class="admin-page-hero__content">
+                <div>
+                    <div class="admin-page-hero__eyebrow">
+                        <span>Workers</span>
+                    </div>
+                    <h1 class="admin-page-hero__title">Queue Monitor</h1>
+                    <p class="admin-page-hero__body text-sm sm:text-base">Track Redis connectivity, Horizon health, backlog pressure, and worker throughput.</p>
+                </div>
+                <div>
             <x-admin-confirm-action
                 :action="route('admin.queue.restart')"
                 title="Restart Queue Workers"
@@ -10,50 +18,52 @@
                 confirmText="Restart Workers"
                 buttonLabel="Restart Workers"
                 buttonClass="rounded-md bg-amber-600 px-4 py-2 text-white hover:bg-amber-700 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2" />
+                </div>
+            </div>
         </div>
 
         {{-- Connection & Horizon Status --}}
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             {{-- Redis Connection --}}
-            <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Redis Connection</h2>
+            <div class="admin-surface p-6">
+                <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Redis Connection</h2>
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Status</span>
+                        <span class="text-sm text-neutral-500 dark:text-neutral-400">Status</span>
                         @if ($redisInfo['connected'])
-                            <span class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/20 dark:text-green-200">Connected</span>
+                            <span role="status" class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/20 dark:text-green-200">Connected</span>
                         @else
-                            <span class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800 dark:bg-red-900/20 dark:text-red-200">Disconnected</span>
+                            <span role="status" class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800 dark:bg-red-900/20 dark:text-red-200">Disconnected</span>
                         @endif
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Queue Driver</span>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $redisInfo['driver'] }}</span>
+                        <span class="text-sm text-neutral-500 dark:text-neutral-400">Queue Driver</span>
+                        <span class="text-sm font-medium text-neutral-900 dark:text-white">{{ $redisInfo['driver'] }}</span>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Host</span>
-                        <span class="text-sm font-mono text-gray-900 dark:text-white">{{ $redisInfo['host'] }}:{{ $redisInfo['port'] }}</span>
+                        <span class="text-sm text-neutral-500 dark:text-neutral-400">Host</span>
+                        <span class="text-sm font-mono text-neutral-900 dark:text-white">{{ $redisInfo['host'] }}:{{ $redisInfo['port'] }}</span>
                     </div>
                     @if (!empty($redisInfo['server_info']))
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">Redis Version</span>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $redisInfo['server_info']['redis_version'] ?? 'N/A' }}</span>
+                            <span class="text-sm text-neutral-500 dark:text-neutral-400">Redis Version</span>
+                            <span class="text-sm font-medium text-neutral-900 dark:text-white">{{ $redisInfo['server_info']['redis_version'] ?? 'N/A' }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">Memory Used</span>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $redisInfo['server_info']['used_memory_human'] ?? 'N/A' }}</span>
+                            <span class="text-sm text-neutral-500 dark:text-neutral-400">Memory Used</span>
+                            <span class="text-sm font-medium text-neutral-900 dark:text-white">{{ $redisInfo['server_info']['used_memory_human'] ?? 'N/A' }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">Uptime</span>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ ($redisInfo['server_info']['uptime_days'] ?? -1) >= 0 ? $redisInfo['server_info']['uptime_days'] . ' days' : 'N/A' }}</span>
+                            <span class="text-sm text-neutral-500 dark:text-neutral-400">Uptime</span>
+                            <span class="text-sm font-medium text-neutral-900 dark:text-white">{{ ($redisInfo['server_info']['uptime_days'] ?? -1) >= 0 ? $redisInfo['server_info']['uptime_days'] . ' days' : 'N/A' }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">Connected Clients</span>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ ($redisInfo['server_info']['connected_clients'] ?? -1) >= 0 ? $redisInfo['server_info']['connected_clients'] : 'N/A' }}</span>
+                            <span class="text-sm text-neutral-500 dark:text-neutral-400">Connected Clients</span>
+                            <span class="text-sm font-medium text-neutral-900 dark:text-white">{{ ($redisInfo['server_info']['connected_clients'] ?? -1) >= 0 ? $redisInfo['server_info']['connected_clients'] : 'N/A' }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">Commands Processed</span>
-                            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ ($redisInfo['server_info']['total_commands_processed'] ?? -1) >= 0 ? number_format($redisInfo['server_info']['total_commands_processed']) : 'N/A' }}</span>
+                            <span class="text-sm text-neutral-500 dark:text-neutral-400">Commands Processed</span>
+                            <span class="text-sm font-medium text-neutral-900 dark:text-white">{{ ($redisInfo['server_info']['total_commands_processed'] ?? -1) >= 0 ? number_format($redisInfo['server_info']['total_commands_processed']) : 'N/A' }}</span>
                         </div>
                         @php
                             $hits = $redisInfo['server_info']['keyspace_hits'] ?? 0;
@@ -62,11 +72,11 @@
                             $hitRate = $total > 0 ? round(($hits / $total) * 100, 1) : -1;
                         @endphp
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">Keyspace Hit Rate</span>
+                            <span class="text-sm text-neutral-500 dark:text-neutral-400">Keyspace Hit Rate</span>
                             <span class="text-sm font-medium {{ $hitRate >= 90 ? 'text-green-600 dark:text-green-400' : ($hitRate >= 50 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400') }}">
                                 {{ $hitRate >= 0 ? $hitRate . '%' : 'N/A' }}
                                 @if ($total > 0)
-                                    <span class="text-gray-400 dark:text-gray-500">({{ number_format($hits) }}/{{ number_format($total) }})</span>
+                                    <span class="text-neutral-500 dark:text-neutral-400">({{ number_format($hits) }}/{{ number_format($total) }})</span>
                                 @endif
                             </span>
                         </div>
@@ -80,30 +90,30 @@
             </div>
 
             {{-- Horizon Status --}}
-            <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Horizon Status</h2>
+            <div class="admin-surface p-6">
+                <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Horizon Status</h2>
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Status</span>
+                        <span class="text-sm text-neutral-500 dark:text-neutral-400">Status</span>
                         @if ($horizonStatus['running'])
-                            <span class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/20 dark:text-green-200">Active</span>
+                            <span role="status" class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/20 dark:text-green-200">Active</span>
                         @elseif ($horizonStatus['status'] === 'error')
-                            <span class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800 dark:bg-red-900/20 dark:text-red-200">Error</span>
+                            <span role="status" class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800 dark:bg-red-900/20 dark:text-red-200">Error</span>
                         @else
-                            <span class="inline-flex rounded-full bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200">Inactive</span>
+                            <span role="status" class="inline-flex rounded-full bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200">Inactive</span>
                         @endif
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Master Supervisors</span>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $horizonStatus['master_count'] }}</span>
+                        <span class="text-sm text-neutral-500 dark:text-neutral-400">Master Supervisors</span>
+                        <span class="text-sm font-medium text-neutral-900 dark:text-white">{{ $horizonStatus['master_count'] }}</span>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Supervisors</span>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $horizonStatus['supervisor_count'] }}</span>
+                        <span class="text-sm text-neutral-500 dark:text-neutral-400">Supervisors</span>
+                        <span class="text-sm font-medium text-neutral-900 dark:text-white">{{ $horizonStatus['supervisor_count'] }}</span>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Horizon Keys in Redis</span>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $redisInfo['horizon_keys'] }}</span>
+                        <span class="text-sm text-neutral-500 dark:text-neutral-400">Horizon Keys in Redis</span>
+                        <span class="text-sm font-medium text-neutral-900 dark:text-white">{{ $redisInfo['horizon_keys'] }}</span>
                     </div>
                     @if ($horizonStatus['error'])
                         <div class="mt-2 rounded bg-red-50 p-2 dark:bg-red-900/10">
@@ -123,8 +133,8 @@
         </div>
 
         {{-- Horizon Metrics --}}
-        <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Horizon Job Metrics</h2>
+        <div class="admin-surface p-6">
+            <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Horizon Job Metrics</h2>
             @if ($horizonMetrics['error'] && !$horizonMetrics['available'])
                 <div class="rounded bg-yellow-50 p-3 dark:bg-yellow-900/10">
                     <p class="text-sm text-yellow-700 dark:text-yellow-300">Metrics unavailable: {{ $horizonMetrics['error'] }}</p>
@@ -132,82 +142,82 @@
             @endif
             <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                 <div class="text-center">
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $horizonMetrics['recent'] }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Recent</p>
+                    <p class="text-2xl font-bold text-neutral-900 dark:text-white">{{ $horizonMetrics['recent'] }}</p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Recent</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-2xl font-bold {{ $horizonMetrics['pending'] > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white' }}">{{ $horizonMetrics['pending'] }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Pending</p>
+                    <p class="text-2xl font-bold {{ $horizonMetrics['pending'] > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-900 dark:text-white' }}">{{ $horizonMetrics['pending'] }}</p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Pending</p>
                 </div>
                 <div class="text-center">
                     <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $horizonMetrics['completed'] }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Completed</p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Completed</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-2xl font-bold {{ $horizonMetrics['failed'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">{{ $horizonMetrics['failed'] }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Failed</p>
+                    <p class="text-2xl font-bold {{ $horizonMetrics['failed'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-neutral-900 dark:text-white' }}">{{ $horizonMetrics['failed'] }}</p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Failed</p>
                 </div>
                 <div class="text-center">
                     <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $horizonMetrics['throughput'] }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Throughput</p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Throughput</p>
                 </div>
                 <div class="text-center">
                     <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{{ $horizonMetrics['jobs_per_minute'] }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Jobs/min</p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Jobs/min</p>
                 </div>
             </div>
         </div>
 
         {{-- Redis Queue Sizes --}}
-        <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Redis Queue Sizes</h2>
+        <div class="admin-surface p-6">
+            <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Redis Queue Sizes</h2>
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 @forelse ($redisInfo['queue_sizes'] as $queueName => $size)
-                    <div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ ucfirst($queueName) }}</h3>
-                        <p class="mt-1 text-2xl font-bold {{ $size > 0 ? 'text-amber-600 dark:text-amber-400' : ($size < 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white') }}">
+                    <div class="rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
+                        <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">{{ ucfirst($queueName) }}</h3>
+                        <p class="mt-1 text-2xl font-bold {{ $size > 0 ? 'text-amber-600 dark:text-amber-400' : ($size < 0 ? 'text-red-600 dark:text-red-400' : 'text-neutral-900 dark:text-white') }}">
                             {{ $size >= 0 ? $size : 'Error' }}
                         </p>
-                        <p class="text-xs text-gray-400 dark:text-gray-500">jobs queued</p>
+                        <p class="text-xs text-neutral-400 dark:text-neutral-500">jobs queued</p>
                     </div>
                 @empty
-                    <div class="col-span-full text-center text-sm text-gray-500 dark:text-gray-400">
+                    <div class="col-span-full text-center text-sm text-neutral-500 dark:text-neutral-400">
                         No queue data available. Redis may not be connected.
                     </div>
                 @endforelse
             </div>
-            <div class="mt-3 flex items-center justify-between border-t border-gray-200 pt-3 dark:border-gray-700">
-                <span class="text-sm text-gray-500 dark:text-gray-400">Total Queued (Redis)</span>
-                <span class="text-lg font-bold text-gray-900 dark:text-white">{{ $redisInfo['total_queued'] >= 0 ? $redisInfo['total_queued'] : 'N/A' }}</span>
+            <div class="mt-3 flex items-center justify-between border-t border-neutral-200 pt-3 dark:border-neutral-700">
+                <span class="text-sm text-neutral-500 dark:text-neutral-400">Total Queued (Redis)</span>
+                <span class="text-lg font-bold text-neutral-900 dark:text-white">{{ $redisInfo['total_queued'] >= 0 ? $redisInfo['total_queued'] : 'N/A' }}</span>
             </div>
             <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-500 dark:text-gray-400">DB Pending (jobs table)</span>
-                <span class="text-lg font-bold text-gray-900 dark:text-white">{{ $stats['db_pending_count'] }}</span>
+                <span class="text-sm text-neutral-500 dark:text-neutral-400">DB Pending (jobs table)</span>
+                <span class="text-lg font-bold text-neutral-900 dark:text-white">{{ $stats['db_pending_count'] }}</span>
             </div>
         </div>
 
         {{-- Queue Workload (from Horizon) --}}
         @if (count($queueWorkload) > 0)
-            <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Queue Workload (Horizon)</h2>
+            <div class="admin-surface p-6">
+                <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Queue Workload (Horizon)</h2>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
                         <caption class="sr-only">Queue workload from Horizon</caption>
-                        <thead class="bg-gray-50 dark:bg-gray-900">
+                        <thead class="bg-neutral-50 dark:bg-neutral-900">
                             <tr>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Queue</th>
-                                <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Length</th>
-                                <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Wait (sec)</th>
-                                <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Processes</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Queue</th>
+                                <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Length</th>
+                                <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Wait (sec)</th>
+                                <th scope="col" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Processes</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                        <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-800">
                             @foreach ($queueWorkload as $workload)
                                 <tr>
-                                    <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ $workload['name'] ?? 'unknown' }}</td>
-                                    <td class="whitespace-nowrap px-4 py-3 text-right text-sm {{ ($workload['length'] ?? 0) > 0 ? 'font-bold text-amber-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400' }}">{{ $workload['length'] ?? 0 }}</td>
-                                    <td class="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-500 dark:text-gray-400">{{ $workload['wait'] ?? 0 }}</td>
-                                    <td class="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-500 dark:text-gray-400">{{ $workload['processes'] ?? 0 }}</td>
+                                    <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-neutral-900 dark:text-white">{{ $workload['name'] ?? 'unknown' }}</td>
+                                    <td class="whitespace-nowrap px-4 py-3 text-right text-sm {{ ($workload['length'] ?? 0) > 0 ? 'font-bold text-amber-600 dark:text-amber-400' : 'text-neutral-500 dark:text-neutral-400' }}">{{ $workload['length'] ?? 0 }}</td>
+                                    <td class="whitespace-nowrap px-4 py-3 text-right text-sm text-neutral-500 dark:text-neutral-400">{{ $workload['wait'] ?? 0 }}</td>
+                                    <td class="whitespace-nowrap px-4 py-3 text-right text-sm text-neutral-500 dark:text-neutral-400">{{ $workload['processes'] ?? 0 }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -218,13 +228,13 @@
 
         {{-- Horizon Job Throughput by Job Class --}}
         @if (!empty($horizonMetrics['job_throughputs']))
-            <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Throughput by Job Class</h2>
+            <div class="rounded-lg bg-white p-6 shadow dark:bg-neutral-800">
+                <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Throughput by Job Class</h2>
                 <div class="space-y-2">
                     @foreach ($horizonMetrics['job_throughputs'] as $jobName => $throughput)
-                        <div class="flex items-center justify-between rounded-md border border-gray-200 px-4 py-2 dark:border-gray-700">
-                            <span class="text-sm font-mono text-gray-900 dark:text-white">{{ $jobName }}</span>
-                            <span class="text-sm font-bold {{ $throughput > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400' }}">{{ $throughput }}</span>
+                        <div class="flex items-center justify-between rounded-md border border-neutral-200 px-4 py-2 dark:border-neutral-700">
+                            <span class="text-sm font-mono text-neutral-900 dark:text-white">{{ $jobName }}</span>
+                            <span class="text-sm font-bold {{ $throughput > 0 ? 'text-green-600 dark:text-green-400' : 'text-neutral-500 dark:text-neutral-400' }}">{{ $throughput }}</span>
                         </div>
                     @endforeach
                 </div>
@@ -233,17 +243,17 @@
 
         {{-- Database Stats Summary --}}
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Failed Jobs (DB)</h3>
-                <p class="mt-2 text-3xl font-bold {{ $stats['failed_count'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">{{ $stats['failed_count'] }}</p>
+            <div class="rounded-lg bg-white p-6 shadow dark:bg-neutral-800">
+                <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Failed Jobs (DB)</h3>
+                <p class="mt-2 text-3xl font-bold {{ $stats['failed_count'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-neutral-900 dark:text-white' }}">{{ $stats['failed_count'] }}</p>
             </div>
-            <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Jobs (DB)</h3>
-                <p class="mt-2 text-3xl font-bold {{ $stats['db_pending_count'] > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white' }}">{{ $stats['db_pending_count'] }}</p>
+            <div class="rounded-lg bg-white p-6 shadow dark:bg-neutral-800">
+                <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Pending Jobs (DB)</h3>
+                <p class="mt-2 text-3xl font-bold {{ $stats['db_pending_count'] > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-900 dark:text-white' }}">{{ $stats['db_pending_count'] }}</p>
             </div>
-            <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Job Batches (DB)</h3>
-                <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ $stats['batch_count'] }}</p>
+            <div class="rounded-lg bg-white p-6 shadow dark:bg-neutral-800">
+                <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Job Batches (DB)</h3>
+                <p class="mt-2 text-3xl font-bold text-neutral-900 dark:text-white">{{ $stats['batch_count'] }}</p>
             </div>
         </div>
 
@@ -270,16 +280,16 @@
 
         {{-- Available Job Classes --}}
         @if (count($availableJobs) > 0)
-            <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Registered Job Classes</h2>
+            <div class="rounded-lg bg-white p-6 shadow dark:bg-neutral-800">
+                <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Registered Job Classes</h2>
                 <div class="space-y-2">
                     @foreach ($availableJobs as $job)
-                        <div class="flex items-center justify-between rounded-md border border-gray-200 px-4 py-2 dark:border-gray-700">
-                            <span class="text-sm font-mono text-gray-900 dark:text-white">{{ $job['name'] }}</span>
+                        <div class="flex items-center justify-between rounded-md border border-neutral-200 px-4 py-2 dark:border-neutral-700">
+                            <span class="text-sm font-mono text-neutral-900 dark:text-white">{{ $job['name'] }}</span>
                             @if ($job['implements_should_queue'])
                                 <span class="inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/20 dark:text-blue-200">ShouldQueue</span>
                             @else
-                                <span class="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-700 dark:text-gray-300">Sync</span>
+                                <span class="inline-flex rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-semibold text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300">Sync</span>
                             @endif
                         </div>
                     @endforeach
@@ -289,38 +299,38 @@
 
         {{-- Job Batches --}}
         @if (count($jobBatches) > 0)
-            <div class="overflow-x-auto rounded-lg bg-white shadow dark:bg-gray-800">
+            <div class="overflow-x-auto rounded-lg bg-white shadow dark:bg-neutral-800">
                 <div class="p-6">
-                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Job Batches</h2>
+                    <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">Job Batches</h2>
                 </div>
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
                     <caption class="sr-only">Job batches</caption>
-                    <thead class="bg-gray-50 dark:bg-gray-900">
+                    <thead class="bg-neutral-50 dark:bg-neutral-900">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Name</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Progress</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Total</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Pending</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Failed</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Created</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Name</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Progress</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Total</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Pending</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Failed</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Created</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                    <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-800">
                         @foreach ($jobBatches as $batch)
                             <tr>
-                                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{{ $batch->name }}</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-neutral-900 dark:text-white">{{ $batch->name }}</td>
                                 <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
                                     <div class="flex items-center justify-end gap-2">
-                                        <div class="h-2 w-16 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                                        <div role="progressbar" aria-valuenow="{{ $batch->progress }}" aria-valuemin="0" aria-valuemax="100" aria-label="Job batch progress" class="h-2 w-16 overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
                                             <div class="h-full rounded-full {{ $batch->progress >= 100 ? 'bg-green-500' : 'bg-blue-500' }}" style="width: {{ $batch->progress }}%"></div>
                                         </div>
-                                        <span class="text-gray-900 dark:text-white">{{ $batch->progress }}%</span>
+                                        <span class="text-neutral-900 dark:text-white">{{ $batch->progress }}%</span>
                                     </div>
                                 </td>
-                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">{{ $batch->total_jobs }}</td>
-                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm {{ $batch->pending_jobs > 0 ? 'font-bold text-amber-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400' }}">{{ $batch->pending_jobs }}</td>
-                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm {{ $batch->failed_jobs > 0 ? 'font-bold text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400' }}">{{ $batch->failed_jobs }}</td>
-                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm text-neutral-500 dark:text-neutral-400">{{ $batch->total_jobs }}</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm {{ $batch->pending_jobs > 0 ? 'font-bold text-amber-600 dark:text-amber-400' : 'text-neutral-500 dark:text-neutral-400' }}">{{ $batch->pending_jobs }}</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-right text-sm {{ $batch->failed_jobs > 0 ? 'font-bold text-red-600 dark:text-red-400' : 'text-neutral-500 dark:text-neutral-400' }}">{{ $batch->failed_jobs }}</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400">
                                     <time datetime="{{ $batch->created_at_formatted }}">{{ $batch->created_at_formatted }}</time>
                                 </td>
                             </tr>
@@ -331,36 +341,36 @@
         @endif
 
         {{-- Failed Jobs --}}
-        <div class="overflow-x-auto rounded-lg bg-white shadow dark:bg-gray-800">
+        <div class="overflow-x-auto rounded-lg bg-white shadow dark:bg-neutral-800">
             <div class="p-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Failed Jobs</h2>
+                <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">Failed Jobs</h2>
             </div>
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
                 <caption class="sr-only">Failed jobs</caption>
-                <thead class="bg-gray-50 dark:bg-gray-900">
+                <thead class="bg-neutral-50 dark:bg-neutral-900">
                     <tr>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             ID</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Queue</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Failed At</th>
                         <th scope="col"
-                            class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-800">
                     @forelse ($failedJobs as $job)
                         <tr>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-neutral-900 dark:text-white">
                                 {{ $job->id }}</td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400">
                                 {{ $job->queue }}</td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400">
                                 <time datetime="{{ $job->failed_at }}">{{ $job->failed_at }}</time></td>
                             <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                                 <div class="flex justify-end gap-2">
@@ -386,7 +396,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <td colspan="4" class="px-6 py-4 text-center text-sm text-neutral-500 dark:text-neutral-400">
                                 No failed jobs.
                             </td>
                         </tr>

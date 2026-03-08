@@ -38,8 +38,8 @@ Accessibility: WCAG 2.2 AA compliant
     x-data="classPyramid({{ json_encode($grades) }})">
     {{-- Header --}}
     <div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $title }}</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">Race tier distribution and fanbase growth</p>
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">{{ $title }}</h3>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">Race tier distribution and fanbase growth</p>
     </div>
 
     {{-- Total Fans Summary --}}
@@ -47,8 +47,8 @@ Accessibility: WCAG 2.2 AA compliant
         class="bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700/50">
         <div class="flex items-center justify-between">
             <div>
-                <span class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Fanbase</span>
-                <span class="block text-2xl font-bold text-gray-900 dark:text-white" x-text="totalFans.toLocaleString()">
+                <span class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">Total Fanbase</span>
+                <span class="block text-2xl font-bold text-neutral-900 dark:text-white" x-text="totalFans.toLocaleString()">
                 </span>
             </div>
             <div class="text-3xl opacity-20">👥</div>
@@ -93,7 +93,7 @@ Accessibility: WCAG 2.2 AA compliant
 
                     {{-- Tooltip on hover --}}
                     <div x-show="hoveredLayer === index"
-                        class="text-center text-xs text-gray-600 dark:text-gray-400 mb-2" x-transition>
+                        class="text-center text-xs text-neutral-600 dark:text-neutral-400 mb-2" x-transition>
                         <span x-text="`Growth potential: +${(layer.fans * 0.3).toLocaleString()} fans`"></span>
                     </div>
                 </div>
@@ -107,15 +107,15 @@ Accessibility: WCAG 2.2 AA compliant
                 <div class="space-y-1">
                     {{-- Grade Label --}}
                     <div class="flex items-center justify-between">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300" x-text="grade.grade">
+                        <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300" x-text="grade.grade">
                         </label>
-                        <span class="text-xs font-semibold text-gray-600 dark:text-gray-400"
+                        <span class="text-xs font-semibold text-neutral-600 dark:text-neutral-400"
                             x-text="`${grade.fans.toLocaleString()} (${Math.round((grade.fans / totalFans) * 100)}%)`">
                         </span>
                     </div>
 
                     {{-- Progress Bar --}}
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                    <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2 overflow-hidden">
                         <div :class="`${grade.color} h-full rounded-full transition-all duration-500`"
                             :style="`width: ${(grade.fans / maxFans) * 100}%`">
                         </div>
@@ -152,16 +152,16 @@ Accessibility: WCAG 2.2 AA compliant
     @endif
 
     {{-- Legend --}}
-    <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <h4 class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-3">Grade Information</h4>
+    <div class="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+        <h4 class="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-3">Grade Information</h4>
         <div class="grid grid-cols-2 gap-2 text-xs">
             <div>
                 <span class="font-medium text-red-600 dark:text-red-400">G1</span>
-                <span class="text-gray-600 dark:text-gray-400"> - Highest tier races</span>
+                <span class="text-neutral-600 dark:text-neutral-400"> - Highest tier races</span>
             </div>
             <div>
                 <span class="font-medium text-blue-600 dark:text-blue-400">Open</span>
-                <span class="text-gray-600 dark:text-gray-400"> - General races</span>
+                <span class="text-neutral-600 dark:text-neutral-400"> - General races</span>
             </div>
         </div>
     </div>

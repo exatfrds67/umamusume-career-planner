@@ -17,10 +17,10 @@
         'B' =>
             'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border border-blue-300 dark:border-blue-700',
         'C' =>
-            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600',
+            'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-600',
     ];
 
-    $colorClass = $tierColors[$tier] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    $colorClass = $tierColors[$tier] ?? 'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200';
     $sizeClass = $sizeClasses[$size] ?? $sizeClasses['sm'];
 @endphp
 

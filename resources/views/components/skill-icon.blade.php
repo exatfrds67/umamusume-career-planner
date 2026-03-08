@@ -103,11 +103,11 @@ Accessibility: WCAG 2.2 AA compliant
 
     {{-- Label (optional) --}}
     @if ($showLabel && $name)
-        <span class="text-sm font-medium text-gray-900 dark:text-gray-100 ml-1">
+        <span class="text-sm font-medium text-neutral-900 dark:text-neutral-100 ml-1">
             {{ $name }}
         </span>
     @elseif ($showLabel)
-        <span class="text-sm font-medium text-gray-600 dark:text-gray-400 ml-1">
+        <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400 ml-1">
             {{ $config['label'] }}
         </span>
     @endif
@@ -115,10 +115,10 @@ Accessibility: WCAG 2.2 AA compliant
     {{-- Tooltip on Interactive --}}
     @if ($interactive && $name)
         <div
-            class="absolute hidden group-hover:block bg-gray-900 dark:bg-gray-700 text-white text-xs rounded px-2 py-1 whitespace-nowrap pointer-events-none z-10 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+            class="absolute hidden group-hover:block bg-neutral-900 dark:bg-neutral-700 text-white text-xs rounded px-2 py-1 whitespace-nowrap pointer-events-none z-10 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
             {{ $name }}
             <div
-                class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700">
+                class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-neutral-900 dark:border-t-neutral-700">
             </div>
         </div>
     @endif

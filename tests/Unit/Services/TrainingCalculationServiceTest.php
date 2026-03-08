@@ -12,6 +12,7 @@ use App\Models\Character;
 use App\Services\MCP\MCPClientService;
 use App\Services\MCP\TrainingOptimizationAgent;
 use App\Services\TrainingCalculationService;
+use Mockery;
 
 beforeEach(function () {
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */
@@ -389,7 +390,7 @@ describe('Verified Formula Components (Phase 4)', function () {
         expect($result['breakdown']['support_card_presence_multiplier'])->toBe(1.30);
     });
 
-    it('calculates friendship multiplier as product not sum', function () {
+    it('applies flat 1.2x friendship multiplier when 3 or more cards have bond >= 80', function () {
         $character = Character::factory()->create([
             'current_stats' => ['speed' => 100],
             'energy_level' => 100,
@@ -398,20 +399,21 @@ describe('Verified Formula Components (Phase 4)', function () {
             'scenario_type' => 'ura_finale',
         ]);
 
-        // Test with 2 rainbow bond cards
+        // 3 rainbow cards (friendship_level >= 80) — threshold met
         $result = $this->service->calculateTrainingPrediction($character, 'speed', [
             'support_cards' => [
-                ['card_type' => 'speed', 'bond_level' => 80, 'limit_break_level' => 0],
-                ['card_type' => 'speed', 'bond_level' => 80, 'limit_break_level' => 0],
+                ['card_type' => 'speed', 'friendship_level' => 80, 'limit_break_level' => 0],
+                ['card_type' => 'speed', 'friendship_level' => 85, 'limit_break_level' => 0],
+                ['card_type' => 'speed', 'friendship_level' => 90, 'limit_break_level' => 0],
             ],
             'participants' => 0,
         ]);
 
-        // Product: (1 + 0.15) × (1 + 0.15) = 1.3225
-        expect($result['breakdown']['friendship_multiplier'])->toBeGreaterThan(1.3);
+        // Flat 1.2x multiplier when 3+ cards at bond >= 80
+        expect($result['breakdown']['friendship_multiplier'])->toBe(1.2);
     });
 
-    it('applies training effect from support card traits', function () {
+    it('applies no friendship bonus when fewer than 3 rainbow cards', function () {
         $character = Character::factory()->create([
             'current_stats' => ['speed' => 100],
             'energy_level' => 100,
@@ -420,15 +422,35 @@ describe('Verified Formula Components (Phase 4)', function () {
             'scenario_type' => 'ura_finale',
         ]);
 
-        // Test with 2 matching support cards
+        // Only 2 rainbow cards — threshold not met
         $result = $this->service->calculateTrainingPrediction($character, 'speed', [
             'support_cards' => [
-                ['card_type' => 'speed', 'limit_break_level' => 2],
-                ['card_type' => 'speed', 'limit_break_level' => 3],
+                ['card_type' => 'speed', 'friendship_level' => 80, 'limit_break_level' => 0],
+                ['card_type' => 'speed', 'friendship_level' => 85, 'limit_break_level' => 0],
+            ],
+            'participants' => 0,
+        ]);
+
+        expect($result['breakdown']['friendship_multiplier'])->toBe(1.0);
+    });
+
+    it('applies training effect from support card traits with rarity and limit break bonuses', function () {
+        $character = Character::factory()->create([
+            'current_stats' => ['speed' => 100],
+            'energy_level' => 100,
+            'mood_status' => 'normal',
+            'growth_rates' => ['speed' => 0],
+            'scenario_type' => 'ura_finale',
+        ]);
+
+        // SSR card (10%) at LB2 (1.2x) + SR card (7%) at LB0 (1.0x) = 0.12 + 0.07 = 0.19
+        $result = $this->service->calculateTrainingPrediction($character, 'speed', [
+            'support_cards' => [
+                ['card_type' => 'speed', 'rarity' => 'SSR', 'limit_break_level' => 2],
+                ['card_type' => 'speed', 'rarity' => 'SR', 'limit_break_level' => 0],
             ],
         ]);
 
-        // Training effect: 2 cards × 5% base + limit breaks
         expect($result['breakdown']['training_effect'])->toBeGreaterThan(0.10);
     });
 

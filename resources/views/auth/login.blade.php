@@ -11,10 +11,10 @@
                         <img src="/images/app_logo/uma_musume_race_planner_logo_256.png" alt="{{ config('app.name') }} logo"
                             loading="eager" decoding="async" class="h-20 w-20 mx-auto mb-4" width="80" height="80">
                     </a>
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h2 class="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
                         Sign in to your account
                     </h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">
                         Or
                         <a href="{{ route('register') }}"
                             class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
@@ -54,12 +54,12 @@
 
                     <div class="space-y-4">
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label for="email" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                                 Email address
                             </label>
                             <input id="email" name="email" type="email" autocomplete="email" required
                                 value="{{ old('email') }}"
-                                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-hidden focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
+                                class="appearance-none relative block w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 placeholder-neutral-500 dark:placeholder-neutral-400 text-neutral-900 dark:text-white rounded-md focus:outline-hidden focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-white dark:bg-neutral-800"
                                 placeholder="Enter your email address">
                         </div>
 
@@ -74,8 +74,8 @@
                             <input type="hidden" name="remember" value="0">
                             <input id="remember" name="remember" type="checkbox" value="1"
                                 {{ old('remember') ? 'checked' : '' }}
-                                class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
-                            <label for="remember" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                                class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 dark:border-neutral-600 rounded">
+                            <label for="remember" class="ml-2 block text-sm text-neutral-900 dark:text-neutral-300">
                                 Remember me
                             </label>
                         </div>

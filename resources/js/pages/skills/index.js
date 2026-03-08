@@ -798,9 +798,9 @@ document.addEventListener("alpine:init", () => {
         // Get hint level color class
         getHintLevelColor(hintLevel) {
             const level = Math.min(Math.max(hintLevel || 0, 0), 5);
-            if (level === 0) return "text-gray-400 dark:text-gray-600";
+            if (level === 0) return "text-neutral-400 dark:text-neutral-600";
             if (level === 1) return "text-amber-600 dark:text-amber-400"; // Bronze
-            if (level === 2) return "text-gray-500 dark:text-gray-400"; // Silver
+            if (level === 2) return "text-neutral-500 dark:text-neutral-400"; // Silver
             if (level >= 3 && level <= 4)
                 return "text-yellow-500 dark:text-yellow-400"; // Gold
             return "text-purple-500 dark:text-purple-400"; // Max (5)

@@ -7,7 +7,7 @@
 
         <template x-for="tool in activeTools" :key="tool.id">
             <div
-                class="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-gray-700 rounded-full border border-blue-200 dark:border-blue-800 shadow-xs">
+                class="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-neutral-700 rounded-full border border-blue-200 dark:border-blue-800 shadow-xs">
                 {{-- Tool Icon --}}
                 <svg class="w-3 h-3 text-blue-600 dark:text-blue-400 animate-pulse" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
@@ -16,7 +16,7 @@
                 </svg>
 
                 {{-- Tool Name --}}
-                <span class="text-xs font-medium text-gray-900 dark:text-white" x-text="tool.name"></span>
+                <span class="text-xs font-medium text-neutral-900 dark:text-white" x-text="tool.name"></span>
 
                 {{-- Progress Spinner --}}
                 <template x-if="tool.status === 'running'">
@@ -32,14 +32,14 @@
 
                 {{-- Duration --}}
                 <template x-if="tool.duration">
-                    <span class="text-xs text-gray-500 dark:text-gray-400" x-text="`${tool.duration}s`"></span>
+                    <span class="text-xs text-neutral-500 dark:text-neutral-400" x-text="`${tool.duration}s`"></span>
                 </template>
             </div>
         </template>
 
         {{-- No Active Tools --}}
         <template x-if="activeTools.length === 0">
-            <span class="text-xs text-gray-500 dark:text-gray-400">None</span>
+            <span class="text-xs text-neutral-500 dark:text-neutral-400">None</span>
         </template>
     </div>
 </div>

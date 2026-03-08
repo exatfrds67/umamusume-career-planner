@@ -136,6 +136,8 @@ pest()->extend(Tests\TestCase::class)
 | verify end-to-end user journeys and UI interactions.
 |
 */
+pest()->browser()->timeout(30000);
+
 pest()->extend(Tests\TestCase::class)
     ->use(RefreshDatabase::class)
     ->use(WithFaker::class)
@@ -146,16 +148,23 @@ pest()->extend(Tests\TestCase::class)
         // test server cannot reach the Vite dev server, so JS assets fail to load.
         // Temporarily move the hot file so @vite uses the production manifest.
         $hotFile = public_path('hot');
-        $backupFile = public_path('hot.browser-test-backup');
-        if (file_exists($hotFile) && ! file_exists($backupFile)) {
-            rename($hotFile, $backupFile);
+        $activeBackupFile = public_path('hot.browser-test-active-backup');
+
+        // If a stale backup already exists, still move the active hot file out of the way.
+        if (file_exists($hotFile)) {
+            if (file_exists($activeBackupFile)) {
+                unlink($activeBackupFile);
+            }
+
+            rename($hotFile, $activeBackupFile);
         }
     })
     ->afterEach(function () {
         $hotFile = public_path('hot');
-        $backupFile = public_path('hot.browser-test-backup');
-        if (file_exists($backupFile) && ! file_exists($hotFile)) {
-            rename($backupFile, $hotFile);
+        $activeBackupFile = public_path('hot.browser-test-active-backup');
+
+        if (file_exists($activeBackupFile) && ! file_exists($hotFile)) {
+            rename($activeBackupFile, $hotFile);
         }
     })
     ->in('Browser');

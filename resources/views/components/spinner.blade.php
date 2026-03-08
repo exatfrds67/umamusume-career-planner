@@ -28,7 +28,7 @@ Accessibility: WCAG 2.2 AA compliant, aria-label for screen readers, reduced mot
     
     $colors = [
         'primary' => 'text-primary-600 dark:text-primary-400',
-        'gray' => 'text-gray-500 dark:text-gray-400',
+        'gray' => 'text-neutral-500 dark:text-neutral-400',
         'white' => 'text-white',
     ];
     

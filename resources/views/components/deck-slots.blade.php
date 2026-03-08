@@ -1,8 +1,8 @@
 @props(['character', 'currentDeck'])
 
-<div class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700"
+<div class="card bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700"
     data-character-id="{{ $character->id }}">
-    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
         Deck Slots ({{ $currentDeck->count() }}/6)
     </h2>
 
@@ -12,13 +12,13 @@
                 $slotCard = $currentDeck->firstWhere('position_slot', $i);
                 $isFriendSlot = $i === 6;
             @endphp
-            <div class="deck-slot p-4 rounded-lg border-2 transition-all duration-200 {{ $slotCard ? 'border-primary-300 dark:border-primary-600 bg-primary-50 dark:bg-primary-900/20' : 'border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/20 hover:border-primary-200 dark:hover:border-primary-700' }}"
+            <div class="deck-slot p-4 rounded-lg border-2 transition-all duration-200 {{ $slotCard ? 'border-primary-300 dark:border-primary-600 bg-primary-50 dark:bg-primary-900/20' : 'border-dashed border-neutral-300 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-900/20 hover:border-primary-200 dark:hover:border-primary-700' }}"
                 data-slot="{{ $i }}" draggable="{{ $slotCard ? 'true' : 'false' }}">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-4 flex-1">
                         <div class="shrink-0">
                             <span
-                                class="inline-flex items-center justify-center w-8 h-8 rounded-full {{ $isFriendSlot ? 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300' }} font-semibold text-sm">
+                                class="inline-flex items-center justify-center w-8 h-8 rounded-full {{ $isFriendSlot ? 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300' : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300' }} font-semibold text-sm">
                                 {{ $i }}
                             </span>
                         </div>
@@ -26,7 +26,7 @@
                         @if ($slotCard?->supportCard)
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <h3 class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                    <h3 class="text-sm font-medium text-neutral-900 dark:text-white truncate">
                                         {{ $slotCard->supportCard->name }}
                                     </h3>
                                     <x-support-card-type-badge :type="$slotCard->supportCard->card_type" />
@@ -38,7 +38,7 @@
                                         </span>
                                     @endif
                                 </div>
-                                <div class="mt-1 flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                <div class="mt-1 flex items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400">
                                     <span>{{ $slotCard->supportCard->character_name }}</span>
                                     <span>•</span>
                                     <span>LB: {{ $slotCard->limit_break_level }}/4</span>
@@ -55,10 +55,10 @@
                             </div>
                         @else
                             <div class="flex-1">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                     {{ $isFriendSlot ? 'Friend Card Slot (Optional)' : 'Empty Slot' }}
                                 </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
                                     Click "Add Card" or drag a card here
                                 </p>
                             </div>

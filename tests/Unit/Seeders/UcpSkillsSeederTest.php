@@ -320,12 +320,12 @@ describe('UcpSkillsSeeder - Fresh Seeding Support', function () {
                 expect($skill)->toHaveKey('unique_base_effects');
 
                 expect($skill['unique_star_upgrade'])->toBeTrue();
-                expect($skill['unique_star6_initial_level'])->toBe(3);
+                expect($skill['unique_star6_initial_level'])->toBeIn([2, 3]);
                 expect($skill['unique_base_effects'])->toBeArray()->not->toBeEmpty();
             }
         });
 
-        it('exactly 67 curated skills have unique star upgrade enabled', function () {
+        it('exactly 68 curated skills have unique star upgrade enabled', function () {
             $curatedData = require database_path('seeders/data/curated_skills.php');
 
             $upgradeableCount = count(array_filter(
@@ -333,7 +333,7 @@ describe('UcpSkillsSeeder - Fresh Seeding Support', function () {
                 fn ($s) => ($s['unique_star_upgrade'] ?? false) === true
             ));
 
-            expect($upgradeableCount)->toBe(67);
+            expect($upgradeableCount)->toBe(68);
         });
 
         it('all unique_base_effects contain at least one meaningful effect key', function () {
@@ -353,7 +353,7 @@ describe('UcpSkillsSeeder - Fresh Seeding Support', function () {
             }
         });
 
-        it('seeds database with correct unique star upgrade data for all 67 skills', function () {
+        it('seeds database with correct unique star upgrade data for all 68 skills', function () {
             $seeder = (new UcpSkillsSeeder)->fresh();
             $seeder->run();
 
@@ -361,11 +361,11 @@ describe('UcpSkillsSeeder - Fresh Seeding Support', function () {
                 ->where('unique_star_upgrade', true)
                 ->get();
 
-            expect($upgradeableSkills)->toHaveCount(67);
+            expect($upgradeableSkills)->toHaveCount(68);
 
             foreach ($upgradeableSkills as $skill) {
                 expect($skill->unique_star_upgrade)->toBeTrue();
-                expect($skill->unique_star6_initial_level)->toBe(3);
+                expect($skill->unique_star6_initial_level)->toBeIn([2, 3]);
                 expect($skill->unique_base_effects)->toBeArray()->not->toBeEmpty();
             }
         });

@@ -16,10 +16,10 @@
         {{-- Turn Number and Stage --}}
         <div class="flex-1 min-w-0">
             <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <span class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
                     Turn {{ $current }}
                 </span>
-                <span class="text-sm text-gray-500 dark:text-gray-400">
+                <span class="text-sm text-neutral-500 dark:text-neutral-400">
                     / {{ $total }}
                 </span>
             </div>
@@ -45,10 +45,10 @@
 
         {{-- Percentage --}}
         <div class="text-right shrink-0">
-            <div class="text-lg font-bold text-gray-700 dark:text-gray-300">
+            <div class="text-lg font-bold text-neutral-700 dark:text-neutral-300">
                 {{ number_format($getProgressPercentage(), 1) }}%
             </div>
-            <div class="text-xs text-gray-500 dark:text-gray-400">
+            <div class="text-xs text-neutral-500 dark:text-neutral-400">
                 Complete
             </div>
         </div>
@@ -57,13 +57,13 @@
     {{-- Progress Bar --}}
     @if ($showProgress)
         <div class="w-full space-y-2">
-            <div class="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div class="relative h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                 {{-- Stage Markers --}}
                 <div class="absolute inset-0 flex">
                     {{-- Junior (1-24) --}}
-                    <div class="flex-1 border-r-2 border-white dark:border-gray-800"></div>
+                    <div class="flex-1 border-r-2 border-white dark:border-neutral-800"></div>
                     {{-- Classic (25-48) --}}
-                    <div class="flex-1 border-r-2 border-white dark:border-gray-800"></div>
+                    <div class="flex-1 border-r-2 border-white dark:border-neutral-800"></div>
                     {{-- Senior (49-78) --}}
                     <div class="flex-1"></div>
                 </div>
@@ -73,7 +73,7 @@
                     'Junior' => 'bg-linear-to-r from-green-400 to-green-500',
                     'Classic' => 'bg-linear-to-r from-blue-400 to-blue-500',
                     'Senior' => 'bg-linear-to-r from-purple-400 to-purple-500',
-                    default => 'bg-gray-500',
+                    default => 'bg-neutral-500',
                 } }}"
                     style="width: {{ $getProgressPercentage() }}%" role="progressbar"
                     aria-valuenow="{{ $current }}" aria-valuemin="1" aria-valuemax="{{ $total }}"

@@ -257,7 +257,7 @@ This directory contains comprehensive screenshots of all pages in the Umamusume 
 
 ### Naming Convention
 
-```
+```text
 [number]-[page-name]-[variant].png
 
 Examples:

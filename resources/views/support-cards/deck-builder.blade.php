@@ -44,13 +44,13 @@
 
         <header class="sm:flex sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
                     Deck Builder - {{ $characterName }}
                 </h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                     Build and optimize your support card deck (6 cards required: 5 owned + 1 friend)
                 </p>
-                <div class="mt-2 flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-400">
+                <div class="mt-2 flex flex-wrap gap-2 text-xs text-neutral-600 dark:text-neutral-400">
                     <span class="inline-flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -84,9 +84,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <div class="lg:col-span-2 space-y-4">
-                <section class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs" aria-labelledby="slots-heading">
+                <section class="card bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-xs" aria-labelledby="slots-heading">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 id="slots-heading" class="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h2 id="slots-heading" class="text-lg font-semibold text-neutral-900 dark:text-white">
                             Deck Slots (<span x-text="deckCount"></span>/6)
                         </h2>
                         <div class="flex gap-2">
@@ -115,16 +115,16 @@
                                         <template x-if="getCardAtSlot(i)">
                                             <div class="flex items-center gap-3 flex-1 min-w-0">
                                                 <img :src="getCardAtSlot(i).supportCard.artwork_url || '/placeholder.png'"
-                                                    class="w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-600">
+                                                    class="w-12 h-12 rounded-lg object-cover border border-neutral-200 dark:border-neutral-600">
                                                 <div class="flex-1 min-w-0">
                                                     <div class="flex items-center gap-2">
-                                                        <h3 class="text-sm font-medium text-gray-900 dark:text-white truncate"
+                                                        <h3 class="text-sm font-medium text-neutral-900 dark:text-white truncate"
                                                             x-text="getCardAtSlot(i).supportCard.name"></h3>
                                                         <span
-                                                            class="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700"
+                                                            class="text-xs px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-700"
                                                             x-text="getCardAtSlot(i).supportCard.card_type"></span>
                                                     </div>
-                                                    <p class="mt-1 text-xs text-gray-500">
+                                                    <p class="mt-1 text-xs text-neutral-500">
                                                         LB: <span x-text="getCardAtSlot(i).limit_break_level"></span>/4 •
                                                         Bond: <span x-text="getCardAtSlot(i).friendship_level"></span>%
                                                     </p>
@@ -133,10 +133,10 @@
                                         </template>
 
                                         <template x-if="!getCardAtSlot(i)">
-                                            <div class="flex-1 text-sm text-gray-500 dark:text-gray-400">
+                                            <div class="flex-1 text-sm text-neutral-500 dark:text-neutral-400">
                                                 <span
                                                     x-text="i === 6 ? 'Friend Card Slot (Required)' : 'Empty Slot'"></span>
-                                                <p class="text-xs text-gray-400 mt-0.5">Click a card from library to add</p>
+                                                <p class="text-xs text-neutral-400 mt-0.5">Click a card from library to add</p>
                                             </div>
                                         </template>
                                     </div>
@@ -205,30 +205,30 @@
             </div>
 
             <div class="space-y-6">
-                <section class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs" aria-labelledby="stats-heading">
+                <section class="card bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-xs" aria-labelledby="stats-heading">
                     <h2 id="stats-heading" class="text-lg font-semibold mb-3">Deck Statistics</h2>
 
                     <dl class="space-y-2 mb-4">
                         <div class="flex justify-between text-sm">
-                            <dt class="text-gray-500 dark:text-gray-400">Cards</dt>
+                            <dt class="text-neutral-500 dark:text-neutral-400">Cards</dt>
                             <dd class="font-medium" x-text="deckCount + '/6'"></dd>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <dt class="text-gray-500 dark:text-gray-400">Friend Cards</dt>
+                            <dt class="text-neutral-500 dark:text-neutral-400">Friend Cards</dt>
                             <dd class="font-medium" x-text="friendCardCount + '/1'"></dd>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <dt class="text-gray-500 dark:text-gray-400">Unique Types</dt>
+                            <dt class="text-neutral-500 dark:text-neutral-400">Unique Types</dt>
                             <dd class="font-medium" x-text="uniqueTypes"></dd>
                         </div>
                     </dl>
 
-                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div class="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
                         <div class="flex items-center justify-between mb-1">
-                            <span class="text-xs font-medium uppercase text-gray-500">Synergy Score</span>
+                            <span class="text-xs font-medium uppercase text-neutral-500">Synergy Score</span>
                             <span class="text-sm font-bold" x-text="synergyScore + '%'"></span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                        <div class="w-full bg-neutral-200 rounded-full h-2.5 dark:bg-neutral-700">
                             <div class="h-2.5 rounded-full transition-all duration-500"
                                 :class="{
                                     'bg-red-500': synergyScore < 30,
@@ -240,12 +240,12 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <h4 class="text-xs font-medium text-gray-500 uppercase mb-2">Type Distribution</h4>
+                    <div class="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+                        <h4 class="text-xs font-medium text-neutral-500 uppercase mb-2">Type Distribution</h4>
                         <div class="flex flex-wrap gap-2">
                             <template x-for="(count, type) in typeDistribution" :key="type">
                                 <span
-                                    class="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                                    class="px-2 py-1 text-xs rounded-full bg-neutral-100 dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600">
                                     <span x-text="type.charAt(0).toUpperCase() + type.slice(1)"></span>: <span
                                         class="font-bold" x-text="count"></span>
                                 </span>
@@ -253,21 +253,21 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div class="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
                         <dl class="space-y-2">
                             <div class="flex justify-between text-sm">
-                                <dt class="text-gray-500 dark:text-gray-400">Avg Bond</dt>
+                                <dt class="text-neutral-500 dark:text-neutral-400">Avg Bond</dt>
                                 <dd class="font-medium" x-text="averageBond + '%'"></dd>
                             </div>
                             <div class="flex justify-between text-sm">
-                                <dt class="text-gray-500 dark:text-gray-400">Avg LB</dt>
+                                <dt class="text-neutral-500 dark:text-neutral-400">Avg LB</dt>
                                 <dd class="font-medium" x-text="averageLimitBreak + '★'"></dd>
                             </div>
                         </dl>
                     </div>
                 </section>
 
-                <aside class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs flex flex-col h-150"
+                <aside class="card bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-xs flex flex-col h-150"
                     aria-labelledby="library-heading">
                     <h2 id="library-heading" class="text-lg font-semibold mb-4">Available Cards</h2>
 
@@ -299,13 +299,13 @@
                             <div class="card-library-item group flex items-center gap-3 p-2" @click="selectCard(card.id)"
                                 @keydown.enter="selectCard(card.id)" tabindex="0" role="button">
                                 <img :src="card.artwork_url || '/placeholder.png'"
-                                    class="w-10 h-10 rounded-md object-cover border border-gray-200 dark:border-gray-600" loading="lazy" decoding="async">
+                                    class="w-10 h-10 rounded-md object-cover border border-neutral-200 dark:border-neutral-600" loading="lazy" decoding="async">
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate"
+                                    <h4 class="text-sm font-medium text-neutral-900 dark:text-white truncate"
                                         x-text="card.name"></h4>
                                     <div class="flex items-center gap-2 mt-0.5">
-                                        <span class="text-xs text-gray-500" x-text="card.card_type"></span>
-                                        <span class="text-xs font-semibold px-1 rounded bg-gray-100 dark:bg-gray-700"
+                                        <span class="text-xs text-neutral-500" x-text="card.card_type"></span>
+                                        <span class="text-xs font-semibold px-1 rounded bg-neutral-100 dark:bg-neutral-700"
                                             x-text="card.meta_tier"></span>
                                     </div>
                                 </div>
@@ -314,7 +314,7 @@
                             </div>
                         </template>
                         <template x-if="filteredCards.length === 0">
-                            <div class="text-center text-gray-500 py-8 text-sm">No cards found matching filters.</div>
+                            <div class="text-center text-neutral-500 py-8 text-sm">No cards found matching filters.</div>
                         </template>
                     </div>
                 </aside>
@@ -324,24 +324,24 @@
         <div x-show="showEditModal" x-cloak class="modal-backdrop" @keydown.escape.window="closeEditModal()">
             <div class="modal-content" @click.away="closeEditModal()">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Edit Card Details</h3>
-                    <button @click="closeEditModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
+                    <h3 class="text-lg font-bold text-neutral-900 dark:text-white">Edit Card Details</h3>
+                    <button @click="closeEditModal()" class="text-neutral-400 hover:text-neutral-600">&times;</button>
                 </div>
 
                 <div class="space-y-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                             Limit Break: <span x-text="editForm.limitBreak"></span>/4
                         </label>
                         <input type="range" x-model.number="editForm.limitBreak" min="0" max="4"
                             step="1" class="w-full">
-                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <div class="flex justify-between text-xs text-neutral-400 mt-1">
                             <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                             Bond Level: <span x-text="editForm.bondLevel"></span>%
                         </label>
                         <input type="range" x-model.number="editForm.bondLevel" min="0" max="100"
@@ -353,7 +353,7 @@
                     </div>
                 </div>
 
-                <div class="mt-6 flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="mt-6 flex justify-end gap-2 pt-4 border-t border-neutral-200 dark:border-neutral-700">
                     <button @click="closeEditModal" class="btn btn-outline">Cancel</button>
                     <button @click="saveEditModal" class="btn btn-primary">Save Changes</button>
                 </div>

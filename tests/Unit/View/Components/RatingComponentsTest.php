@@ -47,7 +47,7 @@ describe('PotentialBadge Component', function () {
             ->and((new PotentialBadge(level: 5))->badgeColor())
             ->toContain('blue-500')
             ->and((new PotentialBadge(level: 2))->badgeColor())
-            ->toContain('gray-500');
+            ->toContain('neutral-500');
     });
 
     it('returns correct size classes', function () {

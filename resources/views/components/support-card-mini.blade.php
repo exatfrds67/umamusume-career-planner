@@ -53,9 +53,9 @@ Accessibility: WCAG 2.2 AA compliant
         '★★★★' => 'bg-purple-400 dark:bg-purple-500',
         '★★★' => 'bg-blue-400 dark:bg-blue-500',
         '★★' => 'bg-green-400 dark:bg-green-500',
-        '★' => 'bg-gray-400 dark:bg-gray-500',
+        '★' => 'bg-neutral-400 dark:bg-neutral-500',
     ];
-    $rarityClass = $rarityColors[$card['rarity'] ?? ''] ?? 'bg-gray-400 dark:bg-gray-500';
+    $rarityClass = $rarityColors[$card['rarity'] ?? ''] ?? 'bg-neutral-400 dark:bg-neutral-500';
 @endphp
 
 <div class="group cursor-pointer" @click="$dispatch('card-selected', { id: '{{ $card['id'] ?? '' }}' })" role="button"
@@ -70,7 +70,7 @@ Accessibility: WCAG 2.2 AA compliant
         {{-- Card Image/Icon Background --}}
         @if (isset($card['imageUrl']))
             <img src="{{ $card['imageUrl'] }}" alt="{{ $card['name'] ?? 'Card' }}"
-                class="w-full h-full object-cover bg-gray-300 dark:bg-gray-700" loading="lazy" decoding="async">
+                class="w-full h-full object-cover bg-neutral-300 dark:bg-neutral-700" loading="lazy" decoding="async">
         @else
             <div
                 class="w-full h-full bg-linear-to-br from-blue-400 to-purple-500 dark:from-blue-600 dark:to-purple-700 flex items-center justify-center text-2xl opacity-80">

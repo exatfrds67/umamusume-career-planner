@@ -80,11 +80,11 @@ describe('StatRadarChart Component', function () {
         $component = new StatRadarChart;
 
         $colors = [
-            'speed' => 'text-blue-500 dark:text-blue-400',
-            'stamina' => 'text-green-500 dark:text-green-400',
-            'power' => 'text-orange-500 dark:text-orange-400',
-            'guts' => 'text-amber-500 dark:text-amber-400',
-            'wit' => 'text-sky-500 dark:text-sky-400',
+            'speed' => 'text-stat-speed-500 dark:text-stat-speed-400',
+            'stamina' => 'text-stat-stamina-500 dark:text-stat-stamina-400',
+            'power' => 'text-stat-power-500 dark:text-stat-power-400',
+            'guts' => 'text-stat-guts-500 dark:text-stat-guts-400',
+            'wit' => 'text-stat-wit-500 dark:text-stat-wit-400',
         ];
 
         foreach ($colors as $stat => $expectedColor) {
@@ -99,7 +99,7 @@ describe('StatRadarChart Component', function () {
             'speed' => '#3b82f6',
             'stamina' => '#22c55e',
             'power' => '#f97316',
-            'guts' => '#fbbf24',
+            'guts' => '#f59e0b',
             'wit' => '#0ea5e9',
         ];
 

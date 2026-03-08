@@ -27,6 +27,16 @@ use Illuminate\Support\Facades\Schema;
  */
 function getCurrentCommitSha(): string
 {
+    static $sha;
+
+    if (is_string($sha)) {
+        return $sha;
+    }
+
+    if (PHP_OS_FAMILY === 'Windows') {
+        return $sha = 'unknown';
+    }
+
     $sha = trim(shell_exec('git rev-parse --short HEAD 2>/dev/null') ?? '');
 
     return $sha ?: 'unknown';
@@ -266,9 +276,7 @@ describe('Database Query Benchmarks', function () {
     })->group('performance', 'benchmark', 'database');
 
     it('benchmarks skill query with filters', function () {
-        if (! Schema::hasTable('ucp_skills')) {
-            $this->markTestSkipped('Skills table not available');
-        }
+        expect(Schema::hasTable('ucp_skills'))->toBeTrue('Skills table should exist for benchmark tests');
 
         $results = benchmark(function () {
             Skill::query()

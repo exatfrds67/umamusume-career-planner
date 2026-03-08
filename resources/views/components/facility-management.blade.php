@@ -2,10 +2,10 @@
 
 <div x-data="facilityManagement({{ $characterId }}, {{ json_encode($facilityLevels) }})" class="glass-card rounded-xl p-6">
     <div class="mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-2 transition-colors duration-300">
             Distance Team Facilities
         </h3>
-        <p class="text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">
+        <p class="text-sm text-neutral-700 dark:text-neutral-300 transition-colors duration-300">
             Upgrade facilities by improving team stat ranks through races (every 6 months)
         </p>
     </div>
@@ -22,13 +22,13 @@
                             <span x-text="team.icon"></span>
                         </div>
                         <div>
-                            <h4 class="text-base font-semibold text-gray-900 dark:text-white capitalize"
+                            <h4 class="text-base font-semibold text-neutral-900 dark:text-white capitalize"
                                 x-text="team.name"></h4>
-                            <p class="text-xs text-gray-600 dark:text-gray-400" x-text="team.distanceRange"></p>
+                            <p class="text-xs text-neutral-600 dark:text-neutral-400" x-text="team.distanceRange"></p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Stat Rank</div>
+                        <div class="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Stat Rank</div>
                         <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold"
                             :class="getRankColorClass(team.statRank)">
                             <span x-text="team.statRank"></span>
@@ -39,7 +39,7 @@
                 <!-- Facility Level Progress -->
                 <div class="mb-3">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                             Facility Level <span x-text="team.facilityLevel"></span>/5
                         </span>
                         <span class="text-sm font-bold text-primary-600 dark:text-primary-400">
@@ -53,7 +53,7 @@
                             <div class="flex-1 h-3 rounded-full transition-all duration-300"
                                 :class="{
                                     'bg-linear-to-r from-primary-400 to-primary-600': level <= team.facilityLevel,
-                                    'bg-gray-200 dark:bg-gray-700': level > team.facilityLevel
+                                    'bg-neutral-200 dark:bg-neutral-700': level > team.facilityLevel
                                 }">
                             </div>
                         </template>
@@ -61,8 +61,8 @@
 
                     <!-- Level Labels -->
                     <div class="flex items-center justify-between mt-1">
-                        <span class="text-xs text-gray-600 dark:text-gray-400">Lv1 (0%)</span>
-                        <span class="text-xs text-gray-600 dark:text-gray-400">Lv5 (100%)</span>
+                        <span class="text-xs text-neutral-600 dark:text-neutral-400">Lv1 (0%)</span>
+                        <span class="text-xs text-neutral-600 dark:text-neutral-400">Lv5 (100%)</span>
                     </div>
                 </div>
 
@@ -73,7 +73,7 @@
                             :class="{
                                 'bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 font-bold': team
                                     .statRank === rank,
-                                'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400': team.statRank !== rank
+                                'bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400': team.statRank !== rank
                             }">
                             <div x-text="rank"></div>
                             <div class="text-xs opacity-75">Lv<span x-text="rankToLevel(rank)"></span></div>
@@ -83,12 +83,12 @@
 
                 <!-- Team Members (if any) -->
                 <template x-if="team.members && team.members.length > 0">
-                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                        <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">Team Members:</div>
+                    <div class="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700">
+                        <div class="text-xs text-neutral-600 dark:text-neutral-400 mb-2">Team Members:</div>
                         <div class="flex flex-wrap gap-2">
                             <template x-for="member in team.members" :key="member.id">
                                 <span
-                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300">
                                     <span x-text="member.icon || '👤'"></span>
                                     <span class="ml-1" x-text="member.name"></span>
                                 </span>

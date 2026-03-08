@@ -255,7 +255,7 @@ export function spAllocator() {
                 'A': 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200',
                 'B': 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200',
                 'C': 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200',
-                'D': 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                'D': 'bg-neutral-100 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200'
             };
             return colors[tier] || colors['C'];
         }

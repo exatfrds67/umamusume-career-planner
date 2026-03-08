@@ -6,11 +6,11 @@
     {{-- Breadcrumb Navigation --}}
     <x-breadcrumb :items="[['label' => 'Profile']]" />
 
-    <div class="space-y-6" x-data="profileManager()">
+    <div class="space-y-4" x-data="profileManager()">
         <!-- Page Header -->
-        <div class="border-b border-gray-200 dark:border-gray-700 pb-5">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Your Profile</h1>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        <div class="border-b border-neutral-200 dark:border-neutral-700 pb-3">
+            <h1 class="text-2xl font-bold text-neutral-900 dark:text-white sm:text-3xl">Your Profile</h1>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                 Manage your account settings, preferences, and privacy controls
             </p>
         </div>
@@ -19,7 +19,7 @@
         @if (session('success'))
             <div class="rounded-md bg-green-50 dark:bg-green-900/20 p-4" role="alert">
                 <div class="flex">
-                    <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                    <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd"
                             d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
                             clip-rule="evenodd" />
@@ -34,7 +34,7 @@
         @if ($errors->any())
             <div class="rounded-md bg-red-50 dark:bg-red-900/20 p-4" role="alert">
                 <div class="flex">
-                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd"
                             d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
                             clip-rule="evenodd" />
@@ -53,21 +53,23 @@
         @endif
 
         <!-- Single Form for All Tabs -->
-        <form action="{{ route('profile.update') }}" method="POST" class="space-y-6">
+        <form action="{{ route('profile.update') }}" method="POST" class="space-y-4">
             @csrf
             @method('PUT')
 
             <!-- Tab Navigation -->
-            <div class="border-b border-gray-200 dark:border-gray-700">
-                <nav class="-mb-px flex gap-2 overflow-x-auto scrollbar-hide" aria-label="Profile sections" role="tablist">
+            <div class="border-b border-neutral-200 dark:border-neutral-700">
+                <nav class="-mb-px flex gap-2 overflow-x-auto scrollbar-hide" aria-label="Profile sections" role="tablist"
+                    @keydown.arrow-right.prevent="focusNextTab()" @keydown.arrow-left.prevent="focusPrevTab()" @keydown.home.prevent="focusFirstTab()" @keydown.end.prevent="focusLastTab()">
                     <button type="button" @click="activeTab = 'account'"
                         :class="activeTab === 'account' ?
                             'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' :
-                            'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'"
+                            'border-transparent text-neutral-600 hover:text-neutral-900 hover:border-neutral-300 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800'"
                         class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg"
-                        role="tab" id="tab-account" :aria-selected="activeTab === 'account'" aria-controls="panel-account">
+                        role="tab" id="tab-account" :aria-selected="activeTab === 'account'" aria-controls="panel-account"
+                        :tabindex="activeTab === 'account' ? 0 : -1">
                         <span class="flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
@@ -77,11 +79,12 @@
                     <button type="button" @click="activeTab = 'preferences'"
                         :class="activeTab === 'preferences' ?
                             'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' :
-                            'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'"
+                            'border-transparent text-neutral-600 hover:text-neutral-900 hover:border-neutral-300 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800'"
                         class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg"
-                        role="tab" id="tab-preferences" :aria-selected="activeTab === 'preferences'" aria-controls="panel-preferences">
+                        role="tab" id="tab-preferences" :aria-selected="activeTab === 'preferences'" aria-controls="panel-preferences"
+                        :tabindex="activeTab === 'preferences' ? 0 : -1">
                         <span class="flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -93,11 +96,12 @@
                     <button type="button" @click="activeTab = 'notifications'"
                         :class="activeTab === 'notifications' ?
                             'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' :
-                            'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'"
+                            'border-transparent text-neutral-600 hover:text-neutral-900 hover:border-neutral-300 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800'"
                         class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg"
-                        role="tab" id="tab-notifications" :aria-selected="activeTab === 'notifications'" aria-controls="panel-notifications">
+                        role="tab" id="tab-notifications" :aria-selected="activeTab === 'notifications'" aria-controls="panel-notifications"
+                        :tabindex="activeTab === 'notifications' ? 0 : -1">
                         <span class="flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                             </svg>
@@ -107,11 +111,12 @@
                     <button type="button" @click="activeTab = 'privacy'"
                         :class="activeTab === 'privacy' ?
                             'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' :
-                            'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'"
+                            'border-transparent text-neutral-600 hover:text-neutral-900 hover:border-neutral-300 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800'"
                         class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg"
-                        role="tab" id="tab-privacy" :aria-selected="activeTab === 'privacy'" aria-controls="panel-privacy">
+                        role="tab" id="tab-privacy" :aria-selected="activeTab === 'privacy'" aria-controls="panel-privacy"
+                        :tabindex="activeTab === 'privacy' ? 0 : -1">
                         <span class="flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
@@ -121,11 +126,12 @@
                     <button type="button" @click="activeTab = 'security'"
                         :class="activeTab === 'security' ?
                             'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' :
-                            'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'"
+                            'border-transparent text-neutral-600 hover:text-neutral-900 hover:border-neutral-300 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800'"
                         class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-lg"
-                        role="tab" id="tab-security" :aria-selected="activeTab === 'security'" aria-controls="panel-security">
+                        role="tab" id="tab-security" :aria-selected="activeTab === 'security'" aria-controls="panel-security"
+                        :tabindex="activeTab === 'security' ? 0 : -1">
                         <span class="flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                             </svg>
@@ -157,7 +163,7 @@
 
             <!-- Save Button (shown for all tabs except Security) -->
             <div x-show="activeTab !== 'security'"
-                class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                class="flex justify-end gap-3 pt-6 border-t border-neutral-200 dark:border-neutral-700">
                 <button type="button" onclick="this.closest('form').reset()" class="btn btn-secondary">
                     Cancel
                 </button>

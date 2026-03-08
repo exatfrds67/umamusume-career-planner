@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Umamusume Career Planner') }}</title>
+    <title>@yield('title', config('app.name', 'Umamusume Career Planner'))</title>
 
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
@@ -59,7 +59,7 @@
     @livewireStyles
 </head>
 
-<body class="h-full font-sans antialiased text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900" x-data="{ sidebarOpen: false }"
+<body class="h-full font-sans antialiased text-neutral-900 dark:text-neutral-100 bg-neutral-50 dark:bg-neutral-900" x-data="{ sidebarOpen: false }"
     @keydown.escape.window="sidebarOpen = false">
 
     <!-- Skip to Content (Accessibility) -->
@@ -86,7 +86,7 @@
     <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-out duration-300"
         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
         x-transition:leave="transition-opacity ease-in duration-300" x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900/80 z-40 lg:hidden" aria-hidden="true"
+        x-transition:leave-end="opacity-0" class="fixed inset-0 bg-neutral-900/80 z-40 lg:hidden" aria-hidden="true"
         @click="sidebarOpen = false"></div>
 
     <!-- Mobile Sidebar (shown when sidebarOpen is true) -->
@@ -95,13 +95,13 @@
         x-transition:leave="transition ease-in duration-300 transform" x-transition:leave-start="translate-x-0"
         x-transition:leave-end="-translate-x-full"
         x-trap.noscroll="sidebarOpen"
-        class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-800 shadow-xl lg:hidden">
+        class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-neutral-800 shadow-xl lg:hidden">
         <x-app.sidebar />
     </div>
 
     <!-- Desktop Sidebar (always visible on lg screens) -->
     <div x-data :class="$store.sidebar.minimized ? 'lg:w-20' : 'lg:w-72'"
-        class="hidden sm:hidden md:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col lg:border-r lg:border-gray-200 dark:lg:border-gray-700 lg:bg-white dark:lg:bg-gray-800 transition-all duration-300 ease-in-out">
+        class="hidden sm:hidden md:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col lg:border-r lg:border-neutral-200 dark:lg:border-neutral-700 lg:bg-white dark:lg:bg-neutral-800 transition-all duration-300 ease-in-out">
         <x-app.sidebar />
     </div>
 
@@ -114,13 +114,13 @@
 
         <!-- Sticky Header -->
         <header
-            class="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-xs">
+            class="sticky top-0 z-40 border-b border-neutral-200 dark:border-neutral-700 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md shadow-xs">
             <div class="flex flex-col">
                 {{-- TODO: Provide storage mode and SP data from a shared context or controller-specific view data. --}}
                 <x-top-status-bar :current-turn="$topStatus['currentTurn'] ?? null" :max-turns="$topStatus['maxTurns'] ?? null" :sp-available="$topStatus['spAvailable'] ?? null" :storage-mode="$topStatus['storageMode'] ?? null" />
 
                 <div class="flex h-16 shrink-0 items-center gap-x-4 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
-                    <button type="button" id="sidebar-toggle-btn" class="-m-2.5 p-2.5 text-gray-700 dark:text-gray-200 lg:hidden"
+                    <button type="button" id="sidebar-toggle-btn" class="-m-2.5 p-2.5 text-neutral-700 dark:text-neutral-200 lg:hidden"
                         @click="sidebarOpen = true" :aria-expanded="sidebarOpen.toString()">
                         <span class="sr-only">Open sidebar</span>
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -139,7 +139,7 @@
 
         <!-- Page Header (if provided via slot) -->
         @isset($header)
-            <header class="bg-white dark:bg-gray-800 shadow">
+            <header class="bg-white dark:bg-neutral-800 shadow">
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     {{ $header }}
                 </div>

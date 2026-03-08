@@ -103,8 +103,8 @@ describe('Accessibility Property Tests', function () {
 
             $content = $response->getContent();
 
-            if (str_contains($content, 'text-gray-')) {
-                $usesGrayText = preg_match('/text-gray-[23]00(?!\/)/', $content);
+            if (str_contains($content, 'text-neutral-')) {
+                $usesGrayText = preg_match('/text-neutral-[23]00(?!\/)/', $content);
                 $supportsDarkMode = str_contains($content, 'dark:');
 
                 if ($usesGrayText) {

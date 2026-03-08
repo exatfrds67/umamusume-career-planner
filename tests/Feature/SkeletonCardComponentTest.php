@@ -108,7 +108,7 @@ describe('SkeletonCard Component', function () {
         $html = Blade::render('<x-skeleton-card />');
 
         expect($html)
-            ->toContain('dark:bg-gray-700')
-            ->toContain('dark:border-gray-700');
+            ->toContain('dark:bg-neutral-700')
+            ->toContain('dark:border-neutral-700');
     });
 });

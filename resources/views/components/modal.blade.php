@@ -84,7 +84,7 @@ Accessibility: WCAG 2.2 AA compliant, focus trap, Escape key closes
         x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 bg-gray-900/50 dark:bg-gray-900/80 backdrop-blur-xs"
+        class="fixed inset-0 z-50 bg-neutral-900/50 dark:bg-neutral-900/80 backdrop-blur-xs"
         @if($closeable) @click="open = false" @endif
         aria-hidden="true"
     ></div>
@@ -110,13 +110,13 @@ Accessibility: WCAG 2.2 AA compliant, focus trap, Escape key closes
                 x-ref="panel"
                 @keydown="trapFocus"
                 @click.stop
-                class="relative w-full {{ $modalSize }} transform overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-2xl transition-all"
+                class="relative w-full {{ $modalSize }} transform overflow-hidden rounded-xl bg-white dark:bg-neutral-800 shadow-2xl transition-all"
             >
                 {{-- Header --}}
                 @if($title || $closeable)
-                    <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                    <div class="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-700 px-6 py-4">
                         @if($title)
-                            <h3 id="modal-title-{{ $name }}" class="text-lg font-semibold text-gray-900 dark:text-white">
+                            <h3 id="modal-title-{{ $name }}" class="text-lg font-semibold text-neutral-900 dark:text-white">
                                 {{ $title }}
                             </h3>
                         @else
@@ -127,7 +127,7 @@ Accessibility: WCAG 2.2 AA compliant, focus trap, Escape key closes
                             <button
                                 type="button"
                                 @click="open = false"
-                                class="rounded-lg p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-primary-500 transition-colors"
+                                class="rounded-lg p-2 text-neutral-400 hover:text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 focus:outline-hidden focus:ring-2 focus:ring-primary-500 transition-colors"
                                 aria-label="Close modal"
                             >
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -145,7 +145,7 @@ Accessibility: WCAG 2.2 AA compliant, focus trap, Escape key closes
                 
                 {{-- Footer (optional slot) --}}
                 @if(isset($footer))
-                    <div class="flex items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-700 px-6 py-4 bg-gray-50 dark:bg-gray-800/50">
+                    <div class="flex items-center justify-end gap-3 border-t border-neutral-200 dark:border-neutral-700 px-6 py-4 bg-neutral-50 dark:bg-neutral-800/50">
                         {{ $footer }}
                     </div>
                 @endif

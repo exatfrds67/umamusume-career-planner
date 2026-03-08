@@ -1,6 +1,6 @@
-<div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+<div class="bg-white dark:bg-neutral-800 shadow rounded-lg">
     <div class="px-4 py-5 sm:p-6">
-        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Change Password</h2>
+        <h2 class="text-lg font-medium text-neutral-900 dark:text-white mb-4">Change Password</h2>
 
         <form action="{{ route('profile.password.change') }}" method="POST" class="space-y-6">
             @csrf
@@ -8,11 +8,11 @@
 
             <!-- Current Password -->
             <div>
-                <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label for="current_password" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     Current Password
                 </label>
                 <input type="password" name="current_password" id="current_password" required autocomplete="current-password"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                 @error('current_password')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -20,11 +20,11 @@
 
             <!-- New Password -->
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label for="password" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     New Password
                 </label>
                 <input type="password" name="password" id="password" required autocomplete="new-password"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                 @error('password')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -32,11 +32,11 @@
 
             <!-- Confirm New Password -->
             <div>
-                <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label for="password_confirmation" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     Confirm New Password
                 </label>
                 <input type="password" name="password_confirmation" id="password_confirmation" required autocomplete="new-password"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
             </div>
 
             <!-- Update Password Button -->
@@ -50,22 +50,22 @@
 </div>
 
 <!-- Active Sessions -->
-<div class="mt-6 bg-white dark:bg-gray-800 shadow rounded-lg">
+<div class="mt-6 bg-white dark:bg-neutral-800 shadow rounded-lg">
     <div class="px-4 py-5 sm:p-6">
-        <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Active Sessions</h2>
+        <h2 class="text-lg font-medium text-neutral-900 dark:text-white mb-4">Active Sessions</h2>
 
         <div class="space-y-4">
-            <div class="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between py-3 border-b border-neutral-200 dark:border-neutral-700">
                 <div class="flex items-center gap-3">
                     <div class="shrink-0">
-                        <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-8 w-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-medium text-gray-900 dark:text-white">Current Session</h3>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                        <h3 class="text-sm font-medium text-neutral-900 dark:text-white">Current Session</h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">
                             {{ request()->userAgent() }} • Last active: Now
                         </p>
                     </div>
@@ -96,28 +96,28 @@
 
     <!-- Delete Account Modal -->
     <div x-show="show" x-cloak @click.away="closeModal()" @keydown.escape.window="closeModal()"
-        class="fixed inset-0 bg-gray-500/75 z-50 flex items-center justify-center p-4">
-        <div @click.stop class="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-xl">
+        class="fixed inset-0 bg-neutral-500/75 z-50 flex items-center justify-center p-4">
+        <div @click.stop class="bg-white dark:bg-neutral-800 rounded-lg max-w-md w-full p-6 shadow-xl" role="dialog" aria-modal="true" aria-labelledby="delete-account-title">
             <div class="flex items-center gap-3 mb-4">
                 <div
                     class="shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                     <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
+                        viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Delete Account</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone</p>
+                    <h3 id="delete-account-title" class="text-lg font-medium text-neutral-900 dark:text-white">Delete Account</h3>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">This action cannot be undone</p>
                 </div>
             </div>
 
             <div class="mb-6">
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
                     This will permanently delete your account and all associated data including:
                 </p>
-                <ul class="text-sm text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1 mb-4">
+                <ul class="text-sm text-neutral-600 dark:text-neutral-400 list-disc list-inside space-y-1 mb-4">
                     <li>All your characters and training data</li>
                     <li>Career runs and race history</li>
                     <li>Skills and support card configurations</li>
@@ -134,23 +134,23 @@
 
                 <div>
                     <label for="delete_password"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                         Confirm your password
                     </label>
-                    <input type="password" name="password" id="delete_password" required x-model="password" autocomplete="current-password"
-                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                    <input type="password" name="password" id="delete_password" required aria-required="true" x-model="password" autocomplete="current-password"
+                        class="block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                 </div>
 
                 <div>
                     <label for="delete_confirmation"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                         Type <strong class="text-red-600 dark:text-red-400">{{ $user?->name ?? 'your username' }}</strong> to confirm
                     </label>
                     <input type="text" name="confirmation" id="delete_confirmation" required x-model="confirmation"
-                        placeholder="{{ $user?->name ?? 'your username' }}"
-                        class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                        placeholder="{{ $user?->name ?? 'your username' }}" aria-describedby="delete-confirm-help"
+                        class="block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                         :class="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': confirmationError }">
-                    <p x-show="confirmationError" x-cloak class="mt-1 text-sm text-red-600 dark:text-red-400">
+                    <p x-show="confirmationError" x-cloak id="delete-confirm-help" class="mt-1 text-sm text-red-600 dark:text-red-400">
                         Account name does not match. Please type <strong>{{ $user?->name ?? 'your username' }}</strong> exactly.
                     </p>
                 </div>

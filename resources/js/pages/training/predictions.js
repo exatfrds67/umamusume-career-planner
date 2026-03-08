@@ -194,7 +194,7 @@ function updateSupportCardsSection(card, data) {
     supportCards.forEach((sc) => {
         const badge = document.createElement("span");
         badge.className =
-            "px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center gap-1";
+            "px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 flex items-center gap-1";
 
         let contentHtml = sc.name || sc.card_name || "Card";
 
@@ -247,8 +247,8 @@ function updateSkillHintsSection(card, data) {
 
         row.innerHTML = `
             <span class="shrink-0">${iconSvg}</span>
-            <span class="font-medium text-gray-700 dark:text-gray-300 ml-1">${hint.skill_name}</span>
-            <span class="text-gray-500 ml-1">(${probability})</span>
+            <span class="font-medium text-neutral-700 dark:text-neutral-300 ml-1">${hint.skill_name}</span>
+            <span class="text-neutral-500 ml-1">(${probability})</span>
             ${hint.is_guaranteed ? '<svg class="w-4 h-4 text-red-500 ml-auto" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>' : ""}
         `;
 
@@ -276,7 +276,7 @@ function updateEfficiencyRating(card, data) {
     // Convert to stars (1-5)
     const stars = Math.min(5, Math.max(1, Math.ceil(score / 20)));
     const filledStarSvg = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>`;
-    const emptyStarSvg = `<svg class="w-4 h-4 text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>`;
+    const emptyStarSvg = `<svg class="w-4 h-4 text-neutral-300 dark:text-neutral-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>`;
 
     starsEl.innerHTML =
         filledStarSvg.repeat(stars) + emptyStarSvg.repeat(5 - stars);
@@ -406,7 +406,7 @@ export function getRecommendationClass(recommendation) {
         case "risky":
             return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
         default:
-            return "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300";
+            return "bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300";
     }
 }
 
@@ -620,14 +620,14 @@ window.showAIDetails = function () {
     drilldown.setAttribute("aria-label", "AI Analysis Details");
     drilldown.innerHTML = `
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
                 <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                 </svg>
                 AI Analysis Drilldown
             </h3>
             <button onclick="document.getElementById('ai-analysis-panel').classList.add('hidden')"
-                class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                class="p-1 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
                 aria-label="Close analysis panel">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -636,12 +636,12 @@ window.showAIDetails = function () {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Recommendation</p>
-                <p class="text-sm text-gray-900 dark:text-white">${advisorMessage}</p>
+            <div class="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1">Recommendation</p>
+                <p class="text-sm text-neutral-900 dark:text-white">${advisorMessage}</p>
             </div>
-            <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Confidence</p>
+            <div class="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+                <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1">Confidence</p>
                 <p class="text-sm font-semibold text-primary-600 dark:text-primary-400">${confidence}</p>
             </div>
         </div>
@@ -651,25 +651,25 @@ window.showAIDetails = function () {
                 ? `
             <div class="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg mb-4">
                 <p class="text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider mb-1">Summary</p>
-                <p class="text-sm text-gray-900 dark:text-white">${recommendationText}</p>
+                <p class="text-sm text-neutral-900 dark:text-white">${recommendationText}</p>
             </div>`
                 : ""
         }
 
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Calculation Breakdown</p>
+        <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4">
+            <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">Calculation Breakdown</p>
             <div class="grid grid-cols-3 gap-3">
-                <div class="text-center p-2 bg-gray-50 dark:bg-gray-800/50 rounded">
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Base Gain</p>
-                    <p class="text-sm font-mono font-semibold text-gray-900 dark:text-white">${baseGain}</p>
+                <div class="text-center p-2 bg-neutral-50 dark:bg-neutral-800/50 rounded">
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Base Gain</p>
+                    <p class="text-sm font-mono font-semibold text-neutral-900 dark:text-white">${baseGain}</p>
                 </div>
-                <div class="text-center p-2 bg-gray-50 dark:bg-gray-800/50 rounded">
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Growth Rate</p>
-                    <p class="text-sm font-mono font-semibold text-gray-900 dark:text-white">${growthRate}</p>
+                <div class="text-center p-2 bg-neutral-50 dark:bg-neutral-800/50 rounded">
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Growth Rate</p>
+                    <p class="text-sm font-mono font-semibold text-neutral-900 dark:text-white">${growthRate}</p>
                 </div>
-                <div class="text-center p-2 bg-gray-50 dark:bg-gray-800/50 rounded">
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Mood Modifier</p>
-                    <p class="text-sm font-mono font-semibold text-gray-900 dark:text-white">${moodMod}</p>
+                <div class="text-center p-2 bg-neutral-50 dark:bg-neutral-800/50 rounded">
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Mood Modifier</p>
+                    <p class="text-sm font-mono font-semibold text-neutral-900 dark:text-white">${moodMod}</p>
                 </div>
             </div>
         </div>

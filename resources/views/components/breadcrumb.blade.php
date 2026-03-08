@@ -28,7 +28,7 @@
                 @if (!$isLast)
                     {{-- Clickable breadcrumb item --}}
                     <a href="{{ $url }}"
-                        class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-1"
+                        class="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-800 rounded px-1"
                         @if ($index === 0) aria-label="Home" @endif>
                         @if ($icon === 'home')
                             {{-- Home icon --}}
@@ -42,7 +42,7 @@
                     </a>
 
                     {{-- Separator --}}
-                    <svg class="w-5 h-5 text-gray-400 dark:text-gray-600 mx-1 shrink-0" fill="currentColor"
+                    <svg class="w-5 h-5 text-neutral-400 dark:text-neutral-600 mx-1 shrink-0" fill="currentColor"
                         viewBox="0 0 20 20" aria-hidden="true">
                         <path fill-rule="evenodd"
                             d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
@@ -50,7 +50,7 @@
                     </svg>
                 @else
                     {{-- Current page (not clickable) --}}
-                    <span class="font-semibold text-gray-900 dark:text-gray-100 px-1" aria-current="page">
+                    <span class="font-semibold text-neutral-900 dark:text-neutral-100 px-1" aria-current="page">
                         {{ $label }}
                     </span>
                 @endif

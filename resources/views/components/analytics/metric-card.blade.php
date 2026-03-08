@@ -93,7 +93,7 @@
 
         {{-- Content --}}
         <div class="flex-1 min-w-0">
-            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">
+            <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400 truncate">
                 {{ $label }}
             </p>
             <div class="flex items-baseline gap-1 mt-1">
@@ -101,7 +101,7 @@
                     {{ is_numeric($value) ? number_format($value, is_float($value) ? 1 : 0) : $value }}
                 </span>
                 @if ($unit)
-                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ $unit }}</span>
+                    <span class="text-sm text-neutral-500 dark:text-neutral-400">{{ $unit }}</span>
                 @endif
             </div>
 
@@ -125,10 +125,10 @@
                             -{{ $trend['value'] ?? 0 }}{{ $trend['unit'] ?? '%' }}
                         </span>
                     @else
-                        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
                         </svg>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Stable</span>
+                        <span class="text-xs text-neutral-500 dark:text-neutral-400">Stable</span>
                     @endif
                 </div>
             @endif

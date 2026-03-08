@@ -8,7 +8,7 @@ Props:
   - currentTurn (int): Current active turn
 
 Usage:
-  <x-training-timeline :character="$character" :totalTurns="78" :currentTurn="15" />
+  <x-training-timeline :character="$character" :totalTurns="72" :currentTurn="15" />
 
 Accessibility: WCAG 2.2 AA compliant
 --}}
@@ -25,8 +25,8 @@ Accessibility: WCAG 2.2 AA compliant
     {{-- Header --}}
     <div class="flex items-center justify-between">
         <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Training Progress</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Training Progress</h3>
+            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                 Turn <span x-text="currentTurn"></span> of <span x-text="totalTurns"></span>
             </p>
         </div>
@@ -41,7 +41,7 @@ Accessibility: WCAG 2.2 AA compliant
     </div>
 
     {{-- Progress Bar --}}
-    <div class="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+    <div class="relative h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
         <div class="absolute h-full bg-linear-to-r from-blue-500 to-cyan-500 rounded-full transition-all duration-300"
              :style="`width: ${progressPercentage}%`">
         </div>
@@ -55,10 +55,10 @@ Accessibility: WCAG 2.2 AA compliant
             :disabled="!canGoBackward"
             class="
                 px-4 py-2 rounded-lg font-medium
-                bg-white dark:bg-gray-800
-                border border-gray-200 dark:border-gray-700
-                text-gray-700 dark:text-gray-300
-                hover:bg-gray-50 dark:hover:bg-gray-700
+                bg-white dark:bg-neutral-800
+                border border-neutral-200 dark:border-neutral-700
+                text-neutral-700 dark:text-neutral-300
+                hover:bg-neutral-50 dark:hover:bg-neutral-700
                 disabled:opacity-50 disabled:cursor-not-allowed
                 transition-colors
                 focus:outline-hidden focus:ring-2 focus:ring-blue-500
@@ -73,9 +73,9 @@ Accessibility: WCAG 2.2 AA compliant
 
         {{-- Turn Indicator --}}
         <div class="flex-1 text-center">
-            <span class="text-2xl font-bold text-gray-900 dark:text-white" x-text="currentTurn"></span>
-            <span class="text-gray-500 dark:text-gray-400"> / </span>
-            <span class="text-2xl font-bold text-gray-500 dark:text-gray-400" x-text="totalTurns"></span>
+            <span class="text-2xl font-bold text-neutral-900 dark:text-white" x-text="currentTurn"></span>
+            <span class="text-neutral-500 dark:text-neutral-400"> / </span>
+            <span class="text-2xl font-bold text-neutral-500 dark:text-neutral-400" x-text="totalTurns"></span>
         </div>
 
         <button
@@ -89,7 +89,7 @@ Accessibility: WCAG 2.2 AA compliant
                 disabled:opacity-50 disabled:cursor-not-allowed
                 transition-colors
                 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                dark:focus:ring-offset-gray-900
+                dark:focus:ring-offset-neutral-900
             "
             aria-label="Next turn"
         >
@@ -101,7 +101,7 @@ Accessibility: WCAG 2.2 AA compliant
     </div>
 
     {{-- Swipe Hint --}}
-    <div class="text-center text-xs text-gray-500 dark:text-gray-400">
+    <div class="text-center text-xs text-neutral-500 dark:text-neutral-400">
         <span class="inline-flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m0 0l4 4m10 0v4m0 0l4-4m0 0l-4-4" />
@@ -112,11 +112,11 @@ Accessibility: WCAG 2.2 AA compliant
 
     {{-- Turn Details Card --}}
     <template x-if="currentTurnData">
-        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-6">
+        <div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-6 space-y-6">
             
             {{-- Condition Badge --}}
             <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Condition</span>
+                <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Condition</span>
                 <span class="inline-flex items-center gap-2 
                     px-3 py-1 rounded-full text-sm font-semibold
                     capitalize"
@@ -129,11 +129,11 @@ Accessibility: WCAG 2.2 AA compliant
 
             {{-- Stats Gains --}}
             <div class="space-y-3">
-                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Stat Gains</h4>
+                <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Stat Gains</h4>
                 <div class="grid grid-cols-5 gap-2">
                     <template x-for="(stat, value) in currentTurnData.stats" :key="stat">
-                        <div class="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                            <span class="text-xs font-medium text-gray-600 dark:text-gray-400 capitalize mb-1" x-text="stat"></span>
+                        <div class="flex flex-col items-center p-2 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                            <span class="text-xs font-medium text-neutral-600 dark:text-neutral-400 capitalize mb-1" x-text="stat"></span>
                             <span class="text-lg font-bold transition-all"
                                 :class="getStatChangeColor(value)"
                                 x-text="value >= 0 ? `+${value}` : value"
@@ -146,10 +146,10 @@ Accessibility: WCAG 2.2 AA compliant
             {{-- Energy Status --}}
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Energy</span>
-                    <span class="text-sm font-semibold text-gray-900 dark:text-white" x-text="`${currentTurnData.energy}/100`"></span>
+                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Energy</span>
+                    <span class="text-sm font-semibold text-neutral-900 dark:text-white" x-text="`${currentTurnData.energy}/100`"></span>
                 </div>
-                <div class="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div class="relative h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                     <div class="absolute h-full bg-linear-to-r from-green-500 to-emerald-500"
                          :style="`width: ${currentTurnData.energy}%`">
                     </div>
@@ -157,8 +157,8 @@ Accessibility: WCAG 2.2 AA compliant
             </div>
 
             {{-- Status Badge --}}
-            <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
-                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Status</span>
+            <div class="flex items-center justify-between pt-2 border-t border-neutral-200 dark:border-neutral-700">
+                <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Status</span>
                 <span class="inline-flex px-2 py-1 rounded text-xs font-semibold"
                     :class="getTurnStatusColor(currentTurnData)"
                     x-text="getTurnStatusText(currentTurnData)"

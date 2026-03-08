@@ -1,25 +1,25 @@
 @props(['availableCards', 'cardsByTier'])
 
-<div class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
-    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Card Library</h2>
+<div class="card bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700">
+    <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Card Library</h2>
 
     <!-- Filters -->
     <div class="space-y-3 mb-4">
         <div class="relative">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg class="h-5 w-5 text-neutral-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd"
                         d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
                         clip-rule="evenodd" />
                 </svg>
             </div>
             <input type="text" x-model="searchQuery" placeholder="Search cards..."
-                class="form-input w-full pl-10 rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm focus:border-primary-500 focus:ring-primary-500"
+                class="form-input w-full pl-10 rounded-md border-neutral-300 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white text-sm focus:border-primary-500 focus:ring-primary-500"
                 aria-label="Search support cards">
         </div>
 
         <select x-model="filterType"
-            class="form-select w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm focus:border-primary-500 focus:ring-primary-500"
+            class="form-select w-full rounded-md border-neutral-300 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white text-sm focus:border-primary-500 focus:ring-primary-500"
             aria-label="Filter by card type">
             <option value="">All Types</option>
             <option value="speed">Speed</option>
@@ -31,7 +31,7 @@
         </select>
 
         <select x-model="filterRarity"
-            class="form-select w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm focus:border-primary-500 focus:ring-primary-500"
+            class="form-select w-full rounded-md border-neutral-300 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white text-sm focus:border-primary-500 focus:ring-primary-500"
             aria-label="Filter by rarity">
             <option value="">All Rarities</option>
             <option value="SSR">SSR</option>
@@ -40,7 +40,7 @@
         </select>
 
         <select x-model="filterTier"
-            class="form-select w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm focus:border-primary-500 focus:ring-primary-500"
+            class="form-select w-full rounded-md border-neutral-300 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white text-sm focus:border-primary-500 focus:ring-primary-500"
             aria-label="Filter by meta tier">
             <option value="">All Tiers</option>
             <option value="S+">S+ Tier</option>
@@ -51,7 +51,7 @@
         </select>
 
         <select x-model="sortBy"
-            class="form-select w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm focus:border-primary-500 focus:ring-primary-500"
+            class="form-select w-full rounded-md border-neutral-300 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white text-sm focus:border-primary-500 focus:ring-primary-500"
             aria-label="Sort cards by">
             <option value="meta_tier">Sort by Meta Tier</option>
             <option value="name">Sort by Name</option>
@@ -63,7 +63,7 @@
     <!-- Card List -->
     <div class="space-y-2 max-h-[600px] overflow-y-auto">
         @foreach ($availableCards as $card)
-            <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-colors cursor-pointer"
+            <div class="p-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-colors cursor-pointer"
                 x-show="filterCard({{ json_encode([
                     'name' => $card->name,
                     'character_name' => $card->character_name,
@@ -75,10 +75,10 @@
                 role="listitem">
                 <div class="flex items-start justify-between gap-2">
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        <h4 class="text-sm font-medium text-neutral-900 dark:text-white truncate">
                             {{ $card->name }}
                         </h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
                             {{ $card->character_name }}
                         </p>
                         <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
@@ -99,15 +99,15 @@
     </div>
 
     <!-- Meta Tier Quick Filter -->
-    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Quick Filter by Tier:</p>
+    <div class="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+        <p class="text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-2">Quick Filter by Tier:</p>
         <div class="flex flex-wrap gap-2">
             @foreach (['S+', 'S', 'A', 'B', 'C'] as $tier)
                 <button type="button"
                     @click="filterTier = filterTier === '{{ $tier }}' ? '' : '{{ $tier }}'"
                     :class="filterTier === '{{ $tier }}' ?
                         'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 border-primary-300 dark:border-primary-700' :
-                        'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'"
+                        'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border-neutral-300 dark:border-neutral-600'"
                     class="px-3 py-1 text-xs font-medium rounded-md border transition-colors hover:bg-primary-50 dark:hover:bg-primary-900/50"
                     aria-label="Filter by {{ $tier }} tier">
                     {{ $tier }}

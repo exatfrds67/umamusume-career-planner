@@ -1,7 +1,7 @@
 @props(['server'])
 
 <div
-    class="rounded-lg border border-gray-200 bg-white p-4 shadow-xs transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
+    class="rounded-lg border border-neutral-200 bg-white p-4 shadow-xs transition-all hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800">
     <div class="flex items-center justify-between">
         <!-- Server Info -->
         <div class="flex items-center space-x-4">
@@ -11,7 +11,7 @@
                     'bg-green-100 dark:bg-green-900': server.status === 'healthy',
                     'bg-yellow-100 dark:bg-yellow-900': server.status === 'degraded',
                     'bg-red-100 dark:bg-red-900': server.status === 'unhealthy',
-                    'bg-gray-100 dark:bg-gray-700': server.status === 'disabled'
+                    'bg-neutral-100 dark:bg-neutral-700': server.status === 'disabled'
                 }">
                 <!-- Pulse animation for healthy servers -->
                 <span x-show="server.status === 'healthy'"
@@ -22,7 +22,7 @@
                         'text-green-600 dark:text-green-300': server.status === 'healthy',
                         'text-yellow-600 dark:text-yellow-300': server.status === 'degraded',
                         'text-red-600 dark:text-red-300': server.status === 'unhealthy',
-                        'text-gray-600 dark:text-gray-400': server.status === 'disabled'
+                        'text-neutral-600 dark:text-neutral-400': server.status === 'disabled'
                     }"
                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -33,16 +33,16 @@
 
             <!-- Server Details -->
             <div>
-                <h4 class="font-semibold text-gray-900 dark:text-white" x-text="server.name"></h4>
+                <h4 class="font-semibold text-neutral-900 dark:text-white" x-text="server.name"></h4>
                 <div class="mt-1 flex items-center space-x-2 text-sm">
-                    <span class="text-gray-600 dark:text-gray-400" x-text="server.type"></span>
-                    <span class="text-gray-400">•</span>
+                    <span class="text-neutral-600 dark:text-neutral-400" x-text="server.type"></span>
+                    <span class="text-neutral-400">•</span>
                     <span class="capitalize"
                         :class="{
                             'text-green-600 dark:text-green-400': server.status === 'healthy',
                             'text-yellow-600 dark:text-yellow-400': server.status === 'degraded',
                             'text-red-600 dark:text-red-400': server.status === 'unhealthy',
-                            'text-gray-600 dark:text-gray-400': server.status === 'disabled'
+                            'text-neutral-600 dark:text-neutral-400': server.status === 'disabled'
                         }"
                         x-text="server.status"></span>
                 </div>
@@ -60,7 +60,7 @@
             </span>
 
             <!-- Response Time -->
-            <span x-show="server.avg_response_time" class="text-xs text-gray-500 dark:text-gray-400">
+            <span x-show="server.avg_response_time" class="text-xs text-neutral-500 dark:text-neutral-400">
                 <span x-text="server.avg_response_time"></span>ms avg
             </span>
         </div>
@@ -68,23 +68,23 @@
 
     <!-- Server Metrics -->
     <div x-show="server.status !== 'disabled'"
-        class="mt-4 grid grid-cols-3 gap-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+        class="mt-4 grid grid-cols-3 gap-4 border-t border-neutral-200 pt-4 dark:border-neutral-700">
         <!-- Uptime -->
         <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Uptime</p>
-            <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white" x-text="server.uptime_percentage + '%'">
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">Uptime</p>
+            <p class="mt-1 text-sm font-semibold text-neutral-900 dark:text-white" x-text="server.uptime_percentage + '%'">
             </p>
         </div>
 
         <!-- Requests (24h) -->
         <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Requests (24h)</p>
-            <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white" x-text="server.requests_24h || 0"></p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">Requests (24h)</p>
+            <p class="mt-1 text-sm font-semibold text-neutral-900 dark:text-white" x-text="server.requests_24h || 0"></p>
         </div>
 
         <!-- Failures -->
         <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Failures</p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">Failures</p>
             <p class="mt-1 text-sm font-semibold"
                 :class="{
                     'text-green-600 dark:text-green-400': server.consecutive_failures === 0,

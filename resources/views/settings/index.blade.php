@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Settings')
+
 @section('content')
     {{-- Breadcrumb Navigation --}}
     <x-breadcrumb :items="[['label' => 'Settings']]" />
@@ -11,41 +13,46 @@
         $notifPrefs   = $user->notification_preferences ? $user->notification_preferences->getArrayCopy() : [];
     @endphp
 
-    <div class="space-y-6 animate-fade-in"
+    <div class="page-stack animate-fade-in"
         x-data="settingsData()"
         x-init="initToggles()">
         <!-- Page Header -->
-        <div class="md:flex md:items-center md:justify-between">
+        <div class="page-hero">
+            <div class="page-hero__content">
             <div class="min-w-0 flex-1">
-                <h2
-                    class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
+                <div class="page-hero__eyebrow">
+                    <span>Preferences</span>
+                </div>
+                <h2 class="page-hero__title sm:truncate">
                     Settings
                 </h2>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="page-hero__body text-sm sm:text-base">
                     Manage your application preferences, privacy settings, and account configuration.
                 </p>
 
             </div>
-            <div class="mt-4 flex md:ml-4 md:mt-0">
+            <div class="page-hero__actions">
                 <button type="button" @click="resetDefaults()"
-                    class="inline-flex items-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-xs ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    class="btn btn-outline btn-md rounded-xl">
                     Reset to Defaults
                 </button>
+            </div>
             </div>
         </div>
 
         <!-- Settings Search -->
-        <div class="relative">
+        <div class="filter-surface p-4 relative">
             <label for="settings-search" class="sr-only">Search settings</label>
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg class="h-5 w-5 text-neutral-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd"
                         d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z"
                         clip-rule="evenodd" />
                 </svg>
             </div>
             <input type="search" id="settings-search"
-                class="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-gray-900 dark:text-white bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                x-model="searchQuery"
+                class="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 ring-1 ring-inset ring-neutral-300 dark:ring-neutral-600 placeholder:text-neutral-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
                 placeholder="Search settings...">
         </div>
 
@@ -53,12 +60,13 @@
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
             <!-- Settings Navigation -->
             <div class="lg:col-span-1">
-                <nav class="space-y-1 sticky top-20" aria-label="Settings navigation">
-                    <a href="#account" @click.prevent="active = 'account'"
+                <nav class="filter-surface p-3 space-y-1 sticky top-20" aria-label="Settings navigation" role="tablist">
+                    <a href="#account" @click.prevent="active = 'account'" x-show="matchesSearch('account profile name email language timezone')"
                         :class="active === 'account' ?
                             'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' :
-                            'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                            'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white'"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md"
+                        id="tab-account" role="tab" :aria-selected="active === 'account'" aria-controls="account">
                         <svg class="shrink-0 -ml-1 mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -66,11 +74,12 @@
                         </svg>
                         Account
                     </a>
-                    <a href="#privacy" @click.prevent="active = 'privacy'"
+                    <a href="#privacy" @click.prevent="active = 'privacy'" x-show="matchesSearch('privacy data analytics cloud backup integration external')"
                         :class="active === 'privacy' ?
                             'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' :
-                            'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                            'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white'"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md"
+                        id="tab-privacy" role="tab" :aria-selected="active === 'privacy'" aria-controls="privacy">
                         <svg class="shrink-0 -ml-1 mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -78,11 +87,12 @@
                         </svg>
                         Privacy & Data
                     </a>
-                    <a href="#ai" @click.prevent="active = 'ai'"
+                    <a href="#ai" @click.prevent="active = 'ai'" x-show="matchesSearch('ai model provider budget recommendation ollama bedrock')"
                         :class="active === 'ai' ?
                             'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' :
-                            'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                            'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white'"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md"
+                        id="tab-ai" role="tab" :aria-selected="active === 'ai'" aria-controls="ai">
                         <svg class="shrink-0 -ml-1 mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -90,11 +100,12 @@
                         </svg>
                         AI Configuration
                     </a>
-                    <a href="#appearance" @click.prevent="active = 'appearance'"
+                    <a href="#appearance" @click.prevent="active = 'appearance'" x-show="matchesSearch('appearance theme dark light font size compact animation')"
                         :class="active === 'appearance' ?
                             'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' :
-                            'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                            'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white'"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md"
+                        id="tab-appearance" role="tab" :aria-selected="active === 'appearance'" aria-controls="appearance">
                         <svg class="shrink-0 -ml-1 mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -102,11 +113,12 @@
                         </svg>
                         Appearance
                     </a>
-                    <a href="#accessibility" @click.prevent="active = 'accessibility'"
+                    <a href="#accessibility" @click.prevent="active = 'accessibility'" x-show="matchesSearch('accessibility contrast motion screen reader colorblind')"
                         :class="active === 'accessibility' ?
                             'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' :
-                            'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                            'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white'"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md"
+                        id="tab-accessibility" role="tab" :aria-selected="active === 'accessibility'" aria-controls="accessibility">
                         <svg class="shrink-0 -ml-1 mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -114,11 +126,12 @@
                         </svg>
                         Accessibility
                     </a>
-                    <a href="#notifications" @click.prevent="active = 'notifications'"
+                    <a href="#notifications" @click.prevent="active = 'notifications'" x-show="matchesSearch('notification alert training race goal budget sound quiet')"
                         :class="active === 'notifications' ?
                             'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' :
-                            'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                            'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white'"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md"
+                        id="tab-notifications" role="tab" :aria-selected="active === 'notifications'" aria-controls="notifications">
                         <svg class="shrink-0 -ml-1 mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -126,11 +139,12 @@
                         </svg>
                         Notifications
                     </a>
-                    <a href="#gameplay" @click.prevent="active = 'gameplay'"
+                    <a href="#gameplay" @click.prevent="active = 'gameplay'" x-show="matchesSearch('gameplay training facility skill support card sp auto-accept')"
                         :class="active === 'gameplay' ?
                             'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' :
-                            'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                            'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white'"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md"
+                        id="tab-gameplay" role="tab" :aria-selected="active === 'gameplay'" aria-controls="gameplay">
                         <svg class="shrink-0 -ml-1 mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -138,11 +152,12 @@
                         </svg>
                         Gameplay
                     </a>
-                    <a href="#advanced" @click.prevent="active = 'advanced'"
+                    <a href="#advanced" @click.prevent="active = 'advanced'" x-show="matchesSearch('advanced auto-save backup lazy loading debug error developer')"
                         :class="active === 'advanced' ?
                             'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' :
-                            'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md">
+                            'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white'"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-md"
+                        id="tab-advanced" role="tab" :aria-selected="active === 'advanced'" aria-controls="advanced">
                         <svg class="shrink-0 -ml-1 mr-3 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -158,53 +173,53 @@
             <!-- Settings Content -->
             <div class="lg:col-span-3 space-y-6">
                 <!-- Account Settings -->
-                <div id="account" x-show="active === 'account'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-1">
+                <div id="account" x-show="active === 'account'" x-transition class="bg-white dark:bg-neutral-800 shadow rounded-lg animate-fade-in-delay-1" role="tabpanel" aria-labelledby="tab-account">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+                        <h3 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white mb-4">
                             Account Settings
                         </h3>
                         <form class="space-y-6" @submit.prevent="saveAccount()">
                             <!-- Profile Information -->
                             <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Profile Information
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Profile Information
                                 </h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div>
                                         <label for="display-name"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Display Name
                                         </label>
                                         <input type="text" id="display-name" name="name"
                                             x-model="name"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                     </div>
                                     <div>
                                         <label for="email"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Email Address
                                         </label>
                                         <input type="email" id="email" name="email"
                                             x-model="email"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                     </div>
                                     <div>
                                         <label for="language"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Language
                                         </label>
                                         <select id="language" x-model="language"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option value="en">English</option>
                                             <option value="ja">日本語 (Japanese)</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label for="timezone"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Timezone
                                         </label>
                                         <select id="timezone" x-model="timezone"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option value="UTC">UTC</option>
                                             <option value="Asia/Tokyo">Asia/Tokyo</option>
                                             <option value="America/New_York">America/New_York</option>
@@ -221,25 +236,25 @@
                             </div>
 
                             <!-- Security Settings -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Security</h4>
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Security</h4>
                                 <div class="space-y-3">
                                     <button type="button" @click="showPasswordModal = true"
-                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        class="inline-flex items-center px-3 py-2 border border-neutral-300 dark:border-neutral-600 shadow-xs text-sm leading-4 font-medium rounded-md text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Change Password
                                     </button>
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="two-factor"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Two-Factor Authentication
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Add an extra layer of security
                                             </p>
                                         </div>
                                         <button type="button" id="two-factor"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable two-factor authentication</span>
                                             <span aria-hidden="true"
@@ -250,17 +265,17 @@
                             </div>
 
                             <!-- Account Management -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Account Management
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Account Management
                                 </h4>
                                 <div class="space-y-3">
                                     <button type="button"
                                         @click="window.location.href = '{{ route('settings.export') }}'"
-                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        class="inline-flex items-center px-3 py-2 border border-neutral-300 dark:border-neutral-600 shadow-xs text-sm leading-4 font-medium rounded-md text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Export Account Data
                                     </button>
                                     <button type="button" @click="showDeleteModal = true"
-                                        class="inline-flex items-center px-3 py-2 border border-error-300 dark:border-error-600 shadow-xs text-sm leading-4 font-medium rounded-md text-error-700 dark:text-error-300 bg-white dark:bg-gray-700 hover:bg-error-50 dark:hover:bg-error-900/20 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-error-500">
+                                        class="inline-flex items-center px-3 py-2 border border-error-200 dark:border-error-600 shadow-xs text-sm leading-4 font-medium rounded-md text-error-700 dark:text-error-200 bg-white dark:bg-neutral-700 hover:bg-error-50 dark:hover:bg-error-900/20 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-error-500">
                                         Delete Account
                                     </button>
                                 </div>
@@ -270,32 +285,32 @@
                 </div>
 
                 <!-- Privacy & Data Control -->
-                <div id="privacy" x-show="active === 'privacy'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-2">
+                <div id="privacy" x-show="active === 'privacy'" x-transition class="bg-white dark:bg-neutral-800 shadow rounded-lg animate-fade-in-delay-2" role="tabpanel" aria-labelledby="tab-privacy">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+                        <h3 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white mb-4">
                             Privacy & Data Control
                         </h3>
                         <div class="space-y-6">
                             <!-- Data Sharing Preferences -->
                             <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Data Sharing
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Data Sharing
                                     Preferences</h4>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-4">
                                     All features are opt-in. Your data stays local by default.
                                 </p>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="analytics"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Anonymous Analytics
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Help improve the app with usage data
                                             </p>
                                         </div>
                                         <button type="button" id="analytics"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable anonymous analytics</span>
                                             <span aria-hidden="true"
@@ -305,15 +320,15 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="cloud-backup"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Cloud Backup
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Backup your data to the cloud
                                             </p>
                                         </div>
                                         <button type="button" id="cloud-backup"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable cloud backup</span>
                                             <span aria-hidden="true"
@@ -323,15 +338,15 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="cloud-ai"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Cloud AI Processing
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Use AWS Bedrock for complex AI tasks
                                             </p>
                                         </div>
                                         <button type="button" id="cloud-ai"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable cloud AI processing</span>
                                             <span aria-hidden="true"
@@ -342,17 +357,17 @@
                             </div>
 
                             <!-- External Service Integration -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">External Services
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">External Services
                                 </h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="umapyoi"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 umapyoi.net API
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Community game data integration
                                             </p>
                                         </div>
@@ -367,10 +382,10 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="umamusumedb"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 UmamusumeDB.com
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Calculator tools and meta analysis
                                             </p>
                                         </div>
@@ -386,17 +401,17 @@
                             </div>
 
                             <!-- Data Management -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Data Management</h4>
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Data Management</h4>
                                 <div class="space-y-3">
                                     <button type="button"
                                         @click="window.location.href = '{{ route('settings.export') }}'"
-                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        class="inline-flex items-center px-3 py-2 border border-neutral-300 dark:border-neutral-600 shadow-xs text-sm leading-4 font-medium rounded-md text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Export All Data (JSON)
                                     </button>
                                     <button type="button"
                                         @click="clearLocalCache()"
-                                        class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        class="inline-flex items-center px-3 py-2 border border-neutral-300 dark:border-neutral-600 shadow-xs text-sm leading-4 font-medium rounded-md text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Clear Local Cache
                                     </button>
                                     <div class="mt-2">
@@ -411,40 +426,40 @@
                     </div>
                 </div>
                 <!-- AI Configuration -->
-                <div id="ai" x-show="active === 'ai'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-3">
+                <div id="ai" x-show="active === 'ai'" x-transition class="bg-white dark:bg-neutral-800 shadow rounded-lg animate-fade-in-delay-3" role="tabpanel" aria-labelledby="tab-ai">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+                        <h3 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white mb-4">
                             AI Configuration
                         </h3>
                         <div class="space-y-6">
                             <!-- AI Model Selection -->
                             <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">AI Model Selection
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">AI Model Selection
                                 </h4>
                                 <div class="space-y-4">
                                     <div>
                                         <label for="ai-provider"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Preferred AI Provider
                                         </label>
                                         <select id="ai-provider"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option value="ollama" {{ ($aiSettings['provider'] ?? 'ollama') === 'ollama' ? 'selected' : '' }}>Ollama (Local - Privacy First)</option>
                                             <option value="bedrock" {{ ($aiSettings['provider'] ?? 'ollama') === 'bedrock' ? 'selected' : '' }}>AWS Bedrock (Cloud - Advanced)</option>
                                             <option value="hybrid" {{ ($aiSettings['provider'] ?? 'ollama') === 'hybrid' ? 'selected' : '' }}>Hybrid (Auto-select based on task)</option>
                                         </select>
-                                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                                             Local models run on your device. Cloud models require internet and may incur
                                             costs.
                                         </p>
                                     </div>
                                     <div>
                                         <label for="ai-model"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Model Preference
                                         </label>
                                         <select id="ai-model"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <optgroup label="Local Models (Ollama)">
                                                 <option selected>Llama 3.3 (Recommended)</option>
                                                 <option>Mistral</option>
@@ -463,69 +478,69 @@
                             </div>
 
                             <!-- Budget Management -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Budget Management
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Budget Management
                                 </h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                     <div>
                                         <label for="daily-limit"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Daily Limit
                                         </label>
                                         <div class="mt-1 relative rounded-md shadow-xs">
                                             <div
                                                 class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                                <span class="text-gray-500 sm:text-sm">$</span>
+                                                <span class="text-neutral-500 sm:text-sm">$</span>
                                             </div>
                                             <input type="number" id="daily-limit" value="0.50" step="0.10"
-                                                class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-7 pr-12 focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                                class="block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white pl-7 pr-12 focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                         </div>
                                     </div>
                                     <div>
                                         <label for="weekly-limit"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Weekly Limit
                                         </label>
                                         <div class="mt-1 relative rounded-md shadow-xs">
                                             <div
                                                 class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                                <span class="text-gray-500 sm:text-sm">$</span>
+                                                <span class="text-neutral-500 sm:text-sm">$</span>
                                             </div>
                                             <input type="number" id="weekly-limit" value="5.00" step="0.50"
-                                                class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-7 pr-12 focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                                class="block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white pl-7 pr-12 focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                         </div>
                                     </div>
                                     <div>
                                         <label for="monthly-limit"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Monthly Limit
                                         </label>
                                         <div class="mt-1 relative rounded-md shadow-xs">
                                             <div
                                                 class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                                <span class="text-gray-500 sm:text-sm">$</span>
+                                                <span class="text-neutral-500 sm:text-sm">$</span>
                                             </div>
                                             <input type="number" id="monthly-limit" value="10.00" step="1.00"
-                                                class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-7 pr-12 focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                                class="block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white pl-7 pr-12 focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                         </div>
                                     </div>
                                 </div>
-                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
                                     Current month usage: $0.00 / $10.00
                                 </p>
                             </div>
 
                             <!-- AI Behavior -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">AI Behavior</h4>
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">AI Behavior</h4>
                                 <div class="space-y-4">
                                     <div>
                                         <label for="recommendation-frequency"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Recommendation Frequency
                                         </label>
                                         <select id="recommendation-frequency"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option value="per_turn" {{ ($aiSettings['recommendation_frequency'] ?? 'per_turn') === 'per_turn' ? 'selected' : '' }}>Per Turn (Automatic)</option>
                                             <option value="per_session" {{ ($aiSettings['recommendation_frequency'] ?? 'per_turn') === 'per_session' ? 'selected' : '' }}>Per Session</option>
                                             <option value="manual" {{ ($aiSettings['recommendation_frequency'] ?? 'per_turn') === 'manual' ? 'selected' : '' }}>Manual Only</option>
@@ -533,11 +548,11 @@
                                     </div>
                                     <div>
                                         <label for="explanation-detail"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Explanation Detail Level
                                         </label>
                                         <select id="explanation-detail"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option value="brief" {{ ($aiSettings['explanation_detail'] ?? 'detailed') === 'brief' ? 'selected' : '' }}>Brief</option>
                                             <option value="detailed" {{ ($aiSettings['explanation_detail'] ?? 'detailed') === 'detailed' ? 'selected' : '' }}>Detailed</option>
                                             <option value="expert" {{ ($aiSettings['explanation_detail'] ?? 'detailed') === 'expert' ? 'selected' : '' }}>Expert</option>
@@ -546,10 +561,10 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="show-model"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Show Which Model is Used
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Display model name in responses
                                             </p>
                                         </div>
@@ -567,53 +582,53 @@
                     </div>
                 </div>
                 <!-- Appearance Settings -->
-                <div id="appearance" x-show="active === 'appearance'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-4">
+                <div id="appearance" x-show="active === 'appearance'" x-transition class="bg-white dark:bg-neutral-800 shadow rounded-lg animate-fade-in-delay-4" role="tabpanel" aria-labelledby="tab-appearance">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+                        <h3 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white mb-4">
                             Appearance
                         </h3>
                         <div class="space-y-6">
                             <!-- Theme Selection -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                                     Theme
                                 </label>
-                                <div class="grid grid-cols-3 gap-3">
-                                    <button type="button" @click="applyTheme('light')"
-                                        :class="theme === 'light' ? 'border-primary-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'"
+                                <div class="grid grid-cols-3 gap-3" role="radiogroup" aria-label="Theme selection">
+                                    <button type="button" @click="applyTheme('light')" role="radio" :aria-checked="theme === 'light'"
+                                        :class="theme === 'light' ? 'border-primary-500' : 'border-neutral-300 dark:border-neutral-600 hover:border-neutral-400'"
                                         class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white p-4 focus:outline-hidden">
-                                        <svg class="h-8 w-8 text-gray-900 mb-2" fill="none" viewBox="0 0 24 24"
+                                        <svg class="h-8 w-8 text-neutral-900 mb-2" fill="none" viewBox="0 0 24 24"
                                             stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
                                         </svg>
-                                        <span class="text-sm font-medium text-gray-900">Light</span>
+                                        <span class="text-sm font-medium text-neutral-900">Light</span>
                                         <span x-show="theme === 'light'"
                                             class="pointer-events-none absolute -inset-px rounded-lg border-2 border-primary-500"
                                             aria-hidden="true"></span>
                                     </button>
-                                    <button type="button" @click="applyTheme('dark')"
-                                        :class="theme === 'dark' ? 'border-primary-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'"
-                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white dark:bg-gray-700 p-4 focus:outline-hidden">
-                                        <svg class="h-8 w-8 text-gray-900 dark:text-white mb-2" fill="none"
+                                    <button type="button" @click="applyTheme('dark')" role="radio" :aria-checked="theme === 'dark'"
+                                        :class="theme === 'dark' ? 'border-primary-500' : 'border-neutral-300 dark:border-neutral-600 hover:border-neutral-400'"
+                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white dark:bg-neutral-700 p-4 focus:outline-hidden">
+                                        <svg class="h-8 w-8 text-neutral-900 dark:text-white mb-2" fill="none"
                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
                                         </svg>
-                                        <span class="text-sm font-medium text-gray-900 dark:text-white">Dark</span>
+                                        <span class="text-sm font-medium text-neutral-900 dark:text-white">Dark</span>
                                         <span x-show="theme === 'dark'"
                                             class="pointer-events-none absolute -inset-px rounded-lg border-2 border-primary-500"
                                             aria-hidden="true"></span>
                                     </button>
-                                    <button type="button" @click="applyTheme('system')"
-                                        :class="theme === 'system' ? 'border-primary-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'"
-                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white dark:bg-gray-700 p-4 focus:outline-hidden">
-                                        <svg class="h-8 w-8 text-gray-900 dark:text-white mb-2" fill="none"
+                                    <button type="button" @click="applyTheme('system')" role="radio" :aria-checked="theme === 'system'"
+                                        :class="theme === 'system' ? 'border-primary-500' : 'border-neutral-300 dark:border-neutral-600 hover:border-neutral-400'"
+                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white dark:bg-neutral-700 p-4 focus:outline-hidden">
+                                        <svg class="h-8 w-8 text-neutral-900 dark:text-white mb-2" fill="none"
                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
                                         </svg>
-                                        <span class="text-sm font-medium text-gray-900 dark:text-white">System</span>
+                                        <span class="text-sm font-medium text-neutral-900 dark:text-white">System</span>
                                         <span x-show="theme === 'system'"
                                             class="pointer-events-none absolute -inset-px rounded-lg border-2 border-primary-500"
                                             aria-hidden="true"></span>
@@ -622,21 +637,21 @@
                             </div>
 
                             <!-- Layout Preferences -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Layout</h4>
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Layout</h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="compact-mode"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Compact Mode
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Reduce spacing for more content
                                             </p>
                                         </div>
                                         <button type="button" id="compact-mode"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable compact mode</span>
                                             <span aria-hidden="true"
@@ -646,10 +661,10 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="animations"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Animations
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Enable smooth transitions
                                             </p>
                                         </div>
@@ -663,14 +678,15 @@
                                     </div>
                                     <div>
                                         <label for="font-size"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                                             Font Size: <span x-text="fontSize + '%'">100%</span>
                                         </label>
                                         <input type="range" id="font-size" min="100" max="200"
                                             x-model="fontSize"
                                             @input="applyFontSize($event.target.value)"
                                             step="10"
-                                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                                            :aria-valuetext="fontSize + '% font size'"
+                                            class="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer dark:bg-neutral-700">
                                     </div>
                                 </div>
                             </div>
@@ -679,28 +695,28 @@
                 </div>
 
                 <!-- Accessibility Settings -->
-                <div id="accessibility" x-show="active === 'accessibility'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div id="accessibility" x-show="active === 'accessibility'" x-transition class="bg-white dark:bg-neutral-800 shadow rounded-lg" role="tabpanel" aria-labelledby="tab-accessibility">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+                        <h3 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white mb-4">
                             Accessibility (WCAG 2.2 AA Compliant)
                         </h3>
                         <div class="space-y-6">
                             <!-- Visual Accessibility -->
                             <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Visual</h4>
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Visual</h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="high-contrast"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 High Contrast Mode
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Increase contrast for better visibility
                                             </p>
                                         </div>
                                         <button type="button" id="high-contrast"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable high contrast mode</span>
                                             <span aria-hidden="true"
@@ -710,15 +726,15 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="reduced-motion"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Reduced Motion
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Minimize animations and transitions
                                             </p>
                                         </div>
                                         <button type="button" id="reduced-motion"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable reduced motion</span>
                                             <span aria-hidden="true"
@@ -727,11 +743,11 @@
                                     </div>
                                     <div>
                                         <label for="colorblind-mode"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Color Blind Mode
                                         </label>
                                         <select id="colorblind-mode"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option selected>None</option>
                                             <option>Deuteranopia (Red-Green)</option>
                                             <option>Protanopia (Red-Green)</option>
@@ -742,21 +758,21 @@
                             </div>
 
                             <!-- Screen Reader Support -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Screen Reader</h4>
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Screen Reader</h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="screen-reader-opt"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Screen Reader Optimization
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Enhanced descriptions for assistive tech
                                             </p>
                                         </div>
                                         <button type="button" id="screen-reader-opt"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable screen reader optimization</span>
                                             <span aria-hidden="true"
@@ -775,24 +791,24 @@
                     </div>
                 </div>
                 <!-- Notification Settings -->
-                <div id="notifications" x-show="active === 'notifications'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div id="notifications" x-show="active === 'notifications'" x-transition class="bg-white dark:bg-neutral-800 shadow rounded-lg" role="tabpanel" aria-labelledby="tab-notifications">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+                        <h3 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white mb-4">
                             Notifications
                         </h3>
                         <div class="space-y-6">
                             <!-- Notification Types -->
                             <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Notification Types
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Notification Types
                                 </h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="training-notif"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Training Recommendations
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 AI-powered training suggestions
                                             </p>
                                         </div>
@@ -807,10 +823,10 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="race-notif"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Race Deadlines
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Upcoming race reminders
                                             </p>
                                         </div>
@@ -825,10 +841,10 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="goal-notif"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Goal Progress Updates
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Milestone achievements
                                             </p>
                                         </div>
@@ -843,10 +859,10 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="budget-notif"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Budget Alerts
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 AI spending limit warnings
                                             </p>
                                         </div>
@@ -862,13 +878,13 @@
                             </div>
 
                             <!-- Notification Channels -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Channels</h4>
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Channels</h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="in-app-notif"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 In-App Notifications
                                             </label>
                                         </div>
@@ -883,12 +899,12 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="sound-notif"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Sound Notifications
                                             </label>
                                         </div>
                                         <button type="button" id="sound-notif"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable sound notifications</span>
                                             <span aria-hidden="true"
@@ -899,24 +915,24 @@
                             </div>
 
                             <!-- Quiet Hours -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Quiet Hours</h4>
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Quiet Hours</h4>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label for="quiet-start"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Start Time
                                         </label>
                                         <input type="time" id="quiet-start" value="22:00"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                     </div>
                                     <div>
                                         <label for="quiet-end"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             End Time
                                         </label>
                                         <input type="time" id="quiet-end" value="08:00"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                     </div>
                                 </div>
                             </div>
@@ -925,23 +941,23 @@
                 </div>
 
                 <!-- Gameplay Preferences -->
-                <div id="gameplay" x-show="active === 'gameplay'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div id="gameplay" x-show="active === 'gameplay'" x-transition class="bg-white dark:bg-neutral-800 shadow rounded-lg" role="tabpanel" aria-labelledby="tab-gameplay">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+                        <h3 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white mb-4">
                             Gameplay Preferences
                         </h3>
                         <div class="space-y-6">
                             <!-- Training Preferences -->
                             <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Training</h4>
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Training</h4>
                                 <div class="space-y-4">
                                     <div>
                                         <label for="default-facility"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Default Training Facility
                                         </label>
                                         <select id="default-facility"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option selected>Speed</option>
                                             <option>Stamina</option>
                                             <option>Power</option>
@@ -952,15 +968,15 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="auto-accept"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Auto-Accept AI Recommendations
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Automatically apply AI suggestions
                                             </p>
                                         </div>
                                         <button type="button" id="auto-accept"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable auto-accept recommendations</span>
                                             <span aria-hidden="true"
@@ -971,16 +987,16 @@
                             </div>
 
                             <!-- Skill Management -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Skills</h4>
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Skills</h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="skill-hints"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Skill Hint Notifications
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Alert when hints reduce SP cost
                                             </p>
                                         </div>
@@ -995,10 +1011,10 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="sp-budget"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 SP Budget Alerts
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Warn when approaching SP limit
                                             </p>
                                         </div>
@@ -1014,15 +1030,15 @@
                             </div>
 
                             <!-- Support Cards -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Support Cards</h4>
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Support Cards</h4>
                                 <div>
                                     <label for="card-sorting"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                         Default Card Sorting
                                     </label>
                                     <select id="card-sorting"
-                                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                        class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                         <option>Rarity (Highest First)</option>
                                         <option selected>Meta Tier</option>
                                         <option>Type (Speed/Stamina/etc.)</option>
@@ -1035,24 +1051,24 @@
                 </div>
 
                 <!-- Advanced Settings -->
-                <div id="advanced" x-show="active === 'advanced'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div id="advanced" x-show="active === 'advanced'" x-transition class="bg-white dark:bg-neutral-800 shadow rounded-lg" role="tabpanel" aria-labelledby="tab-advanced">
                     <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+                        <h3 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white mb-4">
                             Advanced Settings
                         </h3>
                         <div class="space-y-6">
                             <!-- Data & Performance -->
                             <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Data & Performance
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Data & Performance
                                 </h4>
                                 <div class="space-y-4">
                                     <div>
                                         <label for="auto-save"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Auto-Save Frequency
                                         </label>
                                         <select id="auto-save"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option selected>Every Turn</option>
                                             <option>Every 5 Turns</option>
                                             <option>Manual Only</option>
@@ -1060,11 +1076,11 @@
                                     </div>
                                     <div>
                                         <label for="backup-frequency"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                             Backup Frequency
                                         </label>
                                         <select id="backup-frequency"
-                                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                            class="mt-1 block w-full rounded-md border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                             <option selected>Daily</option>
                                             <option>Weekly</option>
                                             <option>Monthly</option>
@@ -1074,10 +1090,10 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="lazy-loading"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Lazy Loading
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Load content as needed for better performance
                                             </p>
                                         </div>
@@ -1093,22 +1109,22 @@
                             </div>
 
                             <!-- Developer Options -->
-                            <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Developer Options
+                            <div class="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Developer Options
                                 </h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="debug-mode"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Debug Mode
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Show detailed error messages
                                             </p>
                                         </div>
                                         <button type="button" id="debug-mode"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable debug mode</span>
                                             <span aria-hidden="true"
@@ -1118,15 +1134,15 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <label for="error-reporting"
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                 Error Reporting
                                             </label>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-neutral-500 dark:text-neutral-400">
                                                 Send crash reports to developers
                                             </p>
                                         </div>
                                         <button type="button" id="error-reporting"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-neutral-200 dark:bg-neutral-600 transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                             role="switch" aria-checked="false">
                                             <span class="sr-only">Enable error reporting</span>
                                             <span aria-hidden="true"
@@ -1140,12 +1156,12 @@
                 </div>
 
                 <!-- Change Password Modal -->
-                <div x-show="showPasswordModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+                <div x-show="showPasswordModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;" @keydown.escape.window="showPasswordModal = false">
                     <div class="absolute inset-0 bg-black/50" @click="showPasswordModal = false"></div>
-                    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div class="relative bg-white dark:bg-neutral-800 rounded-lg shadow-xl max-w-md w-full p-6" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Change Password</h3>
-                            <button type="button" @click="showPasswordModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <h3 id="password-modal-title" class="text-lg font-medium text-neutral-900 dark:text-white">Change Password</h3>
+                            <button type="button" @click="showPasswordModal = false" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
                                 <span class="sr-only">Close</span>
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -1154,27 +1170,27 @@
                         </div>
                         <form class="space-y-4" @submit.prevent="changePassword()">
                             <div>
-                                <label for="current-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
+                                <label for="current-password" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">Current Password</label>
                                 <input type="password" id="current-password" name="current_password" autocomplete="current-password"
                                     x-model="currentPassword"
-                                    class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm">
+                                    class="mt-1 block w-full rounded-md border-0 py-1.5 text-neutral-900 dark:text-white dark:bg-neutral-700 ring-1 ring-inset ring-neutral-300 dark:ring-neutral-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm">
                             </div>
                             <div>
-                                <label for="new-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+                                <label for="new-password" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">New Password</label>
                                 <input type="password" id="new-password" name="new_password" autocomplete="new-password"
                                     x-model="newPassword"
-                                    class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm">
+                                    class="mt-1 block w-full rounded-md border-0 py-1.5 text-neutral-900 dark:text-white dark:bg-neutral-700 ring-1 ring-inset ring-neutral-300 dark:ring-neutral-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm">
                             </div>
                             <div>
-                                <label for="confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New Password</label>
+                                <label for="confirm-password" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">Confirm New Password</label>
                                 <input type="password" id="confirm-password" name="confirm_password" autocomplete="new-password"
                                     x-model="confirmPassword"
-                                    class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm">
+                                    class="mt-1 block w-full rounded-md border-0 py-1.5 text-neutral-900 dark:text-white dark:bg-neutral-700 ring-1 ring-inset ring-neutral-300 dark:ring-neutral-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm">
                             </div>
                             <div x-show="passwordError" class="text-sm text-red-600 dark:text-red-400" x-text="passwordError"></div>
                             <div class="flex justify-end gap-3 pt-2">
                                 <button type="button" @click="showPasswordModal = false; currentPassword = ''; newPassword = ''; confirmPassword = ''; passwordError = ''"
-                                    class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50">
+                                    class="inline-flex items-center px-4 py-2 border border-neutral-300 dark:border-neutral-600 shadow-xs text-sm font-medium rounded-md text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 hover:bg-neutral-50">
                                     Cancel
                                 </button>
                                 <button type="submit"
@@ -1187,29 +1203,29 @@
                 </div>
 
                 <!-- Delete Account Modal -->
-                <div x-show="showDeleteModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+                <div x-show="showDeleteModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;" @keydown.escape.window="showDeleteModal = false">
                     <div class="absolute inset-0 bg-black/50" @click="showDeleteModal = false"></div>
-                    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div class="relative bg-white dark:bg-neutral-800 rounded-lg shadow-xl max-w-md w-full p-6" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-medium text-red-600 dark:text-red-400">Delete Account</h3>
-                            <button type="button" @click="showDeleteModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <h3 id="delete-modal-title" class="text-lg font-medium text-red-600 dark:text-red-400">Delete Account</h3>
+                            <button type="button" @click="showDeleteModal = false" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
                                 <span class="sr-only">Close</span>
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        <p id="delete-confirm-instructions" class="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
                             This action is permanent and cannot be undone. All your data will be deleted.
                             Type <strong>DELETE</strong> to confirm.
                         </p>
                         <div class="mb-4">
-                            <input type="text" x-model="deleteConfirmation" placeholder="Type DELETE to confirm"
-                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm">
+                            <input type="text" x-model="deleteConfirmation" placeholder="Type DELETE to confirm" aria-describedby="delete-confirm-instructions"
+                                class="block w-full rounded-md border-0 py-1.5 text-neutral-900 dark:text-white dark:bg-neutral-700 ring-1 ring-inset ring-neutral-300 dark:ring-neutral-600 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm">
                         </div>
                         <div class="flex justify-end gap-3">
                             <button type="button" @click="showDeleteModal = false; deleteConfirmation = ''"
-                                class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50">
+                                class="inline-flex items-center px-4 py-2 border border-neutral-300 dark:border-neutral-600 shadow-xs text-sm font-medium rounded-md text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 hover:bg-neutral-50">
                                 Cancel
                             </button>
                             <button type="button"
@@ -1236,7 +1252,7 @@
                 <!-- Save Button -->
                 <div class="flex justify-end gap-3">
                     <button type="button" @click="active = 'account'"
-                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-xs text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        class="inline-flex items-center px-4 py-2 border border-neutral-300 dark:border-neutral-600 shadow-xs text-sm font-medium rounded-md text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                         Cancel
                     </button>
                     <button type="button" @click="saveSettings()"

@@ -187,7 +187,7 @@ it('displays validation warnings for low confidence extractions', function () {
     $response = get(route('ocr.results', $extraction->id));
 
     $response->assertStatus(200);
-    $response->assertSee('⚠️ Review recommended');
+    $response->assertSee('Review recommended');
     $response->assertSee('Validation Warnings');
 });
 

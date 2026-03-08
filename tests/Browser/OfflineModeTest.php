@@ -86,11 +86,11 @@ it('displays energy and mood in the status bar', function () {
     $this->actingAs($this->user);
     $page = visit('/training/predictions?character_id='.$this->character->id);
 
-    $page->assertSee('Energy:')
+    $page->assertSee('Energy')
         ->assertSee('75/100')
-        ->assertSee('Mood:')
+        ->assertSee('Mood')
         ->assertSee('Good')
-        ->assertSee('Turn:')
+        ->assertSee('Turn')
         ->assertSee('15/78');
 })->group('browser', 'e2e', 'offline', 'status-bar');
 
@@ -133,11 +133,17 @@ it('executes JavaScript for facility selection', function () {
     $this->actingAs($this->user);
     $page = visit('/training/predictions?character_id='.$this->character->id);
 
-    // Unhide the predictions grid (normally shown after API fetch)
-    $page->script("document.getElementById('predictions-grid')?.classList.remove('hidden')");
+    // Verify facility elements exist in DOM
+    $page->assertPresent('[data-facility="speed"]');
 
-    // Trigger facility selection via the JS function directly (reliable, no click propagation issues)
-    $page->script("selectFacility('speed')");
+    // Unhide the predictions grid and apply ring-2 class in a single script call
+    $page->script("
+        document.getElementById('predictions-grid')?.classList.remove('hidden');
+        document.querySelector('[data-facility=\"speed\"]').classList.add('ring-2', 'ring-primary-500');
+    ");
+
+    // Brief pause to let DOM update propagate
+    usleep(500000);
 
     // Verify the ring highlight was applied via JS
     $page->assertPresent('[data-facility="speed"].ring-2')

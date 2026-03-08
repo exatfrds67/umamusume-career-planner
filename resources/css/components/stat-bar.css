@@ -1,35 +1,51 @@
 /* Stat Bar Component Styles */
 
-@keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
+.stat-bar-container {
+    --stat-200: var(--color-primary-200);
+    --stat-300: var(--color-primary-300);
+    --stat-400: var(--color-primary-400);
+    --stat-500: var(--color-primary-500);
+    --stat-600: var(--color-primary-600);
+    --stat-700: var(--color-primary-700);
+    --stat-800: var(--color-primary-800);
 }
 
-.animate-shimmer {
-    animation: shimmer 2s infinite;
+.stat-bar-icon {
+    background: linear-gradient(135deg, var(--stat-400), var(--stat-500));
+    box-shadow: 0 10px 20px -10px color-mix(in srgb, var(--stat-500) 75%, transparent);
 }
 
-/* Stat-specific icon colors */
-.stat-icon-stat-speed {
-    background: linear-gradient(135deg, #fb7185, #f43f5e);
+.stat-bar-target-indicator,
+.stat-bar-target-dot {
+    background-color: var(--stat-600);
 }
 
-.stat-icon-stat-stamina {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+.dark .stat-bar-target-indicator,
+.dark .stat-bar-target-dot {
+    background-color: var(--stat-400);
 }
 
-.stat-icon-stat-power {
-    background: linear-gradient(135deg, #f97316, #ea580c);
+.stat-bar-fill {
+    background: linear-gradient(90deg, var(--stat-400), var(--stat-500));
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--stat-500) 24%, transparent) inset;
 }
 
-.stat-icon-stat-guts {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+.stat-bar-overcap {
+    background-color: color-mix(in srgb, var(--stat-700) 45%, transparent);
 }
 
-.stat-icon-stat-wit {
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+.dark .stat-bar-overcap {
+    background-color: color-mix(in srgb, var(--stat-800) 55%, transparent);
+}
+
+.stat-factor-bonus {
+    color: var(--stat-600);
+}
+
+.dark .stat-factor-bonus {
+    color: var(--stat-300);
+}
+
+.stat-bar-container:hover .stat-bar-fill {
+    filter: saturate(1.05) brightness(1.02);
 }

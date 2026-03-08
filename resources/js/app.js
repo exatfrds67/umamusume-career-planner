@@ -38,6 +38,7 @@ import agentSelector from "./components/ai/agent-selector.js";
 import performanceMetrics from "./components/ai/performance-metrics.js";
 import providerSelector from "./components/ai/provider-selector.js";
 import serverStatusIndicator from "./components/ai/server-status-indicator.js";
+import toolUsageIndicator from "./components/ai/tool-usage-indicator.js";
 import workflowVisualization from "./components/ai/workflow-visualization.js";
 
 // Analytics Components
@@ -360,7 +361,7 @@ const deckBuilder = () => ({
 
         return {
             "border-primary-300 bg-primary-50 dark:bg-primary-900/20": hasCard,
-            "border-dashed border-gray-300 bg-gray-50": !hasCard,
+            "border-dashed border-neutral-300 bg-neutral-50": !hasCard,
             "ring-2 ring-primary-500 ring-offset-2": isDragOver,
         };
     },
@@ -687,6 +688,7 @@ Alpine.data("agentSelector", agentSelector);
 Alpine.data("performanceMetrics", performanceMetrics);
 Alpine.data("providerSelector", providerSelector);
 Alpine.data("serverStatusIndicator", serverStatusIndicator);
+Alpine.data("toolUsageIndicator", toolUsageIndicator);
 Alpine.data("workflowVisualization", workflowVisualization);
 
 // Analytics Components

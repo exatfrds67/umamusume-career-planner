@@ -13,10 +13,10 @@
         'SR' =>
             'bg-linear-to-r from-purple-100 to-pink-100 text-purple-800 dark:from-purple-900 dark:to-pink-900 dark:text-purple-200 border border-purple-300 dark:border-purple-700',
         'R' =>
-            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600',
+            'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-600',
     ];
 
-    $colorClass = $rarityColors[$rarity] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    $colorClass = $rarityColors[$rarity] ?? 'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200';
     $sizeClass = $sizeClasses[$size] ?? $sizeClasses['sm'];
 @endphp
 

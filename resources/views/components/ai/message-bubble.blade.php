@@ -1,13 +1,13 @@
 @props(['message'])
 
-<div class="flex items-start gap-3" :class="message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'" role="article"
+<div class="flex items-start gap-3 animate-fade-in-up" :class="message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'" role="article"
     :aria-label="`Message from ${message.sender === 'user' ? 'you' : 'AI assistant'}`">
 
     {{-- Avatar --}}
     <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-        :class="message.sender === 'user' ? 'bg-gray-300 dark:bg-gray-600' : 'bg-primary-500'">
+        :class="message.sender === 'user' ? 'bg-neutral-300 dark:bg-neutral-600' : 'bg-primary-500'">
         <template x-if="message.sender === 'user'">
-            <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-neutral-700 dark:text-neutral-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
@@ -25,7 +25,7 @@
         <div class="rounded-lg p-4 shadow-xs"
             :class="message.sender === 'user' ?
                 'bg-primary-600 text-white' :
-                'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600'">
+                'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-600'">
 
             {{-- Message Header --}}
             <div class="flex items-center justify-between mb-2">
@@ -35,7 +35,7 @@
                     <template x-if="message.sender === 'ai' && message.metadata?.model">
                         <span class="text-xs px-2 py-0.5 rounded-full"
                             :class="message.sender === 'user' ? 'bg-primary-500' :
-                                'bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300'"
+                                'bg-neutral-100 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-300'"
                             x-text="message.metadata.model"></span>
                     </template>
                     <template x-if="message.sender === 'ai' && message.metadata?.agent">
@@ -56,13 +56,13 @@
             {{-- AI Message Metadata --}}
             <template x-if="message.sender === 'ai' && message.metadata">
                 <div class="mt-3 pt-3 border-t"
-                    :class="message.sender === 'user' ? 'border-primary-500' : 'border-gray-200 dark:border-gray-600'">
+                    :class="message.sender === 'user' ? 'border-primary-500' : 'border-neutral-200 dark:border-neutral-600'">
 
                     {{-- Confidence Score --}}
                     <template x-if="message.metadata.confidence">
                         <div class="flex items-center gap-2 mb-2">
                             <span class="text-xs opacity-75">Confidence:</span>
-                            <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                            <div class="flex-1 h-2 bg-neutral-200 dark:bg-neutral-600 rounded-full overflow-hidden">
                                 <div class="h-full bg-green-500 transition-all duration-300"
                                     :style="`width: ${message.metadata.confidence}%`"></div>
                             </div>
@@ -117,22 +117,32 @@
 
             {{-- Message Actions --}}
             <div class="mt-3 flex items-center gap-3 text-xs">
-                <button @click="copyMessage(message.content)"
-                    class="flex items-center gap-1 opacity-75 hover:opacity-100 transition-opacity"
-                    :class="message.sender === 'user' ? 'text-white' : 'text-gray-600 dark:text-gray-400'"
+                <button @click="copyMessage(message.id, message.content)"
+                    class="flex items-center gap-1 opacity-75 hover:opacity-100 transition-all"
+                    :class="[
+                        message.sender === 'user' ? 'text-white' : 'text-neutral-600 dark:text-neutral-400',
+                        copiedMessageId === message.id ? 'opacity-100 text-green-600 dark:text-green-400' : ''
+                    ]"
                     aria-label="Copy message">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    <span>Copy</span>
+                    <template x-if="copiedMessageId === message.id">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </template>
+                    <template x-if="copiedMessageId !== message.id">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    </template>
+                    <span x-text="copiedMessageId === message.id ? 'Copied!' : 'Copy'"></span>
                 </button>
 
                 <template x-if="message.sender === 'ai'">
                     <button @click="rateMessage(message.id, 'helpful')"
                         class="flex items-center gap-1 opacity-75 hover:opacity-100 transition-opacity"
                         :class="[
-                            message.sender === 'user' ? 'text-white' : 'text-gray-600 dark:text-gray-400',
+                            message.sender === 'user' ? 'text-white' : 'text-neutral-600 dark:text-neutral-400',
                             message.rating === 'helpful' ? 'opacity-100 text-green-600 dark:text-green-400' : ''
                         ]"
                         aria-label="Mark as helpful">
@@ -148,7 +158,7 @@
                     <button @click="rateMessage(message.id, 'not_helpful')"
                         class="flex items-center gap-1 opacity-75 hover:opacity-100 transition-opacity"
                         :class="[
-                            message.sender === 'user' ? 'text-white' : 'text-gray-600 dark:text-gray-400',
+                            message.sender === 'user' ? 'text-white' : 'text-neutral-600 dark:text-neutral-400',
                             message.rating === 'not_helpful' ? 'opacity-100 text-red-600 dark:text-red-400' : ''
                         ]"
                         aria-label="Mark as not helpful">

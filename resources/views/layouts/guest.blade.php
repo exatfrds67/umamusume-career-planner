@@ -51,8 +51,8 @@
     @livewireStyles
 </head>
 
-<body class="h-full font-sans antialiased text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:dark:bg-gray-800 focus:text-primary-600 focus:dark:text-primary-400 focus:rounded-md focus:shadow-lg focus:ring-2 focus:ring-primary-500 focus:outline-hidden">
+<body class="h-full font-sans antialiased text-neutral-900 dark:text-neutral-100 bg-neutral-50 dark:bg-neutral-900">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:dark:bg-neutral-800 focus:text-primary-600 focus:dark:text-primary-400 focus:rounded-md focus:shadow-lg focus:ring-2 focus:ring-primary-500 focus:outline-hidden">
         Skip to content
     </a>
 

@@ -60,7 +60,7 @@ export default function spiritBurstGauge() {
                 return "bg-gradient-to-r from-green-400 to-yellow-400";
             if (percentage >= 50)
                 return "bg-gradient-to-r from-blue-400 to-green-400";
-            return "bg-gradient-to-r from-gray-400 to-blue-400";
+            return "bg-gradient-to-r from-neutral-400 to-blue-400";
         },
     };
 }

@@ -132,3 +132,37 @@ it('displays mood and energy correctly', function () {
         && $moodEnergy['energy'] === 65
         && $moodEnergy['maxEnergy'] === 100);
 });
+
+it('renders dashboard analytics from live character data instead of placeholder values', function () {
+    $user = User::factory()->create();
+
+    Character::factory()->create([
+        'user_id' => $user->id,
+        'name' => 'Analytics Test Uma',
+        'current_turn' => 35,
+        'current_stats' => [
+            'speed' => 900,
+            'stamina' => 850,
+            'power' => 800,
+            'guts' => 750,
+            'wit' => 700,
+        ],
+        'status' => 'active',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('dashboard'));
+
+    $response->assertSuccessful();
+    $response->assertSee('Turn 35');
+    $response->assertDontSee('Turn 32');
+    $response->assertDontSee('3,500 fans');
+});
+
+it('does not inject the debugbar into dashboard responses by default', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('dashboard'));
+
+    $response->assertSuccessful();
+    $response->assertDontSee('phpdebugbar', false);
+});

@@ -38,25 +38,25 @@ describe('GradeBadge UI Component', function () {
         expect($html)
             ->toContain('C')
             ->toContain('bg-yellow-500')
-            ->toContain('text-gray-900');
+            ->toContain('text-neutral-900');
     });
 
-    it('renders G grade with gray-500 background for WCAG AA contrast', function () {
+    it('renders G grade with neutral-500 background for WCAG AA contrast', function () {
         $html = Blade::render('<x-ui.grade-badge grade="G" />');
 
         expect($html)
             ->toContain('G')
-            ->toContain('bg-gray-500')
+            ->toContain('bg-neutral-500')
             ->toContain('text-white')
-            ->not->toContain('bg-gray-400');
+            ->not->toContain('bg-neutral-400');
     });
 
-    it('renders F grade with gray-500 background', function () {
+    it('renders F grade with neutral-500 background', function () {
         $html = Blade::render('<x-ui.grade-badge grade="F" />');
 
         expect($html)
             ->toContain('F')
-            ->toContain('bg-gray-500')
+            ->toContain('bg-neutral-500')
             ->toContain('text-white');
     });
 

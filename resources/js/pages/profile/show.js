@@ -16,26 +16,55 @@ document.addEventListener("alpine:init", () => {
     Alpine.data("profileManager", () => ({
         activeTab: "account",
         loading: false,
+        tabs: ["account", "preferences", "notifications", "privacy", "security"],
 
         init() {
             // Check URL hash for tab
             const hash = window.location.hash.replace("#", "");
-            if (
-                hash &&
-                [
-                    "account",
-                    "preferences",
-                    "notifications",
-                    "privacy",
-                    "security",
-                ].includes(hash)
-            ) {
+            if (hash && this.tabs.includes(hash)) {
                 this.activeTab = hash;
             }
 
             // Update URL hash when tab changes
             this.$watch("activeTab", (value) => {
                 window.location.hash = value;
+            });
+        },
+
+        focusNextTab() {
+            const idx = this.tabs.indexOf(this.activeTab);
+            const next = this.tabs[(idx + 1) % this.tabs.length];
+            this.activeTab = next;
+            this.$nextTick(() => {
+                const el = document.getElementById("tab-" + next);
+                if (el) el.focus();
+            });
+        },
+
+        focusPrevTab() {
+            const idx = this.tabs.indexOf(this.activeTab);
+            const prev = this.tabs[(idx - 1 + this.tabs.length) % this.tabs.length];
+            this.activeTab = prev;
+            this.$nextTick(() => {
+                const el = document.getElementById("tab-" + prev);
+                if (el) el.focus();
+            });
+        },
+
+        focusFirstTab() {
+            this.activeTab = this.tabs[0];
+            this.$nextTick(() => {
+                const el = document.getElementById("tab-" + this.tabs[0]);
+                if (el) el.focus();
+            });
+        },
+
+        focusLastTab() {
+            const last = this.tabs[this.tabs.length - 1];
+            this.activeTab = last;
+            this.$nextTick(() => {
+                const el = document.getElementById("tab-" + last);
+                if (el) el.focus();
             });
         },
     }));

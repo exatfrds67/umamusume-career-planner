@@ -41,9 +41,9 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation, screen reader friendl
         'focus:outline-hidden focus:ring-2 focus:ring-offset-0 ' .
         ($hasError 
             ? 'border-error-500 text-error-900 focus:border-error-500 focus:ring-error-500/20 bg-error-50 dark:bg-error-900/10 dark:text-error-400 dark:border-error-500' 
-            : 'border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-primary-500 focus:ring-primary-500/20 bg-white dark:bg-gray-800'
+            : 'border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-white focus:border-primary-500 focus:ring-primary-500/20 bg-white dark:bg-neutral-800'
         ) .
-        ($disabled ? ' opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-700' : '');
+        ($disabled ? ' opacity-50 cursor-not-allowed bg-neutral-100 dark:bg-neutral-700' : '');
     
     $ariaDescribedBy = collect([
         $hasError ? $errorId : null,
@@ -62,7 +62,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation, screen reader friendl
 <div {{ $attributes->only('class')->merge(['class' => 'form-group']) }}>
     {{-- Label --}}
     @if($label)
-        <label for="{{ $selectId }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        <label for="{{ $selectId }}" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
             {{ $label }}
             @if($required)
                 <span class="text-error-500 ml-0.5" aria-hidden="true">*</span>
@@ -101,7 +101,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation, screen reader friendl
         
         {{-- Dropdown Icon --}}
         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-            <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <svg class="h-5 w-5 text-neutral-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
             </svg>
         </div>
@@ -119,7 +119,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation, screen reader friendl
     
     {{-- Hint Text --}}
     @if($hint && !$hasError)
-        <p id="{{ $hintId }}" class="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+        <p id="{{ $hintId }}" class="mt-1.5 text-sm text-neutral-500 dark:text-neutral-400">
             {{ $hint }}
         </p>
     @endif

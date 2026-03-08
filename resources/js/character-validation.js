@@ -64,7 +64,7 @@ function updateStatGrade(stat, value) {
         green: "bg-green-100 text-green-700",
         blue: "bg-blue-100 text-blue-700",
         indigo: "bg-indigo-100 text-indigo-700",
-        gray: "bg-gray-100 text-gray-700",
+        gray: "bg-neutral-100 text-neutral-700",
     };
 
     gradeElement.textContent = grade;
@@ -181,7 +181,7 @@ function displayError(input, errors) {
 
         // Insert error message after input or after help text
         const helpText = input.parentElement.querySelector(
-            ".text-gray-500, .text-xs"
+            ".text-neutral-500, .text-xs"
         );
         if (helpText && helpText.nextSibling) {
             helpText.parentElement.insertBefore(

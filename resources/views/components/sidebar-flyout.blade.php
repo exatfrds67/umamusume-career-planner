@@ -44,12 +44,12 @@
             x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0" :style="flyoutStyle" style="display: none;"
             @mouseenter="flyoutShow = true" @mouseleave="hide()"
-            class="min-w-48 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 py-1"
+            class="min-w-48 rounded-lg shadow-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 py-1"
             role="menu" :aria-label="'{{ $text }} submenu'">
 
             {{-- Header --}}
             <div
-                class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 border-b border-neutral-100 dark:border-neutral-700">
                 {{ $text }}
             </div>
 
@@ -58,7 +58,7 @@
 
             {{-- Arrow pointing left --}}
             <div
-                class="absolute w-2 h-2 rotate-45 -left-1 top-4 bg-white dark:bg-gray-800 border-l border-b border-gray-200 dark:border-gray-600">
+                class="absolute w-2 h-2 rotate-45 -left-1 top-4 bg-white dark:bg-neutral-800 border-l border-b border-neutral-200 dark:border-neutral-600">
             </div>
         </div>
     </template>

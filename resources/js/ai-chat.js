@@ -2,6 +2,8 @@
  * AI Chat Interface Alpine.js Component
  */
 
+import DOMPurify from "dompurify";
+
 const aiChatInterface = function (config) {
     return {
         // State
@@ -13,6 +15,9 @@ const aiChatInterface = function (config) {
         showWorkflow: false,
         showSettings: false,
         activeTools: [],
+        copiedMessageId: null,
+        streamAbortController: null,
+        showKeyboardShortcuts: false,
 
         // Configuration
         characterId: config.characterId || null,
@@ -29,7 +34,7 @@ const aiChatInterface = function (config) {
          * Initialize the chat interface
          */
         initialize() {
-            this.conversationId = this.generateConversationId();
+            this.conversationId = this.restoreOrCreateConversationId();
             this.loadPreferences();
             this.loadConversationHistory();
             this.setupEventListeners();
@@ -114,6 +119,8 @@ const aiChatInterface = function (config) {
          */
         async sendMessageStreaming(message, aiMessageId) {
             try {
+                this.streamAbortController = new AbortController();
+
                 const response = await fetch("/api/ai/chat/message/stream", {
                     method: "POST",
                     headers: {
@@ -132,6 +139,7 @@ const aiChatInterface = function (config) {
                         model: this.model,
                         agent_type: this.selectedAgent,
                     }),
+                    signal: this.streamAbortController.signal,
                 });
 
                 if (!response.ok || !response.body) {
@@ -186,6 +194,8 @@ const aiChatInterface = function (config) {
 
                             if (data.conversation_id) {
                                 this.conversationId = data.conversation_id;
+                                const storageKey = `ai_conversation_id_${this.characterId || "general"}`;
+                                sessionStorage.setItem(storageKey, data.conversation_id);
                             }
 
                             if (data.done) {
@@ -195,8 +205,13 @@ const aiChatInterface = function (config) {
                     }
                 }
 
+                this.streamAbortController = null;
                 return true;
             } catch (error) {
+                this.streamAbortController = null;
+                if (error.name === "AbortError") {
+                    return true;
+                }
                 console.error("Streaming failed:", error);
                 return false;
             }
@@ -234,6 +249,8 @@ const aiChatInterface = function (config) {
 
                 if (data.conversation_id) {
                     this.conversationId = data.conversation_id;
+                    const storageKey = `ai_conversation_id_${this.characterId || "general"}`;
+                    sessionStorage.setItem(storageKey, data.conversation_id);
                 }
             } else {
                 this.showError(
@@ -305,11 +322,11 @@ const aiChatInterface = function (config) {
                 // Headers (## Header)
                 .replace(
                     /^## (.*$)/gm,
-                    '<h3 class="text-lg font-bold mt-3 mb-1 text-gray-800 dark:text-gray-100">$1</h3>',
+                    '<h3 class="text-lg font-bold mt-3 mb-1 text-neutral-800 dark:text-neutral-100">$1</h3>',
                 )
                 .replace(
                     /^### (.*$)/gm,
-                    '<h4 class="text-md font-bold mt-2 mb-1 text-gray-800 dark:text-gray-100">$1</h4>',
+                    '<h4 class="text-md font-bold mt-2 mb-1 text-neutral-800 dark:text-neutral-100">$1</h4>',
                 )
                 // Bold (**text**)
                 .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
@@ -318,12 +335,12 @@ const aiChatInterface = function (config) {
                 // Code blocks (```code```)
                 .replace(
                     /```([\s\S]*?)```/g,
-                    '<pre class="bg-gray-100 dark:bg-gray-800 p-2 rounded my-2 overflow-x-auto text-sm font-mono"><code>$1</code></pre>',
+                    '<pre class="bg-neutral-100 dark:bg-neutral-800 p-2 rounded my-2 overflow-x-auto text-sm font-mono"><code>$1</code></pre>',
                 )
                 // Inline code (`code`)
                 .replace(
                     /`([^`]+)`/g,
-                    '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono text-primary-600 dark:text-primary-400">$1</code>',
+                    '<code class="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded text-sm font-mono text-primary-600 dark:text-primary-400">$1</code>',
                 )
                 // Unordered Lists (- item)
                 .replace(
@@ -335,11 +352,27 @@ const aiChatInterface = function (config) {
                     /^\s*\d+\.\s+(.*$)/gm,
                     '<li class="ml-4 list-decimal">$1</li>',
                 )
-                // Wrap lists in ul/ol (simplified approach: just treating them as lines for now, but CSS classes help)
                 // Line breaks
                 .replace(/\n/g, "<br>");
 
-            return formatted;
+            return DOMPurify.sanitize(formatted, {
+                ALLOWED_TAGS: [
+                    "h3",
+                    "h4",
+                    "strong",
+                    "em",
+                    "pre",
+                    "code",
+                    "li",
+                    "ul",
+                    "ol",
+                    "br",
+                    "p",
+                    "span",
+                    "div",
+                ],
+                ALLOWED_ATTR: ["class"],
+            });
         },
 
         /**
@@ -360,17 +393,65 @@ const aiChatInterface = function (config) {
             });
         },
 
-        /**
-         * Copy message to clipboard
-         */
-        async copyMessage(content) {
-            try {
-                // Strip HTML tags for plain text copy
-                const plainText = content.replace(/<[^>]*>/g, "");
-                await navigator.clipboard.writeText(plainText);
+        isCopiedMessage(messageId) {
+            return this.copiedMessageId === messageId;
+        },
 
-                // Show success feedback (could be a toast notification)
-                console.log("Message copied to clipboard");
+        openKeyboardShortcuts() {
+            this.showKeyboardShortcuts = true;
+        },
+
+        closeKeyboardShortcuts() {
+            this.showKeyboardShortcuts = false;
+        },
+
+        async copyPlainText(content) {
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(content);
+
+                    return true;
+                }
+            } catch (error) {
+                console.warn("Clipboard API copy failed, falling back", error);
+            }
+
+            const textarea = document.createElement("textarea");
+            textarea.value = content;
+            textarea.setAttribute("readonly", "readonly");
+            textarea.setAttribute("aria-hidden", "true");
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            textarea.style.pointerEvents = "none";
+
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length);
+
+            const copied = document.execCommand("copy");
+
+            document.body.removeChild(textarea);
+
+            return copied;
+        },
+
+        /**
+         * Copy message to clipboard with visual feedback
+         */
+        async copyMessage(messageId, content) {
+            try {
+                const plainText = content.replace(/<[^>]*>/g, "");
+                const copied = await this.copyPlainText(plainText);
+
+                if (!copied) {
+                    return;
+                }
+
+                this.copiedMessageId = messageId;
+                setTimeout(() => {
+                    this.copiedMessageId = null;
+                }, 2000);
             } catch (error) {
                 console.error("Failed to copy message:", error);
             }
@@ -415,13 +496,30 @@ const aiChatInterface = function (config) {
         },
 
         /**
-         * Show error message
+         * Show error message with contextual details
          */
         showError(message) {
+            let errorTitle = "Error";
+            let errorIcon = "⚠️";
+
+            if (message.toLowerCase().includes("network") || message.toLowerCase().includes("connection")) {
+                errorTitle = "Connection Error";
+                errorIcon = "🔌";
+            } else if (message.toLowerCase().includes("rate limit") || message.toLowerCase().includes("too many")) {
+                errorTitle = "Rate Limited";
+                errorIcon = "⏱️";
+            } else if (message.toLowerCase().includes("model") || message.toLowerCase().includes("unavailable")) {
+                errorTitle = "Model Unavailable";
+                errorIcon = "🤖";
+            } else if (message.toLowerCase().includes("unauthorized") || message.toLowerCase().includes("401")) {
+                errorTitle = "Authentication Error";
+                errorIcon = "🔒";
+            }
+
             this.addMessage({
                 id: Date.now(),
                 sender: "system",
-                content: `⚠️ ${message}`,
+                content: `${errorIcon} **${errorTitle}**: ${message}`,
                 timestamp: new Date().toISOString(),
                 isError: true,
             });
@@ -432,6 +530,20 @@ const aiChatInterface = function (config) {
          */
         generateConversationId() {
             return `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        },
+
+        /**
+         * Restore conversation ID from sessionStorage or create a new one
+         */
+        restoreOrCreateConversationId() {
+            const storageKey = `ai_conversation_id_${this.characterId || "general"}`;
+            const existing = sessionStorage.getItem(storageKey);
+            if (existing) {
+                return existing;
+            }
+            const newId = this.generateConversationId();
+            sessionStorage.setItem(storageKey, newId);
+            return newId;
         },
 
         /**
@@ -503,6 +615,182 @@ const aiChatInterface = function (config) {
                     this.provider = event.detail.provider;
                 if (event.detail.model) this.model = event.detail.model;
             });
+
+            // Keyboard shortcuts
+            document.addEventListener("keydown", (event) => {
+                // Ctrl+K: Focus message input
+                if ((event.ctrlKey || event.metaKey) && event.key === "k") {
+                    event.preventDefault();
+                    const input = document.getElementById("message-input");
+                    if (input) {
+                        input.focus();
+                    }
+                }
+
+                // Ctrl+/: Toggle keyboard shortcuts modal
+                if ((event.ctrlKey || event.metaKey) && event.key === "/") {
+                    event.preventDefault();
+                    this.showKeyboardShortcuts = !this.showKeyboardShortcuts;
+                }
+
+                // Escape: Cancel streaming or close panels
+                if (event.key === "Escape") {
+                    if (this.isProcessing) {
+                        this.cancelStreaming();
+                    } else if (this.showKeyboardShortcuts) {
+                        this.showKeyboardShortcuts = false;
+                    } else if (this.showServerStatus || this.showWorkflow || this.showSettings) {
+                        this.showServerStatus = false;
+                        this.showWorkflow = false;
+                        this.showSettings = false;
+                    }
+                }
+            });
+        },
+
+        /**
+         * Cancel an in-progress streaming response
+         */
+        cancelStreaming() {
+            if (this.streamAbortController) {
+                this.streamAbortController.abort();
+                this.streamAbortController = null;
+            }
+            this.isProcessing = false;
+            this.isTyping = false;
+
+            // Mark last AI message as cancelled
+            const lastAiMsg = [...this.messages].reverse().find(m => m.sender === "ai" && m.isStreaming);
+            if (lastAiMsg) {
+                lastAiMsg.isStreaming = false;
+                lastAiMsg.content += "\n\n*[Response cancelled]*";
+                this.messages = [...this.messages];
+                this.saveToLocalStorage();
+            }
+        },
+
+        /**
+         * Regenerate the last AI response
+         */
+        async regenerateResponse() {
+            // Find the last user message
+            const lastUserMsg = [...this.messages].reverse().find(m => m.sender === "user");
+            if (!lastUserMsg || this.isProcessing) {
+                return;
+            }
+
+            // Remove the last AI message
+            const lastAiIndex = this.messages.map(m => m.sender).lastIndexOf("ai");
+            if (lastAiIndex !== -1) {
+                this.messages.splice(lastAiIndex, 1);
+                this.messages = [...this.messages];
+                this.saveToLocalStorage();
+            }
+
+            // Re-send the last user message
+            this.currentMessage = lastUserMsg.content;
+            // Remove the last user message too (sendMessage will re-add it)
+            const lastUserIndex = this.messages.map(m => m.sender).lastIndexOf("user");
+            if (lastUserIndex !== -1) {
+                this.messages.splice(lastUserIndex, 1);
+                this.messages = [...this.messages];
+            }
+
+            await this.sendMessage();
+        },
+
+        /**
+         * Start a new conversation (clear history) with confirmation
+         */
+        newConversation() {
+            if (this.isProcessing) {
+                return;
+            }
+
+            if (
+                this.messages.length > 0 &&
+                !window.confirm(
+                    "Start a new conversation? Current messages will be cleared.",
+                )
+            ) {
+                return;
+            }
+
+            this.messages = [];
+            this.conversationId = this.generateConversationId();
+            const storageKey = `ai_conversation_id_${this.characterId || "general"}`;
+            sessionStorage.setItem(storageKey, this.conversationId);
+            this.saveToLocalStorage();
+        },
+
+        /**
+         * Delete a specific message by ID
+         */
+        deleteMessage(messageId) {
+            const index = this.messages.findIndex((m) => m.id === messageId);
+            if (index === -1) {
+                return;
+            }
+            this.messages.splice(index, 1);
+            this.messages = [...this.messages];
+            this.saveToLocalStorage();
+        },
+
+        /**
+         * Export conversation as Markdown text and copy to clipboard
+         */
+        exportConversation(format = "markdown") {
+            if (this.messages.length === 0) {
+                return;
+            }
+
+            let output = "";
+            const timestamp = new Date().toISOString().split("T")[0];
+
+            if (format === "markdown") {
+                output = `# AI Chat Export (${timestamp})\n\n`;
+                output += `**Model:** ${this.model} | **Provider:** ${this.provider}\n\n---\n\n`;
+
+                for (const msg of this.messages) {
+                    const sender =
+                        msg.sender === "user"
+                            ? "**You**"
+                            : msg.sender === "ai"
+                              ? "**AI Assistant**"
+                              : "**System**";
+                    const time = msg.timestamp
+                        ? new Date(msg.timestamp).toLocaleString()
+                        : "";
+                    output += `${sender} ${time ? `_(${time})_` : ""}\n\n${msg.content}\n\n---\n\n`;
+                }
+            } else {
+                output = JSON.stringify(
+                    {
+                        exported_at: new Date().toISOString(),
+                        provider: this.provider,
+                        model: this.model,
+                        conversation_id: this.conversationId,
+                        messages: this.messages,
+                    },
+                    null,
+                    2,
+                );
+            }
+
+            const blob = new Blob([output], {
+                type:
+                    format === "markdown"
+                        ? "text/markdown"
+                        : "application/json",
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `chat-export-${timestamp}.${format === "markdown" ? "md" : "json"}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         },
     };
 };

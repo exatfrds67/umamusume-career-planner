@@ -1,84 +1,84 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+        <h2 class="text-xl font-semibold leading-tight text-neutral-800 dark:text-neutral-200">
             Critical Alert Badge Demo
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div class="overflow-hidden bg-white shadow-xs dark:bg-gray-800 sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+            <div class="overflow-hidden bg-white shadow-xs dark:bg-neutral-800 sm:rounded-lg">
+                <div class="p-6 text-neutral-900 dark:text-neutral-100">
                     <h3 class="text-lg font-semibold mb-6">Critical Alert Badge Component</h3>
 
                     <div class="space-y-8">
                         {{-- No Alerts State --}}
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                        <div class="border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
                             <h4 class="text-md font-semibold mb-4">No Alerts (Default State)</h4>
                             <div class="flex items-center gap-4">
                                 <x-ai.critical-alert-badge :alert-count="0" />
-                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                <span class="text-sm text-neutral-600 dark:text-neutral-400">
                                     No critical alerts - icon is gray and not pulsing
                                 </span>
                             </div>
                         </div>
 
                         {{-- Single Alert --}}
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                        <div class="border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
                             <h4 class="text-md font-semibold mb-4">Single Alert</h4>
                             <div class="flex items-center gap-4">
                                 <x-ai.critical-alert-badge :alert-count="1" />
-                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                <span class="text-sm text-neutral-600 dark:text-neutral-400">
                                     1 critical alert - red pulsing icon with badge showing "1"
                                 </span>
                             </div>
                         </div>
 
                         {{-- Multiple Alerts --}}
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                        <div class="border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
                             <h4 class="text-md font-semibold mb-4">Multiple Alerts</h4>
                             <div class="flex items-center gap-4">
                                 <x-ai.critical-alert-badge :alert-count="5" />
-                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                <span class="text-sm text-neutral-600 dark:text-neutral-400">
                                     5 critical alerts - red pulsing icon with badge showing "5"
                                 </span>
                             </div>
                         </div>
 
                         {{-- Many Alerts (99+) --}}
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                        <div class="border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
                             <h4 class="text-md font-semibold mb-4">Many Alerts (99+)</h4>
                             <div class="flex items-center gap-4">
                                 <x-ai.critical-alert-badge :alert-count="150" />
-                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                <span class="text-sm text-neutral-600 dark:text-neutral-400">
                                     150 critical alerts - badge shows "99+" when count exceeds 99
                                 </span>
                             </div>
                         </div>
 
                         {{-- Size Variations --}}
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                        <div class="border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
                             <h4 class="text-md font-semibold mb-4">Size Variations</h4>
                             <div class="flex items-center gap-6">
                                 <div class="flex flex-col items-center gap-2">
                                     <x-ai.critical-alert-badge :alert-count="3" size="sm" />
-                                    <span class="text-xs text-gray-600 dark:text-gray-400">Small</span>
+                                    <span class="text-xs text-neutral-600 dark:text-neutral-400">Small</span>
                                 </div>
                                 <div class="flex flex-col items-center gap-2">
                                     <x-ai.critical-alert-badge :alert-count="3" size="md" />
-                                    <span class="text-xs text-gray-600 dark:text-gray-400">Medium (Default)</span>
+                                    <span class="text-xs text-neutral-600 dark:text-neutral-400">Medium (Default)</span>
                                 </div>
                                 <div class="flex flex-col items-center gap-2">
                                     <x-ai.critical-alert-badge :alert-count="3" size="lg" />
-                                    <span class="text-xs text-gray-600 dark:text-gray-400">Large</span>
+                                    <span class="text-xs text-neutral-600 dark:text-neutral-400">Large</span>
                                 </div>
                             </div>
                         </div>
 
                         {{-- Accessibility Features --}}
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                        <div class="border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
                             <h4 class="text-md font-semibold mb-4">Accessibility Features</h4>
-                            <ul class="list-disc list-inside space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                            <ul class="list-disc list-inside space-y-2 text-sm text-neutral-600 dark:text-neutral-400">
                                 <li>Screen reader announcements for alert count</li>
                                 <li>Keyboard accessible (Tab to focus, Enter/Space to activate)</li>
                                 <li>ARIA labels describing current state</li>
@@ -90,13 +90,13 @@
                         </div>
 
                         {{-- Integration Example --}}
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                        <div class="border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
                             <h4 class="text-md font-semibold mb-4">Integration Example (Header)</h4>
-                            <div class="bg-gray-100 dark:bg-gray-900 rounded-lg p-4">
+                            <div class="bg-neutral-100 dark:bg-neutral-900 rounded-lg p-4">
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm font-medium">Navigation Header</span>
                                     <div class="flex items-center gap-4">
-                                        <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
+                                        <button type="button" class="-m-2.5 p-2.5 text-neutral-400 hover:text-neutral-500">
                                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                                 stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -104,7 +104,7 @@
                                             </svg>
                                         </button>
                                         <x-ai.critical-alert-badge :alert-count="3" />
-                                        <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
+                                        <button type="button" class="-m-2.5 p-2.5 text-neutral-400 hover:text-neutral-500">
                                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                                 stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -117,13 +117,13 @@
                         </div>
 
                         {{-- Event Handling --}}
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                        <div class="border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
                             <h4 class="text-md font-semibold mb-4">Event Handling</h4>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                            <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
                                 Clicking the badge dispatches an Alpine.js event: <code
-                                    class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">open-advisory-panel</code>
+                                    class="bg-neutral-100 dark:bg-neutral-900 px-2 py-1 rounded">open-advisory-panel</code>
                                 with section set to <code
-                                    class="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">alerts</code>
+                                    class="bg-neutral-100 dark:bg-neutral-900 px-2 py-1 rounded">alerts</code>
                             </p>
                             <div x-data="{ message: '' }"
                                 @open-advisory-panel.window="message = 'Event received! Section: ' + $event.detail.section">

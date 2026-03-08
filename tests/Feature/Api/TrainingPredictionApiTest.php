@@ -139,6 +139,22 @@ class TrainingPredictionApiTest extends TestCase
                     'energy_cost',
                     'failure_risk',
                     'total_bonus',
+                    'wit_adequacy' => [
+                        'wit_value',
+                        'activation_chance',
+                        'status',
+                        'status_text',
+                        'threshold_met',
+                    ],
+                    'friendship_training' => [
+                        'is_active',
+                        'multiplier_base',
+                        'status_text',
+                        'cards_at_threshold',
+                        'total_cards_at_threshold',
+                        'cards_needing_bond',
+                        'estimated_turns_until_active',
+                    ],
                     'breakdown' => [
                         'base_gains',
                         'stat_bonus',
@@ -167,6 +183,9 @@ class TrainingPredictionApiTest extends TestCase
         expect($response->json('data.stat_gains'))->toBeArray();
         expect($response->json('data.energy_cost'))->toBeInt();
         expect($response->json('data.failure_risk'))->toBeFloat();
+        expect($response->json('data.wit_adequacy.wit_value'))->toBe(500);
+        expect($response->json('data.wit_adequacy.status'))->toBe('reliable');
+        expect($response->json('data.wit_adequacy.threshold_met'))->toBeTrue();
     }
 
     /** @test */

@@ -70,10 +70,10 @@
     {{-- Chart Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
                 {{ $title }}
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
                 {{ $config['label'] }} trend with statistical analysis
             </p>
         </div>
@@ -81,19 +81,19 @@
         {{-- Controls --}}
         <div class="flex items-center gap-3">
             @if ($showConfidence)
-                <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                <label class="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 cursor-pointer">
                     <input type="checkbox" id="display-confidence-toggle" name="display_confidence"
                         x-model="displayConfidence" @change="updateChart()"
-                        class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                        class="w-4 h-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500">
                     <span>Confidence Interval</span>
                 </label>
             @endif
 
             @if ($showPrediction)
-                <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                <label class="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 cursor-pointer">
                     <input type="checkbox" id="display-prediction-toggle" name="display_prediction"
                         x-model="displayPrediction" @change="updateChart()"
-                        class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                        class="w-4 h-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500">
                     <span>Prediction</span>
                 </label>
             @endif
@@ -101,23 +101,23 @@
     </div>
 
     {{-- Statistics Summary --}}
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4 p-3 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
         <div class="text-center">
-            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Current</p>
-            <p class="text-lg font-bold text-gray-900 dark:text-white"
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Current</p>
+            <p class="text-lg font-bold text-neutral-900 dark:text-white"
                 x-text="stats.current + '{{ $config['unit'] }}'"></p>
         </div>
         <div class="text-center">
-            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Average</p>
-            <p class="text-lg font-bold text-gray-900 dark:text-white"
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Average</p>
+            <p class="text-lg font-bold text-neutral-900 dark:text-white"
                 x-text="stats.average + '{{ $config['unit'] }}'"></p>
         </div>
         <div class="text-center">
-            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Trend</p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Trend</p>
             <p class="text-lg font-bold"
                 :class="stats.trendDirection === 'up' ? 'text-green-600 dark:text-green-400' : (stats
                     .trendDirection === 'down' ? 'text-red-600 dark:text-red-400' :
-                    'text-gray-600 dark:text-gray-400')">
+                    'text-neutral-600 dark:text-neutral-400')">
                 <span x-show="stats.trendDirection === 'up'">↑</span>
                 <span x-show="stats.trendDirection === 'down'">↓</span>
                 <span x-show="stats.trendDirection === 'stable'">→</span>
@@ -125,8 +125,8 @@
             </p>
         </div>
         <div class="text-center">
-            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Confidence</p>
-            <p class="text-lg font-bold text-gray-900 dark:text-white" x-text="stats.confidence + '%'"></p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Confidence</p>
+            <p class="text-lg font-bold text-neutral-900 dark:text-white" x-text="stats.confidence + '%'"></p>
         </div>
     </div>
 
@@ -137,8 +137,8 @@
 
         {{-- Loading State --}}
         <div x-show="loading"
-            class="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-gray-800/50 rounded-lg">
-            <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+            class="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-neutral-800/50 rounded-lg">
+            <div class="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
                 <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                         stroke-width="4"></circle>
@@ -153,7 +153,7 @@
         {{-- No Data State --}}
         <div x-show="!loading && (!data || data.length === 0)"
             class="absolute inset-0 flex items-center justify-center">
-            <div class="text-center text-gray-500 dark:text-gray-400">
+            <div class="text-center text-neutral-500 dark:text-neutral-400">
                 <svg class="mx-auto h-12 w-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
@@ -165,8 +165,8 @@
     </div>
 
     {{-- Legend --}}
-    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div class="flex flex-wrap items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+    <div class="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+        <div class="flex flex-wrap items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400">
             <div class="flex items-center gap-2">
                 <span class="w-4 h-0.5" style="background-color: {{ $config['color'] }};"></span>
                 <span>Actual {{ $config['label'] }}</span>

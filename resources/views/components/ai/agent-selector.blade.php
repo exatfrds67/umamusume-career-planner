@@ -3,10 +3,10 @@
 <div class="agent-selector space-y-4" x-data="agentSelector()" x-init="initialize()">
 
     <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
             Select Specialized Agent
         </label>
-        <p class="text-xs text-gray-500 dark:text-gray-400">
+        <p class="text-xs text-neutral-500 dark:text-neutral-400">
             Choose a specialized agent for domain-specific advice
         </p>
     </div>
@@ -17,17 +17,17 @@
         <button @click="selectAgent(null)" class="w-full flex items-start gap-3 p-3 rounded-lg border-2 transition-all"
             :class="selectedAgent === null ?
                 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' :
-                'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'">
+                'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'">
             <div
-                class="w-10 h-10 rounded-lg bg-linear-to-br from-gray-400 to-gray-600 flex items-center justify-center shrink-0">
+                class="w-10 h-10 rounded-lg bg-linear-to-br from-neutral-400 to-neutral-600 flex items-center justify-center shrink-0">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
             </div>
             <div class="flex-1 text-left">
-                <div class="font-medium text-gray-900 dark:text-white">General Assistant</div>
-                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div class="font-medium text-neutral-900 dark:text-white">General Assistant</div>
+                <div class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
                     General career planning advice and strategy
                 </div>
             </div>
@@ -47,7 +47,7 @@
             :class="selectedAgent === 'training'
                 ?
                 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' :
-                'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'">
+                'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'">
             <div
                 class="w-10 h-10 rounded-lg bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center shrink-0">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,8 +56,8 @@
                 </svg>
             </div>
             <div class="flex-1 text-left">
-                <div class="font-medium text-gray-900 dark:text-white">Training Specialist</div>
-                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div class="font-medium text-neutral-900 dark:text-white">Training Specialist</div>
+                <div class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
                     Optimize training sessions, stat gains, and Spirit Burst mechanics
                 </div>
             </div>
@@ -76,7 +76,7 @@
             :class="selectedAgent === 'career'
                 ?
                 'border-green-500 bg-green-50 dark:bg-green-900/20' :
-                'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'">
+                'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'">
             <div
                 class="w-10 h-10 rounded-lg bg-linear-to-br from-green-400 to-green-600 flex items-center justify-center shrink-0">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,8 +85,8 @@
                 </svg>
             </div>
             <div class="flex-1 text-left">
-                <div class="font-medium text-gray-900 dark:text-white">Career Strategist</div>
-                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div class="font-medium text-neutral-900 dark:text-white">Career Strategist</div>
+                <div class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
                     Long-term career planning, goal setting, and progression analysis
                 </div>
             </div>
@@ -106,7 +106,7 @@
             :class="selectedAgent === 'race'
                 ?
                 'border-purple-500 bg-purple-50 dark:bg-purple-900/20' :
-                'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'">
+                'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'">
             <div
                 class="w-10 h-10 rounded-lg bg-linear-to-br from-purple-400 to-purple-600 flex items-center justify-center shrink-0">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,8 +115,8 @@
                 </svg>
             </div>
             <div class="flex-1 text-left">
-                <div class="font-medium text-gray-900 dark:text-white">Race Strategist</div>
-                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div class="font-medium text-neutral-900 dark:text-white">Race Strategist</div>
+                <div class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
                     Race preparation, strategy selection, and performance optimization
                 </div>
             </div>
@@ -136,7 +136,7 @@
             :class="selectedAgent === 'skill'
                 ?
                 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' :
-                'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'">
+                'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'">
             <div
                 class="w-10 h-10 rounded-lg bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center shrink-0">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,8 +145,8 @@
                 </svg>
             </div>
             <div class="flex-1 text-left">
-                <div class="font-medium text-gray-900 dark:text-white">Skill Optimizer</div>
-                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div class="font-medium text-neutral-900 dark:text-white">Skill Optimizer</div>
+                <div class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
                     Skill builds, SP optimization, and hint collection strategies
                 </div>
             </div>
@@ -163,7 +163,7 @@
 
     {{-- Agent Status --}}
     <div x-show="selectedAgent"
-        class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        class="p-3 bg-neutral-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
         <div class="flex items-center gap-2 text-sm">
             <div class="flex items-center gap-1">
                 <span class="relative flex h-2 w-2">
@@ -171,10 +171,10 @@
                         class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
-                <span class="text-gray-700 dark:text-gray-300">Agent Active</span>
+                <span class="text-neutral-700 dark:text-neutral-300">Agent Active</span>
             </div>
         </div>
-        <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
+        <p class="text-xs text-neutral-600 dark:text-neutral-400 mt-2">
             This agent will provide specialized advice based on your selected domain.
         </p>
     </div>

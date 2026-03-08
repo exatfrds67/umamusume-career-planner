@@ -35,22 +35,22 @@
     <!-- Energy Bar -->
     <div>
         <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
+            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300 transition-colors duration-300">
                 Energy
             </span>
-            <span class="text-sm font-bold text-gray-900 dark:text-white transition-colors duration-300">
+            <span class="text-sm font-bold text-neutral-900 dark:text-white transition-colors duration-300">
                 {{ $energy }}%
             </span>
         </div>
         <div
-            class="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden transition-colors duration-300">
+            class="relative h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden transition-colors duration-300">
             <div class="absolute inset-0 bg-{{ $energyColor }}-500 dark:bg-{{ $energyColor }}-400 rounded-full transition-all duration-500"
                 style="width: {{ $energy }}%">
                 <div class="absolute inset-0 bg-linear-to-r from-transparent to-white/20"></div>
             </div>
         </div>
         @if ($showDetails)
-            <div class="mt-1 text-xs text-gray-600 dark:text-gray-400 transition-colors duration-300">
+            <div class="mt-1 text-xs text-neutral-600 dark:text-neutral-400 transition-colors duration-300">
                 @if ($energy >= 70)
                     Excellent condition for training
                 @elseif($energy >= 40)
@@ -65,7 +65,7 @@
     <!-- Mood Indicator -->
     <div>
         <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
+            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300 transition-colors duration-300">
                 Mood
             </span>
             <div class="flex items-center gap-2">
@@ -80,7 +80,7 @@
             <div class="flex gap-1">
                 @foreach (['awful', 'bad', 'normal', 'good', 'great'] as $level)
                     <div
-                        class="flex-1 h-2 rounded-full {{ $mood === $level ? 'bg-' . $moodColor . '-500 dark:bg-' . $moodColor . '-400' : 'bg-gray-200 dark:bg-gray-700' }} transition-all duration-300">
+                        class="flex-1 h-2 rounded-full {{ $mood === $level ? 'bg-' . $moodColor . '-500 dark:bg-' . $moodColor . '-400' : 'bg-neutral-200 dark:bg-neutral-700' }} transition-all duration-300">
                     </div>
                 @endforeach
             </div>
@@ -90,7 +90,7 @@
     <!-- Conditions -->
     @if (count($conditions) > 0)
         <div>
-            <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300">
+            <div class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 transition-colors duration-300">
                 Active Conditions
             </div>
             <div class="flex flex-wrap gap-2">
@@ -102,7 +102,7 @@
                         @endif
                         {{ $condition['name'] ?? $condition }}
                         @if (isset($condition['turns_remaining']))
-                            <span class="ml-1 text-gray-500 dark:text-gray-400">({{ $condition['turns_remaining'] }}
+                            <span class="ml-1 text-neutral-500 dark:text-neutral-400">({{ $condition['turns_remaining'] }}
                                 turns)</span>
                         @endif
                     </span>

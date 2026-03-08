@@ -1,13 +1,13 @@
 {{-- WF-004: Status Bar - Energy, Mood, Turn, Fail% --}}
-<section class="card rounded-xl p-4 mb-6 animate-fade-in-delay-2" aria-labelledby="status-bar-heading">
+<section class="status-strip p-4 mb-6 animate-fade-in-delay-2" aria-labelledby="status-bar-heading">
     <h2 id="status-bar-heading" class="sr-only">Current Status</h2>
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-6 flex-wrap">
             {{-- Energy Gauge --}}
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Energy:</span>
+                <span class="status-strip__item-label">Energy</span>
                 <div class="flex items-center gap-2">
-                    <div class="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+                    <div class="energy-rail"
                         role="progressbar"
                         aria-valuenow="{{ $character->energy_level }}"
                         aria-valuemin="0"
@@ -21,18 +21,17 @@
                                 default => 'bg-red-500',
                             };
                         @endphp
-                        <div class="h-full transition-all duration-300 {{ $energyColor }}"
+                        <div class="energy-fill {{ $energyColor }}"
                             style="width: {{ $character->energy_level }}%;"></div>
                     </div>
-                    <span
-                        class="text-sm font-semibold text-gray-900 dark:text-white">{{ $character->energy_level }}/100</span>
+                    <span class="status-strip__item-value text-sm font-semibold">{{ $character->energy_level }}/100</span>
                 </div>
             </div>
 
             {{-- Mood Indicator --}}
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Mood:</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white capitalize flex items-center gap-1">
+                <span class="status-strip__item-label">Mood</span>
+                <span class="status-strip__item-value text-sm font-semibold capitalize flex items-center gap-1">
                     @switch($character->mood_status)
                         @case('great')
                             <svg class="w-5 h-5 inline-block text-green-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Great <span class="text-xs text-green-500 dark:text-green-400">(+10%)</span>
@@ -43,7 +42,7 @@
                         @break
 
                         @case('normal')
-                            <svg class="w-5 h-5 inline-block text-gray-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14h6m-6-4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Normal
+                            <svg class="w-5 h-5 inline-block text-neutral-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14h6m-6-4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Normal
                         @break
 
                         @case('bad')
@@ -55,22 +54,22 @@
                         @break
 
                         @default
-                            <svg class="w-5 h-5 inline-block text-gray-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14h6m-6-4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> {{ $character->mood_status }}
+                            <svg class="w-5 h-5 inline-block text-neutral-500" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14h6m-6-4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> {{ $character->mood_status }}
                     @endswitch
                 </span>
             </div>
 
             {{-- Turn Counter --}}
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Turn:</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">
+                <span class="status-strip__item-label">Turn</span>
+                <span class="status-strip__item-value text-sm font-semibold">
                     {{ $character->current_turn ?? 1 }}/78
                 </span>
             </div>
 
             {{-- Base Fail Rate --}}
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Base Fail%:</span>
+                <span class="status-strip__item-label">Base Fail%</span>
                 @php
                     $baseFailRate = match (true) {
                         $character->energy_level >= 70 => 0,

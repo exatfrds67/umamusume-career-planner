@@ -249,11 +249,6 @@ describe('API Endpoint Coverage', function () {
     });
 
     it('has all fallback and recovery routes accessible', function () {
-        // Skip if Redis is not available (check via cache driver)
-        if (config('cache.default') !== 'redis' && ! extension_loaded('redis')) {
-            $this->markTestSkipped('Redis is not available');
-        }
-
         $this->actingAs($this->user);
 
         $this->getJson('/api/fallback/health/status')->assertSuccessful();

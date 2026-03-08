@@ -21,7 +21,7 @@
             return ['B', 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'];
         }
         if ($value >= 501) {
-            return ['C', 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'];
+            return ['C', 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'];
         }
         if ($value >= 301) {
             return ['D', 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'];
@@ -41,16 +41,16 @@
 @endphp
 
 <section class="card rounded-xl p-6 mb-6 animate-fade-in-delay-2" aria-labelledby="char-overview-heading">
-    <h2 id="char-overview-heading" class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+    <h2 id="char-overview-heading" class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
         {{ $character->name }}
     </h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {{-- Current Stats with Grade Badges --}}
-        <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-lg p-4">
-            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between">
+        <div class="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700 rounded-lg p-4">
+            <h3 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3 flex items-center justify-between">
                 Current Stats
-                <span class="text-xs text-gray-500">Soft Cap: 1200</span>
+                <span class="text-xs text-neutral-500">Soft Cap: 1200</span>
             </h3>
             <div class="space-y-2">
                 @foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
@@ -63,7 +63,7 @@
                         <span class="text-sm {{ $statColors[$stat] }} capitalize font-medium">{{ $stat }}</span>
                         <div class="flex items-center gap-2">
                             <span
-                                class="text-sm font-semibold text-gray-900 dark:text-white {{ $isOverCap ? 'text-yellow-600 dark:text-yellow-400' : '' }}">
+                                class="text-sm font-semibold text-neutral-900 dark:text-white {{ $isOverCap ? 'text-yellow-600 dark:text-yellow-400' : '' }}">
                                 {{ $statValue }}
                                 @if ($isOverCap)
                                     <span class="text-xs text-yellow-600 inline-flex items-center"
@@ -78,10 +78,10 @@
                         </div>
                     </div>
                 @endforeach
-                <div class="pt-2 border-t border-gray-200 dark:border-gray-600">
+                <div class="pt-2 border-t border-neutral-200 dark:border-neutral-600">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600 dark:text-gray-400">Total</span>
-                        <span class="text-sm font-bold text-gray-900 dark:text-white">
+                        <span class="text-sm text-neutral-600 dark:text-neutral-400">Total</span>
+                        <span class="text-sm font-bold text-neutral-900 dark:text-white">
                             {{ array_sum($character->current_stats ?? []) }}
                         </span>
                     </div>
@@ -91,10 +91,10 @@
 
         {{-- Facility Levels (Unity Cup) or Growth Rates (URA) --}}
         @if ($character->scenario_type === 'unity_cup')
-            <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center justify-between">
+            <div class="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3 flex items-center justify-between">
                     Facility Levels
-                    <span class="text-xs text-gray-500">1.0×-2.0×</span>
+                    <span class="text-xs text-neutral-500">1.0×-2.0×</span>
                 </h3>
                 <div class="space-y-2">
                     @php $facilityLevels = $character->facility_levels ?? []; @endphp
@@ -110,12 +110,12 @@
                                 <div class="flex gap-0.5" aria-hidden="true">
                                     @for ($i = 1; $i <= 5; $i++)
                                         <div
-                                            class="w-2 h-2 rounded-full {{ $i <= $level ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600' }}">
+                                            class="w-2 h-2 rounded-full {{ $i <= $level ? 'bg-primary-500' : 'bg-neutral-300 dark:bg-neutral-600' }}">
                                         </div>
                                     @endfor
                                 </div>
                                 <span
-                                    class="text-sm font-semibold text-gray-900 dark:text-white">
+                                    class="text-sm font-semibold text-neutral-900 dark:text-white">
                                     <span aria-hidden="true">{{ $multiplier }}</span>
                                     <span class="sr-only">Level {{ $level }}, {{ $multiplier }}</span>
                                 </span>
@@ -125,8 +125,8 @@
                 </div>
             </div>
         @else
-            <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Growth Rates</h3>
+            <div class="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">Growth Rates</h3>
                 <div class="space-y-2">
                     @php $growthRates = $character->growth_rates ?? []; @endphp
                     @foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
@@ -135,7 +135,7 @@
                             <span
                                 class="text-sm {{ $statColors[$stat] }} capitalize font-medium">{{ $stat }}</span>
                             <span
-                                class="text-sm font-semibold {{ $rate > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white' }}">
+                                class="text-sm font-semibold {{ $rate > 0 ? 'text-green-600 dark:text-green-400' : 'text-neutral-900 dark:text-white' }}">
                                 +{{ $rate }}%
                             </span>
                         </div>
@@ -145,8 +145,8 @@
         @endif
 
         {{-- Support Cards Summary --}}
-        <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-lg p-4">
-            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Support Cards</h3>
+        <div class="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700 rounded-lg p-4">
+            <h3 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3">Support Cards</h3>
             <div class="space-y-3">
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-primary-600 dark:text-primary-300" aria-hidden="true" fill="none" stroke="currentColor"
@@ -154,7 +154,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
-                    <span class="text-sm text-gray-700 dark:text-gray-300">
+                    <span class="text-sm text-neutral-700 dark:text-neutral-300">
                         {{ $character->supportCards->count() }}/6 cards equipped
                     </span>
                 </div>
@@ -165,16 +165,16 @@
                 @if ($rainbowCount > 0)
                     <div class="flex items-center gap-2">
                         <svg class="w-5 h-5 text-yellow-500" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" /></svg>
-                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                        <span class="text-sm text-neutral-700 dark:text-neutral-300">
                             {{ $rainbowCount }} at friendship (80%+)
                         </span>
                     </div>
                 @endif
                 {{-- Card type distribution --}}
-                <div class="flex flex-wrap gap-1 pt-2 border-t border-gray-200 dark:border-gray-600">
+                <div class="flex flex-wrap gap-1 pt-2 border-t border-neutral-200 dark:border-neutral-600">
                     @foreach ($cardsByType as $type => $cards)
                         <span
-                            class="px-2 py-0.5 rounded text-xs font-medium {{ $statColors[$type] ?? 'text-gray-600' }} bg-gray-100 dark:bg-gray-700">
+                            class="px-2 py-0.5 rounded text-xs font-medium {{ $statColors[$type] ?? 'text-neutral-600' }} bg-neutral-100 dark:bg-neutral-700">
                             {{ ucfirst($type) }}: {{ $cards->count() }}
                         </span>
                     @endforeach

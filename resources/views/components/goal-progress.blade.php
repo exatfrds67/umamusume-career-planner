@@ -12,8 +12,8 @@
     </div>
 
     <!-- Progress bar -->
-    <div class="w-full {{ $bgColor() }} rounded-full overflow-hidden border {{ match($goal) { 'G1' => 'border-yellow-300 dark:border-yellow-700', 'G2' => 'border-blue-300 dark:border-blue-700', 'G3' => 'border-purple-300 dark:border-purple-700', 'OP' => 'border-green-300 dark:border-green-700', default => 'border-gray-300 dark:border-gray-700' } }}">
-        <div class="h-2 transition-all duration-300 rounded-full {{ match($goal) { 'G1' => 'bg-yellow-400 dark:bg-yellow-500', 'G2' => 'bg-blue-400 dark:bg-blue-500', 'G3' => 'bg-purple-400 dark:bg-purple-500', 'OP' => 'bg-green-400 dark:bg-green-500', default => 'bg-gray-400 dark:bg-gray-500' } }}"
+    <div class="w-full {{ $bgColor() }} rounded-full overflow-hidden border {{ match($goal) { 'G1' => 'border-yellow-300 dark:border-yellow-700', 'G2' => 'border-blue-300 dark:border-blue-700', 'G3' => 'border-purple-300 dark:border-purple-700', 'OP' => 'border-green-300 dark:border-green-700', default => 'border-neutral-300 dark:border-neutral-700' } }}">
+        <div class="h-2 transition-all duration-300 rounded-full {{ match($goal) { 'G1' => 'bg-yellow-400 dark:bg-yellow-500', 'G2' => 'bg-blue-400 dark:bg-blue-500', 'G3' => 'bg-purple-400 dark:bg-purple-500', 'OP' => 'bg-green-400 dark:bg-green-500', default => 'bg-neutral-400 dark:bg-neutral-500' } }}"
             role="progressbar"
             aria-valuenow="{{ $percentage() }}"
             aria-valuemin="0"

@@ -442,3 +442,17 @@ describe('Backup Cleanup', function () {
         ]);
     });
 });
+
+describe('Backup Management Page', function () {
+    it('renders actionable backup management sections', function () {
+        $response = $this->get(route('backup.index'));
+
+        $response->assertSuccessful();
+        $response->assertSee('id="backup-page"', false);
+        $response->assertSee('id="create"', false);
+        $response->assertSee('id="restore"', false);
+        $response->assertSee('Create Backup');
+        $response->assertSee('Schedule Backup');
+        $response->assertSee('Cleanup Old Backups');
+    });
+});

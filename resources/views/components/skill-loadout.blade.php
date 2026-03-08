@@ -68,9 +68,9 @@ Accessibility: WCAG 2.2 AA compliant
                 <div class="
                     {{ $sizeClass }} 
                     flex flex-col items-center justify-center
-                    bg-linear-to-br from-gray-50 to-gray-100
-                    dark:from-gray-700 dark:to-gray-800
-                    border-2 border-gray-300 dark:border-gray-600
+                    bg-linear-to-br from-neutral-50 to-neutral-100
+                    dark:from-neutral-700 dark:to-neutral-800
+                    border-2 border-neutral-300 dark:border-neutral-600
                     rounded-lg
                     hover:ring-2 hover:ring-blue-500 dark:hover:ring-blue-400
                     transition-all duration-200
@@ -89,9 +89,9 @@ Accessibility: WCAG 2.2 AA compliant
                     {{-- Skill Icon Placeholder --}}
                     <div class="
                         w-full h-2/3 flex items-center justify-center
-                        bg-gray-200 dark:bg-gray-600
+                        bg-neutral-200 dark:bg-neutral-600
                         rounded-md
-                        text-gray-500 dark:text-gray-400
+                        text-neutral-500 dark:text-neutral-400
                     ">
                         <svg class="w-1/2 h-1/2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -99,7 +99,7 @@ Accessibility: WCAG 2.2 AA compliant
                     </div>
                     
                     {{-- Skill Name --}}
-                    <div class="text-center w-full px-0.5 text-gray-900 dark:text-gray-100 font-semibold truncate">
+                    <div class="text-center w-full px-0.5 text-neutral-900 dark:text-neutral-100 font-semibold truncate">
                         {{ \Illuminate\Support\Str::limit($skill->name, 10, '...') }}
                     </div>
                 </div>
@@ -149,7 +149,7 @@ Accessibility: WCAG 2.2 AA compliant
                 {{-- Tooltip --}}
                 <div class="
                     hidden group-hover:block absolute z-10
-                    bg-gray-900 dark:bg-gray-700
+                    bg-neutral-900 dark:bg-neutral-700
                     text-white text-xs
                     px-2 py-1 rounded
                     whitespace-nowrap
@@ -165,15 +165,15 @@ Accessibility: WCAG 2.2 AA compliant
                 flex flex-col items-center justify-center
                 py-12 px-4
                 text-center
-                bg-gray-50 dark:bg-gray-800/50
-                border-2 border-dashed border-gray-300 dark:border-gray-600
+                bg-neutral-50 dark:bg-neutral-800/50
+                border-2 border-dashed border-neutral-300 dark:border-neutral-600
                 rounded-lg
             ">
-                <svg class="w-12 h-12 text-gray-500 dark:text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-12 h-12 text-neutral-500 dark:text-neutral-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m0 0h6m-6-6v6m0-6v6m0-6h-6m0 0H6" />
                 </svg>
-                <p class="text-gray-600 dark:text-gray-400 font-medium">No skills equipped</p>
-                <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">Add skills to your loadout to get started</p>
+                <p class="text-neutral-600 dark:text-neutral-400 font-medium">No skills equipped</p>
+                <p class="text-sm text-neutral-500 dark:text-neutral-500 mt-1">Add skills to your loadout to get started</p>
             </div>
         @endforelse
     </div>
@@ -184,8 +184,8 @@ Accessibility: WCAG 2.2 AA compliant
         @forelse($skills as $index => $skill)
             <div class="
                 flex items-center justify-between
-                bg-white dark:bg-gray-800
-                border border-gray-200 dark:border-gray-700
+                bg-white dark:bg-neutral-800
+                border border-neutral-200 dark:border-neutral-700
                 rounded-lg px-4 py-3
                 hover:ring-2 hover:ring-blue-500
                 transition-all duration-200
@@ -197,14 +197,14 @@ Accessibility: WCAG 2.2 AA compliant
                 @keydown.enter="$dispatch('skill-selected', { skill: {{ json_encode($skill) }}, index: {{ $index }} })"
             >
                 <div class="flex items-center gap-4 flex-1">
-                    <div class="w-12 h-12 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-md">
-                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-12 h-12 flex items-center justify-center bg-neutral-200 dark:bg-neutral-700 rounded-md">
+                        <svg class="w-6 h-6 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <h4 class="font-semibold text-gray-900 dark:text-gray-100">{{ $skill->name }}</h4>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $skill->description ?? 'No description' }}</p>
+                        <h4 class="font-semibold text-neutral-900 dark:text-neutral-100">{{ $skill->name }}</h4>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ $skill->description ?? 'No description' }}</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
@@ -243,7 +243,7 @@ Accessibility: WCAG 2.2 AA compliant
             </div>
         @empty
             <div class="py-12 text-center">
-                <p class="text-gray-600 dark:text-gray-400">No skills equipped</p>
+                <p class="text-neutral-600 dark:text-neutral-400">No skills equipped</p>
             </div>
         @endforelse
     </div>
@@ -271,7 +271,7 @@ Accessibility: WCAG 2.2 AA compliant
             </button>
         @empty
             <div class="w-full text-center py-8">
-                <p class="text-gray-500 dark:text-gray-400 text-sm">No skills equipped</p>
+                <p class="text-neutral-500 dark:text-neutral-400 text-sm">No skills equipped</p>
             </div>
         @endforelse
     </div>

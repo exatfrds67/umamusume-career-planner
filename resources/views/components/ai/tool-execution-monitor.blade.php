@@ -2,18 +2,18 @@
     'refreshInterval' => 10000, // 10 seconds
 ])
 
-<div class="tool-execution-monitor bg-white dark:bg-gray-800 rounded-lg shadow-xs p-6" x-data="toolExecutionMonitor({
+<div class="tool-execution-monitor bg-white dark:bg-neutral-800 rounded-lg shadow-xs p-6" x-data="toolExecutionMonitor({
     refreshInterval: {{ $refreshInterval }}
 })">
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
             MCP Tool Execution Monitor
         </h3>
         <div class="flex items-center gap-2">
-            <span class="text-sm text-gray-500 dark:text-gray-400" x-text="lastUpdated"></span>
+            <span class="text-sm text-neutral-500 dark:text-neutral-400" x-text="lastUpdated"></span>
             <button @click="refresh()"
-                class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                class="p-2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
                 <svg class="w-5 h-5" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -25,13 +25,13 @@
     </div>
 
     {{-- Tabs --}}
-    <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+    <div class="border-b border-neutral-200 dark:border-neutral-700 mb-6">
         <nav class="flex gap-4" aria-label="Tabs">
             <button @click="activeTab = 'active'" class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
                 :class="activeTab === 'active'
                     ?
                     'border-primary-500 text-primary-600 dark:text-primary-400' :
-                    'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'">
+                    'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300'">
                 Active Tools
                 <span x-show="toolData?.active_tools?.length > 0"
                     class="ml-2 px-2 py-0.5 text-xs rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200"
@@ -42,14 +42,14 @@
                 :class="activeTab === 'recent'
                     ?
                     'border-primary-500 text-primary-600 dark:text-primary-400' :
-                    'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'">
+                    'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300'">
                 Recent Executions
             </button>
             <button @click="activeTab = 'statistics'" class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
                 :class="activeTab === 'statistics'
                     ?
                     'border-primary-500 text-primary-600 dark:text-primary-400' :
-                    'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'">
+                    'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300'">
                 Statistics
             </button>
         </nav>
@@ -58,12 +58,12 @@
     {{-- Active Tools Tab --}}
     <div x-show="activeTab === 'active'" class="space-y-3">
         <div x-show="!toolData?.active_tools || toolData.active_tools.length === 0" class="text-center py-12">
-            <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" stroke="currentColor"
+            <svg class="w-16 h-16 mx-auto text-neutral-400 dark:text-neutral-600 mb-4" fill="none" stroke="currentColor"
                 viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <p class="text-gray-500 dark:text-gray-400">No active tool executions</p>
+            <p class="text-neutral-500 dark:text-neutral-400">No active tool executions</p>
         </div>
 
         <template x-for="tool in toolData?.active_tools || []" :key="tool.tool_name + tool.started_at">
@@ -103,29 +103,29 @@
     {{-- Recent Executions Tab --}}
     <div x-show="activeTab === 'recent'" class="space-y-2">
         <div x-show="!toolData?.recent_executions || toolData.recent_executions.length === 0" class="text-center py-12">
-            <p class="text-gray-500 dark:text-gray-400">No recent executions</p>
+            <p class="text-neutral-500 dark:text-neutral-400">No recent executions</p>
         </div>
 
         <template x-for="execution in toolData?.recent_executions || []"
             :key="execution.tool_name + execution.completed_at">
             <div
-                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-700 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors">
                 <div class="flex items-center gap-3 flex-1">
                     <div class="w-2 h-2 rounded-full" :class="execution.success ? 'bg-green-500' : 'bg-red-500'">
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
-                            <span class="text-sm font-medium text-gray-900 dark:text-white"
+                            <span class="text-sm font-medium text-neutral-900 dark:text-white"
                                 x-text="execution.tool_name"></span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400"
+                            <span class="text-xs text-neutral-500 dark:text-neutral-400"
                                 x-text="'(' + execution.server + ')'"></span>
                         </div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400"
+                        <div class="text-xs text-neutral-500 dark:text-neutral-400"
                             x-text="formatTime(execution.completed_at)"></div>
                     </div>
                 </div>
                 <div class="flex items-center gap-4 text-sm">
-                    <span class="text-gray-600 dark:text-gray-400"
+                    <span class="text-neutral-600 dark:text-neutral-400"
                         x-text="execution.execution_time.toFixed(2) + 's'"></span>
                     <span class="px-2 py-1 rounded-full text-xs font-medium"
                         :class="execution.success ?
@@ -142,13 +142,13 @@
     <div x-show="activeTab === 'statistics'" class="space-y-4">
         <div x-show="!toolData?.tool_statistics || Object.keys(toolData.tool_statistics).length === 0"
             class="text-center py-12">
-            <p class="text-gray-500 dark:text-gray-400">No statistics available</p>
+            <p class="text-neutral-500 dark:text-neutral-400">No statistics available</p>
         </div>
 
         <template x-for="(stats, toolName) in toolData?.tool_statistics || {}" :key="toolName">
-            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-sm font-medium text-gray-900 dark:text-white" x-text="toolName"></h4>
+                    <h4 class="text-sm font-medium text-neutral-900 dark:text-white" x-text="toolName"></h4>
                     <span class="text-xs px-2 py-1 rounded-full"
                         :class="{
                             'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': stats.success_rate >=
@@ -163,30 +163,30 @@
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                        <div class="text-gray-600 dark:text-gray-400 text-xs mb-1">Total</div>
-                        <div class="font-semibold text-gray-900 dark:text-white" x-text="stats.total_executions">
+                        <div class="text-neutral-600 dark:text-neutral-400 text-xs mb-1">Total</div>
+                        <div class="font-semibold text-neutral-900 dark:text-white" x-text="stats.total_executions">
                         </div>
                     </div>
                     <div>
-                        <div class="text-gray-600 dark:text-gray-400 text-xs mb-1">Successful</div>
+                        <div class="text-neutral-600 dark:text-neutral-400 text-xs mb-1">Successful</div>
                         <div class="font-semibold text-green-600 dark:text-green-400"
                             x-text="stats.successful_executions"></div>
                     </div>
                     <div>
-                        <div class="text-gray-600 dark:text-gray-400 text-xs mb-1">Failed</div>
+                        <div class="text-neutral-600 dark:text-neutral-400 text-xs mb-1">Failed</div>
                         <div class="font-semibold text-red-600 dark:text-red-400" x-text="stats.failed_executions">
                         </div>
                     </div>
                     <div>
-                        <div class="text-gray-600 dark:text-gray-400 text-xs mb-1">Avg Time</div>
-                        <div class="font-semibold text-gray-900 dark:text-white"
+                        <div class="text-neutral-600 dark:text-neutral-400 text-xs mb-1">Avg Time</div>
+                        <div class="font-semibold text-neutral-900 dark:text-white"
                             x-text="stats.average_execution_time.toFixed(2) + 's'"></div>
                     </div>
                 </div>
 
                 {{-- Success Rate Bar --}}
                 <div class="mt-3">
-                    <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 overflow-hidden">
+                    <div class="w-full bg-neutral-200 dark:bg-neutral-600 rounded-full h-2 overflow-hidden">
                         <div class="h-2 rounded-full transition-all duration-300"
                             :class="{
                                 'bg-green-500': stats.success_rate >= 90,

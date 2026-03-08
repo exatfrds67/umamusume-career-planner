@@ -11,7 +11,7 @@
 
             <!-- Grid circles/pentagons -->
             @foreach ($getGridPoints() as $level => $gridPointsString)
-                <polygon points="{{ $gridPointsString }}" class="grid-line dark:stroke-gray-600" />
+                <polygon points="{{ $gridPointsString }}" class="grid-line dark:stroke-neutral-600" />
             @endforeach
 
             <!-- Grid value labels -->
@@ -31,7 +31,7 @@
                 @endphp
                 <text x="{{ $centerX }}" y="{{ $labelY }}"
                     style="font-size: {{ $size === 'sm' ? '3px' : ($size === 'lg' ? '9px' : '6px') }};"
-                    class="grid-label dark:fill-gray-400">{{ $value }}</text>
+                    class="grid-label dark:fill-neutral-400">{{ $value }}</text>
             @endforeach
 
             <!-- Grid radial lines from center -->
@@ -49,7 +49,7 @@
                     $y = $centerY + $maxRadius * sin($radians);
                 @endphp
                 <line x1="{{ $centerX }}" y1="{{ $centerY }}" x2="{{ $x }}"
-                    y2="{{ $y }}" class="grid-line dark:stroke-gray-600" />
+                    y2="{{ $y }}" class="grid-line dark:stroke-neutral-600" />
             @endforeach
 
             <!-- Data polygon -->

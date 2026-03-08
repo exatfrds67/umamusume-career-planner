@@ -3,28 +3,24 @@
  * Shows active tool executions in a compact indicator
  */
 
-// Register Alpine component
-document.addEventListener("alpine:init", () => {
-    // eslint-disable-next-line no-undef
-    Alpine.data("toolUsageIndicator", () => ({
-        activeTools: [],
+export default () => ({
+    activeTools: [],
 
-        initialize() {
-            this.fetchToolUsage();
-            setInterval(() => this.fetchToolUsage(), 1000);
-        },
+    initialize() {
+        this.fetchToolUsage();
+        setInterval(() => this.fetchToolUsage(), 1000);
+    },
 
-        async fetchToolUsage() {
-            try {
-                const response = await fetch("/api/ai/chat/tool-usage");
-                const data = await response.json();
+    async fetchToolUsage() {
+        try {
+            const response = await fetch("/api/ai/chat/tool-usage");
+            const data = await response.json();
 
-                if (data.tools) {
-                    this.activeTools = data.tools;
-                }
-            } catch (error) {
-                console.error("Failed to fetch tool usage:", error);
+            if (data.tools) {
+                this.activeTools = data.tools;
             }
-        },
-    }));
+        } catch (error) {
+            console.error("Failed to fetch tool usage:", error);
+        }
+    },
 });

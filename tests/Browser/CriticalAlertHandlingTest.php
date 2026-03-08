@@ -324,7 +324,7 @@ it('shows turns until critical for upcoming issues', function () {
     $page = visit('/training/predictions?character_id='.$character->id);
 
     // Verify turn counter is displayed
-    $page->assertSee('Turn:')
+    $page->assertSee('Turn')
         ->assertSee('32/78')
         ->assertNoJavaScriptErrors();
 })->group('browser', 'e2e', 'critical-alerts', 'timing');

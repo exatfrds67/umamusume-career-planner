@@ -6,38 +6,43 @@
     {{-- Breadcrumb Navigation --}}
     <x-breadcrumb :items="[['label' => 'Races']]" />
 
-    <div class="space-y-6">
+    <div class="page-stack">
         {{-- Header --}}
-        <header class="sm:flex sm:items-center sm:justify-between">
+        <header class="page-hero">
+            <div class="page-hero__content">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Race Calendar</h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <div class="page-hero__eyebrow">
+                    <span>Campaign Planning</span>
+                </div>
+                <h1 class="page-hero__title">Race Calendar</h1>
+                <p class="page-hero__body text-sm sm:text-base">
                     All available races in the URA scenario — Junior, Classic, and Senior phases
                 </p>
             </div>
-            <div class="mt-4 sm:ml-4 sm:mt-0">
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
+            <div class="page-hero__actions">
+                <span class="hero-chip">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                     {{ $catalog->count() }} Races
                 </span>
             </div>
+            </div>
         </header>
 
         {{-- Filters --}}
-        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700"
+        <aside class="filter-surface p-4"
             aria-label="Race Filters">
             <h2 class="sr-only">Race Filters</h2>
             <form method="GET" action="{{ route('races.index') }}" class="space-y-4" role="search" aria-label="Filter races">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     {{-- Grade --}}
                     <div class="md:col-span-2">
-                        <label for="grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label for="grade" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                             Grade
                         </label>
                         <select id="grade" name="grade"
-                            class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            class="form-select block w-full rounded-md border-neutral-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                             <option value="">All Grades</option>
                             @foreach ($grades as $grade)
                                 <option value="{{ $grade }}" {{ request('grade') === $grade ? 'selected' : '' }}>
@@ -49,11 +54,11 @@
 
                     {{-- Phase --}}
                     <div class="md:col-span-2">
-                        <label for="phase" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label for="phase" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                             Phase
                         </label>
                         <select id="phase" name="phase"
-                            class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            class="form-select block w-full rounded-md border-neutral-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                             <option value="">All Phases</option>
                             @foreach ($phases as $phase)
                                 <option value="{{ $phase }}" {{ request('phase') === $phase ? 'selected' : '' }}>
@@ -65,11 +70,11 @@
 
                     {{-- Surface --}}
                     <div class="md:col-span-2">
-                        <label for="surface" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label for="surface" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                             Surface
                         </label>
                         <select id="surface" name="surface"
-                            class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            class="form-select block w-full rounded-md border-neutral-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                             <option value="">All Surfaces</option>
                             @foreach ($surfaces as $surface)
                                 <option value="{{ $surface }}" {{ request('surface') === $surface ? 'selected' : '' }}>
@@ -81,11 +86,11 @@
 
                     {{-- Distance Category --}}
                     <div class="md:col-span-2">
-                        <label for="distance" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label for="distance" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                             Distance
                         </label>
                         <select id="distance" name="distance"
-                            class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            class="form-select block w-full rounded-md border-neutral-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                             <option value="">All Distances</option>
                             @foreach ($distances as $dist)
                                 <option value="{{ $dist }}" {{ request('distance') === $dist ? 'selected' : '' }}>
@@ -105,7 +110,7 @@
                             Filter
                         </button>
                         @if (request()->hasAny(['grade', 'phase', 'surface', 'distance']))
-                            <a href="{{ route('races.index') }}" class="btn btn-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 rounded">Clear</a>
+                            <a href="{{ route('races.index') }}" class="btn btn-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 rounded">Clear</a>
                         @endif
                     </div>
                 </div>
@@ -114,15 +119,15 @@
 
         {{-- Race Catalog --}}
         @if ($catalog->isEmpty())
-            <div class="card bg-white dark:bg-gray-800">
+            <div class="filter-surface">
                 <div class="card-body text-center py-16">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No races found</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Try adjusting your filters to see more races.</p>
-                    <a href="{{ route('races.index') }}" class="mt-4 inline-block btn btn-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 rounded">Clear Filters</a>
+                    <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-white">No races found</h3>
+                    <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Try adjusting your filters to see more races.</p>
+                    <a href="{{ route('races.index') }}" class="mt-4 inline-block btn btn-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 rounded">Clear Filters</a>
                 </div>
             </div>
         @else
@@ -145,7 +150,7 @@
                     'G3'     => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 ring-1 ring-blue-200 dark:ring-blue-800',
                     'OP'     => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 ring-1 ring-green-200 dark:ring-green-800',
                     'Pre-OP' => 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400 ring-1 ring-teal-200 dark:ring-teal-800',
-                    'Debut'  => 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-gray-600',
+                    'Debut'  => 'bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300 ring-1 ring-neutral-200 dark:ring-neutral-600',
                 ];
                 $grouped = $catalog->groupBy('phase');
             @endphp
@@ -154,11 +159,11 @@
                 @if ($grouped->has($phaseKey))
                     <section aria-labelledby="phase-{{ $phaseKey }}-heading">
                         <h2 id="phase-{{ $phaseKey }}-heading"
-                            class="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                            class="mb-3 text-lg font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
                             <span class="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium {{ $phaseColors[$phaseKey] ?? '' }}">
                                 {{ $phaseLabel }}
                             </span>
-                            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                            <span class="text-sm font-normal text-neutral-500 dark:text-neutral-400">
                                 ({{ $grouped[$phaseKey]->count() }} races)
                             </span>
                         </h2>
@@ -166,14 +171,14 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             @foreach ($grouped[$phaseKey] as $race)
                                 <a href="{{ route('races.show', $race->slug) }}"
-                                    class="group flex flex-col rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-xs hover:shadow-md hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
+                                    class="group flex flex-col rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-4 shadow-xs hover:shadow-md hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
 
                                     {{-- Top row: grade badge + surface + distance --}}
                                     <div class="flex items-center justify-between mb-2">
-                                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold {{ $gradeColors[$race->grade] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' }}">
+                                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold {{ $gradeColors[$race->grade] ?? 'bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300' }}">
                                             {{ $race->grade }}
                                         </span>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                        <span class="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
                                             @if ($race->surface === 'turf')
                                                 <span aria-label="Turf"><span aria-hidden="true">🟩</span><span class="sr-only">Turf</span></span>
                                             @else
@@ -184,15 +189,15 @@
                                     </div>
 
                                     {{-- Race name --}}
-                                    <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 text-sm leading-snug mb-0.5">
+                                    <h3 class="font-semibold text-neutral-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 text-sm leading-snug mb-0.5">
                                         {{ $race->name_en }}
                                     </h3>
                                     @if ($race->name_jp)
-                                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-2">{{ $race->name_jp }}</p>
+                                        <p class="text-xs text-neutral-400 dark:text-neutral-500 mb-2">{{ $race->name_jp }}</p>
                                     @endif
 
                                     {{-- Venue + timing --}}
-                                    <div class="mt-auto space-y-1 text-xs text-gray-500 dark:text-gray-400">
+                                    <div class="mt-auto space-y-1 text-xs text-neutral-500 dark:text-neutral-400">
                                         @if ($race->venue)
                                             <div class="flex items-center gap-1">
                                                 <svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -241,36 +246,36 @@
         @auth
             @if ($recentResults->isNotEmpty())
                 <section aria-labelledby="race-history-heading" class="mt-8">
-                    <h2 id="race-history-heading" class="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    <h2 id="race-history-heading" class="mb-3 text-lg font-semibold text-neutral-800 dark:text-neutral-200">
                         Recent Race History
                     </h2>
-                    <div class="card bg-white dark:bg-gray-800 overflow-hidden">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700/50">
+                    <div class="card bg-white dark:bg-neutral-800 overflow-hidden">
+                        <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
+                            <thead class="bg-neutral-50 dark:bg-neutral-700/50">
                                 <tr>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Race</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Position</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Recorded</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Race</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Position</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Recorded</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
                                 @foreach ($recentResults as $result)
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $result->race_name }}</td>
+                                    <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/30">
+                                        <td class="px-4 py-3 text-sm text-neutral-900 dark:text-white">{{ $result->race_name }}</td>
                                         <td class="px-4 py-3 text-sm">
                                             @if ($result->finish_position === 1)
                                                 <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-bold text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"><span aria-hidden="true">🥇</span><span class="sr-only">1st place</span> 1st</span>
                                             @elseif ($result->finish_position === 2)
-                                                <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-700 dark:bg-gray-700 dark:text-gray-300"><span aria-hidden="true">🥈</span><span class="sr-only">2nd place</span> 2nd</span>
+                                                <span class="inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-bold text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300"><span aria-hidden="true">🥈</span><span class="sr-only">2nd place</span> 2nd</span>
                                             @elseif ($result->finish_position === 3)
                                                 <span class="inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-bold text-orange-800 dark:bg-orange-900/30 dark:text-orange-400"><span aria-hidden="true">🥉</span><span class="sr-only">3rd place</span> 3rd</span>
                                             @elseif ($result->finish_position)
-                                                <span class="text-gray-500 dark:text-gray-400">{{ $result->finish_position }}th</span>
+                                                <span class="text-neutral-500 dark:text-neutral-400">{{ $result->finish_position }}th</span>
                                             @else
-                                                <span class="text-gray-400 dark:text-gray-500">—</span>
+                                                <span class="text-neutral-400 dark:text-neutral-500">—</span>
                                             @endif
                                         </td>
-                                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                        <td class="px-4 py-3 text-sm text-neutral-500 dark:text-neutral-400">
                                             {{ $result->created_at?->diffForHumans() }}
                                         </td>
                                     </tr>

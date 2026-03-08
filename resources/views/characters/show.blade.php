@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', $character->name)
+
 @section('content')
     @php
         /** @var \App\Models\Character $character */
@@ -32,7 +34,8 @@
                     </button>
                 </form>
 
-                <form action="{{ route('characters.rest', $character) }}" method="POST" class="inline">
+                <form action="{{ route('characters.rest', $character) }}" method="POST" class="inline"
+                    onsubmit="return confirm('Rest this turn? This action will advance the game state.')">
                     @csrf
                     <button type="submit" class="btn btn-secondary text-green-700 dark:text-green-400"
                         aria-label="Perform rest action for {{ $character->name }}">
@@ -44,7 +47,8 @@
                     </button>
                 </form>
 
-                <form action="{{ route('characters.next-turn', $character) }}" method="POST" class="inline">
+                <form action="{{ route('characters.next-turn', $character) }}" method="POST" class="inline"
+                    onsubmit="return confirm('Advance to the next turn? This action cannot be undone.')">
                     @csrf
                     <button type="submit" class="btn btn-secondary text-blue-700 dark:text-blue-400"
                         aria-label="Advance to next training turn for {{ $character->name }}">
@@ -85,9 +89,9 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <div class="flex items-center gap-3 mb-1">
-                                    <h2 id="character-overview-heading"
-                                        class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
-                                        {{ $character->name }}</h2>
+                                    <h1 id="character-overview-heading"
+                                        class="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
+                                        {{ $character->name }}</h1>
                                     <x-ui.grade-badge :grade="$character->getStatGrade($character->current_stats['speed'] ?? 0)" size="sm" />
                                     @if ($character->isPinnedBy(Auth::id()))
                                         <span
@@ -102,7 +106,7 @@
                                     @endif
                                 </div>
                                 <div
-                                    class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                    class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-neutral-600 dark:text-neutral-400 font-medium">
                                     <span class="flex items-center">
                                         <svg class="w-4 h-4 mr-1.5 text-primary-500" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor">
@@ -130,12 +134,12 @@
 
                         <!-- Quick Progress Bars -->
                         <div
-                            class="max-w-2xl bg-white/50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50 backdrop-blur-xs"
+                            class="max-w-2xl bg-white/50 dark:bg-neutral-800/50 rounded-xl p-4 border border-neutral-100 dark:border-neutral-700/50 backdrop-blur-xs"
                             aria-label="Character status indicators">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div class="space-y-2">
                                     <div class="flex justify-between text-xs font-semibold uppercase tracking-wider">
-                                        <span class="text-gray-500 dark:text-gray-400">Energy Level</span>
+                                        <span class="text-neutral-500 dark:text-neutral-400">Energy Level</span>
                                         <span
                                             class="{{ $character->energy_level < 30 ? 'text-red-500' : 'text-green-500' }}"
                                             aria-label="Energy level: {{ $character->energy_level }}%">{{ $character->energy_level }}%</span>
@@ -147,7 +151,7 @@
                                 </div>
                                 <div class="space-y-2">
                                     <div class="flex justify-between text-xs font-semibold uppercase tracking-wider">
-                                        <span class="text-gray-500 dark:text-gray-400">Goal Progress</span>
+                                        <span class="text-neutral-500 dark:text-neutral-400">Goal Progress</span>
                                         <span class="text-primary-500"
                                             aria-label="Goal progress: {{ $character->getProgressPercentage() }}%">{{ $character->getProgressPercentage() }}%</span>
                                     </div>
@@ -173,11 +177,11 @@
                 <!-- Detailed Stats Card -->
                 <section class="card rounded-lg" role="region" aria-labelledby="stats-heading">
                     <header
-                        class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                        <h2 id="stats-heading" class="text-lg font-bold text-gray-900 dark:text-white">Current Statistics
+                        class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
+                        <h2 id="stats-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Current Statistics
                         </h2>
                         <span
-                            class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Updated
+                            class="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded">Updated
                             {{ $character->updated_at->diffForHumans() }}</span>
                     </header>
                     <div class="card-body">
@@ -195,8 +199,8 @@
                 <!-- Support Deck -->
                 <section class="card rounded-lg" role="region" aria-labelledby="support-deck-heading">
                     <header
-                        class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                        <h2 id="support-deck-heading" class="text-lg font-bold text-gray-900 dark:text-white">Support Deck
+                        class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
+                        <h2 id="support-deck-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Support Deck
                         </h2>
                         <a href="{{ route('characters.deck-builder', $character) }}" class="btn btn-sm btn-primary"
                             aria-label="Manage Support Deck">
@@ -219,17 +223,17 @@
                                         $bondPercentage = ($bondLevel / $bondMax) * 100;
                                     @endphp
                                     <div
-                                        class="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                                        class="flex items-center gap-3 p-2 rounded-lg bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700">
                                         <div
                                             class="shrink-0 w-10 h-10 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
                                             {{ strtoupper(substr($card->card_type ?? 'S', 0, 1)) }}
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                            <div class="text-sm font-medium text-neutral-900 dark:text-white truncate">
                                                 {{ $card->name ?? 'Unknown Card' }}</div>
                                             <div class="flex items-center gap-2 mt-1">
                                                 <div
-                                                    class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+                                                    class="flex-1 h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden"
                                                     role="progressbar"
                                                     aria-valuenow="{{ $bondLevel }}"
                                                     aria-valuemin="0"
@@ -239,7 +243,7 @@
                                                         @style(['width' => $bondPercentage . '%'])></div>
                                                 </div>
                                                 <span
-                                                    class="text-xs text-gray-500 dark:text-gray-400 tabular-nums"
+                                                    class="text-xs text-neutral-500 dark:text-neutral-400 tabular-nums"
                                                     aria-hidden="true">{{ $bondLevel }}</span>
                                             </div>
                                         </div>
@@ -247,8 +251,8 @@
                                 @endforeach
                             </div>
                         @else
-                            <div class="text-center text-sm text-gray-500 py-6">
-                                <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
+                            <div class="text-center text-sm text-neutral-500 py-6">
+                                <svg class="mx-auto h-10 w-10 text-neutral-400 mb-2" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -268,6 +272,79 @@
                     </div>
                 </section>
 
+                @if ($character->gameCharacter && $character->gameCharacter->goalRaces->isNotEmpty())
+                    <!-- Goal Races -->
+                    <section class="card rounded-lg" role="region" aria-labelledby="goal-races-heading">
+                        <div class="p-4 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
+                            <h2 id="goal-races-heading" class="text-lg font-bold text-neutral-900 dark:text-white">
+                                Goal Races
+                            </h2>
+                            <span
+                                class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+                                {{ $character->gameCharacter->goalRaces->count() }}
+                                {{ Str::plural('race', $character->gameCharacter->goalRaces->count()) }}
+                            </span>
+                        </div>
+                        <div class="divide-y divide-neutral-100 dark:divide-neutral-700/50">
+                            @foreach ($character->gameCharacter->goalRaces->sortBy('pivot.priority') as $race)
+                                <div class="flex items-center gap-3 px-4 py-3">
+                                    {{-- Grade Badge --}}
+                                    <span @class([
+                                        'inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold min-w-[32px]',
+                                        'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' => $race->grade === 'G1',
+                                        'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' => $race->grade === 'G2',
+                                        'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' => $race->grade === 'G3',
+                                        'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' => ! in_array($race->grade, ['G1', 'G2', 'G3']),
+                                    ])>
+                                        {{ $race->grade }}
+                                    </span>
+
+                                    {{-- Race Info --}}
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-medium text-neutral-900 dark:text-white truncate">
+                                            {{ $race->name_en }}
+                                        </div>
+                                        <div class="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-2 flex-wrap">
+                                            <span>{{ $race->distance_meters }}m</span>
+                                            <span class="text-neutral-300 dark:text-neutral-600">&middot;</span>
+                                            <span>{{ ucfirst($race->distance_category ?? 'medium') }}</span>
+                                            @if ($race->venue)
+                                                <span class="text-neutral-300 dark:text-neutral-600">&middot;</span>
+                                                <span>{{ $race->venue }}</span>
+                                            @endif
+                                            @if ($race->phase)
+                                                <span class="text-neutral-300 dark:text-neutral-600">&middot;</span>
+                                                <span>{{ ucfirst($race->phase) }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    {{-- Priority indicator --}}
+                                    @if ($race->pivot->priority)
+                                        <span
+                                            class="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-neutral-100 dark:bg-neutral-700 text-xs font-medium text-neutral-600 dark:text-neutral-300"
+                                            title="Priority {{ $race->pivot->priority }}">
+                                            {{ $race->pivot->priority }}
+                                        </span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                        @if ($character->gameCharacter->goalRaces->whereNotNull('pivot.notes')->where('pivot.notes', '!=', '')->isNotEmpty())
+                            <div class="px-4 py-2 bg-amber-50 dark:bg-amber-900/10 border-t border-neutral-200 dark:border-neutral-700">
+                                @foreach ($character->gameCharacter->goalRaces->sortBy('pivot.priority') as $race)
+                                    @if ($race->pivot->notes)
+                                        <p class="text-xs text-amber-700 dark:text-amber-300">
+                                            <span class="font-semibold">{{ $race->name_en }}:</span>
+                                            {{ $race->pivot->notes }}
+                                        </p>
+                                    @endif
+                                @endforeach
+                            </div>
+                        @endif
+                    </section>
+                @endif
+
                 {{-- 
                     Recent Careers / History Section
                     
@@ -283,18 +360,18 @@
                 {{--
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Training Careers</h3>
+                        <h3 class="text-lg font-bold text-neutral-900 dark:text-white">Training Careers</h3>
                     </div>
                     @if ($character->careers->count() > 0)
-                        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <div class="divide-y divide-neutral-200 dark:divide-neutral-700">
                             @foreach ($character->careers as $career)
                                 <div
-                                    class="p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors flex items-center justify-between">
+                                    class="p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors flex items-center justify-between">
                                     <div>
-                                        <div class="font-medium text-gray-900 dark:text-white">
+                                        <div class="font-medium text-neutral-900 dark:text-white">
                                             {{ $career->scenario_type === 'ura_finale' ? 'URA Finale' : 'Unity Cup' }}
                                         </div>
-                                        <div class="text-xs text-gray-500">{{ $career->created_at->format('M d, Y') }}
+                                        <div class="text-xs text-neutral-500">{{ $career->created_at->format('M d, Y') }}
                                         </div>
                                     </div>
                                     <x-ui.grade-badge :grade="$career->final_grade ?? 'E'" />
@@ -302,7 +379,7 @@
                             @endforeach
                         </div>
                     @else
-                        <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+                        <div class="p-8 text-center text-neutral-500 dark:text-neutral-400">
                             No careers completed yet. Start training to build history!
                         </div>
                     @endif
@@ -314,8 +391,8 @@
             <div class="space-y-6">
                 <!-- Stats Overview -->
                 <section class="card rounded-lg" role="region" aria-labelledby="stats-visualization-heading">
-                    <header class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                        <h2 id="stats-visualization-heading" class="text-lg font-bold text-gray-900 dark:text-white">Stats
+                    <header class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50">
+                        <h2 id="stats-visualization-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Stats
                             Overview</h2>
                     </header>
                     <div class="card-body flex justify-center items-center py-4">
@@ -331,8 +408,8 @@
 
                 <!-- Aptitudes -->
                 <section class="card rounded-lg" role="region" aria-labelledby="aptitudes-heading">
-                    <header class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                        <h2 id="aptitudes-heading" class="text-lg font-bold text-gray-900 dark:text-white">Aptitudes</h2>
+                    <header class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50">
+                        <h2 id="aptitudes-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Aptitudes</h2>
                     </header>
                     <div class="card-body space-y-6">
                         @php
@@ -346,7 +423,7 @@
                         @foreach ($aptitudeGroups as $groupName => $aptitudes)
                             @if ($aptitudes->count() > 0)
                                 <div>
-                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                                    <h4 class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">
                                         {{ $groupName }}</h4>
                                     <div class="space-y-2">
                                         @foreach ($aptitudes as $aptitude)
@@ -364,7 +441,7 @@
                         @endforeach
 
                         @if ($character->aptitudes->isEmpty())
-                            <div class="text-center text-sm text-gray-500 py-4">No aptitude data available.</div>
+                            <div class="text-center text-sm text-neutral-500 py-4">No aptitude data available.</div>
                         @endif
                     </div>
                 </section>
@@ -376,8 +453,8 @@
             <!-- Skills -->
             <section class="card rounded-lg" role="region" aria-labelledby="skills-heading">
                 <header
-                    class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                    <h2 id="skills-heading" class="text-lg font-bold text-gray-900 dark:text-white">Skills</h2>
+                    class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
+                    <h2 id="skills-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Skills</h2>
                     <a href="{{ route('skills.index', ['character' => $character->id]) }}" class="btn btn-sm btn-primary"
                         aria-label="Manage Skills">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -392,22 +469,22 @@
                         <div class="space-y-1">
                             @foreach ($character->skills->take(10) as $skill)
                                 <div
-                                    class="flex items-center justify-between p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    class="flex items-center justify-between p-2 rounded hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
                                     <div class="flex items-center gap-2">
                                         <div class="w-1.5 h-1.5 rounded-full bg-yellow-400" aria-hidden="true"></div>
                                         <span
-                                            class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ $skill->name }}</span>
+                                            class="text-sm font-medium text-neutral-700 dark:text-neutral-200">{{ $skill->name }}</span>
                                     </div>
                                     @if ($skill->pivot && $skill->pivot->final_sp_cost)
                                         <span
-                                            class="text-xs font-mono text-gray-400">{{ $skill->pivot->final_sp_cost }}pt</span>
+                                            class="text-xs font-mono text-neutral-500">{{ $skill->pivot->final_sp_cost }}pt</span>
                                     @endif
                                 </div>
                             @endforeach
                         </div>
                     @else
-                        <div class="text-center text-sm text-gray-500 py-6">
-                            <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
+                        <div class="text-center text-sm text-neutral-500 py-6">
+                            <svg class="mx-auto h-10 w-10 text-neutral-400 mb-2" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -430,10 +507,10 @@
             <!-- Race Schedule -->
             <section class="card rounded-lg" role="region" aria-labelledby="race-schedule-heading-bottom">
                 <header
-                    class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                    <h2 id="race-schedule-heading-bottom" class="text-lg font-bold text-gray-900 dark:text-white">Race
+                    class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
+                    <h2 id="race-schedule-heading-bottom" class="text-lg font-bold text-neutral-900 dark:text-white">Race
                         Schedule</h2>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">Upcoming</span>
+                    <span class="text-xs text-neutral-500 dark:text-neutral-400">Upcoming</span>
                 </header>
                 @php
                     $raceSchedule = $character->race_schedule ?? [];
@@ -455,16 +532,16 @@
                                         'fair' =>
                                             'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
                                         'poor' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                                        'unknown' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400',
+                                        'unknown' => 'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-400',
                                     ];
                                     $readinessColor = $readinessColors[$readiness] ?? $readinessColors['unknown'];
                                 @endphp
                                 <div
-                                    class="flex items-center justify-between p-2 rounded bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                                    class="flex items-center justify-between p-2 rounded bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700">
                                     <div class="flex-1 min-w-0">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                        <div class="text-sm font-medium text-neutral-900 dark:text-white truncate">
                                             {{ $raceName }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ $raceGrade }} • Turn
+                                        <div class="text-xs text-neutral-500 dark:text-neutral-400">{{ $raceGrade }} • Turn
                                             {{ $raceTurn }}</div>
                                     </div>
                                     <span
@@ -475,8 +552,8 @@
                             @endforeach
                         </div>
                     @else
-                        <div class="text-center text-sm text-gray-500 py-6">
-                            <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
+                        <div class="text-center text-sm text-neutral-500 py-6">
+                            <svg class="mx-auto h-10 w-10 text-neutral-400 mb-2" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -490,8 +567,8 @@
             <!-- Inherited Factors -->
             <section class="card rounded-lg" role="region" aria-labelledby="inherited-factors-heading">
                 <header
-                    class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                    <h2 id="inherited-factors-heading" class="text-lg font-bold text-gray-900 dark:text-white">Inherited
+                    class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
+                    <h2 id="inherited-factors-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Inherited
                         Factors</h2>
                     @can('update', $character)
                         <a href="{{ route('characters.factors.manage', $character) }}" class="btn btn-sm btn-primary"
@@ -518,7 +595,7 @@
                                 'blue_stats' => 'text-blue-600 dark:text-blue-400',
                                 'red_aptitudes' => 'text-red-600 dark:text-red-400',
                                 'green_unique_skills' => 'text-green-600 dark:text-green-400',
-                                'white_normal_skills' => 'text-gray-600 dark:text-gray-400',
+                                'white_normal_skills' => 'text-neutral-600 dark:text-neutral-400',
                             ];
                         @endphp
 
@@ -526,23 +603,23 @@
                             @foreach ($factorsByType as $type => $factors)
                                 <div>
                                     <h4
-                                        class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                        class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                                         <div
                                             class="w-2 h-2 rounded-full bg-{{ str_replace('_stats', '', str_replace('_aptitudes', '', str_replace('_unique_skills', '', str_replace('_normal_skills', '', $type)))) }}-500"
                                             aria-hidden="true">
                                         </div>
                                         {{ $factorTypeLabels[$type] ?? ucfirst($type) }}
-                                        <span class="text-gray-400">({{ $factors->count() }})</span>
+                                        <span class="text-neutral-500">({{ $factors->count() }})</span>
                                     </h4>
                                     <div class="space-y-2">
                                         @foreach ($factors as $factor)
                                             <div
-                                                class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 {{ !$factor->is_active ? 'opacity-50' : '' }}">
+                                                class="flex items-center justify-between p-2.5 rounded-lg bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700 {{ !$factor->is_active ? 'opacity-50' : '' }}">
                                                 <div class="flex items-center gap-2">
                                                     <!-- Star Level -->
                                                     <div class="flex items-center" aria-hidden="true">
                                                         @for ($i = 1; $i <= 3; $i++)
-                                                            <svg class="w-3 h-3 {{ $i <= (int) str_replace('_star', '', $factor->star_level) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600' }}"
+                                                            <svg class="w-3 h-3 {{ $i <= (int) str_replace('_star', '', $factor->star_level) ? 'text-yellow-400' : 'text-neutral-300 dark:text-neutral-600' }}"
                                                                 fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                                                 <path
                                                                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -552,7 +629,7 @@
                                                     <span class="sr-only">{{ (int) str_replace('_star', '', $factor->star_level) }} star{{ (int) str_replace('_star', '', $factor->star_level) !== 1 ? 's' : '' }}</span>
 
                                                     <!-- Factor Name -->
-                                                    <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    <span class="text-sm font-medium text-neutral-900 dark:text-white">
                                                         {{ $factor->factor_name }}
                                                     </span>
                                                 </div>
@@ -570,7 +647,7 @@
                                                         </span>
                                                     @else
                                                         <span
-                                                            class="text-xs font-bold {{ $factorTypeColors[$factor->factor_type] ?? 'text-gray-600 dark:text-gray-400' }}">
+                                                            class="text-xs font-bold {{ $factorTypeColors[$factor->factor_type] ?? 'text-neutral-600 dark:text-neutral-400' }}">
                                                             {{ (int) str_replace('_star', '', $factor->star_level) }}★
                                                         </span>
                                                     @endif
@@ -578,7 +655,7 @@
                                                     <!-- Active Status -->
                                                     @if (!$factor->is_active)
                                                         <span
-                                                            class="text-xs text-gray-400 bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded">
+                                                            class="text-xs text-neutral-500 bg-neutral-200 dark:bg-neutral-700 px-1.5 py-0.5 rounded">
                                                             Inactive
                                                         </span>
                                                     @endif
@@ -608,8 +685,8 @@
                         @endphp
 
                         @if ($activeFactors->count() > 0)
-                            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Active
+                            <div class="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+                                <h4 class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Active
                                     Bonuses</h4>
                                 <div class="grid grid-cols-2 gap-2 text-xs">
                                     @if ($totalStatBonuses > 0)
@@ -634,18 +711,18 @@
                                         </div>
                                     @endif
                                     @if ($normalSkills > 0)
-                                        <div class="flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                                            <span class="text-gray-700 dark:text-gray-300">Normal Skills</span>
+                                        <div class="flex justify-between p-2 bg-neutral-50 dark:bg-neutral-800 rounded">
+                                            <span class="text-neutral-700 dark:text-neutral-300">Normal Skills</span>
                                             <span
-                                                class="font-bold text-gray-800 dark:text-gray-200">{{ $normalSkills }}</span>
+                                                class="font-bold text-neutral-800 dark:text-neutral-200">{{ $normalSkills }}</span>
                                         </div>
                                     @endif
                                 </div>
                             </div>
                         @endif
                     @else
-                        <div class="text-center text-sm text-gray-500 py-8">
-                            <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
+                        <div class="text-center text-sm text-neutral-500 py-8">
+                            <svg class="mx-auto h-10 w-10 text-neutral-400 mb-2" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />

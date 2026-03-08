@@ -168,11 +168,11 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation, ARIA labels
     
     {{-- Filter Panel (Collapsible) --}}
     @if($showFilters)
-        <div x-ref="filterPanel" class="hidden border-t border-gray-200 dark:border-gray-700 pt-4">
+        <div x-ref="filterPanel" class="hidden border-t border-neutral-200 dark:border-neutral-700 pt-4">
             <div class="flex flex-wrap gap-4 items-start">
                 {{-- Rarity Filters --}}
                 <div class="flex flex-col gap-2">
-                    <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <label class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
                         Rarity
                     </label>
                     <div class="flex flex-wrap gap-2">
@@ -180,7 +180,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation, ARIA labels
                             <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-colors"
                                 :class="filters.rarity.includes({{ $rarity }}) 
                                     ? 'bg-primary-50 border-primary-500 text-primary-700 dark:bg-primary-900/20 dark:border-primary-600 dark:text-primary-300' 
-                                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'"
+                                    : 'bg-white border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700'"
                             >
                                 <input 
                                     type="checkbox" 
@@ -219,7 +219,7 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation, ARIA labels
     @endif
     
     {{-- Results Summary --}}
-    <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+    <div class="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400">
         <p>
             <span class="font-semibold" x-text="filteredCharacters.length"></span>
             <span x-text="filteredCharacters.length === 1 ? 'character' : 'characters'"></span>
@@ -257,13 +257,13 @@ Accessibility: WCAG 2.2 AA compliant, keyboard navigation, ARIA labels
         x-show="filteredCharacters.length === 0"
         class="text-center py-12"
     >
-        <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="mx-auto h-12 w-12 text-neutral-400 dark:text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">
+        <h3 class="mt-4 text-lg font-medium text-neutral-900 dark:text-neutral-100">
             No characters found
         </h3>
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
             Try adjusting your search or filters
         </p>
         <button 

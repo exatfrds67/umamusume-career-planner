@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 use App\Models\AIConversation;
 use App\Models\Character;
+use App\Models\ConversationMessage;
 use App\Models\User;
 use App\Services\MCP\AgentRoutingService;
 use Illuminate\Support\Facades\Cache;
@@ -52,6 +53,22 @@ describe('AI Chat Interface', function () {
 });
 
 describe('Send Message API', function () {
+    it('prevents sending messages with another users character context', function () {
+        $otherUser = User::factory()->create();
+        $otherCharacter = Character::factory()->create(['user_id' => $otherUser->id]);
+
+        $this->mock(AgentRoutingService::class, function ($mock) {
+            $mock->shouldNotReceive('executeWithFallback');
+        });
+
+        actingAs($this->user)
+            ->postJson(route('api.ai.chat.message'), [
+                'message' => 'What training should I focus on?',
+                'character_id' => $otherCharacter->id,
+            ])
+            ->assertNotFound();
+    });
+
     it('sends a message and receives AI response', function () {
         // Mock the routing service
         $this->mock(AgentRoutingService::class, function ($mock) {
@@ -128,13 +145,56 @@ describe('Send Message API', function () {
 
         $response->assertOk();
 
-        // Check that conversations were logged (may be 0 if logging fails silently)
-        $userMessages = AIConversation::where('message_type', 'user')->count();
-        $aiMessages = AIConversation::where('message_type', 'ai')->count();
+        // Verify conversation container was created
+        $conversation = AIConversation::where('user_id', $this->user->id)->first();
+        expect($conversation)->not->toBeNull();
+        expect($conversation->conversation_type)->toBe('general_help');
+        expect($conversation->status)->toBe('active');
 
-        // Either both are logged or neither (logging may fail due to missing columns)
-        expect($userMessages)->toBeGreaterThanOrEqual(0);
-        expect($aiMessages)->toBeGreaterThanOrEqual(0);
+        // Verify both user and assistant messages were logged
+        $messages = ConversationMessage::where('conversation_id', $conversation->id)->get();
+        expect($messages)->toHaveCount(2);
+        expect($messages->where('message_type', 'user')->first()->message_content)->toBe('Test message');
+        expect($messages->where('message_type', 'ai')->first()->message_content)->toBe('Test response');
+    });
+
+    it('reuses existing conversation container for same conversation_id', function () {
+        $this->mock(AgentRoutingService::class, function ($mock) {
+            $mock->shouldReceive('executeWithFallback')
+                ->twice()
+                ->andReturn([
+                    'success' => true,
+                    'response' => 'Response',
+                    'model' => 'llama3.3',
+                    'provider' => 'ollama',
+                    'execution_time' => 1.0,
+                    'cost' => 0.0,
+                    'fallback_used' => false,
+                ]);
+        });
+
+        $conversationId = 'test-conv-123';
+
+        actingAs($this->user)
+            ->postJson(route('api.ai.chat.message'), [
+                'message' => 'First message',
+                'conversation_id' => $conversationId,
+            ])
+            ->assertOk();
+
+        actingAs($this->user)
+            ->postJson(route('api.ai.chat.message'), [
+                'message' => 'Second message',
+                'conversation_id' => $conversationId,
+            ])
+            ->assertOk();
+
+        // Only one conversation container should exist
+        expect(AIConversation::where('conversation_id', $conversationId)->count())->toBe(1);
+
+        // But four messages (2 user + 2 assistant)
+        $conversation = AIConversation::where('conversation_id', $conversationId)->first();
+        expect(ConversationMessage::where('conversation_id', $conversation->id)->count())->toBe(4);
     });
 
     it('includes character context in request', function () {

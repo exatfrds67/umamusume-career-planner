@@ -3,7 +3,7 @@
     'careerId' => null,
 ])
 
-<div class="ai-chat-interface flex flex-col h-full bg-white dark:bg-gray-900 rounded-lg shadow-lg" x-data="aiChatInterface({
+<div class="ai-chat-interface flex flex-col h-full bg-white dark:bg-neutral-900 rounded-lg shadow-lg" x-data="aiChatInterface({
     characterId: {{ $characterId ?? 'null' }},
     careerId: {{ $careerId ?? 'null' }}
 })"
@@ -11,7 +11,7 @@
 
     {{-- Chat Header --}}
     <div
-        class="chat-header flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-linear-to-r from-primary-50 to-primary-100 dark:from-gray-800 dark:to-gray-700">
+        class="chat-header flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700 bg-linear-to-r from-primary-50 to-primary-100 dark:from-neutral-800 dark:to-neutral-700">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,7 +20,7 @@
                 </svg>
             </div>
             <div>
-                <h2 id="chat-title" class="text-lg font-semibold text-gray-900 dark:text-white">
+                <h2 id="chat-title" class="text-lg font-semibold text-neutral-900 dark:text-white">
                     AI Career Assistant
                 </h2>
                 <div class="flex items-center gap-2 mt-1">
@@ -30,11 +30,35 @@
         </div>
 
         <div class="flex items-center gap-2">
+            {{-- New Conversation --}}
+            <button @click="newConversation()"
+                class="p-2 hover:bg-white/50 dark:hover:bg-neutral-600 rounded-lg transition-colors"
+                aria-label="New conversation" title="New conversation"
+                :disabled="isProcessing">
+                <svg class="w-5 h-5 text-neutral-600 dark:text-neutral-300" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4v16m8-8H4" />
+                </svg>
+            </button>
+
+            {{-- Export Conversation --}}
+            <button @click="exportConversation('markdown')"
+                class="p-2 hover:bg-white/50 dark:hover:bg-neutral-600 rounded-lg transition-colors"
+                aria-label="Export conversation" title="Export conversation"
+                :disabled="messages.length === 0">
+                <svg class="w-5 h-5 text-neutral-600 dark:text-neutral-300" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+            </button>
+
             {{-- MCP Server Status --}}
             <button @click="showServerStatus = !showServerStatus"
-                class="p-2 hover:bg-white/50 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                class="p-2 hover:bg-white/50 dark:hover:bg-neutral-600 rounded-lg transition-colors"
                 aria-label="Toggle server status">
-                <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor"
+                <svg class="w-5 h-5 text-neutral-600 dark:text-neutral-300" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
@@ -43,9 +67,9 @@
 
             {{-- Workflow Visualization Toggle --}}
             <button @click="showWorkflow = !showWorkflow"
-                class="p-2 hover:bg-white/50 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                class="p-2 hover:bg-white/50 dark:hover:bg-neutral-600 rounded-lg transition-colors"
                 aria-label="Toggle workflow visualization">
-                <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor"
+                <svg class="w-5 h-5 text-neutral-600 dark:text-neutral-300" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -54,9 +78,9 @@
 
             {{-- Settings --}}
             <button @click="showSettings = !showSettings"
-                class="p-2 hover:bg-white/50 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                class="p-2 hover:bg-white/50 dark:hover:bg-neutral-600 rounded-lg transition-colors"
                 aria-label="Chat settings">
-                <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor"
+                <svg class="w-5 h-5 text-neutral-600 dark:text-neutral-300" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -73,7 +97,7 @@
         <div class="flex-1 flex flex-col">
             {{-- Messages Container --}}
             <div class="flex-1 overflow-y-auto p-4 space-y-4" x-ref="messagesContainer" role="log"
-                aria-live="polite" aria-label="Chat messages">
+                aria-live="polite" aria-label="Chat messages" :aria-busy="isProcessing">
 
                 <template x-if="messages.length === 0">
                     <div class="flex flex-col items-center justify-center h-full text-center p-8">
@@ -85,26 +109,55 @@
                                     d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                             </svg>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-2">
                             Welcome to AI Career Assistant
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-400 max-w-md">
+                        <p class="text-neutral-600 dark:text-neutral-400 max-w-md mb-6">
                             Ask me anything about training strategies, character optimization, race preparation, or
                             skill builds. I'm here to help you reach S-rank aptitudes!
                         </p>
+
+                        {{-- Conversation Starters --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-lg w-full">
+                            <button @click="currentMessage = 'What training should I focus on for Speed?'; sendMessage()"
+                                class="text-left p-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-primary-50 dark:hover:bg-neutral-800 transition-colors text-sm text-neutral-700 dark:text-neutral-300">
+                                <span class="font-medium text-primary-600 dark:text-primary-400">🏃 Training</span>
+                                <span class="block mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">What training should I focus on for Speed?</span>
+                            </button>
+                            <button @click="currentMessage = 'Analyze my character stats and suggest improvements'; sendMessage()"
+                                class="text-left p-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-primary-50 dark:hover:bg-neutral-800 transition-colors text-sm text-neutral-700 dark:text-neutral-300">
+                                <span class="font-medium text-primary-600 dark:text-primary-400">📊 Analysis</span>
+                                <span class="block mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">Analyze my character stats and suggest improvements</span>
+                            </button>
+                            <button @click="currentMessage = 'What skills should I prioritize for my build?'; sendMessage()"
+                                class="text-left p-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-primary-50 dark:hover:bg-neutral-800 transition-colors text-sm text-neutral-700 dark:text-neutral-300">
+                                <span class="font-medium text-primary-600 dark:text-primary-400">⭐ Skills</span>
+                                <span class="block mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">What skills should I prioritize for my build?</span>
+                            </button>
+                            <button @click="currentMessage = 'Help me plan my upcoming race strategy'; sendMessage()"
+                                class="text-left p-3 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-primary-50 dark:hover:bg-neutral-800 transition-colors text-sm text-neutral-700 dark:text-neutral-300">
+                                <span class="font-medium text-primary-600 dark:text-primary-400">🏁 Race Strategy</span>
+                                <span class="block mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">Help me plan my upcoming race strategy</span>
+                            </button>
+                        </div>
                     </div>
                 </template>
 
                 <template x-for="msg in messages" :key="msg.id">
-                    <div class="flex items-start gap-3"
+                    <div class="flex items-start gap-3 animate-fade-in-up"
                         :class="msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'" role="article"
                         :aria-label="`Message from ${msg.sender === 'user' ? 'you' : 'AI assistant'}`">
 
                         {{-- Avatar --}}
                         <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                            :class="msg.sender === 'user' ? 'bg-gray-300 dark:bg-gray-600' : 'bg-primary-500'">
+                            :class="{
+                                'bg-neutral-300 dark:bg-neutral-600': msg.sender === 'user',
+                                'bg-red-400': msg.sender === 'system' && msg.isError,
+                                'bg-neutral-400': msg.sender === 'system' && !msg.isError,
+                                'bg-primary-500': msg.sender === 'ai'
+                            }">
                             <template x-if="msg.sender === 'user'">
-                                <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" fill="none"
+                                <svg class="w-5 h-5 text-neutral-700 dark:text-neutral-200" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -117,23 +170,33 @@
                                         d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
                             </template>
+                            <template x-if="msg.sender === 'system'">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.924-.833-2.694 0L4.07 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                            </template>
                         </div>
 
                         {{-- Message Content --}}
                         <div class="flex-1 max-w-3xl">
                             <div class="rounded-lg p-4 shadow-xs"
-                                :class="msg.sender === 'user' ?
-                                    'bg-primary-600 text-white' :
-                                    'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600'">
+                                :class="{
+                                    'bg-primary-600 text-white': msg.sender === 'user',
+                                    'bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-200 border border-red-200 dark:border-red-800': msg.sender === 'system' && msg.isError,
+                                    'bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700': msg.sender === 'system' && !msg.isError,
+                                    'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-600': msg.sender === 'ai'
+                                }">
 
                                 {{-- Message Header --}}
                                 <div class="flex items-center justify-between mb-2">
                                     <div class="flex items-center gap-2">
                                         <span class="font-semibold text-sm"
-                                            x-text="msg.sender === 'user' ? 'You' : 'AI Assistant'"></span>
+                                            x-text="msg.sender === 'user' ? 'You' : (msg.sender === 'system' ? 'System' : 'AI Assistant')"></span>
                                         <template x-if="msg.sender === 'ai' && msg.metadata?.model">
                                             <span
-                                                class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300"
+                                                class="text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-300"
                                                 x-text="msg.metadata.model"></span>
                                         </template>
                                         <template x-if="msg.sender === 'ai' && msg.metadata?.provider">
@@ -168,7 +231,7 @@
 
                                 {{-- AI Message Metadata --}}
                                 <template x-if="msg.sender === 'ai' && msg.metadata">
-                                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                    <div class="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-600">
                                         <div class="flex flex-wrap items-center gap-3 text-xs opacity-75">
                                             <template x-if="msg.metadata.processing_time">
                                                 <span>
@@ -209,8 +272,8 @@
 
                                 {{-- Knowledge Sources (RAG Attribution) --}}
                                 <template x-if="msg.sender === 'ai' && msg.metadata?.knowledge_sources && msg.metadata.knowledge_sources.length > 0">
-                                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                                        <div class="text-xs text-gray-600 dark:text-gray-400 flex items-start gap-2">
+                                    <div class="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-600">
+                                        <div class="text-xs text-neutral-600 dark:text-neutral-400 flex items-start gap-2">
                                             <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                             </svg>
@@ -228,16 +291,53 @@
 
                                 {{-- Message Actions --}}
                                 <div class="mt-3 flex items-center gap-3 text-xs">
-                                    <button @click="copyMessage(msg.content)"
-                                        class="flex items-center gap-1 opacity-75 hover:opacity-100 transition-opacity"
-                                        :class="msg.sender === 'user' ? 'text-white' : 'text-gray-600 dark:text-gray-400'"
+                                    <button @click="copyMessage(msg.id, msg.content)"
+                                        class="flex items-center gap-1 opacity-75 hover:opacity-100 transition-all"
+                                        :class="[
+                                            msg.sender === 'user' ? 'text-white' : 'text-neutral-600 dark:text-neutral-400',
+                                            isCopiedMessage(msg.id) ? 'opacity-100 text-green-600 dark:text-green-400' : ''
+                                        ]"
                                         aria-label="Copy message">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        {{-- Checkmark icon when copied --}}
+                                        <template x-if="isCopiedMessage(msg.id)">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </template>
+                                        {{-- Copy icon when not copied --}}
+                                        <template x-if="! isCopiedMessage(msg.id)">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                        </template>
+                                        <span x-text="isCopiedMessage(msg.id) ? 'Copied!' : 'Copy'"></span>
+                                    </button>
+
+                                    {{-- Regenerate button (AI messages only) --}}
+                                    <template x-if="msg.sender === 'ai' && messages.indexOf(msg) === messages.map(m => m.sender).lastIndexOf('ai')">
+                                        <button @click="regenerateResponse()"
+                                            class="flex items-center gap-1 opacity-75 hover:opacity-100 transition-opacity text-neutral-600 dark:text-neutral-400"
+                                            :disabled="isProcessing"
+                                            aria-label="Regenerate response">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                            </svg>
+                                            <span>Regenerate</span>
+                                        </button>
+                                    </template>
+
+                                    {{-- Delete message --}}
+                                    <button @click="deleteMessage(msg.id)"
+                                        class="flex items-center gap-1 opacity-50 hover:opacity-100 transition-opacity text-red-500 dark:text-red-400"
+                                        aria-label="Delete message">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
-                                        <span>Copy</span>
+                                        <span>Delete</span>
                                     </button>
                                 </div>
                             </div>
@@ -246,24 +346,37 @@
                 </template>
 
                 {{-- Typing Indicator --}}
-                <div x-show="isTyping" class="flex items-start gap-3">
+                <div x-show="isTyping" class="flex items-start gap-3 animate-fade-in-up">
                     <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <div class="flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                    <div class="flex-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-3">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-medium text-neutral-600 dark:text-neutral-400"
+                                x-text="`AI is thinking... (${model})`"></span>
+                            <button @click="cancelStreaming()"
+                                class="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors"
+                                aria-label="Cancel response">
+                                Cancel
+                            </button>
+                        </div>
                         <div class="flex gap-1">
-                            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                            <span class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"
                                 style="animation-delay: 0ms"></span>
-                            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                            <span class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"
                                 style="animation-delay: 150ms"></span>
-                            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                            <span class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"
                                 style="animation-delay: 300ms"></span>
                         </div>
                     </div>
                 </div>
+
+                {{-- Screen reader live region for new messages --}}
+                <div role="status" aria-live="polite" class="sr-only"
+                    x-text="isTyping ? 'AI is generating a response...' : ''"></div>
             </div>
 
             {{-- Tool Usage Indicators --}}
@@ -273,17 +386,20 @@
             </div>
 
             {{-- Input Area --}}
-            <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <div class="p-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800">
                 <form @submit.prevent="sendMessage()" class="flex items-end gap-3">
                     <div class="flex-1">
                         <label for="message-input" class="sr-only">Type your message</label>
                         <textarea id="message-input" x-model="currentMessage" @keydown.enter.prevent="handleEnterKey($event)"
                             placeholder="Ask about training strategies, character optimization, or any career planning questions..."
-                            class="w-full resize-none border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                            rows="3" maxlength="2000" :disabled="isProcessing" aria-describedby="input-help"></textarea>
+                            class="w-full resize-none border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            rows="3" maxlength="2000" :disabled="isProcessing"
+                            :aria-disabled="isProcessing"
+                            aria-describedby="input-help"
+                            aria-label="Type your message to AI assistant"></textarea>
                         <div id="input-help"
-                            class="mt-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                            <span>Press Enter to send, Shift+Enter for new line</span>
+                            class="mt-1 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
+                            <span>Enter to send, Shift+Enter for new line — <button type="button" @click="openKeyboardShortcuts()" class="underline hover:text-primary-500 transition-colors" aria-label="Show keyboard shortcuts">Shortcuts (Ctrl+/)</button></span>
                             <span x-text="`${currentMessage.length}/2000`"></span>
                         </div>
                     </div>
@@ -309,7 +425,7 @@
         </div>
 
         {{-- Sidebar Panels --}}
-        <div class="fixed inset-y-0 right-0 w-80 bg-gray-50 dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-xl transform transition-transform duration-300 md:relative md:shadow-none z-50 md:z-auto"
+        <div class="fixed inset-y-0 right-0 w-80 bg-neutral-50 dark:bg-neutral-800 border-l border-neutral-200 dark:border-neutral-700 shadow-xl transform transition-transform duration-300 md:relative md:shadow-none z-50 md:z-auto"
             x-show="showServerStatus || showWorkflow || showSettings"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 transform translate-x-4"
@@ -317,20 +433,68 @@
 
             {{-- Server Status Panel --}}
             <div x-show="showServerStatus" class="p-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">MCP Server Status</h3>
+                <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">MCP Server Status</h3>
                 <x-ai.server-status-indicator />
             </div>
 
             {{-- Workflow Visualization Panel --}}
             <div x-show="showWorkflow" class="p-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Agent Workflow</h3>
+                <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Agent Workflow</h3>
                 <x-ai.workflow-visualization />
             </div>
 
             {{-- Settings Panel --}}
             <div x-show="showSettings" class="p-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Chat Settings</h3>
+                <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Chat Settings</h3>
                 <x-ai.agent-selector />
+            </div>
+        </div>
+    </div>
+
+    {{-- Keyboard Shortcuts Modal --}}
+    <div x-show="showKeyboardShortcuts"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        @click.self="closeKeyboardShortcuts()"
+        @keydown.escape.window="closeKeyboardShortcuts()"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="shortcuts-title">
+        <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 id="shortcuts-title" class="text-lg font-semibold text-neutral-900 dark:text-white">Keyboard Shortcuts</h3>
+                <button type="button" @click="closeKeyboardShortcuts()" class="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors" aria-label="Close">
+                    <svg class="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between items-center">
+                    <span class="text-neutral-700 dark:text-neutral-300">Send message</span>
+                    <kbd class="px-2 py-1 bg-neutral-100 dark:bg-neutral-700 rounded text-xs font-mono text-neutral-600 dark:text-neutral-300">Enter</kbd>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-neutral-700 dark:text-neutral-300">New line</span>
+                    <kbd class="px-2 py-1 bg-neutral-100 dark:bg-neutral-700 rounded text-xs font-mono text-neutral-600 dark:text-neutral-300">Shift+Enter</kbd>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-neutral-700 dark:text-neutral-300">Focus input</span>
+                    <kbd class="px-2 py-1 bg-neutral-100 dark:bg-neutral-700 rounded text-xs font-mono text-neutral-600 dark:text-neutral-300">Ctrl+K</kbd>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-neutral-700 dark:text-neutral-300">Cancel response</span>
+                    <kbd class="px-2 py-1 bg-neutral-100 dark:bg-neutral-700 rounded text-xs font-mono text-neutral-600 dark:text-neutral-300">Esc</kbd>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-neutral-700 dark:text-neutral-300">Show shortcuts</span>
+                    <kbd class="px-2 py-1 bg-neutral-100 dark:bg-neutral-700 rounded text-xs font-mono text-neutral-600 dark:text-neutral-300">Ctrl+/</kbd>
+                </div>
             </div>
         </div>
     </div>

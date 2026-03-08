@@ -64,6 +64,7 @@ export default defineConfig({
                 "resources/js/pages/import/index.js",
                 "resources/js/pages/export/index.js",
                 "resources/js/pages/migration/index.js",
+                "resources/js/pages/backup/index.js",
                 "resources/js/pages/historical/index.js",
                 "resources/js/pages/external-data/browse.js",
                 "resources/js/pages/skills/partials/planner.js",

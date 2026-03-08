@@ -5,10 +5,10 @@
         <!-- Header -->
         <div class="sm:flex sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">
                     Support Card Deck Management - {{ $character->name }}
                 </h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                     Build and optimize your 6-card deck (5 owned + 1 friend card)
                 </p>
             </div>

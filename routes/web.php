@@ -108,6 +108,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/races/calendar', [RaceController::class, 'calendar'])->name('races.calendar');
     Route::get('/races/targets', [RaceController::class, 'targets'])->name('races.targets');
     Route::get('/races/{race}', [RaceController::class, 'show'])->name('races.show');
+    Route::post('/characters/{character}/races/{gameRace}/enter', [RaceController::class, 'enter'])->name('races.enter');
 
     // Skills routes
     Route::get('/skills', [App\Http\Controllers\SkillController::class, 'index'])->name('skills.index');

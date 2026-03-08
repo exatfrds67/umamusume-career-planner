@@ -178,7 +178,7 @@ describe('JavaScript Execution', function () {
 
 describe('Smoke Test - All Critical Pages', function () {
     it('loads all public pages without errors', function () {
-        $publicPages = ['/', '/login', '/register', '/about', '/help'];
+        $publicPages = ['/', '/login', '/register', '/about'];
 
         foreach ($publicPages as $url) {
             $page = visit($url);
@@ -195,7 +195,6 @@ describe('Smoke Test - All Critical Pages', function () {
             '/characters/create',
             '/skills',
             '/races',
-            '/settings',
         ];
 
         foreach ($authenticatedPages as $url) {

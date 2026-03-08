@@ -1,23 +1,23 @@
 /* Condition Badge Component Styles (Verified from game) */
 
 .condition-great {
-    background: linear-gradient(135deg, #ec4899, #be185d);
-    box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.4);
+    background: linear-gradient(135deg, var(--color-condition-great-light), var(--color-condition-great-dark));
+    box-shadow: 0 4px 6px -1px color-mix(in srgb, var(--color-condition-great) 40%, transparent);
 }
 
 .condition-good {
-    background: linear-gradient(135deg, #60a5fa, #2563eb);
-    box-shadow: 0 4px 6px -1px rgba(96, 165, 250, 0.4);
+    background: linear-gradient(135deg, var(--color-condition-good-light), var(--color-condition-good-dark));
+    box-shadow: 0 4px 6px -1px color-mix(in srgb, var(--color-condition-good) 40%, transparent);
 }
 
 .condition-normal {
-    background: linear-gradient(135deg, #f97316, #c2410c);
-    box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.4);
+    background: linear-gradient(135deg, var(--color-condition-normal-light), var(--color-condition-normal-dark));
+    box-shadow: 0 4px 6px -1px color-mix(in srgb, var(--color-condition-normal) 40%, transparent);
 }
 
 .condition-bad {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.4);
+    background: linear-gradient(135deg, var(--color-condition-bad-light), var(--color-condition-bad-dark));
+    box-shadow: 0 4px 6px -1px color-mix(in srgb, var(--color-condition-bad) 40%, transparent);
 }
 
 /* Dark mode adjustments */

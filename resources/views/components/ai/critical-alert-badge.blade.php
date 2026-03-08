@@ -24,7 +24,7 @@
             '-m-2.5 p-2.5 relative transition-colors duration-200 ' .
             ($hasCriticalAlerts
                 ? 'text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
-                : 'text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-100'),
+                : 'text-neutral-400 hover:text-neutral-500 dark:text-neutral-300 dark:hover:text-neutral-100'),
         'aria-label' => $hasCriticalAlerts
             ? "View {$alertCount} critical " . Str::plural('alert', $alertCount)
             : 'No critical alerts',
@@ -54,7 +54,7 @@
     {{-- Alert Count Badge --}}
     @if ($hasCriticalAlerts)
         <span
-            class="absolute -top-1 -right-1 {{ $badgeSizeClasses }} flex items-center justify-center rounded-full bg-red-600 dark:bg-red-500 text-white font-bold shadow-lg critical-alert-badge ring-2 ring-white dark:ring-gray-800"
+            class="absolute -top-1 -right-1 {{ $badgeSizeClasses }} flex items-center justify-center rounded-full bg-red-600 dark:bg-red-500 text-white font-bold shadow-lg critical-alert-badge ring-2 ring-white dark:ring-neutral-800"
             aria-hidden="true">
             {{ $alertCount > 99 ? '99+' : $alertCount }}
         </span>

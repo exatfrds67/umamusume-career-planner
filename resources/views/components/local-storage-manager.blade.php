@@ -30,7 +30,7 @@
 
     <!-- Storage Status Display (Optional Debug) -->
     <template x-if="false">
-        <div class="text-xs text-gray-500 dark:text-gray-400 p-2 bg-gray-100 dark:bg-gray-900 rounded">
+        <div class="text-xs text-neutral-500 dark:text-neutral-400 p-2 bg-neutral-100 dark:bg-neutral-900 rounded">
             <div>Last Save: <span x-text="lastSaveTime ? new Date(lastSaveTime).toLocaleTimeString() : 'Never'"></span></div>
             <div>Storage: <span x-text="checkQuota() + '%'"></span></div>
             <div>Drafts: <span x-text="listDrafts().length"></span></div>

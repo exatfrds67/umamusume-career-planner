@@ -21,7 +21,7 @@ export default function activityTimeline(initialEvents = []) {
                 milestone: "bg-blue-400",
                 achievement: "bg-yellow-400",
             };
-            return colors[type] || "bg-gray-400";
+            return colors[type] || "bg-neutral-400";
         },
 
         getEventIcon(type) {
@@ -86,7 +86,7 @@ export default function activityTimeline(initialEvents = []) {
             };
             return (
                 styles[type] ||
-                "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                "bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300"
             );
         },
 

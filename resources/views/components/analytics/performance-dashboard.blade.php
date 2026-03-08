@@ -45,7 +45,7 @@
     $trendColor = match ($trend['trend'] ?? 'stable') {
         'improving' => 'text-green-600 dark:text-green-400',
         'declining' => 'text-red-600 dark:text-red-400',
-        default => 'text-gray-600 dark:text-gray-400',
+        default => 'text-neutral-600 dark:text-neutral-400',
     };
 @endphp
 
@@ -53,17 +53,17 @@
     {{-- Dashboard Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+            <h2 class="text-xl font-bold text-neutral-900 dark:text-white">
                 Performance Overview
             </h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
                 Key metrics and performance indicators
             </p>
         </div>
 
         @if ($showTrend && isset($trend['trend']))
-            <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Trend:</span>
+            <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Trend:</span>
                 <span class="{{ $trendColor }} flex items-center gap-1">
                     @if ($trend['trend'] === 'improving')
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,18 +131,18 @@
 
     {{-- Scenario Breakdown --}}
     @if (isset($metrics['metrics_by_scenario']) && !empty($metrics['metrics_by_scenario']))
-        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div class="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-700">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                 Performance by Scenario
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @foreach ($metrics['metrics_by_scenario'] as $scenario => $data)
                     <div class="glass-card-inner rounded-lg p-4">
                         <div class="flex items-center justify-between mb-3">
-                            <h4 class="font-medium text-gray-900 dark:text-white capitalize">
+                            <h4 class="font-medium text-neutral-900 dark:text-white capitalize">
                                 {{ str_replace('_', ' ', $scenario) }}
                             </h4>
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                            <span class="text-sm text-neutral-500 dark:text-neutral-400">
                                 {{ $data['count'] ?? 0 }} careers
                             </span>
                         </div>
@@ -151,11 +151,11 @@
                             {{-- Success Rate Bar --}}
                             <div>
                                 <div class="flex justify-between text-sm mb-1">
-                                    <span class="text-gray-600 dark:text-gray-400">Success Rate</span>
+                                    <span class="text-neutral-600 dark:text-neutral-400">Success Rate</span>
                                     <span
-                                        class="font-medium text-gray-900 dark:text-white">{{ $data['success_rate'] ?? 0 }}%</span>
+                                        class="font-medium text-neutral-900 dark:text-white">{{ $data['success_rate'] ?? 0 }}%</span>
                                 </div>
-                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
                                     <div class="h-2 rounded-full transition-all duration-500 {{ ($data['success_rate'] ?? 0) >= 70 ? 'bg-green-500' : (($data['success_rate'] ?? 0) >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}"
                                         style="width: {{ min(100, $data['success_rate'] ?? 0) }}%" role="progressbar"
                                         aria-valuenow="{{ $data['success_rate'] ?? 0 }}" aria-valuemin="0"
@@ -166,11 +166,11 @@
                             {{-- Efficiency Bar --}}
                             <div>
                                 <div class="flex justify-between text-sm mb-1">
-                                    <span class="text-gray-600 dark:text-gray-400">Avg Efficiency</span>
+                                    <span class="text-neutral-600 dark:text-neutral-400">Avg Efficiency</span>
                                     <span
-                                        class="font-medium text-gray-900 dark:text-white">{{ $data['avg_efficiency'] ?? 0 }}%</span>
+                                        class="font-medium text-neutral-900 dark:text-white">{{ $data['avg_efficiency'] ?? 0 }}%</span>
                                 </div>
-                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
                                     <div class="h-2 rounded-full transition-all duration-500 bg-blue-500"
                                         style="width: {{ min(100, $data['avg_efficiency'] ?? 0) }}%" role="progressbar"
                                         aria-valuenow="{{ $data['avg_efficiency'] ?? 0 }}" aria-valuemin="0"
@@ -180,8 +180,8 @@
 
                             {{-- Completed Count --}}
                             <div class="flex justify-between text-sm">
-                                <span class="text-gray-600 dark:text-gray-400">Completed</span>
-                                <span class="font-medium text-gray-900 dark:text-white">
+                                <span class="text-neutral-600 dark:text-neutral-400">Completed</span>
+                                <span class="font-medium text-neutral-900 dark:text-white">
                                     {{ $data['completed'] ?? 0 }} / {{ $data['count'] ?? 0 }}
                                 </span>
                             </div>
@@ -194,8 +194,8 @@
 
     {{-- Recent Performance --}}
     @if (isset($trend['recent_performance']) && !empty($trend['recent_performance']))
-        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div class="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-700">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                 Recent Performance
             </h3>
             <div class="flex items-end gap-2 h-24">
@@ -217,7 +217,7 @@
                     </div>
                 @endforeach
             </div>
-            <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
+            <div class="flex justify-between text-xs text-neutral-500 dark:text-neutral-400 mt-2">
                 <span>Oldest</span>
                 <span>Most Recent</span>
             </div>

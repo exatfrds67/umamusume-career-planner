@@ -13,11 +13,11 @@
     @livewireStyles
 </head>
 
-<body class="bg-gray-50 dark:bg-gray-900">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-gray-900 dark:focus:bg-gray-800 dark:focus:text-white">Skip to main content</a>
+<body class="admin-app">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-neutral-900 dark:focus:bg-neutral-800 dark:focus:text-white">Skip to main content</a>
     <div class="min-h-screen">
         <!-- Admin Navigation -->
-        <nav aria-label="Admin navigation" class="border-b border-red-700 bg-red-600 dark:border-red-900 dark:bg-red-800" x-data="{ mobileOpen: false }">
+        <nav aria-label="Admin navigation" class="admin-nav" x-data="{ mobileOpen: false }">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex h-16 justify-between">
                     <div class="flex">
@@ -27,32 +27,32 @@
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <a href="{{ route('admin.users.index') }}"
                                 aria-current="{{ request()->routeIs('admin.users.*') ? 'page' : 'false' }}"
-                                class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium text-white hover:text-red-100 {{ request()->routeIs('admin.users.*') ? 'border-white' : 'border-transparent' }}">
+                                class="admin-nav__link {{ request()->routeIs('admin.users.*') ? 'border-white' : 'border-transparent' }}">
                                 Users
                             </a>
                             <a href="{{ route('admin.system-settings.index') }}"
                                 aria-current="{{ request()->routeIs('admin.system-settings.*') ? 'page' : 'false' }}"
-                                class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium text-white hover:text-red-100 {{ request()->routeIs('admin.system-settings.*') ? 'border-white' : 'border-transparent' }}">
+                                class="admin-nav__link {{ request()->routeIs('admin.system-settings.*') ? 'border-white' : 'border-transparent' }}">
                                 System Settings
                             </a>
                             <a href="{{ route('admin.logs.index') }}"
                                 aria-current="{{ request()->routeIs('admin.logs.*') ? 'page' : 'false' }}"
-                                class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium text-white hover:text-red-100 {{ request()->routeIs('admin.logs.*') ? 'border-white' : 'border-transparent' }}">
+                                class="admin-nav__link {{ request()->routeIs('admin.logs.*') ? 'border-white' : 'border-transparent' }}">
                                 Logs
                             </a>
                             <a href="{{ route('admin.database.maintenance') }}"
                                 aria-current="{{ request()->routeIs('admin.database.*') ? 'page' : 'false' }}"
-                                class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium text-white hover:text-red-100 {{ request()->routeIs('admin.database.*') ? 'border-white' : 'border-transparent' }}">
+                                class="admin-nav__link {{ request()->routeIs('admin.database.*') ? 'border-white' : 'border-transparent' }}">
                                 Database
                             </a>
                             <a href="{{ route('admin.queue.index') }}"
                                 aria-current="{{ request()->routeIs('admin.queue.*') ? 'page' : 'false' }}"
-                                class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium text-white hover:text-red-100 {{ request()->routeIs('admin.queue.*') ? 'border-white' : 'border-transparent' }}">
+                                class="admin-nav__link {{ request()->routeIs('admin.queue.*') ? 'border-white' : 'border-transparent' }}">
                                 Queue
                             </a>
                             <a href="{{ route('admin.apm') }}"
                                 aria-current="{{ request()->routeIs('admin.apm') ? 'page' : 'false' }}"
-                                class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium text-white hover:text-red-100 {{ request()->routeIs('admin.apm') ? 'border-white' : 'border-transparent' }}">
+                                class="admin-nav__link {{ request()->routeIs('admin.apm') ? 'border-white' : 'border-transparent' }}">
                                 APM
                             </a>
                         </div>
@@ -79,20 +79,20 @@
                 </div>
             </div>
             <!-- Mobile navigation menu -->
-            <div x-show="mobileOpen" x-cloak x-transition class="border-t border-red-700 sm:hidden">
+            <div x-show="mobileOpen" x-cloak x-transition @keydown.escape.window="mobileOpen = false" class="border-t border-red-700 sm:hidden">
                 <div class="space-y-1 px-4 pb-3 pt-2">
-                    <a href="{{ route('admin.users.index') }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.users.*') ? 'bg-red-700' : '' }}">Users</a>
-                    <a href="{{ route('admin.system-settings.index') }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.system-settings.*') ? 'bg-red-700' : '' }}">System Settings</a>
-                    <a href="{{ route('admin.logs.index') }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.logs.*') ? 'bg-red-700' : '' }}">Logs</a>
-                    <a href="{{ route('admin.database.maintenance') }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.database.*') ? 'bg-red-700' : '' }}">Database</a>
-                    <a href="{{ route('admin.queue.index') }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.queue.*') ? 'bg-red-700' : '' }}">Queue</a>
-                    <a href="{{ route('admin.apm') }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.apm') ? 'bg-red-700' : '' }}">APM</a>
+                    <a href="{{ route('admin.users.index') }}" aria-current="{{ request()->routeIs('admin.users.*') ? 'page' : 'false' }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.users.*') ? 'bg-red-700' : '' }}">Users</a>
+                    <a href="{{ route('admin.system-settings.index') }}" aria-current="{{ request()->routeIs('admin.system-settings.*') ? 'page' : 'false' }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.system-settings.*') ? 'bg-red-700' : '' }}">System Settings</a>
+                    <a href="{{ route('admin.logs.index') }}" aria-current="{{ request()->routeIs('admin.logs.*') ? 'page' : 'false' }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.logs.*') ? 'bg-red-700' : '' }}">Logs</a>
+                    <a href="{{ route('admin.database.maintenance') }}" aria-current="{{ request()->routeIs('admin.database.*') ? 'page' : 'false' }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.database.*') ? 'bg-red-700' : '' }}">Database</a>
+                    <a href="{{ route('admin.queue.index') }}" aria-current="{{ request()->routeIs('admin.queue.*') ? 'page' : 'false' }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.queue.*') ? 'bg-red-700' : '' }}">Queue</a>
+                    <a href="{{ route('admin.apm') }}" aria-current="{{ request()->routeIs('admin.apm') ? 'page' : 'false' }}" class="block rounded px-3 py-2 text-base font-medium text-white hover:bg-red-700 {{ request()->routeIs('admin.apm') ? 'bg-red-700' : '' }}">APM</a>
                 </div>
             </div>
         </nav>
 
         <!-- Page Content -->
-        <main id="main-content" class="py-12">
+        <main id="main-content" class="py-8 md:py-10">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 @if (session('success'))
                     <div role="alert" class="mb-4 rounded-md bg-green-50 p-4 dark:bg-green-900/20">
@@ -106,7 +106,9 @@
                     </div>
                 @endif
 
-                {{ $slot }}
+                <div class="admin-shell">
+                    {{ $slot }}
+                </div>
             </div>
         </main>
     </div>

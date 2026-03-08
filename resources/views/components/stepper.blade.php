@@ -29,7 +29,7 @@
             } elseif ($isCompleted) {
                 $indicatorClasses .= 'bg-green-600 dark:bg-green-500 text-white';
             } else {
-                $indicatorClasses .= 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400';
+                $indicatorClasses .= 'bg-neutral-200 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400';
             }
             
             // Label classes
@@ -39,7 +39,7 @@
             } elseif ($isCompleted) {
                 $labelClasses .= 'text-green-600 dark:text-green-400';
             } else {
-                $labelClasses .= 'text-gray-500 dark:text-gray-400';
+                $labelClasses .= 'text-neutral-500 dark:text-neutral-400';
             }
             
             // Connector line classes
@@ -47,7 +47,7 @@
             if ($index < $current) {
                 $connectorClasses .= 'bg-green-600 dark:bg-green-500';
             } else {
-                $connectorClasses .= 'bg-gray-200 dark:bg-gray-700';
+                $connectorClasses .= 'bg-neutral-200 dark:bg-neutral-700';
             }
         @endphp
         

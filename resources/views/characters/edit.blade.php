@@ -12,10 +12,10 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
+                    class="text-2xl font-bold leading-7 text-neutral-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
                     Edit {{ $character->name }}
                 </h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                     Update character stats, goals, and tracking information
                 </p>
             </div>
@@ -66,8 +66,8 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Basic Information & Status -->
                 <div class="glass-card rounded-lg">
-                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                        <h2 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Basic Information &
+                    <div class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50">
+                        <h2 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white">Basic Information &
                             Status</h2>
                     </div>
                     <div class="card-body grid grid-cols-1 gap-4">
@@ -135,9 +135,9 @@
 
                 <!-- Current Stats -->
                 <div class="glass-card rounded-lg">
-                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                        <h2 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Current Stats</h2>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Values between 0-1200</p>
+                    <div class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50">
+                        <h2 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white">Current Stats</h2>
+                        <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Values between 0-1200</p>
                     </div>
                     <div class="card-body">
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -145,7 +145,7 @@
                                 <div>
                                     <label for="stat_{{ $stat }}" class="form-label capitalize text-xs">
                                         {{ $stat }}
-                                        <span class="text-xs text-gray-500 ml-1 font-bold" aria-label="(Grade {{ $character->getStatGrade($character->current_stats[$stat] ?? 0) }})">
+                                        <span class="text-xs text-neutral-500 ml-1 font-bold" aria-label="(Grade {{ $character->getStatGrade($character->current_stats[$stat] ?? 0) }})">
                                             {{ $character->getStatGrade($character->current_stats[$stat] ?? 0) }}
                                         </span>
                                     </label>
@@ -166,8 +166,8 @@
 
             <!-- Row 2: Goals (Full Width) -->
             <div class="glass-card-alt rounded-lg">
-                <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                    <h2 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Training Goals</h2>
+                <div class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50">
+                    <h2 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white">Training Goals</h2>
                 </div>
                 <div class="card-body space-y-6">
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
@@ -190,7 +190,7 @@
                             placeholder="Training strategy notes...">{{ old('goals.notes', $character->goals['notes'] ?? '') }}</textarea>
                     </div>
                 </div>
-                <div class="card-footer bg-transparent border-t border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
+                <div class="card-footer bg-transparent border-t border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
                     <button type="button"
                         onclick="if(confirm('Delete character? This cannot be undone.')) document.getElementById('delete-form').submit()"
                         class="text-red-600 hover:text-red-800 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 rounded"

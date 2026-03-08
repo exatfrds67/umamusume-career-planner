@@ -1,4 +1,4 @@
-<div class="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-800 pb-4" id="sidebar-navigation"
+<div class="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-neutral-800 pb-4" id="sidebar-navigation"
     :class="$store.sidebar.minimized ? 'px-2' : 'px-6'"
     :aria-expanded="!$store.sidebar.minimized ? 'true' : 'false'" x-data="{
         dataOpen: false,
@@ -9,7 +9,7 @@
     }">
     <!-- Logo Section with Hover Toggle -->
     <div x-data="{ showToggle: false }" @mouseenter="showToggle = true" @mouseleave="showToggle = false"
-        class="relative flex h-16 shrink-0 items-center border-b border-gray-200 dark:border-gray-700"
+        class="relative flex h-16 shrink-0 items-center border-b border-neutral-200 dark:border-neutral-700"
         :class="$store.sidebar.minimized ? 'justify-center' : 'gap-3'">
         <!-- Logo -->
         <img src="/images/app_logo/uma_musume_race_planner_logo_128.png"
@@ -31,7 +31,7 @@
             x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100"
             x-transition:leave-end="opacity-0 scale-95" class="absolute top-2 right-2" style="display: none;">
             <button @click="$store.sidebar.toggle()" type="button"
-                class="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100 transition-colors focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-primary-500"
+                class="p-2 rounded-lg text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-primary-500"
                 :aria-label="$store.sidebar.minimized ? 'Expand sidebar' : 'Minimize sidebar'"
                 :aria-pressed="$store.sidebar.minimized ? 'true' : 'false'" aria-controls="sidebar-navigation"
                 :title="$store.sidebar.minimized ? 'Expand sidebar' : 'Minimize sidebar'">
@@ -64,7 +64,7 @@
                             x-data="{ showTooltip: false }"
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
-                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('dashboard') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400' }}"
+                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('dashboard') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400' }}"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -76,7 +76,7 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Dashboard</div>
                         </a>
                     </li>
@@ -87,7 +87,7 @@
                             x-data="{ showTooltip: false }"
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
-                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('characters.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400' }}"
+                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('characters.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400' }}"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -99,7 +99,7 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Characters</div>
                         </a>
                     </li>
@@ -110,7 +110,7 @@
                             x-data="{ showTooltip: false }"
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
-                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('training.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400' }}"
+                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('training.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400' }}"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -122,7 +122,7 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Training</div>
                         </a>
                     </li>
@@ -133,7 +133,7 @@
                             x-data="{ showTooltip: false }"
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
-                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('races.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400' }}"
+                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('races.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400' }}"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -145,7 +145,7 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Races</div>
                         </a>
                     </li>
@@ -156,7 +156,7 @@
                             x-data="{ showTooltip: false }"
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
-                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('skills.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400' }}"
+                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('skills.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400' }}"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -168,7 +168,7 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Skills</div>
                         </a>
                     </li>
@@ -179,7 +179,7 @@
                             x-data="{ showTooltip: false }"
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
-                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('support-cards.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400' }}"
+                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('support-cards.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400' }}"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -191,13 +191,13 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Support Cards</div>
                         </a>
                     </li>
 
                     <!-- Divider -->
-                    <li class="border-t border-gray-200 dark:border-gray-700 my-2"></li>
+                    <li class="border-t border-neutral-200 dark:border-neutral-700 my-2"></li>
 
                     <!-- Secondary Navigation (Collapsible Groups - Available to All Users) -->
 
@@ -209,7 +209,7 @@
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
                             type="button" aria-label="Toggle Data Management menu"
-                            class="relative group flex w-full items-center rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400"
+                            class="relative group flex w-full items-center rounded-md p-2 text-sm font-semibold leading-6 text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -225,37 +225,37 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Data Management</div>
                         </button>
                         <ul x-show="dataOpen && !$store.sidebar.minimized" x-collapse class="mt-1 space-y-1 pl-11">
                             <li>
                                 <a href="{{ route('data-management.index') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('data-management.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('data-management.*') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     Data Hub
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('import.index') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('import.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('import.*') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     Import Data
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('export.index') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('export.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('export.*') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     Export Data
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('migration.index') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('migration.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('migration.*') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     Migration
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('backup.index') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('backup.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('backup.*') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     Backup & Restore
                                 </a>
                             </li>
@@ -270,7 +270,7 @@
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
                             type="button" aria-label="Toggle Analytics & Reports menu"
-                            class="relative group flex w-full items-center rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400"
+                            class="relative group flex w-full items-center rounded-md p-2 text-sm font-semibold leading-6 text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -289,19 +289,19 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Analytics & Reports</div>
                         </button>
                         <ul x-show="analyticsOpen && !$store.sidebar.minimized" x-collapse class="mt-1 space-y-1 pl-11">
                             <li>
                                 <a href="{{ route('reports.index') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('reports.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('reports.*') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     Career Reports
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('historical.index') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('historical.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('historical.*') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     Historical Tracking
                                 </a>
                             </li>
@@ -316,7 +316,7 @@
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
                             type="button" aria-label="Toggle AI & Tools menu"
-                            class="relative group flex w-full items-center rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400"
+                            class="relative group flex w-full items-center rounded-md p-2 text-sm font-semibold leading-6 text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -332,31 +332,31 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">AI & Tools</div>
                         </button>
                         <ul x-show="aiOpen && !$store.sidebar.minimized" x-collapse class="mt-1 space-y-1 pl-11">
                             <li>
                                 <a href="{{ route('ai.dashboard') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('ai.dashboard') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('ai.dashboard') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     AI Dashboard
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('ai.chat') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('ai.chat') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('ai.chat') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     AI Chat
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('mcp.dashboard') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('mcp.dashboard') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('mcp.dashboard') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     MCP Dashboard
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('ocr.upload') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('ocr.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('ocr.*') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     OCR Upload
                                 </a>
                             </li>
@@ -371,7 +371,7 @@
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
                             type="button" aria-label="Toggle External Resources menu"
-                            class="relative group flex w-full items-center rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400"
+                            class="relative group flex w-full items-center rounded-md p-2 text-sm font-semibold leading-6 text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -387,13 +387,13 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">External Resources</div>
                         </button>
                         <ul x-show="toolsOpen && !$store.sidebar.minimized" x-collapse class="mt-1 space-y-1 pl-11">
                             <li>
                                 <a href="{{ route('external-data.browse') }}"
-                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('external-data.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400' }}">
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('external-data.*') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     Browse External Data
                                 </a>
                             </li>
@@ -443,19 +443,19 @@
                                     </li>
                                     <li>
                                         <a href="/admin/users"
-                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-gray-700 hover:text-amber-700 dark:text-gray-400 dark:hover:text-amber-400">
+                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-neutral-700 hover:text-amber-700 dark:text-neutral-400 dark:hover:text-amber-400">
                                             User Management
                                         </a>
                                     </li>
                                     <li>
                                         <a href="/admin/system-settings"
-                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-gray-700 hover:text-amber-700 dark:text-gray-400 dark:hover:text-amber-400">
+                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-neutral-700 hover:text-amber-700 dark:text-neutral-400 dark:hover:text-amber-400">
                                             System Settings
                                         </a>
                                     </li>
                                     <li>
                                         <a href="/admin/logs"
-                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-gray-700 hover:text-amber-700 dark:text-gray-400 dark:hover:text-amber-400">
+                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-neutral-700 hover:text-amber-700 dark:text-neutral-400 dark:hover:text-amber-400">
                                             System Logs
                                         </a>
                                     </li>
@@ -468,13 +468,13 @@
                                     </li>
                                     <li>
                                         <a href="/admin/database/maintenance"
-                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-gray-700 hover:text-amber-700 dark:text-gray-400 dark:hover:text-amber-400">
+                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-neutral-700 hover:text-amber-700 dark:text-neutral-400 dark:hover:text-amber-400">
                                             Database Maintenance
                                         </a>
                                     </li>
                                     <li>
                                         <a href="/admin/database/seeders"
-                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-gray-700 hover:text-amber-700 dark:text-gray-400 dark:hover:text-amber-400">
+                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-neutral-700 hover:text-amber-700 dark:text-neutral-400 dark:hover:text-amber-400">
                                             Run Seeders
                                         </a>
                                     </li>
@@ -487,25 +487,25 @@
                                     </li>
                                     <li>
                                         <a href="{{ route('performance.apm.dashboard') }}"
-                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('performance.*') ? 'text-amber-700 font-semibold dark:text-amber-400' : 'text-gray-700 hover:text-amber-700 dark:text-gray-400 dark:hover:text-amber-400' }}">
+                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('performance.*') ? 'text-amber-700 font-semibold dark:text-amber-400' : 'text-neutral-700 hover:text-amber-700 dark:text-neutral-400 dark:hover:text-amber-400' }}">
                                             Performance Monitor
                                         </a>
                                     </li>
                                     <li>
                                         <a href="/admin/queue-monitor"
-                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-gray-700 hover:text-amber-700 dark:text-gray-400 dark:hover:text-amber-400">
+                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-neutral-700 hover:text-amber-700 dark:text-neutral-400 dark:hover:text-amber-400">
                                             Queue Monitor
                                         </a>
                                     </li>
                                     <li>
                                         <a href="/telescope" target="_blank" rel="noopener noreferrer"
-                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-gray-700 hover:text-amber-700 dark:text-gray-400 dark:hover:text-amber-400">
+                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-neutral-700 hover:text-amber-700 dark:text-neutral-400 dark:hover:text-amber-400">
                                             Telescope
                                         </a>
                                     </li>
                                     <li>
                                         <a href="/horizon" target="_blank" rel="noopener noreferrer"
-                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-gray-700 hover:text-amber-700 dark:text-gray-400 dark:hover:text-amber-400">
+                                            class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 text-neutral-700 hover:text-amber-700 dark:text-neutral-400 dark:hover:text-amber-400">
                                             Horizon
                                         </a>
                                     </li>
@@ -525,7 +525,7 @@
                             x-data="{ showTooltip: false }"
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
-                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('profile.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400' }}"
+                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('profile.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400' }}"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -537,7 +537,7 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Profile</div>
                         </a>
                     </li>
@@ -547,7 +547,7 @@
                             x-data="{ showTooltip: false }"
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
-                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('settings.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400' }}"
+                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('settings.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400' }}"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -561,7 +561,7 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Settings</div>
                         </a>
                     </li>
@@ -571,7 +571,7 @@
                             x-data="{ showTooltip: false }"
                             @mouseenter="if ($store.sidebar.minimized) showTooltip = true"
                             @mouseleave="showTooltip = false"
-                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('help.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400' }}"
+                            class="relative group flex rounded-md p-2 text-sm font-semibold leading-6 {{ request()->routeIs('help.*') ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-primary-400' }}"
                             :class="$store.sidebar.minimized ? 'justify-center' : 'gap-x-3'">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -583,7 +583,7 @@
                                 x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 -translate-x-1"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-gray-900 dark:bg-gray-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
+                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
                                 style="display: none;">Help</div>
                         </a>
                     </li>

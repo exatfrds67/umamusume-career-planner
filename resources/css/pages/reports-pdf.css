@@ -8,17 +8,17 @@
         color: black !important;
     }
 
-    .dark\:bg-gray-800 {
+    .dark\:bg-neutral-800 {
         background: white !important;
     }
 
     .dark\:text-white,
-    .dark\:text-gray-300,
-    .dark\:text-gray-400 {
+    .dark\:text-neutral-300,
+    .dark\:text-neutral-400 {
         color: black !important;
     }
 
-    .dark\:bg-gray-700\/50 {
+    .dark\:bg-neutral-700\/50 {
         background: #f3f4f6 !important;
     }
 }

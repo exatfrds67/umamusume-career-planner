@@ -8,7 +8,7 @@
                 'high' => 'bg-green-100 dark:bg-green-900/30',
                 'medium' => 'bg-amber-100 dark:bg-amber-900/30',
                 'low' => 'bg-red-100 dark:bg-red-900/30',
-                default => 'bg-gray-100 dark:bg-gray-800',
+                default => 'bg-neutral-100 dark:bg-neutral-800',
             } }} flex items-center justify-center">
             <svg class="w-6 h-6 {{ $getColorClasses() }}" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd"
@@ -22,7 +22,7 @@
     <div class="flex-1 min-w-0 w-full">
         {{-- Label and Value --}}
         <div class="flex items-center justify-between mb-1.5 w-full">
-            <span id="energy-label" class="text-sm font-medium text-gray-700 dark:text-gray-300">Energy</span>
+            <span id="energy-label" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Energy</span>
             <div class="flex items-center gap-1.5">
                 <span class="text-lg font-bold {{ $getColorClasses() }}">
                     {{ $value }}%
@@ -38,7 +38,7 @@
         </div>
 
         {{-- Progress Bar --}}
-        <div class="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden w-full">
+        <div class="relative h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden w-full">
             {{-- Energy Fill --}}
             <div class="{{ $getProgressColorClasses() }} h-full rounded-full transition-all duration-500 ease-out relative"
                 style="width: {{ $value }}%" role="progressbar" aria-valuenow="{{ $value }}"
@@ -63,7 +63,7 @@
         </div>
 
         {{-- Status Text --}}
-        <div class="mt-2 mb-1 text-xs font-medium text-gray-600 dark:text-gray-300">
+        <div class="mt-2 mb-1 text-xs font-medium text-neutral-600 dark:text-neutral-300">
             {{ match ($getStatus()) {
                 'high' => '✓ Good condition',
                 'medium' => '⚠ Moderate energy',

@@ -1,22 +1,27 @@
 @extends('layouts.app')
 
+@section('title', 'My Characters')
+
 @section('content')
     {{-- Breadcrumb Navigation --}}
     <x-breadcrumb :items="[['label' => 'Characters']]" />
 
-    <div class="space-y-6" x-data="charactersList()">
+    <div class="page-stack" x-data="charactersList()">
         <!-- Header -->
-        <div class="sm:flex sm:items-center sm:justify-between">
+        <div class="page-hero">
+            <div class="page-hero__content">
             <div>
-                <h1
-                    class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
+                <div class="page-hero__eyebrow">
+                    <span>Character Roster</span>
+                </div>
+                <h1 class="page-hero__title sm:truncate">
                     My Characters
                 </h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="page-hero__body text-sm sm:text-base">
                     Manage your Umamusume training career strategies
                 </p>
             </div>
-            <div class="mt-4 sm:ml-4 sm:mt-0 flex gap-3">
+            <div class="page-hero__actions">
                 <a href="{{ route('external-data.browse') }}" class="btn btn-outline">
                     <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -33,22 +38,23 @@
                 </a>
             </div>
         </div>
+        </div>
 
         <!-- Instant Search Filtering System -->
-        <div class="card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700" role="search" aria-label="Character search and filters">
-            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+        <div class="filter-surface" role="search" aria-label="Character search and filters">
+            <div class="divide-y divide-neutral-200 dark:divide-neutral-700">
                 <!-- Phase 1: Search Bar (Instant) -->
                 <div class="p-4">
                     <div class="relative">
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <svg class="h-5 w-5 text-neutral-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                 <path fill-rule="evenodd"
                                     d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
                                     clip-rule="evenodd" />
                             </svg>
                         </div>
                         <input type="text" x-model="filters.search" @input.debounce.300ms="filterCharacters"
-                            class="form-input block w-full rounded-md border-gray-300 pl-10 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            class="form-input block w-full rounded-md border-neutral-300 pl-10 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-neutral-700 dark:border-neutral-600 dark:text-white"
                             placeholder="Search characters... (e.g., Vodka, Special Week)"
                             aria-label="Search characters">
                     </div>
@@ -58,9 +64,9 @@
                 <div class="p-4">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
-                            <label for="filter-scenario" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Scenario</label>
+                            <label for="filter-scenario" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Scenario</label>
                             <select id="filter-scenario" x-model="filters.scenario" @change="filterCharacters"
-                                class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                class="form-select block w-full rounded-md border-neutral-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                                 <option value="">All Scenarios</option>
                                 <option value="ura_finale">URA Finale</option>
                                 <option value="unity_cup">Unity Cup</option>
@@ -68,9 +74,9 @@
                         </div>
 
                         <div>
-                            <label for="filter-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                            <label for="filter-status" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Status</label>
                             <select id="filter-status" x-model="filters.status" @change="filterCharacters"
-                                class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                class="form-select block w-full rounded-md border-neutral-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                                 <option value="">All Status</option>
                                 <option value="active">Active</option>
                                 <option value="completed">Completed</option>
@@ -79,9 +85,9 @@
                         </div>
 
                         <div>
-                            <label for="filter-sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort</label>
+                            <label for="filter-sort" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Sort</label>
                             <select id="filter-sort" x-model="filters.sort" @change="filterCharacters"
-                                class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                class="form-select block w-full rounded-md border-neutral-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                                 <option value="name">Name</option>
                                 <option value="updated_at">Recently Updated</option>
                                 <option value="created_at">Recently Created</option>
@@ -93,7 +99,7 @@
                                 x-show="hasActiveFilters">
                                 Clear Filters
                             </button>
-                            <div x-show="!hasActiveFilters" class="text-sm text-gray-500 dark:text-gray-400 py-2">
+                            <div x-show="!hasActiveFilters" class="text-sm text-neutral-500 dark:text-neutral-400 py-2">
                                 <span x-text="filteredCharacters.length"></span> characters
                             </div>
                         </div>
@@ -103,7 +109,7 @@
         </div>
 
         <!-- Results Summary -->
-        <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400" aria-live="polite" aria-atomic="true">
+        <div class="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400" aria-live="polite" aria-atomic="true">
             <div>
                 Showing <span class="font-semibold" x-text="filteredCharacters.length"></span> of
                 <span class="font-semibold" x-text="allCharacters.length"></span> characters
@@ -125,41 +131,68 @@
                             </svg>
                         </div>
                         <div
-                            class="character-card bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
+                            class="character-card bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 overflow-hidden hover:shadow-md transition-shadow">
                             <div class="aspect-3/4 relative">
-                                <img :src="character.avatar_url || '/images/trainee_images/default.png'"
+                                <img :src="character.avatar_url || character.image || character.image_url || '/images/trainee_images/default.png'"
                                     :alt="character.name" class="w-full h-full object-cover" loading="lazy" decoding="async">
                             </div>
                             <div class="p-2" aria-hidden="true">
-                                <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate"
+                                <h3 class="text-sm font-semibold text-neutral-900 dark:text-white truncate"
                                     x-text="character.name"></h3>
                                 <div class="mt-1 grid grid-cols-5 gap-1 text-xs">
                                     <div class="text-center">
-                                        <div class="text-[9px] text-gray-400 dark:text-gray-500">Spd</div>
+                                        <div class="text-[10px] text-neutral-500 dark:text-neutral-400">Spd</div>
                                         <div class="text-stat-speed-600 dark:text-stat-speed-400 font-bold"
                                             x-text="character.current_stats?.speed || 0"></div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-[9px] text-gray-400 dark:text-gray-500">Sta</div>
+                                        <div class="text-[10px] text-neutral-500 dark:text-neutral-400">Sta</div>
                                         <div class="text-stat-stamina-600 dark:text-stat-stamina-400 font-bold"
                                             x-text="character.current_stats?.stamina || 0"></div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-[9px] text-gray-400 dark:text-gray-500">Pow</div>
+                                        <div class="text-[10px] text-neutral-500 dark:text-neutral-400">Pow</div>
                                         <div class="text-stat-power-600 dark:text-stat-power-400 font-bold"
                                             x-text="character.current_stats?.power || 0"></div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-[9px] text-gray-400 dark:text-gray-500">Gut</div>
+                                        <div class="text-[10px] text-neutral-500 dark:text-neutral-400">Gut</div>
                                         <div class="text-stat-guts-600 dark:text-stat-guts-400 font-bold"
                                             x-text="character.current_stats?.guts || 0"></div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-[9px] text-gray-400 dark:text-gray-500">Wit</div>
+                                        <div class="text-[10px] text-neutral-500 dark:text-neutral-400">Wit</div>
                                         <div class="text-stat-wit-600 dark:text-stat-wit-400 font-bold"
                                             x-text="character.current_stats?.wit || 0"></div>
                                     </div>
                                 </div>
+
+                                {{-- Goal Races --}}
+                                <template x-if="character.goal_races && character.goal_races.length > 0">
+                                    <div class="mt-2 pt-2 border-t border-neutral-100 dark:border-neutral-700">
+                                        <div class="flex items-center gap-1 mb-1">
+                                            <svg class="w-3 h-3 text-yellow-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                            <span class="text-[10px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Goals</span>
+                                        </div>
+                                        <div class="space-y-0.5">
+                                            <template x-for="race in character.goal_races" :key="race.name">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="shrink-0 inline-block w-4.5 text-center text-[8px] font-bold rounded-sm leading-tight py-px"
+                                                        :class="{
+                                                            'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300': race.grade === 'G1',
+                                                            'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300': race.grade === 'G2',
+                                                            'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300': race.grade === 'G3',
+                                                            'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300': !['G1','G2','G3'].includes(race.grade)
+                                                        }"
+                                                        x-text="race.grade"></span>
+                                                    <span class="text-[10px] text-neutral-600 dark:text-neutral-300 truncate" x-text="race.name"></span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </a>
@@ -168,14 +201,14 @@
         </div>
 
         <div x-show="filteredCharacters.length === 0"
-            class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            class="text-center py-12 bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700">
+            <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 aria-hidden="true">
                 <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
             </svg>
-            <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No characters found</h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-white">No characters found</h3>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                 Try adjusting your filters or get started by creating a new character profile.
             </p>
             <div class="mt-6">

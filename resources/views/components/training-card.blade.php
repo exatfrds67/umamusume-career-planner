@@ -6,31 +6,31 @@
             'name' => 'Speed Training',
             'icon' => '⚡',
             'description' => 'Increases top speed capability',
-            'color' => 'blue',
+            'color' => 'stat-speed',
         ],
         'stamina' => [
             'name' => 'Stamina Training',
             'icon' => '💪',
             'description' => 'Extends duration at top speed',
-            'color' => 'green',
+            'color' => 'stat-stamina',
         ],
         'power' => [
             'name' => 'Power Training',
             'icon' => '🔥',
             'description' => 'Improves acceleration rate',
-            'color' => 'red',
+            'color' => 'stat-power',
         ],
         'guts' => [
             'name' => 'Guts Training',
             'icon' => '💎',
             'description' => 'Enhances final phase performance',
-            'color' => 'purple',
+            'color' => 'stat-guts',
         ],
         'wit' => [
             'name' => 'Wit Training',
             'icon' => '🧠',
             'description' => 'Boosts skill activation and positioning',
-            'color' => 'yellow',
+            'color' => 'stat-wit',
         ],
         'rest' => [
             'name' => 'Rest',
@@ -68,27 +68,27 @@
     <div class="mb-4">
         <div class="flex items-center gap-3 mb-2">
             <span class="text-3xl" aria-hidden="true">{{ $info['icon'] }}</span>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
+            <h3 class="text-xl font-bold text-neutral-900 dark:text-white transition-colors duration-300">
                 {{ $info['name'] }}
             </h3>
         </div>
-        <p class="text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">
+        <p class="text-sm text-neutral-700 dark:text-neutral-300 transition-colors duration-300">
             {{ $info['description'] }}
         </p>
     </div>
 
     <!-- Stat Gains -->
     <div class="mb-4">
-        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300">Predicted
+        <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2 transition-colors duration-300">Predicted
             Stat Gains</h4>
         <div class="grid grid-cols-2 gap-2">
             @foreach ($prediction['stat_gains'] ?? [] as $stat => $gain)
                 <div
                     class="flex justify-between items-center px-3 py-2 glass-card-inner rounded transition-colors duration-300">
                     <span
-                        class="text-sm text-gray-700 dark:text-gray-300 capitalize transition-colors duration-300">{{ $stat }}</span>
+                        class="text-sm text-neutral-700 dark:text-neutral-300 capitalize transition-colors duration-300">{{ $stat }}</span>
                     <span
-                        class="text-sm font-bold {{ $gain > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400' }} transition-colors duration-300">
+                        class="text-sm font-bold {{ $gain > 0 ? 'text-green-600 dark:text-green-400' : 'text-neutral-500 dark:text-neutral-400' }} transition-colors duration-300">
                         {{ $gain > 0 ? '+' : '' }}{{ $gain }}
                     </span>
                 </div>
@@ -99,13 +99,13 @@
     <!-- Energy Cost & Failure Risk -->
     <div class="grid grid-cols-2 gap-4 mb-4">
         <div class="glass-card-inner rounded-lg p-3">
-            <div class="text-xs text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-300">Energy Cost</div>
-            <div class="text-lg font-bold text-gray-900 dark:text-white transition-colors duration-300">
+            <div class="text-xs text-neutral-700 dark:text-neutral-300 mb-1 transition-colors duration-300">Energy Cost</div>
+            <div class="text-lg font-bold text-neutral-900 dark:text-white transition-colors duration-300">
                 {{ $prediction['energy_cost'] ?? 0 }}%
             </div>
         </div>
         <div class="glass-card-inner rounded-lg p-3">
-            <div class="text-xs text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-300">Failure Risk
+            <div class="text-xs text-neutral-700 dark:text-neutral-300 mb-1 transition-colors duration-300">Failure Risk
             </div>
             <div
                 class="text-lg font-bold {{ ($prediction['failure_risk'] ?? 0) > 20 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }} transition-colors duration-300">
@@ -143,7 +143,7 @@
                     <div
                         class="text-xs font-semibold text-primary-700 dark:text-primary-300 mb-1 transition-colors duration-300">
                         AI Reasoning</div>
-                    <div class="text-sm text-gray-900 dark:text-white transition-colors duration-300">
+                    <div class="text-sm text-neutral-900 dark:text-white transition-colors duration-300">
                         {{ $prediction['recommendation']['reason'] }}
                     </div>
                 </div>

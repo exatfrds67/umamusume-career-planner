@@ -3,32 +3,20 @@
 @section('title', 'Character Report - ' . ($character?->name ?? 'Unknown'))
 
 @section('content')
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[['label' => 'Analytics & Reports', 'url' => route('reports.index')], ['label' => $character->name . ' Report']]" />
+
     <div class="container mx-auto px-4 py-8">
         {{-- Page Header --}}
         <div class="mb-8">
-            <nav class="flex mb-2" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                    <li><a href="{{ route('reports.index') }}"
-                            class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">Reports</a>
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        <span class="text-gray-700 dark:text-gray-300">Character Report</span>
-                    </li>
-                </ol>
-            </nav>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $character?->name ?? 'Unknown' }} - Character Report</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">
+            <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">{{ $character?->name ?? 'Unknown' }} - Character Report</h1>
+            <p class="mt-2 text-neutral-600 dark:text-neutral-400">
                 Comprehensive analysis across {{ $report['character_info']['total_careers'] }} career(s)
             </p>
         </div>
 
         {{-- Character Overview --}}
-        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
+        <div class="mb-8 bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
             <div class="flex items-center gap-6">
                 <div class="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
                     @if ($character?->avatar_url)
@@ -42,35 +30,35 @@
                     @endif
                 </div>
                 <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $report['character_info']['name'] ?? 'Unknown' }}
+                    <h2 class="text-2xl font-bold text-neutral-900 dark:text-white">{{ $report['character_info']['name'] ?? 'Unknown' }}
                     </h2>
-                    <p class="text-gray-600 dark:text-gray-400">
+                    <p class="text-neutral-600 dark:text-neutral-400">
                         {{ ucfirst(str_replace('_', ' ', $report['character_info']['scenario_type'] ?? 'unknown')) }}
                     </p>
                 </div>
                 <div class="grid grid-cols-2 gap-4 text-center">
-                    <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <div class="p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
                         <p class="text-3xl font-bold text-primary-600 dark:text-primary-400">
                             {{ $report['character_info']['total_careers'] ?? 0 }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Total Careers</p>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Total Careers</p>
                     </div>
-                    <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <div class="p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
                         <p class="text-3xl font-bold text-green-600 dark:text-green-400">
                             {{ $report['character_info']['completed_careers'] ?? 0 }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Completed</p>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Completed</p>
                     </div>
                 </div>
             </div>
         </div>
 
         {{-- Performance Trends --}}
-        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Performance Trends</h2>
+        <div class="mb-8 bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
+            <h2 class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">Performance Trends</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Trend Direction</p>
+                <div class="text-center p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-2">Trend Direction</p>
                     <p
-                        class="text-2xl font-bold {{ $report['performance_trends']['trend_direction'] === 'improving' ? 'text-green-600 dark:text-green-400' : ($report['performance_trends']['trend_direction'] === 'declining' ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400') }}">
+                        class="text-2xl font-bold {{ $report['performance_trends']['trend_direction'] === 'improving' ? 'text-green-600 dark:text-green-400' : ($report['performance_trends']['trend_direction'] === 'declining' ? 'text-red-600 dark:text-red-400' : 'text-neutral-600 dark:text-neutral-400') }}">
                         @if ($report['performance_trends']['trend_direction'] === 'improving')
                             <svg class="w-6 h-6 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -89,15 +77,15 @@
                         {{ ucfirst($report['performance_trends']['trend_direction']) }}
                     </p>
                 </div>
-                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Improvement Rate</p>
+                <div class="text-center p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-2">Improvement Rate</p>
                     <p
                         class="text-2xl font-bold {{ $report['performance_trends']['improvement_rate'] >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
                         {{ $report['performance_trends']['improvement_rate'] >= 0 ? '+' : '' }}{{ $report['performance_trends']['improvement_rate'] }}%
                     </p>
                 </div>
-                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Average Efficiency</p>
+                <div class="text-center p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-2">Average Efficiency</p>
                     <p class="text-2xl font-bold text-primary-600 dark:text-primary-400">
                         {{ $report['aggregate_statistics']['avg_efficiency'] }}%
                     </p>
@@ -108,35 +96,35 @@
         {{-- Aggregate Statistics --}}
         <div class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
             {{-- Overall Stats --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Aggregate Statistics</h2>
+            <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
+                <h2 class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">Aggregate Statistics</h2>
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                    <div class="p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg text-center">
+                        <p class="text-2xl font-bold text-neutral-900 dark:text-white">
                             {{ number_format($report['aggregate_statistics']['total_training_sessions']) }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Training Sessions</p>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Training Sessions</p>
                     </div>
-                    <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                    <div class="p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg text-center">
+                        <p class="text-2xl font-bold text-neutral-900 dark:text-white">
                             {{ $report['aggregate_statistics']['total_races'] }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Total Races</p>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Total Races</p>
                     </div>
-                    <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-center">
+                    <div class="p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg text-center">
                         <p class="text-2xl font-bold text-green-600 dark:text-green-400">
                             {{ $report['aggregate_statistics']['total_wins'] }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Race Wins</p>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Race Wins</p>
                     </div>
-                    <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-center">
+                    <div class="p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg text-center">
                         <p class="text-2xl font-bold text-primary-600 dark:text-primary-400">
                             {{ $report['aggregate_statistics']['overall_win_rate'] }}%</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Win Rate</p>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Win Rate</p>
                     </div>
                 </div>
             </div>
 
             {{-- Average Stat Gains --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Average Stat Gains Per Career</h2>
+            <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
+                <h2 class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">Average Stat Gains Per Career</h2>
                 <div class="space-y-3">
                     @php
                         $maxAvgStat = max($report['aggregate_statistics']['avg_stat_gains_per_career']);
@@ -152,12 +140,17 @@
                         <div>
                             <div class="flex justify-between mb-1">
                                 <span
-                                    class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ ucfirst($stat) }}</span>
+                                    class="text-sm font-medium text-neutral-700 dark:text-neutral-300">{{ ucfirst($stat) }}</span>
                                 <span
-                                    class="text-sm text-gray-600 dark:text-gray-400">+{{ number_format($value, 1) }}</span>
+                                    class="text-sm text-neutral-600 dark:text-neutral-400">+{{ number_format($value, 1) }}</span>
                             </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="{{ $statColors[$stat] ?? 'bg-gray-500' }} h-2 rounded-full"
+                            <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2"
+                                role="progressbar"
+                                aria-label="{{ ucfirst($stat) }} average gain"
+                                aria-valuenow="{{ round($value, 1) }}"
+                                aria-valuemin="0"
+                                aria-valuemax="{{ round($maxAvgStat, 1) }}">
+                                <div class="{{ $statColors[$stat] ?? 'bg-neutral-500' }} h-2 rounded-full"
                                     style="width: {{ $maxAvgStat > 0 ? ($value / $maxAvgStat) * 100 : 0 }}%"></div>
                             </div>
                         </div>
@@ -167,42 +160,42 @@
         </div>
 
         {{-- Career History --}}
-        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Career History</h2>
+        <div class="mb-8 bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
+            <h2 class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">Career History</h2>
             @if (!empty($report['career_history']))
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
                         <thead>
                             <tr>
-                                <th
-                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
                                     Career</th>
-                                <th
-                                    class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-4 py-3 text-center text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
                                     Status</th>
-                                <th
-                                    class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-4 py-3 text-center text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
                                     Grade</th>
-                                <th
-                                    class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
                                     Efficiency</th>
-                                <th
-                                    class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
                                     Win Rate</th>
-                                <th
-                                    class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
                                     Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
                             @foreach ($report['career_history'] as $career)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                    <td class="px-4 py-3">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $career['name'] }}
+                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/50">
+                                    <th scope="row" class="px-4 py-3">
+                                        <p class="text-sm font-medium text-neutral-900 dark:text-white">{{ $career['name'] }}
                                         </p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">Started
+                                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Started
                                             {{ $career['started_at'] ?? 'Unknown' }}</p>
-                                    </td>
+                                    </th>
                                     <td class="px-4 py-3 text-center">
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
@@ -214,9 +207,9 @@
                                         <span
                                             class="text-lg font-bold text-primary-600 dark:text-primary-400">{{ $career['grade'] }}</span>
                                     </td>
-                                    <td class="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-400">
+                                    <td class="px-4 py-3 text-right text-sm text-neutral-600 dark:text-neutral-400">
                                         {{ $career['efficiency'] }}%</td>
-                                    <td class="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-400">
+                                    <td class="px-4 py-3 text-right text-sm text-neutral-600 dark:text-neutral-400">
                                         {{ $career['win_rate'] }}%</td>
                                     <td class="px-4 py-3 text-right">
                                         <a href="{{ route('reports.career', $career['career_id'] ?? $career['id'] ?? 0) }}"
@@ -230,15 +223,15 @@
                     </table>
                 </div>
             @else
-                <p class="text-gray-500 dark:text-gray-400 text-center py-8">No career history available.</p>
+                <p class="text-neutral-500 dark:text-neutral-400 text-center py-8">No career history available.</p>
             @endif
         </div>
 
         {{-- Strengths & Improvement Areas --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {{-- Strengths --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
+                <h2 class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
                     <svg class="w-5 h-5 inline mr-2 text-green-500" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -254,18 +247,18 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7" />
                             </svg>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $strength }}</span>
+                            <span class="text-sm text-neutral-700 dark:text-neutral-300">{{ $strength }}</span>
                         </li>
                     @empty
-                        <li class="text-sm text-gray-500 dark:text-gray-400">Complete more careers to identify strengths.
+                        <li class="text-sm text-neutral-500 dark:text-neutral-400">Complete more careers to identify strengths.
                         </li>
                     @endforelse
                 </ul>
             </div>
 
             {{-- Improvement Areas --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
+                <h2 class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
                     <svg class="w-5 h-5 inline mr-2 text-yellow-500" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -281,10 +274,10 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $area }}</span>
+                            <span class="text-sm text-neutral-700 dark:text-neutral-300">{{ $area }}</span>
                         </li>
                     @empty
-                        <li class="text-sm text-gray-500 dark:text-gray-400">No improvement areas identified yet.</li>
+                        <li class="text-sm text-neutral-500 dark:text-neutral-400">No improvement areas identified yet.</li>
                     @endforelse
                 </ul>
             </div>

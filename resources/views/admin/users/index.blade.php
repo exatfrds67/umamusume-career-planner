@@ -1,17 +1,25 @@
 <x-admin-layout title="Users">
     <div class="space-y-6">
-        <div class="flex items-center justify-between">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">User Management</h1>
+        <div class="admin-page-hero">
+            <div class="admin-page-hero__content">
+                <div>
+                    <div class="admin-page-hero__eyebrow">
+                        <span>Access Control</span>
+                    </div>
+                    <h1 class="admin-page-hero__title">User Management</h1>
+                    <p class="admin-page-hero__body text-sm sm:text-base">Review roles, search accounts, and manage administrative privileges.</p>
+                </div>
+            </div>
         </div>
 
         <!-- Search and Filter -->
-        <form method="GET" role="search" aria-label="Filter users" class="flex gap-4">
+        <form method="GET" role="search" aria-label="Filter users" class="filter-surface p-4 flex gap-4 flex-wrap md:flex-nowrap">
             <label for="user-search" class="sr-only">Search users</label>
             <input type="text" name="search" id="user-search" value="{{ request('search') }}" placeholder="Search users..."
-                class="flex-1 rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                class="flex-1 rounded-md border-neutral-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
             <label for="user-role-filter" class="sr-only">Role filter</label>
             <select name="is_admin" id="user-role-filter"
-                class="rounded-md border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                class="rounded-md border-neutral-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                 <option value="">All Users</option>
                 <option value="1" {{ request('is_admin') == '1' ? 'selected' : '' }}>Admins Only</option>
                 <option value="0" {{ request('is_admin') == '0' ? 'selected' : '' }}>Regular Users</option>
@@ -22,42 +30,42 @@
         </form>
 
         <!-- Users Table -->
-        <div class="overflow-x-auto rounded-lg bg-white shadow dark:bg-gray-800">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <div class="admin-surface overflow-x-auto">
+            <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
                 <caption class="sr-only">User list</caption>
-                <thead class="bg-gray-50 dark:bg-gray-900">
+                <thead class="bg-neutral-50 dark:bg-neutral-900">
                     <tr>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             User</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Email</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Characters</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Role</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Joined</th>
                         <th scope="col"
-                            class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-800">
                     @forelse ($users as $user)
                         <tr>
                             <td class="whitespace-nowrap px-6 py-4">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</div>
+                                <div class="text-sm font-medium text-neutral-900 dark:text-white">{{ $user->name }}</div>
                             </td>
                             <td class="whitespace-nowrap px-6 py-4">
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</div>
+                                <div class="text-sm text-neutral-500 dark:text-neutral-400">{{ $user->email }}</div>
                             </td>
                             <td class="whitespace-nowrap px-6 py-4">
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ $user->characters_count }}
+                                <div class="text-sm text-neutral-500 dark:text-neutral-400">{{ $user->characters_count }}
                                 </div>
                             </td>
                             <td class="whitespace-nowrap px-6 py-4">
@@ -66,10 +74,10 @@
                                         class="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800 dark:bg-red-900/20 dark:text-red-200">Admin</span>
                                 @else
                                     <span
-                                        class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800 dark:bg-gray-700 dark:text-gray-200">User</span>
+                                        class="inline-flex rounded-full bg-neutral-100 px-2 text-xs font-semibold leading-5 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200">User</span>
                                 @endif
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400">
                                 {{ $user->created_at->format('M d, Y') }}
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
@@ -105,7 +113,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <td colspan="6" class="px-6 py-4 text-center text-sm text-neutral-500 dark:text-neutral-400">
                                 No users found.
                             </td>
                         </tr>

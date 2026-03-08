@@ -1,6 +1,16 @@
 <x-admin-layout title="Database Maintenance">
     <div class="space-y-6">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Database Maintenance</h1>
+        <div class="admin-page-hero">
+            <div class="admin-page-hero__content">
+                <div>
+                    <div class="admin-page-hero__eyebrow">
+                        <span>Persistence</span>
+                    </div>
+                    <h1 class="admin-page-hero__title">Database Maintenance</h1>
+                    <p class="admin-page-hero__body text-sm sm:text-base">Optimize tables, create backups, and manage schema operations from a single workspace.</p>
+                </div>
+            </div>
+        </div>
 
         <!-- Actions -->
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -44,44 +54,44 @@
         </div>
 
         <!-- Migration Status -->
-        <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <h2 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Migration Status</h2>
-            <pre aria-label="Migration status output" class="overflow-x-auto rounded bg-gray-100 p-4 text-xs text-gray-700 dark:bg-gray-900 dark:text-gray-300">{{ $migrationStatus['output'] }}</pre>
+        <div class="admin-surface p-6">
+            <h2 class="mb-4 text-xl font-semibold text-neutral-900 dark:text-white">Migration Status</h2>
+            <pre aria-label="Migration status output" class="overflow-x-auto rounded bg-neutral-100 p-4 text-xs text-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">{{ $migrationStatus['output'] }}</pre>
         </div>
 
         <!-- Tables -->
-        <div class="overflow-x-auto rounded-lg bg-white shadow dark:bg-gray-800">
+        <div class="admin-surface overflow-x-auto">
             <div class="p-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Database Tables</h2>
+                <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">Database Tables</h2>
             </div>
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
                 <caption class="sr-only">Database tables</caption>
-                <thead class="bg-gray-50 dark:bg-gray-900">
+                <thead class="bg-neutral-50 dark:bg-neutral-900">
                     <tr>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Table</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Rows</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Size</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             Engine</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-800">
                     @foreach ($tables as $table)
                         <tr>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-neutral-900 dark:text-white">
                                 {{ $table['name'] }}</td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400">
                                 {{ number_format($table['rows']) }}</td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400">
                                 {{ $table['size'] }}</td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400">
                                 {{ $table['engine'] }}</td>
                         </tr>
                     @endforeach

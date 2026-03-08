@@ -3,8 +3,8 @@
 <div x-data="spiritBurstGauge({{ $characterId }}, {{ $currentGauge }}, {{ $maxGauge }})" class="glass-card rounded-xl p-6">
     <div class="mb-4">
         <div class="flex items-center justify-between mb-2">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">
-                Spirit Burst Gauge
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white transition-colors duration-300">
+                Spirit Gauge Tracker
             </h3>
             <template x-if="gauge >= maxGauge">
                 <span
@@ -17,7 +17,7 @@
                 </span>
             </template>
         </div>
-        <p class="text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">
+        <p class="text-sm text-neutral-700 dark:text-neutral-300 transition-colors duration-300">
             Train with teammates 4 times to fill the gauge and trigger massive stat bonuses
         </p>
     </div>
@@ -35,18 +35,18 @@
                     }"
                         class="transition-all duration-300">
                         <span x-show="i <= gauge" class="text-yellow-500 drop-shadow-lg">🔥</span>
-                        <span x-show="i > gauge" class="text-gray-300 dark:text-gray-600">○</span>
+                        <span x-show="i > gauge" class="text-neutral-300 dark:text-neutral-600">○</span>
                     </div>
                     <!-- Progress Number -->
                     <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                        <span class="text-xs font-bold text-gray-600 dark:text-gray-400" x-text="i"></span>
+                        <span class="text-xs font-bold text-neutral-600 dark:text-neutral-400" x-text="i"></span>
                     </div>
                 </div>
             </template>
         </div>
 
         <!-- Progress Bar -->
-        <div class="relative w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div class="relative w-full h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
             <div :style="`width: ${(gauge / maxGauge) * 100}%`"
                 class="absolute top-0 left-0 h-full bg-linear-to-r from-yellow-400 to-orange-500 transition-all duration-500 ease-out">
             </div>
@@ -54,11 +54,11 @@
 
         <!-- Progress Text -->
         <div class="text-center mt-2">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                 <span x-text="gauge"></span> / <span x-text="maxGauge"></span> Sessions
             </span>
             <template x-if="gauge < maxGauge">
-                <span class="text-xs text-gray-600 dark:text-gray-400 ml-2">
+                <span class="text-xs text-neutral-600 dark:text-neutral-400 ml-2">
                     (<span x-text="maxGauge - gauge"></span> more needed)
                 </span>
             </template>
@@ -66,32 +66,32 @@
     </div>
 
     <!-- Spirit Burst Bonuses Info -->
-    <div class="mb-4 p-4 glass-card-inner rounded-lg border-2 border-yellow-200 dark:border-yellow-800">
-        <h4 class="text-sm font-semibold text-yellow-700 dark:text-yellow-300 mb-3 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-            </svg>
-            Spirit Burst Bonuses
-        </h4>
-        <div class="grid grid-cols-2 gap-3 text-xs">
-            <div class="flex justify-between items-center">
-                <span class="text-gray-700 dark:text-gray-300">Speed/Stamina/Power</span>
-                <span class="font-bold text-green-600 dark:text-green-400">+50</span>
-            </div>
-            <div class="flex justify-between items-center">
-                <span class="text-gray-700 dark:text-gray-300">Guts/Wit</span>
-                <span class="font-bold text-green-600 dark:text-green-400">+30</span>
-            </div>
-            <div class="flex justify-between items-center">
-                <span class="text-gray-700 dark:text-gray-300">Skill Hint Chance</span>
-                <span class="font-bold text-blue-600 dark:text-blue-400">80%</span>
-            </div>
-            <div class="flex justify-between items-center">
-                <span class="text-gray-700 dark:text-gray-300">Energy Recovery</span>
-                <span class="font-bold text-purple-600 dark:text-purple-400">+20</span>
-            </div>
-        </div>
+     <div class="mb-4 p-4 glass-card-inner rounded-lg border-2 border-yellow-200 dark:border-yellow-800">
+         <h4 class="text-sm font-semibold text-yellow-700 dark:text-yellow-300 mb-3 flex items-center gap-2">
+             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                 <path
+                     d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+             </svg>
+             Spirit Burst Bonuses
+         </h4>
+         <div class="grid grid-cols-2 gap-3 text-xs">
+             <div class="flex justify-between items-center">
+                 <span class="text-neutral-700 dark:text-neutral-300">Speed/Stamina/Power</span>
+                 <span class="font-bold text-green-600 dark:text-green-400">+50</span>
+             </div>
+             <div class="flex justify-between items-center">
+                 <span class="text-neutral-700 dark:text-neutral-300">Guts/Wit</span>
+                 <span class="font-bold text-green-600 dark:text-green-400">+30</span>
+             </div>
+             <div class="flex justify-between items-center">
+                 <span class="text-neutral-700 dark:text-neutral-300">Skill Hint Chance</span>
+                 <span class="font-bold text-blue-600 dark:text-blue-400">80%</span>
+             </div>
+             <div class="flex justify-between items-center">
+                 <span class="text-neutral-700 dark:text-neutral-300">Energy Recovery</span>
+                 <span class="font-bold text-purple-600 dark:text-purple-400">+20</span>
+             </div>
+         </div>
     </div>
 
     <!-- Trigger Button -->
@@ -103,7 +103,7 @@
                     <path
                         d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
                 </svg>
-                Trigger Spirit Burst!
+                Record Spirit Explosion
             </span>
             <span x-show="triggering" class="flex items-center justify-center gap-2">
                 <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
@@ -143,7 +143,7 @@
         <div x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-            class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/75 transition-opacity"
+            class="fixed inset-0 bg-neutral-500/75 dark:bg-neutral-900/75 transition-opacity"
             aria-hidden="true" @click="showModal = false"></div>
 
         <!-- Modal panel -->
@@ -164,18 +164,18 @@
                         </svg>
                     </div>
                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+                        <h3 class="text-lg leading-6 font-medium text-neutral-900 dark:text-white" id="modal-title">
                             Trigger Spirit Burst?
                         </h3>
                         <div class="mt-2">
-                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="text-sm text-neutral-700 dark:text-neutral-300">
                                 Are you ready to unleash the Spirit Burst? This will grant massive stat bonuses and
                                 reset the gauge.
                             </p>
                             <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                                 <p class="text-xs font-semibold text-yellow-800 dark:text-yellow-200 mb-2">You will
                                     receive:</p>
-                                <ul class="text-xs text-yellow-700 dark:text-yellow-300 space-y-1">
+                                 <ul class="text-xs text-yellow-700 dark:text-yellow-300 space-y-1">
                                     <li>• +50 Speed, Stamina, Power</li>
                                     <li>• +30 Guts, Wit</li>
                                     <li>• 80% chance for random skill hint</li>
@@ -192,7 +192,7 @@
                     Confirm Trigger
                 </button>
                 <button @click="showModal = false" type="button"
-                    class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-xs px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:w-auto sm:text-sm">
+                    class="mt-3 w-full inline-flex justify-center rounded-lg border border-neutral-300 dark:border-neutral-600 shadow-xs px-4 py-2 bg-white dark:bg-neutral-800 text-base font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:w-auto sm:text-sm">
                     Cancel
                 </button>
             </div>

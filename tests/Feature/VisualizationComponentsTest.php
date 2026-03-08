@@ -493,7 +493,7 @@ describe('Dark Mode Support', function () {
         );
 
         $view->assertSee('dark:text-white');
-        $view->assertSee('dark:bg-gray-800');
+        $view->assertSee('dark:bg-neutral-800');
     });
 
     it('comparison table supports dark mode', function () {
@@ -504,7 +504,7 @@ describe('Dark Mode Support', function () {
             ]
         );
 
-        $view->assertSee('dark:bg-gray-900');
-        $view->assertSee('dark:border-gray-700');
+        $view->assertSee('dark:bg-neutral-900');
+        $view->assertSee('dark:border-neutral-700');
     });
 });

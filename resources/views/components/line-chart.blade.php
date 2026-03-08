@@ -43,8 +43,8 @@ Accessibility: WCAG 2.2 AA compliant
     )">
     {{-- Header --}}
     <div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $title }}</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">Trend analysis and progression</p>
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">{{ $title }}</h3>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">Trend analysis and progression</p>
     </div>
 
     {{-- Chart Container --}}
@@ -54,20 +54,20 @@ Accessibility: WCAG 2.2 AA compliant
     </div>
 
     {{-- Data Summary Stats --}}
-    <div class="grid grid-cols-3 gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+    <div class="grid grid-cols-3 gap-3 pt-4 border-t border-neutral-200 dark:border-neutral-700">
         <div class="text-center">
-            <span class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Current</span>
-            <span class="block text-lg font-bold text-gray-900 dark:text-white" x-text="lastDataPoint">
+            <span class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">Current</span>
+            <span class="block text-lg font-bold text-neutral-900 dark:text-white" x-text="lastDataPoint">
             </span>
         </div>
         <div class="text-center">
-            <span class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Average</span>
-            <span class="block text-lg font-bold text-gray-900 dark:text-white" x-text="Math.round(averageValue)">
+            <span class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">Average</span>
+            <span class="block text-lg font-bold text-neutral-900 dark:text-white" x-text="Math.round(averageValue)">
             </span>
         </div>
         <div class="text-center">
-            <span class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Peak</span>
-            <span class="block text-lg font-bold text-gray-900 dark:text-white" x-text="maxValue">
+            <span class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">Peak</span>
+            <span class="block text-lg font-bold text-neutral-900 dark:text-white" x-text="maxValue">
             </span>
         </div>
     </div>

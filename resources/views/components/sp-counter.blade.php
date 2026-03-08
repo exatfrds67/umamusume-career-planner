@@ -18,11 +18,11 @@
                 <span class="font-bold {{ $getStatusColorClasses() }}">
                     {{ number_format($current) }}
                 </span>
-                <span class="text-gray-500 dark:text-gray-400">/</span>
-                <span class="font-semibold text-gray-700 dark:text-gray-300">
+                <span class="text-neutral-500 dark:text-neutral-400">/</span>
+                <span class="font-semibold text-neutral-700 dark:text-neutral-300">
                     {{ number_format($available) }}
                 </span>
-                <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">SP</span>
+                <span class="text-xs text-neutral-500 dark:text-neutral-400 ml-1">SP</span>
             </div>
 
             {{-- Remaining Display --}}
@@ -60,7 +60,7 @@
 
     {{-- Progress Bar --}}
     @if ($showBar)
-        <div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div class="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
             <div class="{{ $getProgressColorClasses() }} h-full rounded-full transition-all duration-300 relative"
                 style="width: {{ min(100, $getPercentage()) }}%" role="progressbar"
                 aria-valuenow="{{ $current }}" aria-valuemin="0" aria-valuemax="{{ $available }}"

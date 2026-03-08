@@ -38,7 +38,7 @@
 @if($level > 0)
     <div class="inline-flex items-center gap-0.5 ml-1" aria-hidden="true">
         @for($i = 1; $i <= 5; $i++)
-            <div class="w-1.5 h-1.5 rounded-full {{ $i <= $level ? 'bg-current' : 'bg-gray-300 dark:bg-gray-600' }}"></div>
+            <div class="w-1.5 h-1.5 rounded-full {{ $i <= $level ? 'bg-current' : 'bg-neutral-300 dark:bg-neutral-600' }}"></div>
         @endfor
     </div>
 @endif

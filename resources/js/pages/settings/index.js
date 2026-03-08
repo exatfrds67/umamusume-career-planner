@@ -23,6 +23,7 @@ document.addEventListener("alpine:init", () => {
 
         return {
             active: "account",
+            searchQuery: "",
             showPasswordModal: false,
             showDeleteModal: false,
             deleteConfirmation: "",
@@ -89,14 +90,14 @@ document.addEventListener("alpine:init", () => {
                     btn.setAttribute("aria-checked", String(isOn));
                     if (isOn) {
                         btn.classList.add("bg-primary-600");
-                        btn.classList.remove("bg-gray-200", "dark:bg-gray-600");
+                        btn.classList.remove("bg-neutral-200", "dark:bg-neutral-600");
                         if (thumb) {
                             thumb.classList.add("translate-x-5");
                             thumb.classList.remove("translate-x-0");
                         }
                     } else {
                         btn.classList.remove("bg-primary-600");
-                        btn.classList.add("bg-gray-200");
+                        btn.classList.add("bg-neutral-200");
                         if (thumb) {
                             thumb.classList.remove("translate-x-5");
                             thumb.classList.add("translate-x-0");
@@ -115,14 +116,14 @@ document.addEventListener("alpine:init", () => {
                     const thumb = btn.querySelector('[aria-hidden="true"]');
                     if (isOn) {
                         btn.classList.remove("bg-primary-600");
-                        btn.classList.add("bg-gray-200");
+                        btn.classList.add("bg-neutral-200");
                         if (thumb) {
                             thumb.classList.remove("translate-x-5");
                             thumb.classList.add("translate-x-0");
                         }
                     } else {
                         btn.classList.add("bg-primary-600");
-                        btn.classList.remove("bg-gray-200");
+                        btn.classList.remove("bg-neutral-200");
                         if (thumb) {
                             thumb.classList.add("translate-x-5");
                             thumb.classList.remove("translate-x-0");
@@ -140,6 +141,18 @@ document.addEventListener("alpine:init", () => {
                     document.documentElement.style.fontSize =
                         prefs.font_size / 100 + "rem";
                 }
+            },
+
+            /**
+             * Check if a tab's keywords match the current search query.
+             */
+            matchesSearch(keywords) {
+                if (!this.searchQuery || this.searchQuery.trim() === "") {
+                    return true;
+                }
+                return keywords
+                    .toLowerCase()
+                    .includes(this.searchQuery.toLowerCase().trim());
             },
 
             /**
@@ -496,14 +509,14 @@ document.addEventListener("alpine:init", () => {
                     btn.setAttribute("aria-checked", String(isOn));
                     if (isOn) {
                         btn.classList.add("bg-primary-600");
-                        btn.classList.remove("bg-gray-200", "dark:bg-gray-600");
+                        btn.classList.remove("bg-neutral-200", "dark:bg-neutral-600");
                         if (thumb) {
                             thumb.classList.add("translate-x-5");
                             thumb.classList.remove("translate-x-0");
                         }
                     } else {
                         btn.classList.remove("bg-primary-600");
-                        btn.classList.add("bg-gray-200");
+                        btn.classList.add("bg-neutral-200");
                         if (thumb) {
                             thumb.classList.remove("translate-x-5");
                             thumb.classList.add("translate-x-0");

@@ -163,7 +163,7 @@ export function raceCalendar() {
         getRaceStatusColor(race) {
             if (race.status === 'completed') return 'bg-green-100 dark:bg-green-900/30';
             if (race.status === 'upcoming') return 'bg-blue-100 dark:bg-blue-900/30';
-            return 'bg-gray-100 dark:bg-gray-700/30';
+            return 'bg-neutral-100 dark:bg-neutral-700/30';
         },
         
         getGradeColor(grade) {

@@ -12,8 +12,8 @@
     @livewireStyles
 </head>
 
-<body class="bg-gray-50 dark:bg-gray-900">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-gray-900 dark:focus:bg-gray-800 dark:focus:text-white">Skip to main content</a>
+<body class="bg-neutral-50 dark:bg-neutral-900">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-neutral-900 dark:focus:bg-neutral-800 dark:focus:text-white">Skip to main content</a>
     <div class="min-h-screen">
         <!-- Admin Navigation -->
         <nav aria-label="Admin navigation" class="bg-red-600 dark:bg-red-800 border-b border-red-700 dark:border-red-900">

@@ -3,7 +3,7 @@
     <!-- Import Section -->
     <div class="space-y-4">
         <div>
-            <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+            <label class="block text-sm font-medium text-neutral-900 dark:text-white mb-2">
                 Import Plans
             </label>
             <div class="flex items-center gap-2">
@@ -19,7 +19,7 @@
                         class="hidden"
                     />
                 </label>
-                <span class="text-sm text-gray-500 dark:text-gray-400" x-show="currentFormat">
+                <span class="text-sm text-neutral-500 dark:text-neutral-400" x-show="currentFormat">
                     Format: <span x-text="currentFormat" class="font-mono"></span>
                 </span>
             </div>
@@ -27,37 +27,37 @@
 
         <!-- Import Progress -->
         <div x-show="isImporting" class="space-y-2">
-            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div class="h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                 <div 
                     class="h-full bg-blue-600 transition-all duration-300"
                     :style="`width: ${(importProgress / importTotal) * 100}%`"
                 ></div>
             </div>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
                 Importing... <span x-text="`${importProgress}/${importTotal}`"></span>
             </p>
         </div>
 
         <!-- Import Preview -->
-        <div x-show="previewData" class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
-            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Preview</h3>
+        <div x-show="previewData" class="border border-neutral-200 dark:border-neutral-700 rounded-lg p-4 bg-neutral-50 dark:bg-neutral-800">
+            <h3 class="text-sm font-medium text-neutral-900 dark:text-white mb-2">Preview</h3>
             <div class="max-h-40 overflow-y-auto">
                 <template x-if="Array.isArray(previewData)">
                     <ul class="space-y-1 text-sm">
                         <template x-for="(item, idx) in previewData.slice(0, 5)" :key="idx">
-                            <li class="text-gray-600 dark:text-gray-400">
+                            <li class="text-neutral-600 dark:text-neutral-400">
                                 <span x-text="item.characterName || item.name || `Item ${idx + 1}`"></span>
                             </li>
                         </template>
                         <template x-if="previewData.length > 5">
-                            <li class="text-gray-500 italic text-xs">
+                            <li class="text-neutral-500 italic text-xs">
                                 <span x-text="`+${previewData.length - 5} more items`"></span>
                             </li>
                         </template>
                     </ul>
                 </template>
                 <template x-if="!Array.isArray(previewData)">
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                    <div class="text-sm text-neutral-600 dark:text-neutral-400">
                         <p><span x-text="`Character: ${previewData.characterName}`"></span></p>
                         <p><span x-text="`Turns: ${previewData.turns?.length || 0}`"></span></p>
                     </div>

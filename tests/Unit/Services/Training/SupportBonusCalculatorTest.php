@@ -23,74 +23,139 @@ describe('SupportBonusCalculator', function () {
 
         expect($bonuses['base_bonus'])->toBe(0)
             ->and($bonuses['final_bonus'])->toBe(0)
+            ->and($bonuses['per_card_bonus'])->toBe(0)
             ->and($bonuses['is_friendship'])->toBeFalse()
             ->and($bonuses['active_cards'])->toBeEmpty();
     });
 
-    it('calculates bonuses for SSR card', function () {
+    it('calculates rarity bonuses for SSR card without specialization match', function () {
         $character = Character::factory()->create();
         $deck = SupportDeck::factory()->create(['character_id' => $character->id]);
-        $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 0]);
+        $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 0, 'card_type' => 'stamina']);
 
         $deck->supportCards()->attach($card->id, ['position' => 1, 'bond_level' => 50]);
 
         $bonuses = $this->calculator->calculateBonuses($deck, 'speed');
 
-        expect($bonuses['base_bonus'])->toBe(10.0) // SSR base bonus
-            ->and($bonuses['is_friendship'])->toBeFalse() // Need 3+ cards at 80+ bond
+        expect($bonuses['rarity_bonus'])->toBe(10.0)
+            ->and($bonuses['per_card_bonus'])->toBe(0)
+            ->and($bonuses['base_bonus'])->toBe(10.0)
+            ->and($bonuses['is_friendship'])->toBeFalse()
             ->and($bonuses['active_cards'])->toHaveCount(1);
     });
 
-    it('calculates bonuses for SR card', function () {
+    it('calculates rarity bonuses for SR card', function () {
         $character = Character::factory()->create();
         $deck = SupportDeck::factory()->create(['character_id' => $character->id]);
-        $card = SupportCard::factory()->create(['rarity' => 'SR', 'limit_break' => 0]);
+        $card = SupportCard::factory()->create(['rarity' => 'SR', 'limit_break' => 0, 'card_type' => 'stamina']);
 
         $deck->supportCards()->attach($card->id, ['position' => 1, 'bond_level' => 50]);
 
         $bonuses = $this->calculator->calculateBonuses($deck, 'speed');
 
-        expect($bonuses['base_bonus'])->toBe(7.0); // SR base bonus
+        expect($bonuses['rarity_bonus'])->toBe(7.0)
+            ->and($bonuses['per_card_bonus'])->toBe(0)
+            ->and($bonuses['base_bonus'])->toBe(7.0);
     });
 
-    it('calculates bonuses for R card', function () {
+    it('calculates rarity bonuses for R card', function () {
         $character = Character::factory()->create();
         $deck = SupportDeck::factory()->create(['character_id' => $character->id]);
-        $card = SupportCard::factory()->create(['rarity' => 'R', 'limit_break' => 0]);
+        $card = SupportCard::factory()->create(['rarity' => 'R', 'limit_break' => 0, 'card_type' => 'stamina']);
 
         $deck->supportCards()->attach($card->id, ['position' => 1, 'bond_level' => 50]);
 
         $bonuses = $this->calculator->calculateBonuses($deck, 'speed');
 
-        expect($bonuses['base_bonus'])->toBe(5.0); // R base bonus
+        expect($bonuses['rarity_bonus'])->toBe(5.0)
+            ->and($bonuses['per_card_bonus'])->toBe(0)
+            ->and($bonuses['base_bonus'])->toBe(5.0);
     });
 
     it('applies limit break multiplier', function () {
         $character = Character::factory()->create();
         $deck = SupportDeck::factory()->create(['character_id' => $character->id]);
-        $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 4]);
+        $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 4, 'card_type' => 'stamina']);
 
         $deck->supportCards()->attach($card->id, ['position' => 1, 'bond_level' => 50]);
 
         $bonuses = $this->calculator->calculateBonuses($deck, 'speed');
 
-        expect($bonuses['base_bonus'])->toBe(14.0); // 10% + (4 × 10%) = 14%
+        expect($bonuses['rarity_bonus'])->toBe(14.0); // 10% × 1.4 = 14%
     });
 
-    it('applies friendship multiplier with 3+ cards at 80+ bond', function () {
+    it('adds per-card +5% bonus when card specialization matches training type', function () {
+        $character = Character::factory()->create();
+        $deck = SupportDeck::factory()->create(['character_id' => $character->id]);
+        $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 0, 'card_type' => 'speed']);
+
+        $deck->supportCards()->attach($card->id, ['position' => 1, 'bond_level' => 50]);
+
+        $bonuses = $this->calculator->calculateBonuses($deck, 'speed');
+
+        expect($bonuses['rarity_bonus'])->toBe(10.0)
+            ->and($bonuses['per_card_bonus'])->toBe(5)
+            ->and($bonuses['base_bonus'])->toBe(15.0); // 10 rarity + 5 per-card
+    });
+
+    it('stacks per-card bonus for multiple matching cards', function () {
         $character = Character::factory()->create();
         $deck = SupportDeck::factory()->create(['character_id' => $character->id]);
 
         for ($i = 1; $i <= 3; $i++) {
-            $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 0]);
+            $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 0, 'card_type' => 'speed']);
+            $deck->supportCards()->attach($card->id, ['position' => $i, 'bond_level' => 50]);
+        }
+
+        $bonuses = $this->calculator->calculateBonuses($deck, 'speed');
+
+        expect($bonuses['rarity_bonus'])->toBe(30.0) // 3 × 10%
+            ->and($bonuses['per_card_bonus'])->toBe(15) // 3 × 5%
+            ->and($bonuses['base_bonus'])->toBe(45.0); // 30 + 15
+    });
+
+    it('gives per-card bonus to friend/pal cards for any training type', function () {
+        $character = Character::factory()->create();
+        $deck = SupportDeck::factory()->create(['character_id' => $character->id]);
+        $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 0, 'card_type' => 'friend']);
+
+        $deck->supportCards()->attach($card->id, ['position' => 1, 'bond_level' => 50]);
+
+        $bonuses = $this->calculator->calculateBonuses($deck, 'speed');
+
+        expect($bonuses['per_card_bonus'])->toBe(5)
+            ->and($bonuses['base_bonus'])->toBe(15.0); // 10 rarity + 5 friend
+    });
+
+    it('does not give per-card bonus when specialization does not match', function () {
+        $character = Character::factory()->create();
+        $deck = SupportDeck::factory()->create(['character_id' => $character->id]);
+        $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 0, 'card_type' => 'power']);
+
+        $deck->supportCards()->attach($card->id, ['position' => 1, 'bond_level' => 50]);
+
+        $bonuses = $this->calculator->calculateBonuses($deck, 'speed');
+
+        expect($bonuses['per_card_bonus'])->toBe(0)
+            ->and($bonuses['base_bonus'])->toBe(10.0);
+    });
+
+    it('applies friendship multiplier with 3+ cards at 80+ bond including per-card bonus', function () {
+        $character = Character::factory()->create();
+        $deck = SupportDeck::factory()->create(['character_id' => $character->id]);
+
+        for ($i = 1; $i <= 3; $i++) {
+            $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 0, 'card_type' => 'speed']);
             $deck->supportCards()->attach($card->id, ['position' => $i, 'bond_level' => 85]);
         }
 
         $bonuses = $this->calculator->calculateBonuses($deck, 'speed');
 
-        expect($bonuses['base_bonus'])->toBe(30.0) // 3 SSR cards × 10%
+        expect($bonuses['rarity_bonus'])->toBe(30.0) // 3 × 10%
+            ->and($bonuses['per_card_bonus'])->toBe(15) // 3 × 5%
+            ->and($bonuses['base_bonus'])->toBe(45.0)
             ->and($bonuses['friendship_multiplier'])->toBe(1.2)
-            ->and($bonuses['final_bonus'])->toBe(36.0) // 30 × 1.2
+            ->and($bonuses['final_bonus'])->toBe(54.0) // 45 × 1.2
             ->and($bonuses['is_friendship'])->toBeTrue()
             ->and($bonuses['friendship_card_count'])->toBe(3);
     });
@@ -100,7 +165,7 @@ describe('SupportBonusCalculator', function () {
         $deck = SupportDeck::factory()->create(['character_id' => $character->id]);
 
         for ($i = 1; $i <= 2; $i++) {
-            $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 0]);
+            $card = SupportCard::factory()->create(['rarity' => 'SSR', 'limit_break' => 0, 'card_type' => 'stamina']);
             $deck->supportCards()->attach($card->id, ['position' => $i, 'bond_level' => 85]);
         }
 
@@ -108,7 +173,8 @@ describe('SupportBonusCalculator', function () {
 
         expect($bonuses['is_friendship'])->toBeFalse()
             ->and($bonuses['friendship_multiplier'])->toBe(1.0)
-            ->and($bonuses['final_bonus'])->toBe(20.0); // 2 × 10%, no friendship bonus
+            ->and($bonuses['per_card_bonus'])->toBe(0)
+            ->and($bonuses['final_bonus'])->toBe(20.0); // 2 × 10%, no per-card, no friendship
     });
 
     it('applies bonuses to stat gains', function () {

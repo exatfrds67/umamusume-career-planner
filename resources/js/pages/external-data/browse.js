@@ -950,7 +950,7 @@ export default function externalDataBrowser() {
                 local: {
                     text: "Local",
                     classes:
-                        "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+                        "bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300",
                     icon: "database",
                 },
             };
@@ -1046,14 +1046,14 @@ export default function externalDataBrowser() {
                 wit: "bg-blue-100 dark:bg-blue-900/30",
                 wisdom: "bg-blue-100 dark:bg-blue-900/30",
                 unique: "bg-pink-100 dark:bg-pink-900/30",
-                debuff: "bg-gray-100 dark:bg-gray-700",
+                debuff: "bg-neutral-100 dark:bg-neutral-700",
                 recovery: "bg-rose-100 dark:bg-rose-900/30",
                 acceleration: "bg-cyan-100 dark:bg-cyan-900/30",
                 positioning: "bg-indigo-100 dark:bg-indigo-900/30",
                 vision: "bg-violet-100 dark:bg-violet-900/30",
             };
             return (
-                classes[type?.toLowerCase()] || "bg-gray-100 dark:bg-gray-700"
+                classes[type?.toLowerCase()] || "bg-neutral-100 dark:bg-neutral-700"
             );
         },
 

@@ -1,18 +1,20 @@
 @extends('layouts.app')
 
+@section('title', 'Browse External Data')
+
 @section('content')
     {{-- Breadcrumb Navigation --}}
-    <x-breadcrumb :items="[['label' => 'External Resources', 'url' => route('external-data.browse')], ['label' => 'Browse Data']]" />
+    <x-breadcrumb :items="[['label' => 'External Resources', 'url' => route('dashboard')], ['label' => 'Browse Data']]" />
 
     <div class="space-y-6" x-data="externalDataBrowser()">
         <!-- Header -->
         <div class="sm:flex sm:items-center sm:justify-between">
             <div>
                 <h1
-                    class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
+                    class="text-2xl font-bold leading-7 text-neutral-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
                     External Data Browser
                 </h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                     Browse and import data from umapyoi.net community database
                 </p>
             </div>
@@ -58,15 +60,17 @@
         </div>
 
         <!-- Tabs -->
-        <div class="border-b border-gray-200 dark:border-gray-700">
-            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+        <div class="border-b border-neutral-200 dark:border-neutral-700">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs" role="tablist">
                 <button @click="activeTab = 'characters'"
+                    role="tab" id="tab-characters" aria-controls="panel-characters"
+                    :aria-selected="activeTab === 'characters'"
                     :class="activeTab === 'characters' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                        'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300 dark:text-neutral-400 dark:hover:text-neutral-300'"
                     class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
                     <span>Characters</span>
                     <span x-show="characters.length > 0"
-                        class="py-0.5 px-2 rounded-full text-xs font-medium bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-300"
+                        class="py-0.5 px-2 rounded-full text-xs font-medium bg-neutral-100 text-neutral-900 dark:bg-neutral-700 dark:text-neutral-300"
                         x-text="characters.length"></span>
                     <!-- Data Source Badge (3.3.1.1) -->
                     <template x-if="shouldShowDataSourceBadge('characters')">
@@ -77,12 +81,14 @@
                     </template>
                 </button>
                 <button @click="activeTab = 'support-cards'"
+                    role="tab" id="tab-support-cards" aria-controls="panel-support-cards"
+                    :aria-selected="activeTab === 'support-cards'"
                     :class="activeTab === 'support-cards' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                        'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300 dark:text-neutral-400 dark:hover:text-neutral-300'"
                     class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
                     <span>Support Cards</span>
                     <span x-show="supportCards.length > 0"
-                        class="py-0.5 px-2 rounded-full text-xs font-medium bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-300"
+                        class="py-0.5 px-2 rounded-full text-xs font-medium bg-neutral-100 text-neutral-900 dark:bg-neutral-700 dark:text-neutral-300"
                         x-text="supportCards.length"></span>
                     <!-- Data Source Badge (3.3.1.1) -->
                     <template x-if="shouldShowDataSourceBadge('supportCards')">
@@ -93,12 +99,14 @@
                     </template>
                 </button>
                 <button @click="activeTab = 'skills'"
+                    role="tab" id="tab-skills" aria-controls="panel-skills"
+                    :aria-selected="activeTab === 'skills'"
                     :class="activeTab === 'skills' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                        'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300 dark:text-neutral-400 dark:hover:text-neutral-300'"
                     class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
                     <span>Skills</span>
                     <span x-show="skills.length > 0"
-                        class="py-0.5 px-2 rounded-full text-xs font-medium bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-300"
+                        class="py-0.5 px-2 rounded-full text-xs font-medium bg-neutral-100 text-neutral-900 dark:bg-neutral-700 dark:text-neutral-300"
                         x-text="skills.length"></span>
                     <!-- Data Source Badge (3.3.1.3) -->
                     <template x-if="shouldShowDataSourceBadge('skills')">
@@ -109,12 +117,14 @@
                     </template>
                 </button>
                 <button @click="activeTab = 'news'"
+                    role="tab" id="tab-news" aria-controls="panel-news"
+                    :aria-selected="activeTab === 'news'"
                     :class="activeTab === 'news' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                        'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300 dark:text-neutral-400 dark:hover:text-neutral-300'"
                     class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2">
                     <span>News & Updates</span>
                     <span x-show="news.length > 0"
-                        class="py-0.5 px-2 rounded-full text-xs font-medium bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-300"
+                        class="py-0.5 px-2 rounded-full text-xs font-medium bg-neutral-100 text-neutral-900 dark:bg-neutral-700 dark:text-neutral-300"
                         x-text="news.length"></span>
                     <!-- Data Source Badge (3.3.1.1) -->
                     <template x-if="shouldShowDataSourceBadge('news')">
@@ -128,7 +138,7 @@
         </div>
 
         <!-- Characters Tab -->
-        <div x-show="activeTab === 'characters'" class="space-y-4">
+        <div x-show="activeTab === 'characters'" class="space-y-4" role="tabpanel" id="panel-characters" aria-labelledby="tab-characters">
             <!-- Error Banner for Characters -->
             <div x-show="errors.characters" x-transition
                 class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -169,7 +179,7 @@
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                     </path>
                 </svg>
-                <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">Loading characters...</p>
+                <p class="mt-3 text-sm text-neutral-500 dark:text-neutral-400">Loading characters...</p>
             </div>
 
             <!-- Search and Filters -->
@@ -177,14 +187,14 @@
                 <!-- Search Bar -->
                 <div class="relative rounded-md shadow-xs">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <svg class="h-5 w-5 text-neutral-400" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
                                 clip-rule="evenodd" />
                         </svg>
                     </div>
                     <input type="text" x-model="searchTerm" @input="filterData()"
-                        class="form-input block w-full rounded-md border-gray-300 pl-10 focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        class="form-input block w-full rounded-md border-neutral-300 pl-10 focus:border-primary-500 focus:ring-primary-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white"
                         placeholder="Search characters...">
                 </div>
 
@@ -192,9 +202,9 @@
                 <div class="flex flex-wrap items-center gap-3">
                     <!-- Category Filter -->
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Category:</label>
+                        <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Category:</label>
                         <select x-model="filters.category" @change="filterData()"
-                            class="form-select rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            class="form-select rounded-md border-neutral-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                             <option value="">All Categories</option>
                             <template x-for="category in getUniqueCategories()" :key="category">
                                 <option :value="category" x-text="category"></option>
@@ -204,9 +214,9 @@
 
                     <!-- Sort By -->
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Sort:</label>
+                        <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Sort:</label>
                         <select x-model="sortBy" @change="filterData()"
-                            class="form-select rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            class="form-select rounded-md border-neutral-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                             <option value="id-asc">ID (Low to High)</option>
                             <option value="id-desc">ID (High to Low)</option>
                             <option value="name-asc">Name (A-Z)</option>
@@ -226,10 +236,10 @@
                 </div>
 
                 <!-- Active Filters Summary -->
-                <div x-show="hasActiveFilters()" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div x-show="hasActiveFilters()" class="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
                     <span class="font-medium">Active filters:</span>
                     <span x-text="getActiveFiltersCount() + ' filter(s) applied'"></span>
-                    <span class="text-gray-400">•</span>
+                    <span class="text-neutral-400">•</span>
                     <span x-text="filteredCharacters.length + ' of ' + characters.length + ' characters shown'"></span>
                 </div>
             </div>
@@ -240,14 +250,14 @@
                 <template x-for="character in filteredCharacters" :key="character.id">
                     <div class="glass-card-alt rounded-lg p-4 hover:shadow-md transition-all group">
                         <div class="flex items-start gap-3">
-                            <img :src="character.thumb_img || '/images/app_logo/logo.svg'" :alt="character.name_en"
+                            <img :src="character.thumb_img || character.avatar_url || character.image || '/images/app_logo/logo.svg'" :alt="character.name_en"
                                 class="w-16 h-16 rounded-lg object-cover cursor-pointer"
                                 loading="lazy" decoding="async"
                                 @click="showCharacterDetail(character)">
                             <div class="flex-1 min-w-0">
-                                <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate cursor-pointer hover:text-primary-600 dark:hover:text-primary-400"
+                                <h3 class="text-sm font-semibold text-neutral-900 dark:text-white truncate cursor-pointer hover:text-primary-600 dark:hover:text-primary-400"
                                     x-text="character.name_en" @click="showCharacterDetail(character)"></h3>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate" x-text="character.name_jp">
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate" x-text="character.name_jp">
                                 </p>
                                 <div class="mt-2 flex items-center justify-between">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
@@ -272,19 +282,19 @@
 
             <!-- Empty State -->
             <div x-show="filteredCharacters.length === 0 && !loading"
-                class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                class="text-center py-12 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
+                <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No characters found</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Try a different search term or load data from the
+                <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-white">No characters found</h3>
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Try a different search term or load data from the
                     API.</p>
             </div>
         </div>
 
         <!-- Support Cards Tab -->
-        <div x-show="activeTab === 'support-cards'" class="space-y-4">
+        <div x-show="activeTab === 'support-cards'" class="space-y-4" role="tabpanel" id="panel-support-cards" aria-labelledby="tab-support-cards">
             <!-- Error Banner for Support Cards -->
             <div x-show="errors.supportCards" x-transition
                 class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -325,7 +335,7 @@
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                     </path>
                 </svg>
-                <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">Loading support cards...</p>
+                <p class="mt-3 text-sm text-neutral-500 dark:text-neutral-400">Loading support cards...</p>
             </div>
 
             <!-- Search and Filters -->
@@ -333,14 +343,14 @@
                 <!-- Search Bar -->
                 <div class="relative rounded-md shadow-xs">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <svg class="h-5 w-5 text-neutral-400" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
                                 clip-rule="evenodd" />
                         </svg>
                     </div>
                     <input type="text" x-model="searchTerm" @input="filterData()"
-                        class="form-input block w-full rounded-md border-gray-300 pl-10 focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        class="form-input block w-full rounded-md border-neutral-300 pl-10 focus:border-primary-500 focus:ring-primary-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white"
                         placeholder="Search support cards...">
                 </div>
 
@@ -348,26 +358,26 @@
                 <div class="flex flex-wrap items-center gap-3">
                     <!-- Rarity Filter -->
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Rarity:</label>
+                        <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Rarity:</label>
                         <div class="flex gap-2">
                             <button @click="toggleFilter('rarity', 'SSR')"
                                 :class="filters.rarity.includes('SSR') ?
                                     'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 ring-2 ring-yellow-500' :
-                                    'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                    'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400'"
                                 class="px-3 py-1 rounded-md text-xs font-medium transition-all hover:ring-2 hover:ring-yellow-400">
                                 SSR
                             </button>
                             <button @click="toggleFilter('rarity', 'SR')"
                                 :class="filters.rarity.includes('SR') ?
                                     'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300 ring-2 ring-purple-500' :
-                                    'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                    'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400'"
                                 class="px-3 py-1 rounded-md text-xs font-medium transition-all hover:ring-2 hover:ring-purple-400">
                                 SR
                             </button>
                             <button @click="toggleFilter('rarity', 'R')"
                                 :class="filters.rarity.includes('R') ?
                                     'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 ring-2 ring-blue-500' :
-                                    'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                    'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400'"
                                 class="px-3 py-1 rounded-md text-xs font-medium transition-all hover:ring-2 hover:ring-blue-400">
                                 R
                             </button>
@@ -376,20 +386,20 @@
 
                     <!-- Import Status Filter -->
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Status:</label>
+                        <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Status:</label>
                         <div class="flex gap-2">
                             <button @click="toggleFilter('importStatus', 'imported')"
                                 :class="filters.importStatus.includes('imported') ?
                                     'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 ring-2 ring-green-500' :
-                                    'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                    'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400'"
                                 class="px-3 py-1 rounded-md text-xs font-medium transition-all hover:ring-2 hover:ring-green-400">
                                 Imported
                             </button>
                             <button @click="toggleFilter('importStatus', 'not-imported')"
                                 :class="filters.importStatus.includes('not-imported') ?
-                                    'bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200 ring-2 ring-gray-500' :
-                                    'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
-                                class="px-3 py-1 rounded-md text-xs font-medium transition-all hover:ring-2 hover:ring-gray-400">
+                                    'bg-neutral-200 text-neutral-800 dark:bg-neutral-600 dark:text-neutral-200 ring-2 ring-neutral-500' :
+                                    'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400'"
+                                class="px-3 py-1 rounded-md text-xs font-medium transition-all hover:ring-2 hover:ring-neutral-400">
                                 Not Imported
                             </button>
                         </div>
@@ -397,9 +407,9 @@
 
                     <!-- Sort By -->
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Sort:</label>
+                        <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Sort:</label>
                         <select x-model="sortBy" @change="filterData()"
-                            class="form-select rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            class="form-select rounded-md border-neutral-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                             <option value="id-asc">ID (Low to High)</option>
                             <option value="id-desc">ID (High to Low)</option>
                             <option value="name-asc">Name (A-Z)</option>
@@ -421,10 +431,10 @@
                 </div>
 
                 <!-- Active Filters Summary -->
-                <div x-show="hasActiveFilters()" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div x-show="hasActiveFilters()" class="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
                     <span class="font-medium">Active filters:</span>
                     <span x-text="getActiveFiltersCount() + ' filter(s) applied'"></span>
-                    <span class="text-gray-400">•</span>
+                    <span class="text-neutral-400">•</span>
                     <span x-text="filteredSupportCards.length + ' of ' + supportCards.length + ' cards shown'"></span>
                 </div>
             </div>
@@ -441,10 +451,10 @@
                                 x-on:error="$event.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(card.title_en || card.name_en || 'Card') + '&background=random&color=fff'"
                                 @click="showSupportCardDetail(card)">
                             <div class="flex-1 min-w-0">
-                                <h3 class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 cursor-pointer hover:text-primary-600 dark:hover:text-primary-400"
+                                <h3 class="text-sm font-semibold text-neutral-900 dark:text-white line-clamp-2 cursor-pointer hover:text-primary-600 dark:hover:text-primary-400"
                                     x-text="card.title_en || card.name_en || 'Unknown'"
                                     @click="showSupportCardDetail(card)"></h3>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1"
                                     x-text="formatCharacterName(card.gametora)"></p>
                                 <div class="mt-2 flex items-center justify-between">
                                     <div class="flex items-center gap-2">
@@ -458,7 +468,7 @@
                                                     .rarity === 'R'
                                             }"
                                             x-text="card.rarity || 'R'"></span>
-                                        <span x-show="card.gametora" class="text-xs text-gray-500 dark:text-gray-400">
+                                        <span x-show="card.gametora" class="text-xs text-neutral-500 dark:text-neutral-400">
                                             #<span x-text="card.id"></span>
                                         </span>
                                     </div>
@@ -480,19 +490,19 @@
 
             <!-- Empty State -->
             <div x-show="filteredSupportCards.length === 0 && !loading"
-                class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                class="text-center py-12 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
+                <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No support cards found</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Try a different search term or load data from the
+                <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-white">No support cards found</h3>
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Try a different search term or load data from the
                     API.</p>
             </div>
         </div>
 
         <!-- Skills Tab -->
-        <div x-show="activeTab === 'skills'" class="space-y-4">
+        <div x-show="activeTab === 'skills'" class="space-y-4" role="tabpanel" id="panel-skills" aria-labelledby="tab-skills">
             <!-- Error Banner for Skills -->
             <div x-show="errors.skills" x-transition
                 class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -533,7 +543,7 @@
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                     </path>
                 </svg>
-                <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">Loading skills...</p>
+                <p class="mt-3 text-sm text-neutral-500 dark:text-neutral-400">Loading skills...</p>
             </div>
 
             <!-- Info Banner -->
@@ -556,14 +566,14 @@
                 <!-- Search Bar -->
                 <div class="relative rounded-md shadow-xs">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <svg class="h-5 w-5 text-neutral-400" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
                                 clip-rule="evenodd" />
                         </svg>
                     </div>
                     <input type="text" x-model="searchTerm" @input="filterData()"
-                        class="form-input block w-full rounded-md border-gray-300 pl-10 focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        class="form-input block w-full rounded-md border-neutral-300 pl-10 focus:border-primary-500 focus:ring-primary-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white"
                         placeholder="Search skills...">
                 </div>
 
@@ -571,26 +581,26 @@
                 <div class="flex flex-wrap items-center gap-3">
                     <!-- Rarity Filter -->
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Rarity:</label>
+                        <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Rarity:</label>
                         <div class="flex gap-2">
                             <button @click="toggleFilter('skillRarity', 'unique')"
                                 :class="filters.skillRarity.includes('unique') ?
                                     'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 ring-2 ring-yellow-500' :
-                                    'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                    'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400'"
                                 class="px-3 py-1 rounded-md text-xs font-medium transition-all hover:ring-2 hover:ring-yellow-400">
                                 Unique
                             </button>
                             <button @click="toggleFilter('skillRarity', 'rare')"
                                 :class="filters.skillRarity.includes('rare') ?
                                     'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300 ring-2 ring-purple-500' :
-                                    'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                    'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400'"
                                 class="px-3 py-1 rounded-md text-xs font-medium transition-all hover:ring-2 hover:ring-purple-400">
                                 Rare
                             </button>
                             <button @click="toggleFilter('skillRarity', 'normal')"
                                 :class="filters.skillRarity.includes('normal') ?
                                     'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 ring-2 ring-blue-500' :
-                                    'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'"
+                                    'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400'"
                                 class="px-3 py-1 rounded-md text-xs font-medium transition-all hover:ring-2 hover:ring-blue-400">
                                 Normal
                             </button>
@@ -599,9 +609,9 @@
 
                     <!-- Type Filter -->
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Type:</label>
+                        <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Type:</label>
                         <select x-model="filters.skillType" @change="filterData()"
-                            class="form-select rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            class="form-select rounded-md border-neutral-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                             <option value="">All Types</option>
                             <template x-for="type in getUniqueSkillTypes()" :key="type">
                                 <option :value="type" x-text="type"></option>
@@ -611,9 +621,9 @@
 
                     <!-- Sort By -->
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Sort:</label>
+                        <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Sort:</label>
                         <select x-model="sortBy" @change="filterData()"
-                            class="form-select rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            class="form-select rounded-md border-neutral-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                             <option value="id-asc">ID (Low to High)</option>
                             <option value="id-desc">ID (High to Low)</option>
                             <option value="name-asc">Name (A-Z)</option>
@@ -635,10 +645,10 @@
                 </div>
 
                 <!-- Active Filters Summary -->
-                <div x-show="hasActiveFilters()" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div x-show="hasActiveFilters()" class="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
                     <span class="font-medium">Active filters:</span>
                     <span x-text="getActiveFiltersCount() + ' filter(s) applied'"></span>
-                    <span class="text-gray-400">•</span>
+                    <span class="text-neutral-400">•</span>
                     <span x-text="filteredSkills.length + ' of ' + skills.length + ' skills shown'"></span>
                 </div>
             </div>
@@ -656,7 +666,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-start justify-between gap-2">
-                                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2"
+                                    <h3 class="text-sm font-semibold text-neutral-900 dark:text-white line-clamp-2"
                                         x-text="skill.name || skill.name_en"></h3>
                                     <span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
                                         :class="{
@@ -671,7 +681,7 @@
                                 </div>
                                 <!-- Skill Type & SP Cost -->
                                 <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-xs text-gray-500 dark:text-gray-400 capitalize"
+                                    <span class="text-xs text-neutral-500 dark:text-neutral-400 capitalize"
                                         x-text="skill.type || 'normal'"></span>
                                     <span x-show="skill.sp_cost"
                                         class="text-xs font-medium text-primary-600 dark:text-primary-400">
@@ -679,7 +689,7 @@
                                     </span>
                                 </div>
                                 <!-- Description -->
-                                <p class="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 mt-2"
+                                <p class="text-xs text-neutral-600 dark:text-neutral-300 line-clamp-2 mt-2"
                                     x-text="truncateText(skill.description || 'No description available', 100)">
                                 </p>
                                 <!-- Additional Info Row -->
@@ -712,13 +722,13 @@
                                                 .meta_tier === 'A',
                                             'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': skill
                                                 .meta_tier === 'B',
-                                            'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400': skill
+                                            'bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-400': skill
                                                 .meta_tier === 'C' || skill.meta_tier === 'D'
                                         }">
                                         Tier <span x-text="skill.meta_tier"></span>
                                     </span>
                                     <!-- Internal ID -->
-                                    <span x-show="skill.internal_id" class="text-xs text-gray-500 dark:text-gray-400">
+                                    <span x-show="skill.internal_id" class="text-xs text-neutral-500 dark:text-neutral-400">
                                         #<span x-text="skill.internal_id"></span>
                                     </span>
                                 </div>
@@ -730,19 +740,19 @@
 
             <!-- Empty State -->
             <div x-show="filteredSkills.length === 0 && !loading"
-                class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                class="text-center py-12 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
+                <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No skills found</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Try a different search term or load data from the
+                <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-white">No skills found</h3>
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Try a different search term or load data from the
                     API.</p>
             </div>
         </div>
 
         <!-- News Tab -->
-        <div x-show="activeTab === 'news'" class="space-y-4">
+        <div x-show="activeTab === 'news'" class="space-y-4" role="tabpanel" id="panel-news" aria-labelledby="tab-news">
             <!-- Error Banner for News -->
             <div x-show="errors.news" x-transition
                 class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -783,7 +793,7 @@
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                     </path>
                 </svg>
-                <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">Loading news...</p>
+                <p class="mt-3 text-sm text-neutral-500 dark:text-neutral-400">Loading news...</p>
             </div>
 
             <div x-show="news.length > 0" class="space-y-3">
@@ -799,14 +809,14 @@
                                     <span
                                         class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300"
                                         x-text="item.category || 'News'"></span>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400"
+                                    <span class="text-xs text-neutral-500 dark:text-neutral-400"
                                         x-text="item.published_at ? new Date(item.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Unknown date'"></span>
                                 </div>
-                                <div class="text-sm text-gray-900 dark:text-white line-clamp-3"
+                                <div class="text-sm text-neutral-900 dark:text-white line-clamp-3"
                                     x-text="truncateText(stripHtml(item.title_en || item.title || 'No content'), 200)">
                                 </div>
                                 <p x-show="item.title_jp"
-                                    class="text-xs text-gray-500 dark:text-gray-400 mt-2 line-clamp-2"
+                                    class="text-xs text-neutral-500 dark:text-neutral-400 mt-2 line-clamp-2"
                                     x-text="truncateText(item.title_jp, 100)"></p>
                             </div>
                         </div>
@@ -815,13 +825,13 @@
             </div>
 
             <!-- Empty State -->
-            <div x-show="news.length === 0 && !loading" class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div x-show="news.length === 0 && !loading" class="text-center py-12 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
+                <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                 </svg>
-                <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No news available</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Click "Refresh Data" to load the latest news.</p>
+                <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-white">No news available</h3>
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Click "Refresh Data" to load the latest news.</p>
             </div>
         </div>
 
@@ -835,22 +845,24 @@
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                 </path>
             </svg>
-            <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">Loading data from umapyoi.net...</p>
+            <p class="mt-4 text-sm text-neutral-500 dark:text-neutral-400">Loading data from umapyoi.net...</p>
         </div>
 
         <!-- Character Detail Modal -->
         <div x-show="showCharacterModal" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
             x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+            x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;"
+            role="dialog" aria-modal="true" aria-labelledby="character-modal-title"
+            @keydown.escape.window="showCharacterModal = false">
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-                <div class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/75"
+                <div class="fixed inset-0 bg-neutral-500/75 dark:bg-neutral-900/75"
                     @click="showCharacterModal = false"></div>
                 <div
-                    class="relative inline-block w-full max-w-lg p-6 my-8 text-left align-middle bg-white dark:bg-gray-800 rounded-xl shadow-xl transform transition-all">
+                    class="relative inline-block w-full max-w-lg p-6 my-8 text-left align-middle bg-white dark:bg-neutral-800 rounded-xl shadow-xl transform transition-all">
                     <div class="absolute top-4 right-4">
                         <button @click="showCharacterModal = false"
-                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12" />
@@ -863,9 +875,9 @@
                                 <img :src="selectedCharacter.thumb_img || '/images/app_logo/logo.svg'"
                                     :alt="selectedCharacter.name_en" class="w-24 h-24 rounded-xl object-cover" loading="lazy" decoding="async">
                                 <div class="flex-1">
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white"
+                                    <h3 id="character-modal-title" class="text-xl font-bold text-neutral-900 dark:text-white"
                                         x-text="selectedCharacter.name_en"></h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400"
+                                    <p class="text-sm text-neutral-500 dark:text-neutral-400"
                                         x-text="selectedCharacter.name_jp"></p>
                                     <div class="mt-2">
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
@@ -875,21 +887,21 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-                                <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Character Info</h4>
+                            <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4">
+                                <h4 class="text-sm font-semibold text-neutral-900 dark:text-white mb-2">Character Info</h4>
                                 <dl class="grid grid-cols-2 gap-2 text-sm">
                                     <div>
-                                        <dt class="text-gray-500 dark:text-gray-400">External ID</dt>
-                                        <dd class="font-medium text-gray-900 dark:text-white"
+                                        <dt class="text-neutral-500 dark:text-neutral-400">External ID</dt>
+                                        <dd class="font-medium text-neutral-900 dark:text-white"
                                             x-text="selectedCharacter.id"></dd>
                                     </div>
                                     <div>
-                                        <dt class="text-gray-500 dark:text-gray-400">Source</dt>
-                                        <dd class="font-medium text-gray-900 dark:text-white">umapyoi.net</dd>
+                                        <dt class="text-neutral-500 dark:text-neutral-400">Source</dt>
+                                        <dd class="font-medium text-neutral-900 dark:text-white">umapyoi.net</dd>
                                     </div>
                                 </dl>
                             </div>
-                            <div class="border-t border-gray-200 dark:border-gray-700 pt-4 flex gap-3">
+                            <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4 flex gap-3">
                                 <button @click="useForCharacterCreation(selectedCharacter); showCharacterModal = false;"
                                     class="flex-1 btn btn-primary">
                                     <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -912,15 +924,17 @@
         <div x-show="showSupportCardModal" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
             x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+            x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;"
+            role="dialog" aria-modal="true" aria-labelledby="support-card-modal-title"
+            @keydown.escape.window="showSupportCardModal = false">
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-                <div class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/75"
+                <div class="fixed inset-0 bg-neutral-500/75 dark:bg-neutral-900/75"
                     @click="showSupportCardModal = false"></div>
                 <div
-                    class="relative inline-block w-full max-w-lg p-6 my-8 text-left align-middle bg-white dark:bg-gray-800 rounded-xl shadow-xl transform transition-all">
+                    class="relative inline-block w-full max-w-lg p-6 my-8 text-left align-middle bg-white dark:bg-neutral-800 rounded-xl shadow-xl transform transition-all">
                     <div class="absolute top-4 right-4">
                         <button @click="showSupportCardModal = false"
-                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12" />
@@ -935,9 +949,9 @@
                                     loading="lazy" decoding="async"
                                     x-on:error="$event.target.src = '/images/app_logo/logo.svg'">
                                 <div class="flex-1">
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white"
+                                    <h3 id="support-card-modal-title" class="text-xl font-bold text-neutral-900 dark:text-white"
                                         x-text="selectedSupportCard.title_en || 'Unknown'"></h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400"
+                                    <p class="text-sm text-neutral-500 dark:text-neutral-400"
                                         x-text="formatCharacterName(selectedSupportCard.gametora)"></p>
                                     <div class="mt-2 flex items-center gap-2">
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
@@ -950,27 +964,27 @@
                                                     .rarity === 'R'
                                             }"
                                             x-text="selectedSupportCard.rarity || 'R'"></span>
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">#<span
+                                        <span class="text-sm text-neutral-500 dark:text-neutral-400">#<span
                                                 x-text="selectedSupportCard.id"></span></span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-                                <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Card Info</h4>
+                            <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4">
+                                <h4 class="text-sm font-semibold text-neutral-900 dark:text-white mb-2">Card Info</h4>
                                 <dl class="grid grid-cols-2 gap-2 text-sm">
                                     <div>
-                                        <dt class="text-gray-500 dark:text-gray-400">External ID</dt>
-                                        <dd class="font-medium text-gray-900 dark:text-white"
+                                        <dt class="text-neutral-500 dark:text-neutral-400">External ID</dt>
+                                        <dd class="font-medium text-neutral-900 dark:text-white"
                                             x-text="selectedSupportCard.id"></dd>
                                     </div>
                                     <div>
-                                        <dt class="text-gray-500 dark:text-gray-400">Character ID</dt>
-                                        <dd class="font-medium text-gray-900 dark:text-white"
+                                        <dt class="text-neutral-500 dark:text-neutral-400">Character ID</dt>
+                                        <dd class="font-medium text-neutral-900 dark:text-white"
                                             x-text="selectedSupportCard.chara_id || 'N/A'"></dd>
                                     </div>
                                     <div x-show="selectedSupportCard.gametora">
-                                        <dt class="text-gray-500 dark:text-gray-400">GameTora</dt>
-                                        <dd class="font-medium text-gray-900 dark:text-white">
+                                        <dt class="text-neutral-500 dark:text-neutral-400">GameTora</dt>
+                                        <dd class="font-medium text-neutral-900 dark:text-white">
                                             <a :href="'https://gametora.com/umamusume/supports/' + selectedSupportCard.gametora"
                                                 target="_blank"
                                                 class="text-primary-600 hover:text-primary-700 dark:text-primary-400">
@@ -980,7 +994,7 @@
                                     </div>
                                 </dl>
                             </div>
-                            <div class="border-t border-gray-200 dark:border-gray-700 pt-4 flex gap-3">
+                            <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4 flex gap-3">
                                 <button @click="importSupportCard(selectedSupportCard); showSupportCardModal = false;"
                                     class="flex-1 btn btn-primary" :disabled="importingCard">
                                     <svg x-show="!importingCard" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24"
@@ -1036,7 +1050,7 @@
                                 'text-red-800 dark:text-red-200'"
                             x-text="toast.message"></p>
                     </div>
-                    <button @click="toast.show = false" class="text-gray-400 hover:text-gray-600">
+                    <button @click="toast.show = false" class="text-neutral-400 hover:text-neutral-600">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12" />

@@ -106,10 +106,10 @@ function showLoadingState(container) {
     container.innerHTML = `
         <div class="glass-card rounded-xl p-12 text-center">
             <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-            <p class="mt-4 text-gray-700 dark:text-gray-300 transition-colors duration-300">
+            <p class="mt-4 text-neutral-700 dark:text-neutral-300 transition-colors duration-300">
                 Loading training predictions...
             </p>
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
                 Analyzing character state and support cards
             </p>
         </div>
@@ -241,10 +241,10 @@ function renderTrainingCard(prediction, scenarioType) {
     const info = TRAINING_TYPES[prediction.training_type] || {};
 
     return `
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-2 ${
+        <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border-2 ${
             isRecommended
                 ? "border-primary-500"
-                : "border-gray-200 dark:border-gray-700"
+                : "border-neutral-200 dark:border-neutral-700"
         } p-6 relative">
             ${isRecommended ? renderRecommendedBadge(rank) : ""}
             ${renderCardHeader(info)}
@@ -294,11 +294,11 @@ function renderCardHeader(info) {
         <div class="mb-4">
             <div class="flex items-center gap-3 mb-2">
                 <span class="text-3xl">${info.icon || "❓"}</span>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                <h3 class="text-xl font-bold text-neutral-900 dark:text-white">
                     ${info.name || "Unknown"}
                 </h3>
             </div>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
                 ${info.description || ""}
             </p>
         </div>
@@ -313,17 +313,17 @@ function renderStatGains(statGains) {
 
     return `
         <div class="mb-4">
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Predicted Stat Gains</h4>
+            <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Predicted Stat Gains</h4>
             <div class="grid grid-cols-2 gap-2">
                 ${Object.entries(statGains)
                     .map(
                         ([stat, gain]) => `
-                    <div class="flex justify-between items-center px-3 py-2 bg-gray-50 dark:bg-gray-700 rounded">
-                        <span class="text-sm text-gray-600 dark:text-gray-400 capitalize">${stat}</span>
+                    <div class="flex justify-between items-center px-3 py-2 bg-neutral-50 dark:bg-neutral-700 rounded">
+                        <span class="text-sm text-neutral-600 dark:text-neutral-400 capitalize">${stat}</span>
                         <span class="text-sm font-bold ${
                             gain > 0
                                 ? "text-green-600 dark:text-green-400"
-                                : "text-gray-400"
+                                : "text-neutral-400"
                         }">
                             ${gain > 0 ? "+" : ""}${gain}
                         </span>
@@ -343,13 +343,13 @@ function renderCostsAndRisks(prediction) {
     return `
         <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Energy Cost</div>
-                <div class="text-lg font-bold text-gray-900 dark:text-white">
+                <div class="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Energy Cost</div>
+                <div class="text-lg font-bold text-neutral-900 dark:text-white">
                     ${prediction.energy_cost || 0}%
                 </div>
             </div>
             <div>
-                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Failure Risk</div>
+                <div class="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Failure Risk</div>
                 <div class="text-lg font-bold ${
                     prediction.failure_risk > 20
                         ? "text-red-600"
@@ -370,17 +370,17 @@ function renderBreakdown(breakdown) {
 
     return `
         <div class="mb-4">
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Calculation Breakdown</h4>
+            <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Calculation Breakdown</h4>
             <div class="space-y-1 text-xs">
                 <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-400">Support Card Bonus</span>
-                    <span class="font-medium text-gray-900 dark:text-white">+${(
+                    <span class="text-neutral-600 dark:text-neutral-400">Support Card Bonus</span>
+                    <span class="font-medium text-neutral-900 dark:text-white">+${(
                         breakdown.support_card_bonus || 0
                     ).toFixed(1)}%</span>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-400">Friendship Multiplier</span>
-                    <span class="font-medium text-gray-900 dark:text-white">×${(
+                    <span class="text-neutral-600 dark:text-neutral-400">Friendship Multiplier</span>
+                    <span class="font-medium text-neutral-900 dark:text-white">×${(
                         breakdown.friendship_multiplier || 1
                     ).toFixed(2)}</span>
                 </div>
@@ -388,8 +388,8 @@ function renderBreakdown(breakdown) {
                     breakdown.facility_bonus
                         ? `
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Facility Bonus</span>
-                        <span class="font-medium text-gray-900 dark:text-white">+${(
+                        <span class="text-neutral-600 dark:text-neutral-400">Facility Bonus</span>
+                        <span class="font-medium text-neutral-900 dark:text-white">+${(
                             breakdown.facility_bonus || 0
                         ).toFixed(1)}%</span>
                     </div>
@@ -397,14 +397,14 @@ function renderBreakdown(breakdown) {
                         : ""
                 }
                 <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-400">Growth Rate Bonus</span>
-                    <span class="font-medium text-gray-900 dark:text-white">+${(
+                    <span class="text-neutral-600 dark:text-neutral-400">Growth Rate Bonus</span>
+                    <span class="font-medium text-neutral-900 dark:text-white">+${(
                         breakdown.growth_rate_bonus || 0
                     ).toFixed(1)}%</span>
                 </div>
-                <div class="flex justify-between pt-1 border-t border-gray-200 dark:border-gray-600">
-                    <span class="text-gray-700 dark:text-gray-300 font-semibold">Total Multiplier</span>
-                    <span class="font-bold text-gray-900 dark:text-white">×${(
+                <div class="flex justify-between pt-1 border-t border-neutral-200 dark:border-neutral-600">
+                    <span class="text-neutral-700 dark:text-neutral-300 font-semibold">Total Multiplier</span>
+                    <span class="font-bold text-neutral-900 dark:text-white">×${(
                         breakdown.total_multiplier || 1
                     ).toFixed(2)}</span>
                 </div>
@@ -438,7 +438,7 @@ function renderUnityCupInfo(scenarioData) {
                                     i <=
                                     (scenarioData.spirit_burst_progress || 0)
                                         ? "text-yellow-500"
-                                        : "text-gray-300"
+                                        : "text-neutral-300"
                                 }">
                                     ${
                                         i <=
@@ -562,8 +562,8 @@ function renderMetrics(predictions) {
     const cachedCount = predictions.filter((p) => p.cached).length;
 
     return `
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                 Performance Metrics
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -571,7 +571,7 @@ function renderMetrics(predictions) {
                     <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
                         ${avgTime.toFixed(0)}ms
                     </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                    <div class="text-sm text-neutral-600 dark:text-neutral-400">
                         Avg Processing Time
                     </div>
                 </div>
@@ -579,7 +579,7 @@ function renderMetrics(predictions) {
                     <div class="text-2xl font-bold text-green-600 dark:text-green-400">
                         ${cachedCount}/${predictions.length}
                     </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                    <div class="text-sm text-neutral-600 dark:text-neutral-400">
                         Cached Predictions
                     </div>
                 </div>
@@ -587,7 +587,7 @@ function renderMetrics(predictions) {
                     <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
                         ${predictions.length}
                     </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                    <div class="text-sm text-neutral-600 dark:text-neutral-400">
                         Training Options
                     </div>
                 </div>

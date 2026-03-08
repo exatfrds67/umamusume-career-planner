@@ -6,27 +6,31 @@
     {{-- Breadcrumb Navigation --}}
     <x-breadcrumb :items="[['label' => 'Skills']]" />
 
-    <div class="space-y-6" x-data="skillManagement({{ $isAdmin ? 'true' : 'false' }}, '{{ $selectedCharacterId ?? '' }}')">
+    <div class="page-stack" x-data="skillManagement({{ $isAdmin ? 'true' : 'false' }}, '{{ $selectedCharacterId ?? '' }}')">
         {{-- Header Section --}}
-        <header class="flex items-center justify-between">
+        <header class="page-hero">
+            <div class="page-hero__content">
             <div>
-                <div class="flex items-center gap-3">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Skill Management</h1>
-                    <span x-show="isAdmin"
-                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                        <span aria-hidden="true">🔓</span> Admin Mode - No SP Required
+                <div class="page-hero__eyebrow">
+                    <span>Skill Loadout</span>
+                </div>
+                <div class="flex items-center gap-3 flex-wrap">
+                    <h1 class="page-hero__title">Skill Management</h1>
+                    <span x-show="isAdmin" class="hero-chip">
+                        <span aria-hidden="true">🔓</span>
+                        <span>Admin Mode</span>
                     </span>
                 </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
+                <p class="page-hero__body text-sm sm:text-base">
                     Manage skills, track hints, and optimize SP allocation with AI-powered recommendations
                 </p>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="page-hero__actions">
                 {{-- Character Selector --}}
                 <select x-model="selectedCharacterId" @change="loadCharacterData()" id="character-selector"
                     name="character_id"
-                    class="form-select rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    class="form-select min-w-64 rounded-xl border-neutral-300/80 bg-white/90 dark:border-neutral-600 dark:bg-neutral-800/90 dark:text-white"
                     aria-label="Select character">
                     <option value="">Select Character</option>
                     @foreach ($characters as $character)
@@ -44,25 +48,26 @@
                     <span class="ml-2">Refresh</span>
                 </button>
             </div>
+            </div>
         </header>
 
         {{-- Loading State --}}
-        <div x-show="loading && !character" class="card bg-white dark:bg-gray-800" role="status">
+        <div x-show="loading && !character" class="filter-surface" role="status">
             <div class="card-body text-center py-12">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto" aria-hidden="true"></div>
-                <p class="mt-4 text-gray-600 dark:text-gray-400">Loading skill data...</p>
+                <p class="mt-4 text-neutral-600 dark:text-neutral-400">Loading skill data...</p>
             </div>
         </div>
 
         {{-- No Character Selected --}}
-        <div x-show="!loading && !selectedCharacterId" class="card bg-white dark:bg-gray-800">
+        <div x-show="!loading && !selectedCharacterId" class="filter-surface">
             <div class="card-body text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No Character Selected</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Select a character to manage their skills</p>
+                <h3 class="mt-2 text-sm font-medium text-neutral-900 dark:text-white">No Character Selected</h3>
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Select a character to manage their skills</p>
             </div>
         </div>
 
@@ -102,48 +107,43 @@
             </section>
 
             {{-- Tab Navigation --}}
-            <div class="border-b border-gray-200 dark:border-gray-700">
-                <nav class="-mb-px flex space-x-8" aria-label="Skill Management Sections" role="tablist"
+            <div class="tab-surface">
+                <nav class="tab-surface__nav" aria-label="Skill Management Sections" role="tablist"
                     @keydown.arrow-right.prevent="const tabs = [...$el.querySelectorAll('[role=tab]')]; const idx = tabs.indexOf(document.activeElement); if (idx >= 0) { const next = tabs[(idx + 1) % tabs.length]; next.focus(); next.click(); }"
                     @keydown.arrow-left.prevent="const tabs = [...$el.querySelectorAll('[role=tab]')]; const idx = tabs.indexOf(document.activeElement); if (idx >= 0) { const prev = tabs[(idx - 1 + tabs.length) % tabs.length]; prev.focus(); prev.click(); }"
                     @keydown.home.prevent="const tabs = [...$el.querySelectorAll('[role=tab]')]; tabs[0]?.focus(); tabs[0]?.click();"
                     @keydown.end.prevent="const tabs = [...$el.querySelectorAll('[role=tab]')]; tabs[tabs.length - 1]?.focus(); tabs[tabs.length - 1]?.click();">
                     <button @click="activeTab = 'inventory'" id="tab-inventory" aria-controls="panel-inventory"
-                        :class="activeTab === 'inventory' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                        :class="activeTab === 'inventory' ? 'soft-pill soft-pill--active' : 'soft-pill'"
+                        class="font-medium text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                         role="tab" :aria-selected="activeTab === 'inventory' ? 'true' : 'false'"
                         :tabindex="activeTab === 'inventory' ? '0' : '-1'">
                         Skill Inventory
                     </button>
                     <button @click="activeTab = 'acquisition'" id="tab-acquisition" aria-controls="panel-acquisition"
-                        :class="activeTab === 'acquisition' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                        :class="activeTab === 'acquisition' ? 'soft-pill soft-pill--active' : 'soft-pill'"
+                        class="font-medium text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                         role="tab" :aria-selected="activeTab === 'acquisition' ? 'true' : 'false'"
                         :tabindex="activeTab === 'acquisition' ? '0' : '-1'">
                         Skill Acquisition
                     </button>
                     <button @click="activeTab = 'evolution'" id="tab-evolution" aria-controls="panel-evolution"
-                        :class="activeTab === 'evolution' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                        :class="activeTab === 'evolution' ? 'soft-pill soft-pill--active' : 'soft-pill'"
+                        class="font-medium text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                         role="tab" :aria-selected="activeTab === 'evolution' ? 'true' : 'false'"
                         :tabindex="activeTab === 'evolution' ? '0' : '-1'">
                         Skill Evolution
                     </button>
                     <button @click="activeTab = 'planner'" id="tab-planner" aria-controls="panel-planner"
-                        :class="activeTab === 'planner' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                        :class="activeTab === 'planner' ? 'soft-pill soft-pill--active' : 'soft-pill'"
+                        class="font-medium text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                         role="tab" :aria-selected="activeTab === 'planner' ? 'true' : 'false'"
                         :tabindex="activeTab === 'planner' ? '0' : '-1'">
                         Build Planner
                     </button>
                     <button @click="activeTab = 'performance'" id="tab-performance" aria-controls="panel-performance"
-                        :class="activeTab === 'performance' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                        :class="activeTab === 'performance' ? 'soft-pill soft-pill--active' : 'soft-pill'"
+                        class="font-medium text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                         role="tab" :aria-selected="activeTab === 'performance' ? 'true' : 'false'"
                         :tabindex="activeTab === 'performance' ? '0' : '-1'">
                         Agent Performance
@@ -189,7 +189,7 @@
         <div x-show="showSkillModal" x-cloak @keydown.escape.window="closeSkillModal()"
             class="fixed inset-0 z-50 flex items-center justify-center p-4" aria-labelledby="modal-title" role="dialog"
             :aria-modal="showSkillModal ? 'true' : 'false'">
-            <div class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/75" @click="closeSkillModal()" aria-hidden="true"></div>
+            <div class="fixed inset-0 bg-neutral-500/75 dark:bg-neutral-900/75" @click="closeSkillModal()" aria-hidden="true"></div>
                 {{-- Modal panel --}}
                 <div x-show="showSkillModal" x-transition:enter="ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-4 scale-95"
@@ -197,7 +197,7 @@
                     x-transition:leave="ease-in duration-200"
                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                     x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-                    class="relative bg-white dark:bg-gray-800 rounded-xl text-left shadow-2xl transform transition-all w-full max-w-2xl max-h-[90vh] overflow-y-auto z-50">
+                    class="relative bg-white dark:bg-neutral-800 rounded-xl text-left shadow-2xl transform transition-all w-full max-w-2xl max-h-[90vh] overflow-y-auto z-50">
 
                     <template x-if="selectedSkill">
                         <div>
@@ -225,7 +225,7 @@
                                                     .meta_tier === 'S',
                                                 'bg-green-200 text-green-900': selectedSkill.meta_tier === 'A',
                                                 'bg-blue-200 text-blue-900': selectedSkill.meta_tier === 'B',
-                                                'bg-gray-200 text-gray-900': selectedSkill.meta_tier === 'C'
+                                                'bg-neutral-200 text-neutral-900': selectedSkill.meta_tier === 'C'
                                             }"
                                             x-text="selectedSkill.meta_tier"></span>
 
@@ -237,7 +237,7 @@
                                     </div>
                                 </div>
                                 <button @click="closeSkillModal()" type="button"
-                                    class="text-white hover:text-gray-200 transition-colors"
+                                    class="text-white hover:text-neutral-200 transition-colors"
                                     aria-label="Close skill details">
                                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -250,15 +250,15 @@
                             <div class="px-6 py-4 space-y-4">
                                 {{-- Description --}}
                                 <div>
-                                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Description
+                                    <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Description
                                     </h4>
-                                    <p class="text-gray-900 dark:text-white" x-text="selectedSkill.description"></p>
+                                    <p class="text-neutral-900 dark:text-white" x-text="selectedSkill.description"></p>
                                 </div>
 
                                 {{-- Effects --}}
                                 <div x-show="selectedSkill.effects">
-                                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Effects</h4>
-                                    <div class="text-gray-900 dark:text-white">
+                                    <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Effects</h4>
+                                    <div class="text-neutral-900 dark:text-white">
                                         <template
                                             x-if="typeof selectedSkill.effects === 'object' && selectedSkill.effects !== null">
                                             <div class="space-y-1">
@@ -286,14 +286,14 @@
 
                                 {{-- SP Cost Information --}}
                                 <div class="grid grid-cols-2 gap-4">
-                                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">Base SP Cost</p>
-                                        <p class="text-2xl font-bold text-gray-900 dark:text-white"
+                                    <div class="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4">
+                                        <p class="text-sm text-neutral-600 dark:text-neutral-400">Base SP Cost</p>
+                                        <p class="text-2xl font-bold text-neutral-900 dark:text-white"
                                             x-text="selectedSkill.base_sp_cost"></p>
                                     </div>
-                                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
+                                    <div class="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4"
                                         x-show="selectedSkill.available_hints > 0">
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">Discounted Cost</p>
+                                        <p class="text-sm text-neutral-600 dark:text-neutral-400">Discounted Cost</p>
                                         <p class="text-2xl font-bold text-green-600 dark:text-green-400"
                                             x-text="selectedSkill.discounted_cost || selectedSkill.base_sp_cost"></p>
                                         <p class="text-xs text-green-600 dark:text-green-400 mt-1"
@@ -320,16 +320,16 @@
 
                                 {{-- Evolution Information --}}
                                 <div x-show="selectedSkill.evolves_from_id || selectedSkill.evolves_to_id">
-                                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Evolution
+                                    <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Evolution
                                         Path</h4>
                                     <div class="flex items-center gap-2">
                                         <span x-show="selectedSkill.evolves_from_id"
-                                            class="text-sm text-gray-600 dark:text-gray-400">
+                                            class="text-sm text-neutral-600 dark:text-neutral-400">
                                             Evolves from: <span class="font-medium"
                                                 x-text="selectedSkill.evolves_from_name || 'Unknown'"></span>
                                         </span>
                                         <span x-show="selectedSkill.evolves_to_id"
-                                            class="text-sm text-gray-600 dark:text-gray-400">
+                                            class="text-sm text-neutral-600 dark:text-neutral-400">
                                             Evolves to: <span class="font-medium"
                                                 x-text="selectedSkill.evolves_to_name || 'Unknown'"></span>
                                         </span>
@@ -375,12 +375,12 @@
                             </div>
 
                             {{-- Modal Footer --}}
-                            <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex items-center justify-between gap-3">
+                            <div class="bg-neutral-50 dark:bg-neutral-700 px-6 py-4 flex items-center justify-between gap-3">
                                 {{-- Remove button: only for acquired or planned skills --}}
                                 <button x-show="selectedSkill.is_acquired || selectedSkill.is_planned"
                                     @click="openRemoveModal(selectedSkill); closeSkillModal()"
                                     :disabled="loading" type="button"
-                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-red-300 dark:border-red-700 bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 text-sm font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-400 dark:hover:border-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-red-300 dark:border-red-700 bg-white dark:bg-neutral-800 text-red-600 dark:text-red-400 text-sm font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-400 dark:hover:border-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -414,7 +414,7 @@
 
     {{-- Action Confirmation Modal --}}
     <div x-show="showActionModal" x-cloak
-        class="fixed inset-0 z-[60] overflow-y-auto"
+        class="fixed inset-0 z-60 overflow-y-auto"
         role="dialog" aria-modal="true" :aria-label="actionModalSkill ? 'Skill action for ' + actionModalSkill.name : 'Skill action'"
         @keydown.escape.window="closeActionModal()">
 
@@ -425,7 +425,7 @@
         <div class="flex min-h-full items-center justify-center p-4">
 
         {{-- Panel --}}
-        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md"
+        <div class="relative bg-white dark:bg-neutral-800 rounded-xl shadow-2xl w-full max-w-md"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-95"
             x-transition:enter-end="opacity-100 scale-100"
@@ -434,14 +434,14 @@
             x-transition:leave-end="opacity-0 scale-95">
 
             {{-- Header --}}
-            <div class="flex items-start justify-between px-6 pt-5 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-start justify-between px-6 pt-5 pb-4 border-b border-neutral-200 dark:border-neutral-700">
                 <div class="flex-1 min-w-0">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate"
+                    <h3 class="text-lg font-semibold text-neutral-900 dark:text-white truncate"
                         x-text="actionModalSkill?.name"></h3>
-                    <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Choose an action for this skill</p>
+                    <p class="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">Choose an action for this skill</p>
                 </div>
                 <button @click="closeActionModal()" type="button"
-                    class="ml-4 shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    class="ml-4 shrink-0 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
                     aria-label="Close">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -451,14 +451,14 @@
 
             {{-- Cost summary --}}
             <div class="px-6 py-4">
-                <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 rounded-lg px-4 py-3 mb-5">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">SP Cost</span>
+                <div class="flex items-center justify-between bg-neutral-50 dark:bg-neutral-700 rounded-lg px-4 py-3 mb-5">
+                    <span class="text-sm text-neutral-600 dark:text-neutral-400">SP Cost</span>
                     <div class="flex items-center gap-2">
                         <template x-if="actionModalSkill && actionModalSkill.available_hints > 0">
-                            <span class="text-sm text-gray-400 line-through"
+                            <span class="text-sm text-neutral-400 line-through"
                                 x-text="actionModalSkill.base_sp_cost + ' SP'"></span>
                         </template>
-                        <span class="text-xl font-bold text-gray-900 dark:text-white"
+                        <span class="text-xl font-bold text-neutral-900 dark:text-white"
                             x-text="actionModalSkill ? (actionModalSkill.available_hints > 0 ? actionModalSkill.discounted_cost : actionModalSkill.base_sp_cost) + ' SP' : ''"></span>
                         <template x-if="actionModalSkill && actionModalSkill.available_hints > 0">
                             <span class="text-xs font-semibold text-success-600 dark:text-success-400"
@@ -484,7 +484,7 @@
                     {{-- Plan --}}
                     <button @click="confirmPlan()"
                         :disabled="loading"
-                        class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-amber-400 bg-amber-50 dark:bg-gray-700 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-amber-400 bg-amber-50 dark:bg-neutral-700 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg class="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -506,7 +506,7 @@
 
     {{-- Remove Confirmation Modal --}}
     <div x-show="showRemoveModal" x-cloak
-        class="fixed inset-0 z-[70] overflow-y-auto"
+        class="fixed inset-0 z-70 overflow-y-auto"
         role="dialog" aria-modal="true" :aria-label="removeModalSkill ? 'Remove ' + removeModalSkill.name : 'Remove skill'"
         @keydown.escape.window="closeRemoveModal()">
 
@@ -517,7 +517,7 @@
         <div class="flex min-h-full items-center justify-center p-4">
 
         {{-- Panel --}}
-        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-sm"
+        <div class="relative bg-white dark:bg-neutral-800 rounded-xl shadow-2xl w-full max-w-sm"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-95"
             x-transition:enter-end="opacity-100 scale-100"
@@ -526,14 +526,14 @@
             x-transition:leave-end="opacity-0 scale-95">
 
             {{-- Header --}}
-            <div class="flex items-start justify-between px-6 pt-5 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-start justify-between px-6 pt-5 pb-4 border-b border-neutral-200 dark:border-neutral-700">
                 <div class="flex-1 min-w-0">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate"
+                    <h3 class="text-lg font-semibold text-neutral-900 dark:text-white truncate"
                         x-text="removeModalSkill?.name"></h3>
-                    <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Remove this skill from your career plan?</p>
+                    <p class="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">Remove this skill from your career plan?</p>
                 </div>
                 <button @click="closeRemoveModal()" type="button"
-                    class="ml-4 shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    class="ml-4 shrink-0 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
                     aria-label="Close">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -543,9 +543,9 @@
 
             {{-- Body --}}
             <div class="px-6 py-5">
-                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                <p class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
                     This will remove
-                    <span class="font-semibold text-gray-900 dark:text-white" x-text="removeModalSkill?.name"></span>
+                    <span class="font-semibold text-neutral-900 dark:text-white" x-text="removeModalSkill?.name"></span>
                     from your career plan.
                 </p>
                 <p x-show="removeModalSkill?.is_acquired"

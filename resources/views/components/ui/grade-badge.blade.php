@@ -8,13 +8,13 @@
         'S' => 'bg-linear-to-r from-purple-500 to-pink-500 text-white',
         'A' => 'bg-red-500 text-white',
         'B' => 'bg-orange-500 text-white',
-        'C' => 'bg-yellow-500 text-gray-900',
+        'C' => 'bg-yellow-500 text-neutral-900',
         'D' => 'bg-green-500 text-white',
         'E' => 'bg-blue-500 text-white',
-        'F' => 'bg-gray-500 text-white',
-        'G' => 'bg-gray-500 text-white',
+        'F' => 'bg-neutral-500 text-white',
+        'G' => 'bg-neutral-500 text-white',
     ];
-    $colorClass = $gradeColors[$grade] ?? 'bg-gray-400 text-white';
+    $colorClass = $gradeColors[$grade] ?? 'bg-neutral-400 text-white';
 @endphp
 
 <span

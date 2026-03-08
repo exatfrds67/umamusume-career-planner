@@ -1,7 +1,7 @@
 @props(['agent'])
 
 <div
-    class="rounded-lg border border-gray-200 bg-white p-4 shadow-xs transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
+    class="rounded-lg border border-neutral-200 bg-white p-4 shadow-xs transition-all hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800">
     <div class="flex items-start justify-between">
         <!-- Agent Info -->
         <div class="flex items-start space-x-3">
@@ -12,7 +12,7 @@
                     'bg-green-100 dark:bg-green-900': agent.status === 'completed',
                     'bg-yellow-100 dark:bg-yellow-900': agent.status === 'waiting',
                     'bg-red-100 dark:bg-red-900': agent.status === 'failed',
-                    'bg-gray-100 dark:bg-gray-700': agent.status === 'idle'
+                    'bg-neutral-100 dark:bg-neutral-700': agent.status === 'idle'
                 }">
                 <svg class="h-5 w-5"
                     :class="{
@@ -20,7 +20,7 @@
                         'text-green-600 dark:text-green-300': agent.status === 'completed',
                         'text-yellow-600 dark:text-yellow-300': agent.status === 'waiting',
                         'text-red-600 dark:text-red-300': agent.status === 'failed',
-                        'text-gray-600 dark:text-gray-400': agent.status === 'idle'
+                        'text-neutral-600 dark:text-neutral-400': agent.status === 'idle'
                     }"
                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -32,7 +32,7 @@
             <!-- Agent Details -->
             <div class="flex-1">
                 <div class="flex items-center space-x-2">
-                    <h4 class="font-semibold text-gray-900 dark:text-white" x-text="agent.name"></h4>
+                    <h4 class="font-semibold text-neutral-900 dark:text-white" x-text="agent.name"></h4>
                     <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize"
                         :class="{
                             'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': agent
@@ -42,16 +42,16 @@
                             'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': agent
                                 .status === 'waiting',
                             'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': agent.status === 'failed',
-                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': agent.status === 'idle'
+                            'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200': agent.status === 'idle'
                         }"
                         x-text="agent.status"></span>
                 </div>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400" x-text="agent.type"></p>
+                <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400" x-text="agent.type"></p>
 
                 <!-- Current Task -->
                 <div x-show="agent.current_task" class="mt-2">
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Current Task:</p>
-                    <p class="mt-0.5 text-sm text-gray-700 dark:text-gray-300" x-text="agent.current_task"></p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Current Task:</p>
+                    <p class="mt-0.5 text-sm text-neutral-700 dark:text-neutral-300" x-text="agent.current_task"></p>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@
         <!-- Agent Actions -->
         <div class="flex space-x-2">
             <button x-show="agent.status === 'active'" @click="$dispatch('pause-agent', { agentId: agent.id })"
-                class="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                class="rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-300"
                 title="Pause Agent">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -67,7 +67,7 @@
                 </svg>
             </button>
             <button @click="$dispatch('view-agent-details', { agentId: agent.id })"
-                class="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                class="rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-300"
                 title="View Details">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -79,41 +79,41 @@
 
     <!-- Progress Bar (for active agents) -->
     <div x-show="agent.status === 'active' && agent.progress !== undefined" class="mt-4">
-        <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+        <div class="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">
             <span>Progress</span>
             <span x-text="agent.progress + '%'"></span>
         </div>
-        <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+        <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
             <div class="h-full bg-blue-600 transition-all duration-300 dark:bg-blue-500"
                 :style="'width: ' + (agent.progress || 0) + '%'"></div>
         </div>
     </div>
 
     <!-- Agent Metrics -->
-    <div class="mt-4 grid grid-cols-4 gap-3 border-t border-gray-200 pt-3 dark:border-gray-700">
+    <div class="mt-4 grid grid-cols-4 gap-3 border-t border-neutral-200 pt-3 dark:border-neutral-700">
         <!-- Execution Time -->
         <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Time</p>
-            <p class="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white" x-text="agent.execution_time || '0s'">
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">Time</p>
+            <p class="mt-0.5 text-sm font-semibold text-neutral-900 dark:text-white" x-text="agent.execution_time || '0s'">
             </p>
         </div>
 
         <!-- Tools Used -->
         <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Tools</p>
-            <p class="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white" x-text="agent.tools_used || 0"></p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">Tools</p>
+            <p class="mt-0.5 text-sm font-semibold text-neutral-900 dark:text-white" x-text="agent.tools_used || 0"></p>
         </div>
 
         <!-- Cost -->
         <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Cost</p>
-            <p class="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white"
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">Cost</p>
+            <p class="mt-0.5 text-sm font-semibold text-neutral-900 dark:text-white"
                 x-text="'$' + (agent.cost || 0).toFixed(4)"></p>
         </div>
 
         <!-- Confidence -->
         <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Confidence</p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">Confidence</p>
             <p class="mt-0.5 text-sm font-semibold"
                 :class="{
                     'text-green-600 dark:text-green-400': agent.confidence >= 0.8,
@@ -126,7 +126,7 @@
 
     <!-- Workflow Steps (if available) -->
     <div x-show="agent.workflow_steps && agent.workflow_steps.length > 0" class="mt-3">
-        <p class="text-xs font-medium text-gray-700 dark:text-gray-300">Workflow Steps:</p>
+        <p class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Workflow Steps:</p>
         <div class="mt-2 space-y-1">
             <template x-for="(step, index) in agent.workflow_steps" :key="index">
                 <div class="flex items-center space-x-2 text-xs">
@@ -134,7 +134,7 @@
                         :class="{
                             'bg-green-500': step.status === 'completed',
                             'bg-blue-500': step.status === 'active',
-                            'bg-gray-400': step.status === 'pending'
+                            'bg-neutral-400': step.status === 'pending'
                         }">
                         <svg x-show="step.status === 'completed'" class="h-3 w-3" fill="currentColor"
                             viewBox="0 0 20 20">
@@ -144,7 +144,7 @@
                         </svg>
                         <span x-show="step.status !== 'completed'" x-text="index + 1"></span>
                     </span>
-                    <span class="text-gray-700 dark:text-gray-300" x-text="step.name"></span>
+                    <span class="text-neutral-700 dark:text-neutral-300" x-text="step.name"></span>
                 </div>
             </template>
         </div>

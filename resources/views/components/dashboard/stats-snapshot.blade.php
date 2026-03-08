@@ -42,7 +42,7 @@
 <div {{ $attributes->merge(['class' => 'glass-card rounded-xl overflow-hidden']) }}>
     <div class="px-4 py-5 sm:p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Stat Snapshot</h3>
+            <h3 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white">Stat Snapshot</h3>
             @if ($character)
                 <a href="{{ route('characters.show', $character) }}"
                     class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
@@ -63,10 +63,10 @@
         </div>
 
         @if ($character && $character->current_turn > 0)
-            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
                 <div class="flex items-center justify-between text-sm">
-                    <span class="text-gray-500 dark:text-gray-400">Total Stats</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">
+                    <span class="text-neutral-500 dark:text-neutral-400">Total Stats</span>
+                    <span class="font-semibold text-neutral-900 dark:text-white">
                         {{ array_sum($stats) }}
                     </span>
                 </div>

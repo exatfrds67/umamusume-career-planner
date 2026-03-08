@@ -1,19 +1,19 @@
 @props(['performance' => []])
 
-<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-xs dark:border-gray-700 dark:bg-gray-800">
+<div class="rounded-lg border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-700 dark:bg-neutral-800">
     <div class="mb-4 flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Performance Metrics</h3>
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Performance Metrics</h3>
         <div class="flex items-center space-x-2">
             <select x-model="performanceTimeRange"
                 @change="$dispatch('update-performance-range', { range: performanceTimeRange })"
-                class="rounded-md border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                class="rounded-md border-neutral-300 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white">
                 <option value="1h">Last Hour</option>
                 <option value="24h" selected>Last 24 Hours</option>
                 <option value="7d">Last 7 Days</option>
                 <option value="30d">Last 30 Days</option>
             </select>
             <button @click="$dispatch('refresh-performance')"
-                class="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                class="rounded-md p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-300"
                 title="Refresh Performance">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -26,42 +26,42 @@
 
     <!-- Provider Comparison Table -->
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-900">
+        <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
+            <thead class="bg-neutral-50 dark:bg-neutral-900">
                 <tr>
                     <th
-                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                         Provider
                     </th>
                     <th
-                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                         Requests
                     </th>
                     <th
-                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                         Success Rate
                     </th>
                     <th
-                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                         Avg Response
                     </th>
                     <th
-                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                         P95 Response
                     </th>
                     <th
-                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                         Cost/Request
                     </th>
                     <th
-                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                         Rating
                     </th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+            <tbody class="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-800">
                 <template x-for="(provider, name) in performance.providers" :key="name">
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/50">
                         <!-- Provider Name -->
                         <td class="whitespace-nowrap px-4 py-4">
                             <div class="flex items-center">
@@ -80,15 +80,15 @@
                                         x-text="name.substring(0, 2).toUpperCase()"></span>
                                 </div>
                                 <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-900 dark:text-white" x-text="provider.name">
+                                    <p class="text-sm font-medium text-neutral-900 dark:text-white" x-text="provider.name">
                                     </p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400" x-text="provider.model"></p>
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400" x-text="provider.model"></p>
                                 </div>
                             </div>
                         </td>
 
                         <!-- Requests -->
-                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-700 dark:text-gray-300"
+                        <td class="whitespace-nowrap px-4 py-4 text-sm text-neutral-700 dark:text-neutral-300"
                             x-text="provider.requests"></td>
 
                         <!-- Success Rate -->
@@ -118,11 +118,11 @@
                         </td>
 
                         <!-- P95 Response Time -->
-                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-700 dark:text-gray-300"
+                        <td class="whitespace-nowrap px-4 py-4 text-sm text-neutral-700 dark:text-neutral-300"
                             x-text="provider.p95_response_time.toFixed(2) + 's'"></td>
 
                         <!-- Cost per Request -->
-                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-700 dark:text-gray-300"
+                        <td class="whitespace-nowrap px-4 py-4 text-sm text-neutral-700 dark:text-neutral-300"
                             x-text="'$' + provider.cost_per_request.toFixed(6)"></td>
 
                         <!-- Rating -->
@@ -132,7 +132,7 @@
                                     <svg class="h-4 w-4"
                                         :class="{
                                             'text-yellow-400': i <= provider.rating,
-                                            'text-gray-300 dark:text-gray-600': i > provider.rating
+                                            'text-neutral-300 dark:text-neutral-600': i > provider.rating
                                         }"
                                         fill="currentColor" viewBox="0 0 20 20">
                                         <path
@@ -205,7 +205,7 @@
 
     <!-- Performance Recommendations -->
     <div x-show="performance.recommendations && performance.recommendations.length > 0" class="mt-6">
-        <h4 class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">Performance Recommendations</h4>
+        <h4 class="mb-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">Performance Recommendations</h4>
         <div class="space-y-2">
             <template x-for="(rec, index) in performance.recommendations" :key="index">
                 <div class="flex items-start space-x-2 rounded-lg bg-yellow-50 p-3 dark:bg-yellow-900/20">

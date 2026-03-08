@@ -30,14 +30,14 @@
 <div {{ $attributes->merge(['class' => 'progress-bar-wrapper']) }}>
     @if($label)
         <div class="flex items-center justify-between mb-1">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">{{ $label }}</span>
             @if($showPercentage)
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($percentage, 0) }}%</span>
+                <span class="text-sm font-semibold text-neutral-900 dark:text-white">{{ number_format($percentage, 0) }}%</span>
             @endif
         </div>
     @endif
     <div 
-        class="w-full bg-gray-200 dark:bg-gray-700 rounded-full {{ $sizeClass }} overflow-hidden"
+        class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full {{ $sizeClass }} overflow-hidden"
         role="progressbar"
         aria-valuenow="{{ $value }}"
         aria-valuemin="0"

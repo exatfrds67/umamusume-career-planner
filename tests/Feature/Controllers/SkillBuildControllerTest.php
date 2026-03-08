@@ -60,10 +60,7 @@ it('returns empty array for unauthenticated saved builds', function () {
 
 it('optimizes a skill build', function () {
     $skillIds = $this->skills->pluck('id')->toArray();
-
-    if (empty($skillIds)) {
-        $this->markTestSkipped('No active skills available');
-    }
+    expect($skillIds)->not->toBeEmpty('Expected seeded active skills for build optimization test');
 
     $response = $this->postJson('/api/skills/build-optimization', [
         'skill_ids' => $skillIds,
@@ -93,10 +90,7 @@ it('rejects optimization with empty skills', function () {
 
 it('saves a custom build', function () {
     $skillIds = $this->skills->pluck('id')->toArray();
-
-    if (empty($skillIds)) {
-        $this->markTestSkipped('No active skills available');
-    }
+    expect($skillIds)->not->toBeEmpty('Expected seeded active skills for save build test');
 
     $response = $this->actingAs($this->user)
         ->postJson('/api/skills/save-build', [

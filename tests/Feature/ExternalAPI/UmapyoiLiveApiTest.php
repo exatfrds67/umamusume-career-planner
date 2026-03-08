@@ -29,12 +29,6 @@ use Illuminate\Support\Facades\Http;
 beforeEach(function () {
     Cache::flush();
 
-    // Note: These tests call the live API - they may fail if the API is down
-    // Set SKIP_LIVE_API_TESTS=true to skip them in CI
-    if (env('SKIP_LIVE_API_TESTS') === 'true' || env('SKIP_LIVE_API_TESTS') === true) {
-        $this->markTestSkipped('Live API tests are disabled. Set SKIP_LIVE_API_TESTS=false to enable.');
-    }
-
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */
     $mcpClient = Mockery::mock(MCPClientService::class);
     $mcpClient->shouldReceive('isServerEnabled')->withArgs(['fetch'])->andReturn(false);

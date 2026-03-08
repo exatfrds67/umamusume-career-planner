@@ -43,13 +43,13 @@ function initializeToggles() {
                 if (newState) {
                     slider.classList.remove("translate-x-0");
                     slider.classList.add("translate-x-5");
-                    this.classList.remove("bg-gray-200", "dark:bg-gray-600");
+                    this.classList.remove("bg-neutral-200", "dark:bg-neutral-600");
                     this.classList.add("bg-primary-600");
                 } else {
                     slider.classList.remove("translate-x-5");
                     slider.classList.add("translate-x-0");
                     this.classList.remove("bg-primary-600");
-                    this.classList.add("bg-gray-200", "dark:bg-gray-600");
+                    this.classList.add("bg-neutral-200", "dark:bg-neutral-600");
                 }
             }
 
@@ -140,7 +140,7 @@ function initializeThemeSelection() {
 function updateThemeButtonUI(buttons, activeIndex) {
     buttons.forEach((btn, idx) => {
         if (idx === activeIndex) {
-            btn.classList.remove("border-gray-300", "dark:border-gray-600");
+            btn.classList.remove("border-neutral-300", "dark:border-neutral-600");
             btn.classList.add("border-primary-500");
             
             if (!btn.querySelector(".border-primary-500")) {
@@ -152,7 +152,7 @@ function updateThemeButtonUI(buttons, activeIndex) {
             }
         } else {
             btn.classList.remove("border-primary-500");
-            btn.classList.add("border-gray-300", "dark:border-gray-600");
+            btn.classList.add("border-neutral-300", "dark:border-neutral-600");
             const indicator = btn.querySelector(".border-primary-500");
             if (indicator) indicator.remove();
         }
@@ -325,8 +325,8 @@ function loadSavedSettings() {
                             slider.classList.remove("translate-x-0");
                             slider.classList.add("translate-x-5");
                             element.classList.remove(
-                                "bg-gray-200",
-                                "dark:bg-gray-600"
+                                "bg-neutral-200",
+                                "dark:bg-neutral-600"
                             );
                             element.classList.add("bg-primary-600");
                         } else {
@@ -334,8 +334,8 @@ function loadSavedSettings() {
                             slider.classList.add("translate-x-0");
                             element.classList.remove("bg-primary-600");
                             element.classList.add(
-                                "bg-gray-200",
-                                "dark:bg-gray-600"
+                                "bg-neutral-200",
+                                "dark:bg-neutral-600"
                             );
                         }
                     }

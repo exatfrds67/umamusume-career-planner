@@ -25,7 +25,7 @@
                             <div class="flex-1">
                                 <p class="text-xs font-semibold text-primary-700 dark:text-primary-300 mb-1">Full Character
                                     Name Preview:</p>
-                                <p class="text-lg font-bold text-gray-900 dark:text-white">
+                                <p class="text-lg font-bold text-neutral-900 dark:text-white">
                                     <span x-show="formData.title" class="text-primary-600 dark:text-primary-400"
                                         x-text="'[' + formData.title + '] '"></span>
                                     <span x-text="formData.name || 'Enter name...'"></span>
@@ -41,8 +41,8 @@
                             <!-- Left Column: Avatar Preview -->
                             <div class="flex items-center justify-center">
                                 <div
-                                    class="flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 w-full">
-                                    <div class="w-64 h-64 mb-4 relative bg-gray-800 dark:bg-gray-900 overflow-hidden"
+                                    class="flex flex-col items-center justify-center p-8 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg border-2 border-dashed border-neutral-300 dark:border-neutral-600 w-full">
+                                    <div class="w-64 h-64 mb-4 relative bg-neutral-800 dark:bg-neutral-900 overflow-hidden"
                                         tabindex="0"
                                         role="application"
                                         aria-label="Avatar image position adjuster. Use arrow keys to reposition the image."
@@ -61,7 +61,7 @@
                                         </div>
                                         <!-- Translucent mask layer - HIDES image except in circular cutout -->
                                         <div x-show="formData.avatar_preview"
-                                            class="absolute inset-0 pointer-events-none bg-gray-900/60 dark:bg-gray-950/70"
+                                            class="absolute inset-0 pointer-events-none bg-neutral-900/60 dark:bg-neutral-950/70"
                                             style="mask-image: radial-gradient(circle 96px at center, transparent 0%, transparent 96px, black 96px, black 100%); -webkit-mask-image: radial-gradient(circle 96px at center, transparent 0%, transparent 96px, black 96px, black 100%);">
                                         </div>
                                         <!-- Draggable overlay for interaction -->
@@ -74,7 +74,7 @@
                                         </div>
                                         <!-- Empty state -->
                                         <div x-show="!formData.avatar_preview"
-                                            class="absolute inset-0 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                                            class="absolute inset-0 flex items-center justify-center text-neutral-500 dark:text-neutral-400">
                                             <svg class="w-32 h-32" fill="none" viewBox="0 0 24 24"
                                                 stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -82,7 +82,7 @@
                                             </svg>
                                         </div>
                                     </div>
-                                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+                                    <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300 text-center">
                                         <span x-show="formData.avatar_preview">Use arrow keys or drag to position</span>
                                         <span x-show="!formData.avatar_preview">No avatar selected</span>
                                     </p>
@@ -105,7 +105,7 @@
                                             <input type="file" name="avatar_upload" accept="image/*" class="hidden"
                                                 @change="handleImageUpload($event)">
                                         </label>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">JPG, PNG, GIF
+                                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 text-center">JPG, PNG, GIF
                                             (max 2MB)</p>
                                     </div>
 
@@ -135,10 +135,10 @@
 
                                 <!-- Image Editor Panel -->
                                 <div x-show="formData.avatar_preview" x-cloak
-                                    class="glass-card-inner border border-gray-200 dark:border-gray-700 rounded-lg">
+                                    class="glass-card-inner border border-neutral-200 dark:border-neutral-700 rounded-lg">
                                     <div class="card-header">
                                         <h4
-                                            class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                            class="text-sm font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                                                 stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -167,7 +167,7 @@
                                                 </button>
                                                 <input type="range" min="0.5" max="2" step="0.1"
                                                     x-model.number="formData.imageZoom"
-                                                    class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                                                    class="flex-1 h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer">
                                                 <button type="button" @click="adjustZoom(0.1)"
                                                     class="btn btn-sm btn-outline px-2">
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
@@ -199,7 +199,7 @@
                                                 </button>
                                                 <input type="range" min="0" max="360" step="15"
                                                     x-model.number="formData.imageRotation"
-                                                    class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                                                    class="flex-1 h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer">
                                                 <button type="button" @click="rotateImage(15)"
                                                     class="btn btn-sm btn-outline px-2">
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
@@ -213,7 +213,7 @@
                                         </div>
 
                                         <!-- Quick Actions -->
-                                        <div class="flex gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                                        <div class="flex gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-700">
                                             <button type="button" @click="flipImageHorizontal()"
                                                 class="btn btn-sm btn-outline flex-1 justify-center">
                                                 <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24"
@@ -239,8 +239,8 @@
                         </div>
 
                         <!-- Image Gallery -->
-                        <div x-show="showGallery" x-transition class="mt-4 p-6 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 text-center">Select from
+                        <div x-show="showGallery" x-transition class="mt-4 p-6 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                            <h4 class="text-sm font-semibold text-neutral-900 dark:text-white mb-4 text-center">Select from
                                 Trainee
                                 Gallery
                             </h4>
@@ -273,7 +273,7 @@
                                         class="relative group aspect-square rounded-lg overflow-hidden border-2 transition-all hover:border-primary-500 hover:scale-105"
                                         :class="formData.avatar_url === '{{ $imagePath }}' ?
                                             'border-primary-500 ring-2 ring-primary-500' :
-                                            'border-gray-300 dark:border-gray-600'">
+                                            'border-neutral-300 dark:border-neutral-600'">
                                         <img src="{{ $imagePath }}" alt="{{ $imageName }}" loading="lazy"
                                             decoding="async" width="80" height="80" class="w-full h-full object-cover">
                                         <div
@@ -295,6 +295,11 @@
                         </div>
 
                         <input type="hidden" name="avatar_url" x-model="formData.avatar_url">
+                        <input type="hidden" name="image_x" x-model="formData.imageX">
+                        <input type="hidden" name="image_y" x-model="formData.imageY">
+                        <input type="hidden" name="image_zoom" x-model="formData.imageZoom">
+                        <input type="hidden" name="image_rotation" x-model="formData.imageRotation">
+                        <input type="hidden" name="image_flip_h" :value="formData.imageFlipH ? '1' : '0'">
                     </div>
 
                     <fieldset>
@@ -302,19 +307,19 @@
                                 aria-label="required">*</span></legend>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <label
-                                class="relative flex flex-col p-4 rounded-lg border-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all"
+                                class="relative flex flex-col p-4 rounded-lg border-2 cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-all"
                                 :class="formData.scenario_type === 'ura_finale' ?
                                     'border-primary-500 bg-primary-50 dark:bg-primary-900/20' :
-                                    'border-gray-200 dark:border-gray-700'">
+                                    'border-neutral-200 dark:border-neutral-700'">
                                 <div class="flex items-center justify-between mb-2">
-                                    <span class="text-base font-semibold text-gray-900 dark:text-white">URA Finale</span>
+                                    <span class="text-base font-semibold text-neutral-900 dark:text-white">URA Finale</span>
                                     <input type="radio" name="scenario_type" value="ura_finale"
                                         x-model="formData.scenario_type" required
-                                        class="h-4 w-4 text-primary-600 border-gray-300 focus:ring-primary-500">
+                                        class="h-4 w-4 text-primary-600 border-neutral-300 focus:ring-primary-500">
                                 </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Traditional individual development path
+                                <p class="text-sm text-neutral-600 dark:text-neutral-400">Traditional individual development path
                                     with classic races</p>
-                                <div class="mt-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                <div class="mt-3 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -324,19 +329,18 @@
                             </label>
 
                             <label
-                                class="relative flex flex-col p-4 rounded-lg border-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all"
+                                class="relative flex flex-col p-4 rounded-lg border-2 cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-all"
                                 :class="formData.scenario_type === 'unity_cup' ?
                                     'border-primary-500 bg-primary-50 dark:bg-primary-900/20' :
-                                    'border-gray-200 dark:border-gray-700'">
+                                    'border-neutral-200 dark:border-neutral-700'">
                                 <div class="flex items-center justify-between mb-2">
-                                    <span class="text-base font-semibold text-gray-900 dark:text-white">Unity Cup</span>
+                                    <span class="text-base font-semibold text-neutral-900 dark:text-white">Unity Cup</span>
                                     <input type="radio" name="scenario_type" value="unity_cup"
                                         x-model="formData.scenario_type" required
-                                        class="h-4 w-4 text-primary-600 border-gray-300 focus:ring-primary-500">
+                                        class="h-4 w-4 text-primary-600 border-neutral-300 focus:ring-primary-500">
                                 </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Team-based training with Spirit Burst
-                                    mechanics</p>
-                                <div class="mt-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                <p class="text-sm text-neutral-600 dark:text-neutral-400">Team-based training with Spirit Burst mechanics</p>
+                                <div class="mt-3 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />

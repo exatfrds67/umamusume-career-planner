@@ -36,24 +36,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function createSkillItem(index) {
         return `
-            <div class="skill-item bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="skill-item bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg p-4">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
                     <div class="md:col-span-5">
-                        <label for="skill_name_${index}" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Skill Name</label>
-                        <input type="text" id="skill_name_${index}" name="skills[${index}][name]" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:text-white" placeholder="Skill name">
+                        <label for="skill_name_${index}" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">Skill Name</label>
+                        <input type="text" id="skill_name_${index}" name="skills[${index}][name]" class="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-800 dark:text-white" placeholder="Skill name">
                     </div>
                     <div class="md:col-span-2">
-                        <label for="skill_sp_${index}" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">SP Cost</label>
-                        <input type="number" id="skill_sp_${index}" name="skills[${index}][sp_cost]" min="0" max="500" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:text-white" placeholder="0">
+                        <label for="skill_sp_${index}" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">SP Cost</label>
+                        <input type="number" id="skill_sp_${index}" name="skills[${index}][sp_cost]" min="0" max="500" class="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-800 dark:text-white" placeholder="0">
                     </div>
                     <div class="md:col-span-2">
-                        <label for="skill_hint_${index}" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Hint Level</label>
-                        <input type="number" id="skill_hint_${index}" name="skills[${index}][hint_level]" min="0" max="5" value="0" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:text-white" placeholder="0">
+                        <label for="skill_hint_${index}" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">Hint Level</label>
+                        <input type="number" id="skill_hint_${index}" name="skills[${index}][hint_level]" min="0" max="5" value="0" class="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-800 dark:text-white" placeholder="0">
                     </div>
                     <div class="md:col-span-2 flex items-end">
                         <label class="flex items-center">
-                            <input type="checkbox" name="skills[${index}][is_acquired]" value="1" class="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700">
-                            <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Acquired</span>
+                            <input type="checkbox" name="skills[${index}][is_acquired]" value="1" class="w-4 h-4 text-primary-500 border-neutral-300 rounded focus:ring-primary-500 dark:border-neutral-600 dark:bg-neutral-700">
+                            <span class="ml-2 text-xs text-neutral-700 dark:text-neutral-300">Acquired</span>
                         </label>
                     </div>
                     <div class="md:col-span-1 flex items-end">

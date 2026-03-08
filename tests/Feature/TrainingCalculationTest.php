@@ -6,6 +6,7 @@ use App\Models\Character;
 use App\Services\MCP\MCPClientService;
 use App\Services\MCP\TrainingOptimizationAgent;
 use App\Services\TrainingCalculationService;
+use Mockery;
 
 test('calculates speed training gains correctly', function () {
     // Mock dependencies
@@ -74,18 +75,19 @@ test('verified formula produces consistent results', function () {
 
     $result = $service->calculateTrainingPrediction($character, 'speed', [
         'support_cards' => [
-            ['card_type' => 'speed', 'limit_break_level' => 2, 'bond_level' => 80],
-            ['card_type' => 'speed', 'limit_break_level' => 3, 'bond_level' => 80],
+            ['card_type' => 'speed', 'limit_break_level' => 2, 'friendship_level' => 80],
+            ['card_type' => 'speed', 'limit_break_level' => 3, 'friendship_level' => 85],
+            ['card_type' => 'speed', 'limit_break_level' => 0, 'friendship_level' => 90],
         ],
-        'participants' => 2,
+        'participants' => 3,
     ]);
 
     // Verify all formula components are present
     expect($result['breakdown']['growth_rate_multiplier'])->toBe(1.2) // 1 + 0.20
         ->and($result['breakdown']['mood_multiplier'])->toBe(1.02) // Good mood
-        ->and($result['breakdown']['support_card_presence_multiplier'])->toBe(1.10) // 2 cards
+        ->and($result['breakdown']['support_card_presence_multiplier'])->toBe(1.15) // 3 cards
         ->and($result['breakdown']['training_effect'])->toBeGreaterThan(0.0)
-        ->and($result['breakdown']['friendship_multiplier'])->toBeGreaterThan(1.0)
+        ->and($result['breakdown']['friendship_multiplier'])->toBe(1.2) // Flat 1.2x with 3+ rainbow cards
         ->and($result['stat_gains']['speed'])->toBeGreaterThan(0)
         ->and($result['stat_gains']['speed'])->toBeLessThanOrEqual(100); // Per-training cap
 });

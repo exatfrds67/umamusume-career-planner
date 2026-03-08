@@ -1,10 +1,10 @@
 {{-- Build Planner Tab --}}
 <div class="space-y-6" x-data="buildPlanner()">
     {{-- Build Templates --}}
-    <div class="card bg-white dark:bg-gray-800">
-        <div class="card-header border-b border-gray-200 dark:border-gray-700">
+    <div class="card bg-white dark:bg-neutral-800">
+        <div class="card-header border-b border-neutral-200 dark:border-neutral-700">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Build Templates</h3>
+                <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">Build Templates</h3>
                 <button @click="createCustomBuild()" class="btn btn-primary btn-sm">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -20,7 +20,7 @@
                     <div class="border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md"
                         :class="selectedTemplate?.id === template.id ?
                             'border-primary-500 bg-primary-50 dark:bg-primary-900/20' :
-                            'border-gray-200 dark:border-gray-700'"
+                            'border-neutral-200 dark:border-neutral-700'"
                         @click="selectTemplate(template)"
                         @keydown.enter.prevent="selectTemplate(template)"
                         @keydown.space.prevent="selectTemplate(template)"
@@ -30,8 +30,8 @@
                         :aria-pressed="selectedTemplate?.id === template.id ? 'true' : 'false'">
                         <div class="flex items-start justify-between mb-3">
                             <div>
-                                <h4 class="font-semibold text-gray-900 dark:text-white" x-text="template.name"></h4>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" x-text="template.category"></p>
+                                <h4 class="font-semibold text-neutral-900 dark:text-white" x-text="template.name"></h4>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1" x-text="template.category"></p>
                             </div>
                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
                                 :class="{
@@ -45,31 +45,31 @@
                                 x-text="template.meta_tier"></span>
                         </div>
 
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3" x-text="template.description"></p>
+                        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-3" x-text="template.description"></p>
 
                         <div class="space-y-2">
                             <div class="flex items-center justify-between text-sm">
-                                <span class="text-gray-500 dark:text-gray-400">Total Skills</span>
-                                <span class="font-medium text-gray-900 dark:text-white"
+                                <span class="text-neutral-500 dark:text-neutral-400">Total Skills</span>
+                                <span class="font-medium text-neutral-900 dark:text-white"
                                     x-text="template.skill_count"></span>
                             </div>
                             <div class="flex items-center justify-between text-sm">
-                                <span class="text-gray-500 dark:text-gray-400">Total SP Cost</span>
-                                <span class="font-medium text-gray-900 dark:text-white"
+                                <span class="text-neutral-500 dark:text-neutral-400">Total SP Cost</span>
+                                <span class="font-medium text-neutral-900 dark:text-white"
                                     x-text="`${template.total_sp_cost} SP`"></span>
                             </div>
                             <div class="flex items-center justify-between text-sm">
-                                <span class="text-gray-500 dark:text-gray-400">Potential Savings</span>
+                                <span class="text-neutral-500 dark:text-neutral-400">Potential Savings</span>
                                 <span class="font-medium text-green-600 dark:text-green-400"
                                     x-text="`${template.potential_savings} SP`"></span>
                             </div>
                         </div>
 
-                        <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <div class="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700">
                             <div class="flex flex-wrap gap-1">
                                 <template x-for="tag in template.tags" :key="tag">
                                     <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300"
                                         x-text="tag"></span>
                                 </template>
                             </div>
@@ -81,13 +81,13 @@
     </div>
 
     {{-- Selected Build Details --}}
-    <div x-show="selectedTemplate" class="card bg-white dark:bg-gray-800">
-        <div class="card-header border-b border-gray-200 dark:border-gray-700">
+    <div x-show="selectedTemplate" class="card bg-white dark:bg-neutral-800">
+        <div class="card-header border-b border-neutral-200 dark:border-neutral-700">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white" x-text="selectedTemplate?.name">
+                    <h3 class="text-lg font-semibold text-neutral-900 dark:text-white" x-text="selectedTemplate?.name">
                     </h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" x-text="selectedTemplate?.description"></p>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1" x-text="selectedTemplate?.description"></p>
                 </div>
                 <button @click="getAIOptimization()" :disabled="loading" class="btn btn-primary">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,14 +101,14 @@
         <div class="card-body">
             {{-- Build Overview --}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Skills</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white" x-text="selectedTemplate?.skill_count">
+                <div class="bg-neutral-50 dark:bg-neutral-900 rounded-lg p-4">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Total Skills</p>
+                    <p class="text-2xl font-bold text-neutral-900 dark:text-white" x-text="selectedTemplate?.skill_count">
                     </p>
                 </div>
-                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Base SP Cost</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white"
+                <div class="bg-neutral-50 dark:bg-neutral-900 rounded-lg p-4">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Base SP Cost</p>
+                    <p class="text-2xl font-bold text-neutral-900 dark:text-white"
                         x-text="selectedTemplate?.total_sp_cost"></p>
                 </div>
                 <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
@@ -125,20 +125,20 @@
 
             {{-- Skill List --}}
             <div class="mb-6">
-                <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Skills in This Build</h4>
+                <h4 class="font-semibold text-neutral-900 dark:text-white mb-3">Skills in This Build</h4>
                 <div class="space-y-2">
                     <template x-for="(skill, index) in selectedTemplate?.skills" :key="skill.id">
-                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
                             <div class="flex items-center gap-3">
                                 <span
                                     class="shrink-0 w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold"
                                     x-text="index + 1"></span>
                                 <div>
-                                    <p class="font-medium text-gray-900 dark:text-white" x-text="skill.name"></p>
+                                    <p class="font-medium text-neutral-900 dark:text-white" x-text="skill.name"></p>
                                     <div class="flex items-center gap-2 mt-1">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
                                             :class="{
-                                                'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': skill
+                                                'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300': skill
                                                     .rarity === 'normal',
                                                 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300': skill
                                                     .rarity === 'rare',
@@ -146,13 +146,13 @@
                                                     .rarity === 'unique'
                                             }"
                                             x-text="skill.rarity"></span>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400"
+                                        <span class="text-xs text-neutral-500 dark:text-neutral-400"
                                             x-text="skill.skill_type"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="font-bold text-gray-900 dark:text-white" x-text="`${skill.final_cost} SP`">
+                                <p class="font-bold text-neutral-900 dark:text-white" x-text="`${skill.final_cost} SP`">
                                 </p>
                                 <p x-show="skill.hints_available > 0"
                                     class="text-xs text-green-600 dark:text-green-400"
@@ -175,45 +175,45 @@
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">AI Optimization Analysis
+                        <h4 class="text-lg font-semibold text-neutral-900 dark:text-white mb-2">AI Optimization Analysis
                         </h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4" x-text="aiOptimization?.summary"></p>
+                        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4" x-text="aiOptimization?.summary"></p>
 
                         {{-- Optimization Score --}}
                         <div class="grid grid-cols-3 gap-4 mb-4">
                             <div>
-                                <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Efficiency Score</p>
+                                <p class="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Efficiency Score</p>
                                 <div class="flex items-baseline gap-2">
                                     <span class="text-2xl font-bold text-purple-600 dark:text-purple-400"
                                         x-text="aiOptimization?.efficiency_score"></span>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">/ 100</span>
+                                    <span class="text-sm text-neutral-500 dark:text-neutral-400">/ 100</span>
                                 </div>
                             </div>
                             <div>
-                                <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Synergy Rating</p>
+                                <p class="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Synergy Rating</p>
                                 <div class="flex items-baseline gap-2">
                                     <span class="text-2xl font-bold text-blue-600 dark:text-blue-400"
                                         x-text="aiOptimization?.synergy_rating"></span>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">/ 10</span>
+                                    <span class="text-sm text-neutral-500 dark:text-neutral-400">/ 10</span>
                                 </div>
                             </div>
                             <div>
-                                <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Meta Alignment</p>
+                                <p class="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Meta Alignment</p>
                                 <div class="flex items-baseline gap-2">
                                     <span class="text-2xl font-bold text-green-600 dark:text-green-400"
                                         x-text="aiOptimization?.meta_alignment"></span>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">%</span>
+                                    <span class="text-sm text-neutral-500 dark:text-neutral-400">%</span>
                                 </div>
                             </div>
                         </div>
 
                         {{-- Recommendations --}}
                         <div x-show="aiOptimization?.recommendations && aiOptimization.recommendations.length > 0">
-                            <h5 class="font-medium text-gray-900 dark:text-white mb-2">Recommendations</h5>
+                            <h5 class="font-medium text-neutral-900 dark:text-white mb-2">Recommendations</h5>
                             <ul class="space-y-2">
                                 <template x-for="rec in (aiOptimization?.recommendations || [])"
                                     :key="rec">
-                                    <li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                    <li class="flex items-start gap-2 text-sm text-neutral-700 dark:text-neutral-300">
                                         <svg class="w-5 h-5 text-purple-500 shrink-0 mt-0.5" fill="currentColor"
                                             viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
@@ -229,15 +229,15 @@
                         {{-- Acquisition Order --}}
                         <div x-show="aiOptimization?.acquisition_order && aiOptimization.acquisition_order.length > 0"
                             class="mt-4">
-                            <h5 class="font-medium text-gray-900 dark:text-white mb-2">Optimal Acquisition Order</h5>
+                            <h5 class="font-medium text-neutral-900 dark:text-white mb-2">Optimal Acquisition Order</h5>
                             <div class="space-y-2">
                                 <template x-for="(step, index) in (aiOptimization?.acquisition_order || [])"
                                     :key="index">
-                                    <div class="flex items-center gap-3 p-2 bg-white dark:bg-gray-800 rounded">
+                                    <div class="flex items-center gap-3 p-2 bg-white dark:bg-neutral-800 rounded">
                                         <span
                                             class="shrink-0 w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold"
                                             x-text="index + 1"></span>
-                                        <span class="text-sm text-gray-700 dark:text-gray-300" x-text="step"></span>
+                                        <span class="text-sm text-neutral-700 dark:text-neutral-300" x-text="step"></span>
                                     </div>
                                 </template>
                             </div>
@@ -262,22 +262,22 @@
     </div>
 
     {{-- Saved Builds --}}
-    <div class="card bg-white dark:bg-gray-800">
-        <div class="card-header border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">My Saved Builds</h3>
+    <div class="card bg-white dark:bg-neutral-800">
+        <div class="card-header border-b border-neutral-200 dark:border-neutral-700">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">My Saved Builds</h3>
         </div>
         <div class="card-body">
             <div x-show="savedBuilds.length === 0" class="text-center py-8">
-                <p class="text-gray-500 dark:text-gray-400">No saved builds yet</p>
+                <p class="text-neutral-500 dark:text-neutral-400">No saved builds yet</p>
             </div>
 
             <div x-show="savedBuilds.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <template x-for="build in savedBuilds" :key="build.id">
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <div class="border border-neutral-200 dark:border-neutral-700 rounded-lg p-4">
                         <div class="flex items-start justify-between mb-3">
                             <div>
-                                <h4 class="font-semibold text-gray-900 dark:text-white" x-text="build.name"></h4>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" x-text="build.created_at">
+                                <h4 class="font-semibold text-neutral-900 dark:text-white" x-text="build.name"></h4>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1" x-text="build.created_at">
                                 </p>
                             </div>
                             <button @click="deleteBuild(build.id)"
@@ -292,13 +292,13 @@
 
                         <div class="space-y-2 mb-3">
                             <div class="flex items-center justify-between text-sm">
-                                <span class="text-gray-500 dark:text-gray-400">Skills</span>
-                                <span class="font-medium text-gray-900 dark:text-white"
+                                <span class="text-neutral-500 dark:text-neutral-400">Skills</span>
+                                <span class="font-medium text-neutral-900 dark:text-white"
                                     x-text="build.skill_count"></span>
                             </div>
                             <div class="flex items-center justify-between text-sm">
-                                <span class="text-gray-500 dark:text-gray-400">Total SP</span>
-                                <span class="font-medium text-gray-900 dark:text-white"
+                                <span class="text-neutral-500 dark:text-neutral-400">Total SP</span>
+                                <span class="font-medium text-neutral-900 dark:text-white"
                                     x-text="`${build.total_sp} SP`"></span>
                             </div>
                         </div>

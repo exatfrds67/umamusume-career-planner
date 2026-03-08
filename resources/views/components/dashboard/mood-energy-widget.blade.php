@@ -25,18 +25,18 @@
 
 <div {{ $attributes->merge(['class' => 'glass-card rounded-xl w-full']) }}>
     <div class="px-6 pt-6 pb-8">
-        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+        <h3 class="text-lg font-medium leading-6 text-neutral-900 dark:text-white mb-4">
             Mood & Energy
         </h3>
 
         <div class="space-y-3 w-full">
             {{-- Mood Status using ConditionBadge --}}
             <div class="flex items-center justify-between w-full">
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Mood</span>
+                <span class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Mood</span>
                 <x-condition-badge :condition="strtoupper($mood)" trend="flat" :turns-active="0" :show-trend="false" />
             </div>
 
-            <hr class="border-gray-200 dark:border-gray-700/60">
+            <hr class="border-neutral-200 dark:border-neutral-700/60">
 
             {{-- Energy using EnergyGauge --}}
             <div class="w-full">
