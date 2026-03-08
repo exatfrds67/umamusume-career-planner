@@ -115,7 +115,7 @@ flowchart TD
     style End fill:#c8e6c9
     style AIOptimize fill:#fff3e0
     style SaveDeck fill:#f3e5f5
-```
+```text
 
 ### 2.2 Detailed State Diagram
 
@@ -208,7 +208,7 @@ sequenceDiagram
     Cache-->>Service: Current deck (if exists)
     Service-->>UI: Deck context bundle
     UI-->>User: Display deck builder
-```
+```text
 
 **Context Data Loaded**:
 
@@ -256,7 +256,7 @@ sequenceDiagram
 │                                                            │
 │                          [SKIP] [START FROM SCRATCH]       │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Template Composition Rules**:
 
@@ -357,7 +357,7 @@ sequenceDiagram
 │                                                            │
 │                  [AUTO-OPTIMIZE] [SAVE DECK] [RESET]       │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Slot Management Actions**:
 
@@ -401,7 +401,7 @@ sequenceDiagram
 │                                                            │
 │                                    [CANCEL] [SELECT NONE]  │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Card Selection Criteria**:
 
@@ -540,7 +540,7 @@ class DeckValidationService
         );
     }
 }
-```
+```text
 
 ---
 
@@ -641,7 +641,7 @@ class DeckSynergyCalculator
         return ($totalPoints / $maxPoints) * 20;
     }
 }
-```
+```text
 
 #### 3.5.2 Deck Analysis Display
 
@@ -677,7 +677,7 @@ class DeckSynergyCalculator
 │                                                            │
 │                          [RUN AUTO-OPTIMIZE] [CONTINUE]    │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 ---
 
@@ -721,7 +721,7 @@ class DeckSynergyCalculator
 │                                                            │
 │              [APPLY CHANGES] [CUSTOMIZE] [CANCEL]          │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 #### 3.6.2 Optimization Service
 
@@ -804,7 +804,7 @@ class DeckOptimizationService
 
 #### 3.7.1 Save Confirmation
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Save Deck Configuration                                   │
 ├────────────────────────────────────────────────────────────┤
@@ -856,7 +856,7 @@ sequenceDiagram
     Service-->>UI: Save successful
     UI-->>User: Show success message
     UI-->>User: Redirect to career dashboard
-```
+```text
 
 ---
 
@@ -952,7 +952,7 @@ sequenceDiagram
     Service->>Cache: Update cache("meta_tiers")
     Service->>Service: Log sync event
     Service-->>Scheduler: Sync complete
-```
+```text
 
 ### 5.3 Friendship Training System
 
@@ -1071,7 +1071,7 @@ flowchart TD
     R2 --> Resolve
     R3 --> Resolve
     R4 --> Resolve
-```
+```text
 
 ### 7.2 Error Messages
 

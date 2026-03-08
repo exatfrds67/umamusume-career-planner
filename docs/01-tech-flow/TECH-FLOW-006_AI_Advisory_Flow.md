@@ -98,7 +98,7 @@ flowchart TB
     style Providers fill:#e8f5e9
     style MCPLayer fill:#fce4ec
     style Infrastructure fill:#f3e5f5
-```
+```text
 
 ### 1.2 Component Hierarchy
 
@@ -143,7 +143,7 @@ AI Advisory System
     ├── AIRecommendation
     ├── MCPToolUsage
     └── AICostTracking
-```
+```text
 
 ---
 
@@ -245,7 +245,7 @@ flowchart TD
     style RaceAgent fill:#fff9c4
     style SkillAgent fill:#fff9c4
     style CareerAgent fill:#fff9c4
-```
+```text
 
 ### 2.3 MCP Tool Execution Flow
 
@@ -311,7 +311,7 @@ flowchart TD
     
     style Trigger fill:#e3f2fd
     style Complete fill:#c8e6c9
-```
+```text
 
 ### 2.5 Cost Tracking and Budget Management
 
@@ -440,7 +440,7 @@ class OllamaService implements AIProviderInterface
         return 'ollama';
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -521,7 +521,7 @@ ollama pull codellama
 
 # Verify installation
 ollama list
-```
+```text
 
 **Deliverables**:
 
@@ -658,7 +658,7 @@ AWS_DEFAULT_REGION=us-east-1
 BEDROCK_ENABLED=true
 BEDROCK_MODEL=anthropic.claude-3-5-sonnet-20241022-v2:0
 BEDROCK_MAX_TOKENS=4096
-```
+```text
 
 **Deliverables**:
 
@@ -813,7 +813,7 @@ Format your response as JSON:
 PROMPT;
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -913,7 +913,7 @@ Schema::create('ucp_ai_conversations', function (Blueprint $table) {
     $table->index(['user_id', 'context_type']);
     $table->index('created_at');
 });
-```
+```text
 
 **Deliverables**:
 
@@ -1001,7 +1001,7 @@ class AIContextSnapshot extends Model
         return $this->belongsTo(Character::class);
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -1101,7 +1101,7 @@ test('falls back to Bedrock when Ollama unavailable', function () {
     
     expect($advice->provider)->toBe('bedrock');
 });
-```
+```text
 
 **Deliverables**:
 
@@ -1169,7 +1169,7 @@ public function getAdvice(string $query, ?Character $character, array $options =
  * @return AIResponse
  */
 public function generate(string $prompt, array $options = []): AIResponse;
-```
+```text
 
 ---
 
@@ -1252,7 +1252,7 @@ flowchart TD
     
     CostTrackingService --> AICostTracking
     CostTrackingService --> EventDispatcher
-```
+```text
 
 ---
 
@@ -1314,7 +1314,7 @@ pie title Test Distribution
     "Feature Tests (API)" : 8
     "Integration Tests (Providers)" : 6
     "Mock Tests" : 6
-```
+```text
 
 ---
 

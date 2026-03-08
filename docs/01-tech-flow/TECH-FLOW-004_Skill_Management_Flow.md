@@ -78,7 +78,7 @@ flowchart TB
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fff3e0
-```
+```text
 
 ### 1.2 Component Hierarchy
 
@@ -116,7 +116,7 @@ Skill Management System
     ├── SkillAcquisition
     ├── SkillHint
     └── SkillEvolution
-```
+```text
 
 ---
 
@@ -199,7 +199,7 @@ flowchart TD
     style End fill:#c8e6c9
     style GuaranteedHint fill:#fff9c4
     style CapAtMax fill:#ffccbc
-```
+```text
 
 **Game-Accurate Hint Discount System (Verified Jan 2026)**:
 
@@ -353,7 +353,7 @@ class Skill extends Model
         return $this->evolutionTo->base_sp_cost - $this->base_sp_cost;
     }
 }
-```
+```text
 
 **Migration**:
 
@@ -490,7 +490,7 @@ class SkillCatalogService
         return $baseQuery->orderBy('base_sp_cost', 'desc')->limit(10)->get();
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -614,7 +614,7 @@ Schema::create('ucp_skill_hints', function (Blueprint $table) {
     $table->index(['character_id', 'skill_id']);
     $table->unique(['character_id', 'skill_id', 'support_card_id']);
 });
-```
+```text
 
 **Deliverables**:
 
@@ -786,7 +786,7 @@ class SkillHintService
 ```php
 // database/migrations/YYYY_MM_DD_add_evolution_to_skills.php
 // Already covered in Skill model with evolution_from_id relationship
-```
+```text
 
 **Deliverables**:
 
@@ -1056,7 +1056,7 @@ test('skill search finds by name or japanese name', function () {
     expect($resultsEnglish)->toHaveCount(1)
         ->and($resultsJapanese)->toHaveCount(1);
 });
-```
+```text
 
 **Deliverables**:
 
@@ -1126,7 +1126,7 @@ public function searchSkills(string $term, int $limit = 10): Collection;
  * @return int Final SP cost after discounts
  */
 public function calculateFinalCost(Skill $skill, Character $character): int;
-```
+```text
 
 ---
 
@@ -1200,7 +1200,7 @@ erDiagram
         int discount_percentage
         boolean is_used
     }
-```
+```text
 
 ---
 
@@ -1292,7 +1292,7 @@ flowchart TD
     "cached": false
   }
 }
-```
+```text
 
 ---
 

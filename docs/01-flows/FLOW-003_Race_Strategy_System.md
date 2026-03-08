@@ -40,7 +40,7 @@ flowchart TD
     DisplayUI --> UserAction{User Action}
     UserAction -->|Register| SaveRegistration[Save to Plan]
     UserAction -->|Cancel| ReturnToCalendar
-```
+```text
 
 ---
 
@@ -108,7 +108,7 @@ flowchart TD
     Normalize --> ApplyVariance[Apply RNG Variance (+/- 5%)]
     
     ApplyVariance --> ReturnProb[Return Probability]
-```
+```text
 
 ---
 
@@ -175,7 +175,7 @@ flowchart TD
     GoodMod --> FinalCalc
     MedMod --> FinalCalc
     PoorMod --> FinalCalc
-```
+```text
 
 ### 6.1 Track Condition Reference (Game-Accurate)
 

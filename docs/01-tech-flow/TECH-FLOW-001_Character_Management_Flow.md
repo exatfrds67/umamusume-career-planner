@@ -76,7 +76,7 @@ flowchart TB
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fff3e0
-```
+```text
 
 ### 1.2 Component Hierarchy
 
@@ -113,7 +113,7 @@ Character Management System
     ├── Goal
     ├── Condition
     └── Snapshot
-```
+```text
 
 ---
 
@@ -200,7 +200,7 @@ flowchart TD
     style Response fill:#c8e6c9
     style TriggerEvent fill:#fff3e0
     style GoalCompleted fill:#ffccbc
-```
+```text
 
 ### 2.3 Factor Inheritance Calculation Flow
 
@@ -348,7 +348,7 @@ class Character extends Model
         };
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -457,7 +457,7 @@ class Factor extends Model
         return "{$this->factor_type}: " . str_repeat('★', $this->star_rating) . str_repeat('☆', 3 - $this->star_rating);
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -577,7 +577,7 @@ class Condition extends Model
         return $this->modifier_json[$key] ?? null;
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -704,7 +704,7 @@ class CharacterRepository
         return $character->delete();
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -940,7 +940,7 @@ class FactorInheritanceService
         };
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -1089,7 +1089,7 @@ public function createCharacter(array $data): Character;
  * }
  */
 public function calculateInheritedStats(array $parentIds): array;
-```
+```text
 
 ---
 
@@ -1198,7 +1198,7 @@ flowchart TD
     
     GoalManagementService --> GoalRepository
     GoalManagementService --> EventDispatcher
-```
+```text
 
 ---
 

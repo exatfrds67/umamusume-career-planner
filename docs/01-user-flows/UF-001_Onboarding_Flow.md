@@ -109,7 +109,7 @@ flowchart TD
     style End fill:#c8e6c9
     style Welcome fill:#fff3e0
     style Dashboard fill:#f3e5f5
-```
+```text
 
 ### 2.2 Detailed Flow with States
 
@@ -194,7 +194,7 @@ stateDiagram-v2
 
 **UI Components**:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ Choose Your Storage Mode                                    │
 ├─────────────────────────────────────────────────────────────┤
@@ -274,7 +274,7 @@ class LocalStorageManager {
         };
     }
 }
-```
+```text
 
 **Validation**:
 
@@ -364,7 +364,7 @@ sequenceDiagram
     User->>App: Click Verification Link
     App->>Database: Mark Email Verified
     App-->>User: Redirect to Setup
-```
+```text
 
 ---
 
@@ -390,7 +390,7 @@ sequenceDiagram
 │                                                             │
 │                                    [← Back]  [Next →]       │
 └──────────────���──────────────────────────────────────────────┘
-```
+```text
 
 **Validation**:
 
@@ -418,7 +418,7 @@ sequenceDiagram
 │                                                             │
 │                                    [← Back]  [Next →]       │
 └─────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Avatar Options**:
 
@@ -449,7 +449,7 @@ sequenceDiagram
 │                                                             │
 │                                    [← Back]  [Complete →]   │
 └─────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Preferences Configuration**:
 
@@ -500,7 +500,7 @@ protected $fillable = [
 
 **Completion Screen**:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ You're All Set! 🎉                                          │
 ├────────────���────────────────────────────────────────────────┤
@@ -580,7 +580,7 @@ tour.addStep({
 // ... additional steps
 
 tour.start();
-```
+```text
 
 **Tour Controls**:
 
@@ -695,7 +695,7 @@ flowchart TD
     R2 --> Resolve
     R3 --> Resolve
     R4 --> Resolve
-```
+```text
 
 ### 6.2 Error Messages
 

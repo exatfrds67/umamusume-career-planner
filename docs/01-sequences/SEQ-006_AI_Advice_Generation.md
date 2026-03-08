@@ -90,7 +90,7 @@ The AI advisory system provides intelligent recommendations across all planning 
 
 ### 2.2 Component Locations
 
-```
+```text
 
 app/
 ├── Livewire/
@@ -212,7 +212,7 @@ sequenceDiagram
     UI->>UI: Render recommendation
     UI->>UI: Display confidence badge
     UI-->>User: Show AI advice + actions
-```
+```text
 
 ### 3.2 Timeline Breakdown
 
@@ -242,7 +242,7 @@ sequenceDiagram
 
 ```
 User Query → Controller → AIAdvisoryService → ContextBuilder
-```
+```text
 
 **Context Builder Implementation:**
 
@@ -374,7 +374,7 @@ class AIRouterService
         }
     }
 }
-```
+```text
 
 ### 4.3 Ollama Service Integration
 
@@ -528,7 +528,7 @@ class BedrockService implements AIProviderInterface
         };
     }
 }
-```
+```text
 
 ### 4.5 Neuron Agent Execution
 
@@ -623,7 +623,7 @@ class MCPClientService
         );
     }
 }
-```
+```text
 
 ---
 
@@ -694,7 +694,7 @@ class MCPClientService
     }
   ]
 }
-```
+```text
 
 ### 5.3 AI Response Object
 
@@ -743,7 +743,7 @@ class MCPClientService
   "cost_usd": 0.00,
   "created_at": "2026-01-24T10:00:00Z"
 }
-```
+```text
 
 ### 5.5 Agent Response
 
@@ -823,7 +823,7 @@ sequenceDiagram
             end
         end
     end
-```
+```text
 
 ### 6.3 Error Recovery Strategies
 
@@ -885,7 +885,7 @@ if ($this->getUserCostLimit() !== null) {
         return 'ollama';
     }
 }
-```
+```text
 
 **Cost Tracking:**
 

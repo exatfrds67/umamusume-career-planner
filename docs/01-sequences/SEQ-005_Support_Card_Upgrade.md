@@ -83,7 +83,7 @@ Support card management is critical for training optimization:
 
 ### 2.2 Component Locations
 
-```
+```text
 
 app/
 ├── Livewire/
@@ -226,7 +226,7 @@ sequenceDiagram
     CardSvc-->>Controller: Deck saved
     Controller-->>UI: 200 OK
     UI-->>User: Display success
-```
+```text
 
 ### 3.2 Timeline Breakdown
 
@@ -254,7 +254,7 @@ sequenceDiagram
 
 ```
 User → Livewire Component → SupportCardController → SupportCardService
-```
+```text
 
 **Controller Action:**
 
@@ -319,7 +319,7 @@ public function getOwnedCards(User $user, array $filters = []): Collection
             ];
         });
 }
-```
+```text
 
 ### 4.2 Limit Break Upgrade Logic (Game-Accurate - Global English Server Jan 2026)
 
@@ -454,7 +454,7 @@ class BondProgressionService
         event(new BondMilestoneReached($card, $milestone, $reward));
     }
 }
-```
+```text
 
 **Bond Milestones:**
 
@@ -613,7 +613,7 @@ class SynergyCalculator
         return $avgTierScore;
     }
 }
-```
+```text
 
 ---
 
@@ -726,7 +726,7 @@ class SynergyCalculator
   "average_limit_break": 2.5,
   "average_bond_level": 76.7
 }
-```
+```text
 
 ### 5.3 Card Upgrade Request
 
@@ -759,7 +759,7 @@ class SynergyCalculator
   },
   "message": "Card upgraded to 4★ limit break!"
 }
-```
+```text
 
 ### 5.5 Deck Validation Response
 
@@ -832,7 +832,7 @@ sequenceDiagram
         Controller-->>UI: 200 OK
         UI-->>User: Display success + animation
     end
-```
+```text
 
 ### 6.3 Transaction Rollback Scenarios
 
@@ -899,7 +899,7 @@ CREATE INDEX idx_support_cards_user_type ON ucp_support_cards(user_id, card_type
 CREATE INDEX idx_support_cards_limit_break ON ucp_support_cards(limit_break_level);
 CREATE INDEX idx_deck_cards_deck ON ucp_deck_cards(support_deck_id);
 CREATE INDEX idx_support_cards_template ON ucp_support_cards(card_template_id);
-```
+```text
 
 ### 7.4 Cache Strategy
 

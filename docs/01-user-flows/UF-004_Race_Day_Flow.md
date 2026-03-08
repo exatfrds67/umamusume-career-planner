@@ -137,7 +137,7 @@ flowchart TD
     style End fill:#c8e6c9
     style AIStrategyAdvice fill:#fff3e0
     style ExecuteRace fill:#f3e5f5
-```
+```text
 
 ### 2.2 Detailed State Diagram
 
@@ -198,7 +198,7 @@ stateDiagram-v2
 
 #### 3.1.1 Race Calendar Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Race Calendar                                        [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -261,7 +261,7 @@ stateDiagram-v2
 
 #### 3.2.1 Race Analysis Dashboard
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Race Analysis: Kanto Okami Cup                       [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -448,7 +448,7 @@ class RaceAnalysisService
         };
     }
 }
-```
+```text
 
 ---
 
@@ -500,7 +500,7 @@ class RaceAnalysisService
 │                                                            │
 │                                    [BACK] [IMPLEMENT PLAN] │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Recommendation Components**:
 
@@ -564,7 +564,7 @@ class RacePreparationAgent extends Agent
 
 #### 3.4.1 Strategy Selection Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Select Running Style Strategy                        [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -653,7 +653,7 @@ class StrategyScoreCalculator
         return $score * 100;
     }
 }
-```
+```text
 
 ---
 
@@ -703,7 +703,7 @@ sequenceDiagram
 
 #### 3.5.2 Race Results Screen
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Race Results: Kanto Okami Cup                        [✓]   │
 ├────────────────────────────────────────────────────────────┤
@@ -806,7 +806,7 @@ flowchart TD
     Good --> NextTurn
     Low --> NextTurn
     Skip --> NextTurn[Next Turn]
-```
+```text
 
 ### 4.2 Key Decision Factors
 
@@ -880,7 +880,7 @@ class ReadinessCalculator
         return array_sum($scores) / count($scores);
     }
 }
-```
+```text
 
 ### 5.2 Win Probability Calculation
 
@@ -995,7 +995,7 @@ test('race day flow completes successfully', function () {
         ->and($career->energy)->toBeLessThan(78)
         ->and($career->raceResults)->toHaveCount(1);
 });
-```
+```text
 
 ---
 
@@ -1101,7 +1101,7 @@ flowchart LR
     Execution --> HistoryRepo
     
     Execution --> AnalyticsService
-```
+```text
 
 ---
 

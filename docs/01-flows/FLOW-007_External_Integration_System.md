@@ -49,7 +49,7 @@ flowchart TD
     ValidateData --> StoreCache[Store in Redis (24h TTL)]
     StoreCache --> StoreDB[Sync to Database]
     StoreDB --> ReturnData[Return Fresh Data]
-```
+```text
 
 ---
 
@@ -126,7 +126,7 @@ flowchart TD
     
     Broadcast --> WebSocket[Laravel Reverb]
     WebSocket --> ClientUpdate[Update Client UI]
-```
+```text
 
 ---
 
@@ -183,7 +183,7 @@ flowchart TD
         UpdateEvent[Data Update Event] --> FindKeys[Find Related Keys]
         FindKeys --> DeleteKeys[Delete/Tag Invalidation]
     end
-```
+```text
 
 ---
 

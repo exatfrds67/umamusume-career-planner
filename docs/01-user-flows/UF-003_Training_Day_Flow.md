@@ -147,7 +147,7 @@ flowchart TD
     style End fill:#c8e6c9
     style AIProcessing fill:#fff3e0
     style ExecuteTraining fill:#f3e5f5
-```
+```text
 
 ### 2.2 Detailed State Diagram
 
@@ -223,7 +223,7 @@ stateDiagram-v2
 
 #### 3.1.1 Status Display Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Training Session - Turn 45 (Classic Year)            [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -277,7 +277,7 @@ class TrainingSelector extends Component
             ->getPredictions($this->career);
     }
 }
-```
+```text
 
 ---
 
@@ -351,7 +351,7 @@ public function calculate(CareerRun $career, TrainingType $type): StatGains
         // Secondary stats calculated similarly
     ]);
 }
-```
+```text
 
 ---
 
@@ -419,7 +419,7 @@ public function calculate(CareerRun $career, TrainingType $type): StatGains
 │                                                            │
 │                      [Request Detailed AI Analysis]        │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Prediction Components Explained**:
 
@@ -476,7 +476,7 @@ public function calculate(CareerRun $career, TrainingType $type): StatGains
 │                                                            │
 │             [CONFIRM AND EXECUTE] [CANCEL]                 │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **User Actions**:
 
@@ -560,7 +560,7 @@ flowchart TD
     CheckGoals --> ClearCache[Invalidate Prediction Cache]
     ClearCache --> ShowResults[Display Results]
     ShowResults --> End([Training Complete])
-```
+```text
 
 #### 3.5.2 Success Roll Logic
 
@@ -649,7 +649,7 @@ private function applyStatGain(int $currentStat, float $gain): int
     
     return $currentStat + (int) round($effectiveGain);
 }
-```
+```text
 
 ---
 
@@ -692,7 +692,7 @@ private function applyStatGain(int $currentStat, float $gain): int
 │                                                            │
 │               [CONTINUE TO NEXT TURN] [VIEW FULL STATS]    │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Failure Result Example**:
 
@@ -717,7 +717,7 @@ private function applyStatGain(int $currentStat, float $gain): int
 │                                                            │
 │               [CONTINUE TO NEXT TURN] [REQUEST AI ADVICE]  │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 ---
 
@@ -784,7 +784,7 @@ flowchart LR
     
     Alternative --> Rest[Consider Rest]
     Alternative --> OtherFacility[Try Different Facility]
-```
+```text
 
 ---
 
@@ -842,7 +842,7 @@ flowchart TD
 
 The accurate training formula from the Global English Server:
 
-```
+```text
 Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
             × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
 ```
@@ -925,7 +925,7 @@ private function calculateFriendshipMultiplier(CareerRun $career, TrainingType $
     
     return $friendshipBonus;
 }
-```
+```text
 
 ```
 
@@ -995,7 +995,7 @@ public function calculateBondGain(CareerRun $career): int
     
     return $baseBondGain;
 }
-```
+```text
 
 #### 5.2.3 Risk Calculation
 
@@ -1059,7 +1059,7 @@ public function invalidatePredictions(CareerRun $career): void
 {
     Cache::forget("predictions.career.{$career->id}");
 }
-```
+```text
 
 ---
 
@@ -1143,7 +1143,7 @@ flowchart TD
     R2 --> Resolve
     R3 --> Resolve
     R4 --> Resolve
-```
+```text
 
 ### 7.2 Error Messages
 

@@ -45,7 +45,7 @@ flowchart TD
     CheckFallback -->|No| ReturnError[Return Service Unavailable]
     
     ProcessResponse --> ReturnUser[Return Advice]
-```
+```text
 
 ---
 
@@ -119,7 +119,7 @@ flowchart TD
     NewResponse --> UpdateMemory[Update Memory MCP]
     
     UpdateDB --> End([End Flow])
-```
+```text
 
 ---
 
@@ -189,7 +189,7 @@ flowchart TD
     CheckLimit -->|Approaching| SendWarning[Send Budget Warning]
     CheckLimit -->|Exceeded| BlockCloud[Disable Cloud Provider]
     CheckLimit -->|OK| Continue
-```
+```text
 
 ---
 
@@ -248,7 +248,7 @@ flowchart TD
     
     UpdateUI --> RenderActions[Render Follow-up Actions]
     RenderActions --> SaveHistory[Persist State]
-```
+```text
 
 ---
 
@@ -295,7 +295,7 @@ This section documents the verified game mechanics that AI agents must use when 
 
 ```
 Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
-```
+```text
 
 ### 8.5 Stat Caps
 

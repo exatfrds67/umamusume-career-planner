@@ -64,7 +64,7 @@ sequenceDiagram
     Controller-->>UI: 201 Created + character data
     UI->>UI: Update component state
     UI-->>User: Display Success + Redirect
-```
+```text
 
 **Related Documents:**
 
@@ -180,7 +180,7 @@ sequenceDiagram
     Controller-->>Livewire: 200 OK + updated state
     Livewire->>Livewire: Update reactive properties
     Livewire-->>User: Display results + animation
-```
+```text
 
 **Related Documents:**
 
@@ -284,7 +284,7 @@ sequenceDiagram
     RaceService-->>Controller: Result summary
     Controller-->>Livewire: 200 OK + result data
     Livewire-->>User: Display race outcome
-```
+```text
 
 **Related Documents:**
 
@@ -389,7 +389,7 @@ sequenceDiagram
     
     Controller-->>Livewire: Response
     Livewire-->>User: Display evolution result
-```
+```text
 
 **Related Documents:**
 
@@ -519,7 +519,7 @@ sequenceDiagram
     AdviceService-->>Controller: Advice object
     Controller-->>Livewire: JSON response
     Livewire-->>User: Display recommendation
-```
+```text
 
 **Related Documents:**
 
@@ -629,7 +629,7 @@ sequenceDiagram
     end
     
     ExternalDataService-->>Scheduler: Sync complete
-```
+```text
 
 **Related Documents:**
 
@@ -759,7 +759,7 @@ sequenceDiagram
     end
     
     Controller-->>User: Success count + warnings
-```
+```text
 
 **Related Documents:**
 
@@ -878,7 +878,7 @@ sequenceDiagram
         
         Controller-->>User: Restore result
     end
-```
+```text
 
 **Related Documents:**
 
@@ -957,7 +957,7 @@ sequenceDiagram
     CacheManager->>Redis: DEL key
     CacheManager->>CacheManager: Tag-based invalidation
     CacheManager->>Redis: DEL related keys
-```
+```text
 
 **Related Documents:**
 

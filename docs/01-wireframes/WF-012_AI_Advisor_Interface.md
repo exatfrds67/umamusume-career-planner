@@ -62,7 +62,7 @@ The AI Advisor Interface provides an intelligent conversational interface for tr
 
 The AI Advisor uses the following verified training formula for stat gain predictions:
 
-```
+```text
 Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
             × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
 ```
@@ -137,7 +137,7 @@ The AI Advisor tracks and advises based on critical stat breakpoints:
 
 ### 3.1 Desktop Layout (≥1024px)
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ [≡] Menu | AI Advisor - Tazuna-san                              [?] Help     │
 ├──────────────────────────────────────────────────────────────────────────────┤
@@ -189,7 +189,7 @@ The AI Advisor tracks and advises based on critical stat breakpoints:
 
 ### 3.2 Tablet Layout (640px-1024px)
 
-```
+```text
 ┌────────────────────────────────────────────────────┐
 │ [≡] AI Advisor - Tazuna-san              [?]       │
 ├────────────────────────────────────────────────────┤
@@ -223,7 +223,7 @@ The AI Advisor tracks and advises based on critical stat breakpoints:
 
 ### 3.3 Mobile Layout (<640px)
 
-```
+```text
 ┌──────────────────────────────┐
 │ [≡] AI Advisor         [?]   │
 ├──────────────────────────────┤
@@ -301,7 +301,7 @@ class ProviderStatus extends Component
         return view('livewire.ai.provider-status');
     }
 }
-```
+```text
 
 **Visual Format**:
 
@@ -318,7 +318,7 @@ class ProviderStatus extends Component
 │ Cost: $2.15 / $50.00 budget            │
 │ ████░░░░░░░░░░░░ 12.5%                 │
 └────────────────────────────────────────┘
-```
+```text
 
 ### 4.2 Turn Counter & Career Phase Widget (NEW in v2.2.0)
 
@@ -393,7 +393,7 @@ class TurnPhaseIndicator extends Component
 
 **Visual Format**:
 
-```
+```text
 ┌─────────────────────────────────────┐
 │ Career Progress                     │
 ├─────────────────────────────────────┤
@@ -464,7 +464,7 @@ class TrainingFormulaDisplay extends Component
         return view('livewire.ai.training-formula-display');
     }
 }
-```
+```text
 
 **Visual Format (Expanded)**:
 
@@ -492,7 +492,7 @@ class TrainingFormulaDisplay extends Component
 │                                                     │
 │ ⚠️ Note: Above 1200, gains are halved (soft cap)    │
 └─────────────────────────────────────────────────────┘
-```
+```text
 
 ### 4.4 Conversation Message Component
 
@@ -623,7 +623,7 @@ class QuickTopics extends Component
         return view('livewire.ai.quick-topics');
     }
 }
-```
+```text
 
 ### 4.6 AI Chat Interface (Updated v2.2.0)
 
@@ -947,7 +947,7 @@ class AdvisorChat extends Component
         Refresh Context
     </button>
 </div>
-```
+```text
 
 ### 4.8 Cost Tracking Display
 
@@ -1032,7 +1032,7 @@ The AI provides training advice based on:
 
 **Example AI Response**:
 
-```
+```text
 📊 Training Recommendation: Speed Training
 
 Based on your current situation:
@@ -1119,7 +1119,7 @@ class AdvisorChat extends Component
         $this->validateOnly('inputMessage');
     }
 }
-```
+```text
 
 ### 6.2 Data Flow
 
@@ -1197,7 +1197,7 @@ flowchart TD
     SaveAI --> Display[Display with Formula Breakdown]
     Display --> UpdateMetrics[Update Usage Metrics]
     UpdateMetrics --> End([Message Complete])
-```
+```text
 
 ### 7.2 Topic Selection Flow
 
@@ -1237,7 +1237,7 @@ flowchart TD
     RecalcBreakpoints --> Confirm
     Confirm --> Refresh[Refresh UI with New Stats]
     Refresh --> Success([Applied Successfully])
-```
+```text
 
 ---
 
@@ -1419,7 +1419,7 @@ test('warns when approaching soft cap', function () {
     
     expect($response->breakpointWarning)->toContain('approaching soft cap');
 });
-```
+```text
 
 ### 10.2 Feature Tests
 
@@ -1577,7 +1577,7 @@ test.describe("WF-012: AI Advisor Interface", () => {
         await expect(page.getByText(/Junior|Classic|Senior/)).toBeVisible();
     });
 });
-```
+```text
 
 ### 10.4 Accessibility Tests
 

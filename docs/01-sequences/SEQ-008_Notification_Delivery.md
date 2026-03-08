@@ -84,7 +84,7 @@ The notification system enables users to:
 
 ### 2.2 Component Locations
 
-```
+```text
 
 app/
 ├── Events/
@@ -174,7 +174,7 @@ sequenceDiagram
     User->>DB: Mark as read
     DB->>Cache: Invalidate notification cache
     DB-->>User: Updated notification list
-```
+```text
 
 ### 3.2 Timeline Breakdown
 
@@ -200,7 +200,7 @@ sequenceDiagram
 
 ```
 System Event → NotificationService → Channel Router → Delivery Services
-```
+```text
 
 **Service Implementation:**
 
@@ -304,7 +304,7 @@ class WebSocketService
         ))->toOthers();
     }
 }
-```
+```text
 
 **WebSocket Event:**
 
@@ -395,7 +395,7 @@ class NotificationRepository
         });
     }
 }
-```
+```text
 
 ### 4.4 Email Notification Delivery
 
@@ -460,7 +460,7 @@ class SendNotificationEmail implements ShouldQueue
         ]);
     }
 }
-```
+```text
 
 ### 4.5 User Preferences Management
 
@@ -525,7 +525,7 @@ private function isQuietHours(User $user, NotificationPreferences $preferences):
     
     return $now->between($start, $end);
 }
-```
+```text
 
 ### 4.6 Notification Types and Triggers
 
@@ -595,7 +595,7 @@ class RaceReminderEvent extends NotificationEvent
             ->calculateReadiness($this->career, $this->race);
     }
 }
-```
+```text
 
 ---
 
@@ -638,7 +638,7 @@ class RaceReminderEvent extends NotificationEvent
   "achievements": true,
   "stat_updates": false
 }
-```
+```text
 
 ### 5.3 WebSocket Broadcast Payload
 
@@ -694,7 +694,7 @@ class RaceReminderEvent extends NotificationEvent
     "readiness": 85
   }
 }
-```
+```text
 
 ---
 
@@ -797,7 +797,7 @@ DB::transaction(function () use ($users, $event) {
     
     Notification::insert($notifications->toArray());
 });
-```
+```text
 
 ### 7.3 Database Query Analysis
 
@@ -835,7 +835,7 @@ Cache::forget("notification_preferences.{$user->id}");
 
 // Invalidate on notification read
 Cache::forget("notifications.user.{$user->id}.unread_count");
-```
+```text
 
 ---
 

@@ -110,7 +110,7 @@ Skills activate based on various race conditions:
 
 ### 2.1 Desktop Layout (≥1024px)
 
-```
+```text
 
 ┌──────────────────────────────────────────────────────────────────────┐
 │ [≡] Menu  |  Skill Loadout Manager                          [?]    │
@@ -160,7 +160,7 @@ Skills activate based on various race conditions:
 
 ### 2.2 Tablet Layout (640px-1024px)
 
-```
+```text
 
 ┌────────────────────────────────────────────────────┐
 │ [≡] Menu  |  Loadout Manager                [?]    │
@@ -196,7 +196,7 @@ Skills activate based on various race conditions:
 
 ### 2.3 Mobile Layout (<640px)
 
-```
+```text
 
 ┌──────────────────────────────┐
 │ [≡] Loadout Manager      [?] │
@@ -325,7 +325,7 @@ class LoadoutStatusWidget extends Component
         return view('livewire.skills.loadout-status-widget');
     }
 }
-```
+```text
 
 **Visual Format**:
 
@@ -351,7 +351,7 @@ class LoadoutStatusWidget extends Component
 │ Skill Rarities:                        │
 │ Normal: 4  Rare: 3  Unique: 1          │
 └────────────────────────────────────────┘
-```
+```text
 
 **Hint Level Display**:
 
@@ -517,7 +517,7 @@ class ActiveSkillsList extends Component
         </button>
     </div>
 </div>
-```
+```text
 
 **Rarity Badge Styles**:
 
@@ -719,7 +719,7 @@ class LoadoutPresets extends Component
         return view('livewire.skills.loadout-presets');
     }
 }
-```
+```text
 
 **Preset Card Format**:
 
@@ -733,7 +733,7 @@ class LoadoutPresets extends Component
 │                                        │
 │ [LOAD] [EDIT] [DELETE]                 │
 └────────────────────────────────────────┘
-```
+```text
 
 ### 3.5 AI Loadout Recommendations
 
@@ -796,7 +796,7 @@ class AILoadoutRecommendations extends Component
 
 **Recommendation Format**:
 
-```
+```text
 ┌────────────────────────────────────────────────────┐
 │ AI Loadout Recommendations                         │
 ├────────────────────────────────────────────────────┤
@@ -899,7 +899,7 @@ class SkillSynergyAnalyzer
         return $score;
     }
 }
-```
+```text
 
 **Synergy Rating Display**:
 
@@ -975,7 +975,7 @@ sequenceDiagram
     LoadoutManager->>SynergyAnalyzer: Recalculate
     SynergyAnalyzer-->>LoadoutManager: New scores
     LoadoutManager->>User: Update UI
-```
+```text
 
 ### 4.3 Cache Strategy
 
@@ -1021,7 +1021,7 @@ sequenceDiagram
     PresetComponent->>SynergyAnalyzer: Analyze new loadout
     SynergyAnalyzer-->>PresetComponent: Synergy scores
     PresetComponent->>User: Show success + updated UI
-```
+```text
 
 ### 5.3 AI Recommendation Flow
 
@@ -1096,7 +1096,7 @@ sequenceDiagram
 <div aria-live="polite" aria-atomic="true" class="sr-only">
     AI recommends 2 loadout changes. Estimated performance gain: 12 percent.
 </div>
-```
+```text
 
 ---
 
@@ -1214,7 +1214,7 @@ test('user cannot activate more than 10 skills', function () {
 
     expect($character->fresh()->skills()->wherePivot('is_active', true)->count())->toBe(10);
 });
-```
+```text
 
 ### 8.3 E2E Tests (Playwright)
 
@@ -1357,7 +1357,7 @@ test.describe("WF-009: Accessibility", () => {
         await expect(page.getByRole("alert")).toBeVisible();
     });
 });
-```
+```text
 
 ---
 

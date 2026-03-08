@@ -78,7 +78,7 @@ The career setup flow guides users through the initial configuration of a new ca
         |
         v
 [Career Dashboard]
-```
+```text
 
 ### 1.3 Mermaid Diagram
 
@@ -193,7 +193,7 @@ The core optimization flow occurs every turn (1-78), analyzing current character
      |
      v
 [Next Turn]
-```
+```text
 
 ### 2.3 Mermaid Diagram
 
@@ -372,7 +372,7 @@ The race preparation workflow activates when races approach, analyzing race requ
          |
          v
 [Next Race Planning]
-```
+```text
 
 ### 3.3 Mermaid Diagram
 
@@ -556,7 +556,7 @@ The AI advisory system workflow shows how users interact with the chatbot for st
         |
         v
 [Cost Tracking] ────> [Token Usage Recording]
-```
+```text
 
 ### 4.3 Mermaid Diagram
 
@@ -730,7 +730,7 @@ The screenshot processing workflow handles image uploads, performs OCR analysis 
         |
         v
 [Data Import to Career Run]
-```
+```text
 
 ### 5.3 Mermaid Diagram
 
@@ -870,7 +870,7 @@ flowchart TD
         ConfirmImport --> ExecuteImport[Execute Import]
         ExecuteImport --> ImportComplete([Import Complete])
     end
-```
+```text
 
 ### 6.3 Export Formats
 

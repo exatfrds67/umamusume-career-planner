@@ -236,7 +236,7 @@ class RaceCalendar extends Component
         return view('livewire.race.race-calendar');
     }
 }
-```
+```text
 
 **Visual Elements**:
 
@@ -324,7 +324,7 @@ class RaceDetailPanel extends Component
         ]);
     }
 }
-```
+```text
 
 **Visual Format**:
 
@@ -351,7 +351,7 @@ class RaceDetailPanel extends Component
 │                                                   │
 │ [VIEW DETAILS] [ENTER RACE] [PREPARE]             │
 └───────────────────────────────────────────────────┘
-```
+```text
 
 **Track Condition Effects (Global English Server - Feb 2026)**:
 
@@ -479,7 +479,7 @@ class RaceDetailPanel extends Component
         <p class="text-gray-500">No races match your filters</p>
     @endforelse
 </div>
-```
+```text
 
 ---
 
@@ -516,7 +516,7 @@ public function getCalendarDaysProperty()
 {
     // Array of day objects with race data
 }
-```
+```text
 
 ### 4.2 Data Flow
 
@@ -573,7 +573,7 @@ flowchart TD
     UserAction -->|Prepare| Navigate
     Confirm --> Register[Register for Race]
     Register --> Success([Registration Complete])
-```
+```text
 
 ### 5.2 Calendar Navigation Flow
 
@@ -614,7 +614,7 @@ sequenceDiagram
 
     Component->>Component: Recalculate calendar grid
     Component->>User: Update calendar display
-```
+```text
 
 ---
 
@@ -758,7 +758,7 @@ test('accounts for aptitude bonuses in readiness', function () {
 
     expect($readiness->aptitude_bonus)->toBeGreaterThan(0);
 });
-```
+```text
 
 ### 8.2 Feature Tests
 
@@ -884,7 +884,7 @@ test.describe("WF-006: Race Calendar View", () => {
         await expect(page.getByTestId("race-detail-panel")).toBeVisible();
     });
 });
-```
+```text
 
 ### 8.4 Accessibility Tests
 

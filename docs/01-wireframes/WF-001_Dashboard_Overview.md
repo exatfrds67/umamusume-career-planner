@@ -54,7 +54,7 @@ The Dashboard serves as the primary landing page and command center for the Umam
 
 ### 2.1 Desktop Layout (≥1024px)
 
-```
+```text
 
 
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -104,7 +104,7 @@ The Dashboard serves as the primary landing page and command center for the Umam
 
 ### 2.2 Tablet Layout (640px-1024px)
 
-```
+```text
 
 
 ┌──────────────────────────────────────────────────────────┐
@@ -147,7 +147,7 @@ The Dashboard serves as the primary landing page and command center for the Umam
 
 ### 2.3 Mobile Layout (<640px)
 
-```
+```text
 
 
 ┌────────────────────────────┐
@@ -261,7 +261,7 @@ The Dashboard serves as the primary landing page and command center for the Umam
         ['type' => 'achievement', 'target' => 'URA Finals Champion', 'turns_remaining' => 33]
     ]
 ]
-```
+```text
 
 **Visual Elements**:
 
@@ -289,7 +289,7 @@ Stamina  B  (820)  ████████████████░░░░ 
 Power    B  (780)  ███████████████░░░░░ 65.0%
 Guts     B  (760)  ██████████████░░░░░░ 63.3%
 Wit      A  (890)  █████████████████░░░ 74.2%
-```
+```text
 
 **Note**: Stats can exceed 1200 but gain at 50% rate above soft cap.
 
@@ -376,7 +376,7 @@ Wit      A  (890)  █████████████████░░░ 
 
 **Display Format**:
 
-```
+```text
 1. Speed Training
    Predicted Gains: +45 Speed, +5 Stamina
    Risk: Low (12%)
@@ -414,7 +414,7 @@ Wit      A  (890)  █████████████████░░░ 
 
 **Display Elements**:
 
-```
+```text
 ┌────────────────────────┐
 │ Mood: Good (+2%)       │
 │ ████████░░ 78/100      │
@@ -462,7 +462,7 @@ Wit      A  (890)  █████████████████░░░ 
 
 **Display Format**:
 
-```
+```text
 ┌────────────────────────────────────┐
 │ 💡 AI Recommendation               │
 │                                    │
@@ -516,7 +516,7 @@ Wit      A  (890)  █████████████████░░░ 
 
 **Visual Design**:
 
-```
+```text
 ○ Turn 45: Speed Training (+48 Speed)          [2 min ago]
 ○ Turn 44: Skill Acquired (Lane Guidance)      [1 hour ago]
 ● Turn 43: Race Won (2nd Place, G2)            [3 hours ago]
@@ -550,7 +550,7 @@ public ?int $selectedCareerRunId = null;
 public string $view = 'overview'; // overview, compact, detailed
 public bool $showAICard = true;
 public array $filters = [];
-```
+```text
 
 **Computed Properties**:
 
@@ -600,7 +600,7 @@ Echo.private(`character.${characterId}`)
     .listen("TrainingCompleted", (e) => {
         Livewire.emit("refreshActivity");
     });
-```
+```text
 
 ---
 
@@ -646,7 +646,7 @@ sequenceDiagram
     TrainingService-->>Dashboard: Training result
     Dashboard->>User: Show success toast
     Dashboard->>Dashboard: Refresh panels
-```
+```text
 
 ### 5.3 AI Advisor Interaction Flow
 
@@ -716,7 +716,7 @@ sequenceDiagram
 <div aria-live="polite" aria-atomic="true" class="sr-only">
     Upcoming race in 2 days: Kanto Okami Cup, G1
 </div>
-```
+```text
 
 ---
 
@@ -802,7 +802,7 @@ test('user can switch between career runs', function () {
         ->assertEmitted('careerRunChanged')
         ->assertViewHas('selectedCareerRun', $run2);
 });
-```
+```text
 
 ### 8.3 E2E Tests (Playwright)
 
@@ -869,7 +869,7 @@ test.describe("Dashboard Accessibility", () => {
         await expect(page.getByTestId("notifications-button")).toBeFocused();
     });
 });
-```
+```text
 
 ---
 

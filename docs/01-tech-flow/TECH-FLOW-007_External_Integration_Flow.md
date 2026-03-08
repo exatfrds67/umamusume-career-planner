@@ -99,7 +99,7 @@ flowchart TB
     style OCRPipeline fill:#e8f5e9
     style RealtimeLayer fill:#fce4ec
     style Infrastructure fill:#fff9c4
-```
+```text
 
 ### 1.2 Component Hierarchy
 
@@ -140,7 +140,7 @@ External Integration System
     ├── OCRExtraction
     ├── SyncConflict
     └── ExternalAPICache
-```
+```text
 
 ---
 
@@ -259,7 +259,7 @@ flowchart TD
     style Complete fill:#c8e6c9
     style Error1 fill:#ffcdd2
     style ManualReview fill:#fff9c4
-```
+```text
 
 ### 2.3 Circuit Breaker State Machine
 
@@ -321,7 +321,7 @@ sequenceDiagram
     
     UI->>UI: Re-render affected elements
     UI->>User: Display real-time update
-```
+```text
 
 ### 2.5 Conflict Resolution Flow
 
@@ -446,7 +446,7 @@ class ExternalAPIService
         throw new DataUnavailableException('No data available from APIs or cache');
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -659,7 +659,7 @@ class OCRProcessingService
         }
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -802,7 +802,7 @@ return [
         ],
     ],
 ];
-```
+```text
 
 **Deliverables**:
 
@@ -887,7 +887,7 @@ class BroadcastCharacterUpdate
         $this->broadcaster->broadcastCharacterUpdate($event->character);
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -970,7 +970,7 @@ Schema::create('ucp_external_sync_logs', function (Blueprint $table) {
     $table->index(['character_id', 'synced_at']);
     $table->index(['api_provider', 'status']);
 });
-```
+```text
 
 **Deliverables**:
 
@@ -1035,7 +1035,7 @@ Schema::create('ucp_sync_conflicts', function (Blueprint $table) {
     $table->index(['character_id', 'resolved_at']);
     $table->index('detected_at');
 });
-```
+```text
 
 **Deliverables**:
 
@@ -1178,7 +1178,7 @@ test('processes OCR screenshot with high confidence', function () {
  * @throws DataUnavailableException If all sources fail
  */
 public function syncCharacterData(int $characterId): array;
-```
+```text
 
 ---
 
@@ -1235,7 +1235,7 @@ public function processScreenshot(UploadedFile $file): OCRResult;
 public function recordFailure(string $service): void;
 public function recordSuccess(string $service): void;
 public function isOpen(string $service): bool;
-```
+```text
 
 ---
 
@@ -1318,7 +1318,7 @@ flowchart TD
     
     SyncConflictResolver --> SyncConflict
     SyncConflictResolver --> Character
-```
+```text
 
 ---
 
@@ -1381,7 +1381,7 @@ pie title Test Distribution
     "Feature Tests (API)" : 10
     "Integration Tests (External)" : 6
     "E2E Tests (OCR)" : 4
-```
+```text
 
 ---
 

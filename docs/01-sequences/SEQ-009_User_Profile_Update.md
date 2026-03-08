@@ -84,7 +84,7 @@ User profile management enables:
 
 ### 2.2 Component Locations
 
-```
+```text
 
 app/
 ├── Livewire/
@@ -215,7 +215,7 @@ sequenceDiagram
         Controller-->>UI: Include new tokens
         UI->>UI: Update auth context
     end
-```
+```text
 
 ### 3.2 Timeline Breakdown
 
@@ -244,7 +244,7 @@ sequenceDiagram
 
 ```
 User → Livewire Component → UserController → UserService
-```
+```text
 
 **Service Implementation:**
 
@@ -391,7 +391,7 @@ class PreferenceService
         ])->validate();
     }
 }
-```
+```text
 
 ### 4.3 Accessibility Settings
 
@@ -460,7 +460,7 @@ class AuthService
         return collect($changes)->keys()->intersect($securityFields)->isNotEmpty();
     }
 }
-```
+```text
 
 ---
 
@@ -539,7 +539,7 @@ class AuthService
     }
   }
 }
-```
+```text
 
 ### 5.3 Profile Update Response
 
@@ -584,7 +584,7 @@ class AuthService
   },
   "applied": true
 }
-```
+```text
 
 ---
 
@@ -682,7 +682,7 @@ sequenceDiagram
 $preferences = Cache::remember("user.{$userId}.preferences", 3600, function () use ($user) {
     return $user->preferences;
 });
-```
+```text
 
 ### 7.3 Database Query Analysis
 
@@ -724,7 +724,7 @@ $this->cache->forget("user.{$user->id}.preferences");
 
 // Invalidate on email change
 $this->cache->forget("user.email.{$user->email}");
-```
+```text
 
 ---
 

@@ -84,7 +84,7 @@ Skill management is a critical resource optimization workflow that:
 
 ### 2.2 Component Locations
 
-```
+```text
 
 app/
 ├── Livewire/
@@ -205,7 +205,7 @@ sequenceDiagram
         Controller-->>UI: Error response
         UI-->>User: Display error message
     end
-```
+```text
 
 ### 3.2 Timeline Breakdown
 
@@ -232,7 +232,7 @@ sequenceDiagram
 
 ```
 User → Livewire Component → SkillController → SkillService
-```
+```text
 
 **Controller Action:**
 
@@ -284,7 +284,7 @@ public function getAvailableSkills(Career $career): Collection
         ];
     });
 }
-```
+```text
 
 ### 4.2 Hint-Based Cost Calculation (Game-Accurate - Global English Server Jan 2026)
 
@@ -355,7 +355,7 @@ public function markHintsAsUsed(Career $career, Skill $skill): void
         ->where('is_used', false)
         ->update(['is_used' => true]);
 }
-```
+```text
 
 ### 4.3 Skill Acquisition Transaction
 
@@ -466,7 +466,7 @@ public function checkEvolutionRequirements(Career $career, Skill $skill): bool
     // Evolution is always available if target exists (no additional requirements in base system)
     return true;
 }
-```
+```text
 
 **Evolution Example:**
 
@@ -548,7 +548,7 @@ public function checkEvolutionRequirements(Career $career, Skill $skill): bool
     "acquired_skill_count": 8
   }
 }
-```
+```text
 
 ### 5.3 Skill Acquisition Request
 
@@ -581,7 +581,7 @@ public function checkEvolutionRequirements(Career $career, Skill $skill): bool
   "updated_sp_balance": 378,
   "message": "Skill 'Lane Guidance' acquired for 72 SP (40% discount from 2 hints)"
 }
-```
+```text
 
 ### 5.5 Skill Evolution Request
 
@@ -608,7 +608,7 @@ public function checkEvolutionRequirements(Career $career, Skill $skill): bool
   },
   "message": "Skill evolved from 'Lane Guidance' to 'Lane Legerdemain'"
 }
-```
+```text
 
 ---
 
@@ -708,7 +708,7 @@ $skills = Skill::whereNotIn('id', $acquiredSkillIds)
     ])
     ->select(['id', 'name', 'name_jp', 'rarity', 'skill_type', 'base_sp_cost', 'evolution_target_id'])
     ->get();
-```
+```text
 
 ### 7.3 Database Query Analysis
 
@@ -747,7 +747,7 @@ $this->cache->forget("skill.hints.career.{$career->id}.skill.{$skill->id}");
 
 // Invalidate on hint received (via training)
 $this->cache->forget("skill.hints.career.{$career->id}.*");
-```
+```text
 
 ---
 

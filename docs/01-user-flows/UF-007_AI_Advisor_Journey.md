@@ -127,7 +127,7 @@ flowchart TD
     style OllamaProcess fill:#fff3e0
     style BedrockDirect fill:#f3e5f5
     style GenerateResponse fill:#e1f5fe
-```
+```text
 
 ### 2.2 Detailed State Diagram
 
@@ -197,7 +197,7 @@ stateDiagram-v2
 
 #### 3.1.1 Entry Point Options
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  AI ADVISOR ACCESS POINTS                                  │
 ├────────────────────────────────────────────────────────────┤
@@ -242,7 +242,7 @@ stateDiagram-v2
 
 #### 3.2.1 Chat Interface Layout
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  AI Advisor                                           [×]   │
 ├────────────────────────────────────────────────────────────┤
@@ -325,7 +325,7 @@ flowchart TD
     
     RetryBedrock --> ProcessBedrock
     ProcessBedrock --> Response([AI Response])
-```
+```text
 
 **Complexity Scoring**:
 
@@ -412,7 +412,7 @@ flowchart TD
     
     FormatDisplay --> Response
     FallbackResponse --> Response([Formatted Response])
-```
+```text
 
 **System Prompt Structure**:
 
@@ -444,7 +444,7 @@ Provide a clear, actionable recommendation with:
 4. Risks/Considerations (if any)
 
 Format your response in markdown.
-```
+```text
 
 #### 3.4.2 Confidence Scoring Algorithm
 
@@ -509,7 +509,7 @@ class ConfidenceScorer
 
 #### 3.5.1 Recommendation Display
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  AI Recommendation                                         │
 ├────────────────────────────────────────────────────────────┤
@@ -568,7 +568,7 @@ class ConfidenceScorer
 
 #### 3.6.1 Cost Tracking Dashboard
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  AI Usage & Cost Tracking                             [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -642,7 +642,7 @@ class CostTracker
         event(new AIUsageRecorded($provider, $cost));
     }
 }
-```
+```text
 
 ---
 
@@ -756,7 +756,7 @@ flowchart TB
     NeuronLayer --> Providers
     
     Providers --> Monitoring
-```
+```text
 
 ### 5.2 Neuron AI Agents
 
@@ -825,7 +825,7 @@ sequenceDiagram
     Fetch-->>MCP: External data
     
     MCP-->>Agent: Aggregated result
-```
+```text
 
 **MCP Tools for AI**:
 
@@ -930,7 +930,7 @@ flowchart TD
     R2 --> Resolve
     R3 --> Resolve
     R4 --> Resolve
-```
+```text
 
 ### 7.2 Error Messages
 

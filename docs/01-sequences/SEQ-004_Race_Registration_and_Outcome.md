@@ -87,7 +87,7 @@ Race strategy management is a critical planning workflow that:
 
 ### 2.2 Component Locations
 
-```
+```text
 
 app/
 ├── Livewire/
@@ -222,7 +222,7 @@ sequenceDiagram
     UI->>UI: Update career stats
     UI->>UI: Display result animation
     UI-->>User: Show race outcome + rewards
-```
+```text
 
 ### 3.2 Timeline Breakdown
 
@@ -251,7 +251,7 @@ sequenceDiagram
 
 ```
 User → Livewire Component → RaceController → Database
-```
+```text
 
 **Controller Action:**
 
@@ -395,7 +395,7 @@ class ReadinessCalculator
         return max(0, $moodScore - $penalty);
     }
 }
-```
+```text
 
 ### 4.3 Running Style Optimization
 
@@ -542,7 +542,7 @@ class WinProbabilityCalculator
         };
     }
 }
-```
+```text
 
 ### 4.5 Race Result Recording
 
@@ -666,7 +666,7 @@ private function getNextGrade(string $currentGrade): string
   "career_id": 157,
   "race_id": 42
 }
-```
+```text
 
 ### 5.2 Race Analysis Response
 
@@ -738,7 +738,7 @@ private function getNextGrade(string $currentGrade): string
   "race_id": 42,
   "running_style": "sashi"
 }
-```
+```text
 
 ### 5.4 Race Result Submission Request
 
@@ -784,7 +784,7 @@ private function getNextGrade(string $currentGrade): string
     "grade": "S"
   }
 }
-```
+```text
 
 ---
 
@@ -880,7 +880,7 @@ $races = Race::with([
 ])->whereDate('race_date', '>=', now())
     ->orderBy('race_date')
     ->get();
-```
+```text
 
 ### 7.3 Database Query Analysis
 
@@ -917,7 +917,7 @@ CREATE INDEX idx_race_registrations_career_race ON ucp_race_registrations(career
 // Invalidate on result recording
 $this->cache->forget("race.analysis.{$career->id}.{$race->id}");
 $this->cache->tags(['race_catalog'])->flush();
-```
+```text
 
 ---
 

@@ -333,7 +333,7 @@ class DeckOverview extends Component
         return view('livewire.support-cards.deck-overview');
     }
 }
-```
+```text
 
 **Visual Format**:
 
@@ -358,7 +358,7 @@ class DeckOverview extends Component
 │                                        │
 │ [SAVE DECK] [AUTO-OPTIMIZE] [EXPORT]   │
 └────────────────────────────────────────┘
-```
+```text
 
 ### 3.2 Deck Slot Component
 
@@ -567,7 +567,7 @@ class DeckValidator extends Component
         return view('livewire.support-cards.deck-validator');
     }
 }
-```
+```text
 
 ### 3.4 Deck Analysis Panel
 
@@ -843,7 +843,7 @@ class DeckOptimizationService
         return $reasons;
     }
 }
-```
+```text
 
 ### 3.6 Card Library Browser
 
@@ -982,7 +982,7 @@ class DeckBuilder extends Component
         return view('livewire.support-cards.deck-builder');
     }
 }
-```
+```text
 
 ### 4.2 Data Flow
 
@@ -1046,7 +1046,7 @@ flowchart TD
     Validate --> RefreshUI[Refresh UI]
     RefreshUI --> Success([Card Added])
     Cancel --> End([Cancelled])
-```
+```text
 
 ### 5.2 Auto-Optimize Flow
 
@@ -1098,7 +1098,7 @@ flowchart TD
     InfoMeta --> CalcScore
 
     CalcScore --> DisplayResults[Display Validation Results]
-```
+```text
 
 ---
 
@@ -1226,7 +1226,7 @@ test('prioritizes meta tier cards in optimization', function () {
 
     expect($metaCards)->toBeGreaterThan(0);
 });
-```
+```text
 
 ### 8.2 Feature Tests
 
@@ -1365,7 +1365,7 @@ test.describe("WF-011: Support Deck Builder", () => {
         await expect(page.getByTestId("card-library")).toBeVisible();
     });
 });
-```
+```text
 
 ### 8.4 Accessibility Tests
 

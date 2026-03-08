@@ -80,7 +80,7 @@ flowchart TB
     Core --> Skills
     Core --> Support
     Core --> AI
-```
+```text
 
 ---
 
@@ -290,7 +290,7 @@ flowchart LR
     Mobile[Mobile<br/>< 640px] --> Tablet[Tablet<br/>640-1024px]
     Tablet --> Desktop[Desktop<br/>1024-1280px]
     Desktop --> Wide[Wide<br/>> 1280px]
-```
+```text
 
 | Breakpoint | Width | Layout Strategy |
 | --- | --- | --- |
@@ -391,7 +391,7 @@ flowchart TD
         <x-grade-badge :value="$value" />
     </div>
 </div>
-```
+```text
 
 #### Livewire Component Example
 
@@ -467,7 +467,7 @@ test.describe('WF-004: Training Selection Interface', () => {
         await expect(riskBadge).toHaveClass(/bg-red/);
     });
 });
-```
+```text
 
 #### Accessibility Testing
 
@@ -526,7 +526,7 @@ flowchart LR
     Wireframe --> Review --> Document
     Document --> ComponentDev --> Integration --> Testing
     Testing --> QA --> UAT --> Deploy
-```
+```text
 
 ### Wireframe Import Process
 

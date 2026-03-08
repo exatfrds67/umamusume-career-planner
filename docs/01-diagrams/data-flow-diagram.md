@@ -54,7 +54,7 @@ flowchart LR
     style Process fill:#e3f2fd
     style ExternalEntity fill:#fff3e0
     style DataStore fill:#e8f5e9
-```
+```text
 
 | Symbol | Meaning |
 | --- | --- |
@@ -210,7 +210,7 @@ flowchart TB
     style Processes fill:#e3f2fd
     style DataStores fill:#e8f5e9
     style External fill:#fff3e0
-```
+```text
 
 ### 3.2 Process Descriptions
 
@@ -378,7 +378,7 @@ flowchart TB
     style Inputs fill:#fff3e0
     style External fill:#fff9c4
     style Outputs fill:#c8e6c9
-```
+```text
 
 ### 5.2 AI Advisory Process Details
 
@@ -536,7 +536,7 @@ flowchart TB
     style DataStores fill:#e8f5e9
     style Inputs fill:#fff3e0
     style Outputs fill:#c8e6c9
-```
+```text
 
 ### 7.2 Data Management Process Details
 
@@ -698,7 +698,7 @@ erDiagram
         json card_assignments
         float synergy_score
     }
-```
+```text
 
 ### 8.2 Data Store Catalog
 
@@ -768,7 +768,7 @@ flowchart TD
     F6 -->|On-demand| F2
     
     style CriticalFlows fill:#e3f2fd
-```
+```text
 
 ### 9.2 Data Flow Volumes
 

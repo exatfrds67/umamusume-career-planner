@@ -208,7 +208,7 @@ class ResultBanner extends Component
             : "Training failed due to {$this->result->failure_reason}";
     }
 }
-```
+```text
 
 **Visual Elements**:
 
@@ -217,7 +217,7 @@ class ResultBanner extends Component
 │ ✅ Training Success!                           │
 │ Speed Training completed successfully          │
 └────────────────────────────────────────────────┘
-```
+```text
 
 **States**:
 
@@ -288,7 +288,7 @@ class ResultBanner extends Component
     ],
     'capApplied' => false, // True if stat > 1200 (cap reduced to +50)
 ]
-```
+```text
 
 **Game-Accurate Training Mechanics (Global English Server - Jan 2026)**:
 
@@ -353,7 +353,7 @@ class BondChanges extends Component
 
 **Visual Format**:
 
-```
+```text
 Bond Changes
 ────────────────────────────────────────
 Mejiro Dober
@@ -415,7 +415,7 @@ Bond: 82% → 85% (+3)
         <p class="text-gray-500 italic">No skill hints obtained this turn</p>
     @endforelse
 </div>
-```
+```text
 
 **Hint Types**:
 
@@ -431,7 +431,7 @@ SP Cost: 120 → 96 (Lv 2 hint, -20%)
 SP Cost: 120 → 84 (Lv 3 hint, -30%)
 SP Cost: 120 → 72 (Lv 5 hint, -40% max)
 SP Cost: 120 → 66 (Lv 5 hint + Fast Learner, -45%)
-```
+```text
 
 ### 3.5 Energy/Mood Changes Widget
 
@@ -470,7 +470,7 @@ class EnergyMoodChanges extends Component
 
 **Visual Format**:
 
-```
+```text
 ┌────────────────────────────────────┐
 │ Energy/Mood Changes                │
 ├────────────────────────────────────┤
@@ -523,7 +523,7 @@ class EventsPanel extends Component
         return view('livewire.training.events-panel');
     }
 }
-```
+```text
 
 **Visual Format**:
 
@@ -541,7 +541,7 @@ class EventsPanel extends Component
 │                                               │
 │ [MAKE CHOICE]                                 │
 └───────────────────────────────────────────────┘
-```
+```text
 
 **Event Types**:
 
@@ -654,7 +654,7 @@ class ResultScreen extends Component
         return view('livewire.training.result-screen');
     }
 }
-```
+```text
 
 ### 4.2 Data Flow
 
@@ -710,7 +710,7 @@ flowchart TD
     UserChoice -->|No| Wait[Wait for Input]
     ProcessChoice --> ShowActions
     ShowActions --> End([Result Screen Complete])
-```
+```text
 
 ### 5.2 Event Choice Flow
 
@@ -741,7 +741,7 @@ flowchart LR
     ResultScreen -->|View Character| CharacterDetail[Character Detail]
     ResultScreen -->|Ask AI| AIAdvisor[AI Advisor]
     ResultScreen -->|Dashboard| Dashboard[Dashboard]
-```
+```text
 
 ---
 
@@ -882,7 +882,7 @@ test('displays skill hints with cost reduction', function () {
         ->assertSee('Guaranteed hint')
         ->assertSee('-40%');
 });
-```
+```text
 
 ### 8.2 Feature Tests
 
@@ -1002,7 +1002,7 @@ test.describe("WF-005: Training Result Screen", () => {
         await expect(page).toHaveURL(/.*training\/select/);
     });
 });
-```
+```text
 
 ### 8.4 Accessibility Tests
 

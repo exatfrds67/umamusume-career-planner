@@ -99,7 +99,7 @@ The Training Selection Interface provides users with AI-powered training predict
 │ │
 └──────────────────────────────────────────────────────────────────────┘
 
-```
+```text
 
 ### 2.2 Tablet Layout (640px-1024px)
 
@@ -162,7 +162,7 @@ The Training Selection Interface provides users with AI-powered training predict
 │ [Skip] [Rest] [Ask AI] │
 └────────────────────────────────────────────────────┘
 
-```
+```text
 
 ### 2.3 Mobile Layout (<640px)
 
@@ -220,7 +220,7 @@ The Training Selection Interface provides users with AI-powered training predict
 │ \[🏠]\[👤]\[⚡]\[🏆]\[🤖]\[⚙️] │
 └──────────────────────────────┘
 
-````
+````text
 
 ---
 
@@ -257,7 +257,7 @@ class PredictionCard extends Component
 
 **Visual Elements**:
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │ Training Type Header                      [AI ✓]    │
 │ Recommendation Score: XX/100                        │
@@ -320,7 +320,7 @@ class PredictionCard extends Component
         </div>
     @endforeach
 </div>
-```
+```text
 
 **Red Exclamation Indicator** (🔴):
 
@@ -357,7 +357,7 @@ class PredictionCard extends Component
 
 **Visual Format**:
 
-```
+```text
 Skill Hints:
 • Lane Guidance (Guaranteed ✓) 🔴
 • Going Strong (25% chance)
@@ -396,7 +396,7 @@ Skill Hints:
         <span class="stat-value">+{{ $gains['wit'] }}</span>
     </div>
 </div>
-```
+```text
 
 **Stat Colors**:
 
@@ -413,9 +413,9 @@ Skill Hints:
 **Core Training Formula**:
 
 ```
-Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
+Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect))
             × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
-```
+```text
 
 **Formula Components**:
 
@@ -537,7 +537,7 @@ class TrainingSelector extends Component
         return view('livewire.training.training-selector');
     }
 }
-```
+```text
 
 ### 4.2 Cache Strategy
 
@@ -601,7 +601,7 @@ sequenceDiagram
     Service->>Service: Log training session
     Service-->>Selector: Training result
     Selector->>User: Redirect to result page
-```
+```text
 
 ### 5.2 Prediction Expansion Flow
 
@@ -627,7 +627,7 @@ flowchart TD
     UserChoice -->|No| Cancel[Return to Selection]
     Execute --> Result[Navigate to Result]
     Cancel --> Start
-```
+```text
 
 ---
 
@@ -787,7 +787,7 @@ test('calculates support card bonuses correctly', function () {
     expect($speedPrediction['active_support_cards'])->toHaveCount(3)
         ->and($speedPrediction['stat_gains']['speed'])->toBeGreaterThan(40);
 });
-```
+```text
 
 ### 8.2 Feature Tests
 
@@ -939,7 +939,7 @@ test.describe("WF-004: Training Selection Interface", () => {
         await expect(page).toHaveURL(/.*training\/result/);
     });
 });
-```
+```text
 
 ### 8.4 Accessibility Tests
 

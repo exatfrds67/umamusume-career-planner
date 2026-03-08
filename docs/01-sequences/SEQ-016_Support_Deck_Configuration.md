@@ -261,7 +261,7 @@ sequenceDiagram
     
     C-->>LW: Complete deck data
     LW->>U: Show synergy score, friendship bonus, recommendations
-```
+```text
 
 ### 4.2 Deck Activation Sequence
 
@@ -332,7 +332,7 @@ sequenceDiagram
     DS-->>C: BondUpdatedEvent
     C-->>LW: Updated bond and friendship status
     LW->>U: Show bond bar, friendship indicator
-```
+```text
 
 ### 4.4 External Sync Sequence
 
@@ -394,7 +394,7 @@ INSERT INTO ucp_support_decks (
     created_at,
     updated_at
 ) VALUES (?, ?, ?, false, null, null, NOW(), NOW());
-```
+```text
 
 ### 5.2 Card Slot Assignment
 
@@ -448,7 +448,7 @@ public function getMaxLevel(int $limitBreak): int
         default => throw new InvalidArgumentException('Limit break must be 0-4'),
     };
 }
-```
+```text
 
 ### 5.4 Friendship Bonus Calculation
 
@@ -533,7 +533,7 @@ class SupportDeck extends Model
         return $this->belongsTo(User::class);
     }
 }
-```
+```text
 
 ### 6.2 SupportDeckCard Model
 
@@ -647,7 +647,7 @@ enum CardType: string
         };
     }
 }
-```
+```text
 
 ### 6.4 CardRarity Enum
 
@@ -689,7 +689,7 @@ readonly class DeckSynergyResult
         public array $missingTypes,
     ) {}
 }
-```
+```text
 
 ---
 
@@ -758,7 +758,7 @@ DB::transaction(function () use ($deckId, $cardId, $slot, $limitBreak) {
 $deck = SupportDeck::with([
     'cards' => fn($q) => $q->with('card:id,name,type,rarity,meta_tier'),
 ])->find($deckId);
-```
+```text
 
 **Eager Loading Pattern:**
 

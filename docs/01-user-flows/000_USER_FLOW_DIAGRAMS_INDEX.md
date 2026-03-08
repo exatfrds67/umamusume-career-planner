@@ -24,7 +24,7 @@ User flow diagrams document the complete journeys users take through the system.
 
 ## UF-001: New Player Onboarding Flow
 
-```
+```text
 
 START: Launch App
     │
@@ -61,7 +61,7 @@ START: Launch App
 
 ## UF-002: Career Setup Flow
 
-```
+```text
 
 START: Create New Run
     │
@@ -96,7 +96,7 @@ START: Create New Run
 
 ## UF-003: Training Day Flow
 
-```
+```text
 
 START: Turn Start
     │
@@ -135,7 +135,7 @@ START: Turn Start
 
 ## UF-004: Race Day Flow
 
-```
+```text
 
 START: Race Week
     │
@@ -171,7 +171,7 @@ START: Race Week
 
 ## UF-005: Skill Management Flow
 
-```
+```text
 
 START: Skill Shop
     │
@@ -204,7 +204,7 @@ START: Skill Shop
 
 ## UF-006: Support Deck Building Flow
 
-```
+```text
 
 START: Deck Editor
     │
@@ -233,7 +233,7 @@ START: Deck Editor
 
 ## UF-007: AI Advisor Journey
 
-```
+```text
 
 START: Ask Question
     │
@@ -268,7 +268,7 @@ START: Ask Question
 
 ## UF-008: OCR & Data Import Flow
 
-```
+```text
 
 START: Import Action
     │

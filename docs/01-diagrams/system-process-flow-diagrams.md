@@ -87,7 +87,7 @@ flowchart TB
     style Application fill:#f3e5f5
     style AI fill:#fff3e0
     style Data fill:#e8f5e9
-```
+```text
 
 ---
 
@@ -199,7 +199,7 @@ public function syncGameData(string $dataType): SyncResult
         return $this->attemptFallback($dataType, $cacheKey);
     }
 }
-```
+```text
 
 ### 2.4 Circuit Breaker Configuration
 
@@ -311,7 +311,7 @@ sequenceDiagram
     
     Service-->>Controller: Training Result
     Controller-->>User: Success Response + Updated State
-```
+```text
 
 ### 3.4 Optimization Algorithms
 
@@ -488,7 +488,7 @@ flowchart TD
     DirectResponse --> DeliverResponse
     
     DeliverResponse --> Complete([Complete])
-```
+```text
 
 ### 4.3 Model Cost Tracking
 
@@ -605,7 +605,7 @@ sequenceDiagram
             Orchestrator-->>Agent: Error response
         end
     end
-```
+```text
 
 ### 5.3 MCP Server Lifecycle
 
@@ -684,7 +684,7 @@ public function executeTool(
         return $this->handleToolError($e, $toolName, $parameters);
     }
 }
-```
+```text
 
 ### 5.5 MCP Configuration
 
@@ -852,7 +852,7 @@ public function processCareerEvent(CareerEvent $event): void
     // Async analytics processing
     dispatch(new ProcessCareerAnalytics($event));
 }
-```
+```text
 
 ---
 
@@ -990,7 +990,7 @@ public function processScreenshot(UploadedFile $file): OCRResult
         requiresReview: $validation->confidence < 0.85,
     );
 }
-```
+```text
 
 ---
 
@@ -1177,7 +1177,7 @@ private function handleAPIError(APIException $e, Request $request)
         'code' => 'EXT_001',
     ], 503);
 }
-```
+```text
 
 ---
 
@@ -1278,7 +1278,7 @@ class TrainingCompleted implements ShouldBroadcast
         ];
     }
 }
-```
+```text
 
 ---
 
@@ -1389,7 +1389,7 @@ flowchart TB
     CoreApp <--> ExternalSystems
     CoreApp <--> DataSystems
     AILayer <--> MCP
-```
+```text
 
 ---
 
@@ -1498,7 +1498,7 @@ flowchart TD
     style Query fill:#e3f2fd
     style OptimizationEngine fill:#fff3e0
     style Report fill:#e8f5e9
-```
+```text
 
 ### 11.4 Cache Optimization Flow
 
@@ -1580,7 +1580,7 @@ flowchart TD
     style Deploy fill:#e3f2fd
     style SeverityCalc fill:#fff3e0
     style ImmediateAlert fill:#ffcdd2
-```
+```text
 
 ### 11.6 Historical Tracking Architecture
 

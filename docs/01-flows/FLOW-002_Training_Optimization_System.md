@@ -41,7 +41,7 @@ flowchart TD
     CacheResults --> ReturnNew[Return Predictions]
     ReturnCache --> AIAnalysis[Optional: Neuron Agent Analysis]
     ReturnNew --> AIAnalysis
-```
+```text
 
 ---
 
@@ -101,7 +101,7 @@ flowchart TD
     ProcessEvents --> Save[Commit Transaction]
     Save --> Invalidate[Invalidate Predictions Cache]
     Invalidate --> Return[Return TrainingResult]
-```
+```text
 
 ---
 
@@ -153,7 +153,7 @@ flowchart TD
     Pen2 --> Clamp
     
     Clamp --> Return[Return Failure Probability]
-```
+```text
 
 ---
 
@@ -210,7 +210,7 @@ flowchart TD
     
     CalcBonus --> ApplyMultiplier[Apply Level Multiplier]
     ApplyMultiplier --> ReturnGains[Return Stat Gains]
-```
+```text
 
 ### 7.1 Summer Training Camp Details
 
@@ -228,7 +228,7 @@ The precise formula used by `TrainingCalculationService` to determine stat gains
 
 ```
 Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
-```
+```text
 
 ### 8.2 Formula Components
 

@@ -79,7 +79,7 @@ flowchart TB
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fff3e0
-```
+```text
 
 ### 1.2 Component Hierarchy
 
@@ -120,7 +120,7 @@ Race Strategy System
     ├── RaceRequirement
     ├── RaceStrategy
     └── RaceResult
-```
+```text
 
 ---
 
@@ -213,7 +213,7 @@ flowchart TD
     style Start fill:#e3f2fd
     style Response fill:#c8e6c9
     style ComparePredicted fill:#fff3e0
-```
+```text
 
 ### 2.3 Running Style Optimization Flow
 
@@ -354,7 +354,7 @@ class RaceRequirementAnalyzer
         };
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -629,7 +629,7 @@ class RunningStyleOptimizer
         return 1 - min(1, $variance / 10000); // Normalize variance
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -867,7 +867,7 @@ Schema::create('ucp_races', function (Blueprint $table) {
     
     $table->index(['grade', 'distance']);
 });
-```
+```text
 
 **Deliverables**:
 
@@ -925,7 +925,7 @@ Schema::create('ucp_race_strategies', function (Blueprint $table) {
     
     $table->index(['character_id', 'race_id']);
 });
-```
+```text
 
 **Deliverables**:
 
@@ -1020,7 +1020,7 @@ test('correctly evaluates stat requirements', function () {
     
     expect($strategy['stat_requirements']['speed']['indicator'])->toBe('×');
 });
-```
+```text
 
 **Deliverables**:
 
@@ -1112,7 +1112,7 @@ public function generateStrategy(Race $race, Character $character): array;
  * }
  */
 public function recommendStyle(Race $race, Character $character): array;
-```
+```text
 
 ---
 
@@ -1197,7 +1197,7 @@ flowchart TD
     
     AIRaceAdvisorService --> RaceStrategyService
     AIRaceAdvisorService --> HybridAIService
-```
+```text
 
 ---
 
@@ -1276,7 +1276,7 @@ pie title Test Distribution
     "Integration Tests" : 8
     "API Tests" : 6
     "Performance Tests" : 2
-```
+```text
 
 ---
 

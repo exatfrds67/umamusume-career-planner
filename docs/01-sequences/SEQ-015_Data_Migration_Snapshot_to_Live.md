@@ -86,7 +86,7 @@ Data migration enables:
 
 ### 2.2 Component Locations
 
-```
+```text
 
 app/
 ├── Http/
@@ -254,7 +254,7 @@ sequenceDiagram
         Controller-->>UI: 200 OK + summary
         UI-->>User: Display success + imported count
     end
-```
+```text
 
 ### 3.2 Timeline Breakdown
 
@@ -282,7 +282,7 @@ sequenceDiagram
 
 ```
 File Upload → Format Detection → Schema Version → Adapter Selection
-```
+```text
 
 **Service Implementation:**
 
@@ -561,7 +561,7 @@ class TransformationService
         return $data;
     }
 }
-```
+```text
 
 ### 4.3 Validation Service
 
@@ -795,7 +795,7 @@ class DuplicateDetector
         return $conflicts;
     }
 }
-```
+```text
 
 ### 4.5 Import Execution
 
@@ -930,7 +930,7 @@ class DataImportService
     "dry_run": false
   }
 }
-```
+```text
 
 ### 5.2 Format Detection Result
 
@@ -986,7 +986,7 @@ class DataImportService
     ]
   }
 }
-```
+```text
 
 ### 5.4 Import Result
 
@@ -1024,7 +1024,7 @@ class DataImportService
     }
   ]
 }
-```
+```text
 
 ### 5.6 Game-Accurate Migration Rules (v2.2.0)
 
@@ -1063,7 +1063,7 @@ class DataImportService
     "old_2_hints": "new_level_5 (40%)"
   }
 }
-```
+```text
 
 #### Stat Soft Cap Handling
 
@@ -1096,7 +1096,7 @@ class DataImportService
   },
   "valid_types": ["Speed", "Stamina", "Power", "Guts", "Wit", "Friend"]
 }
-```
+```text
 
 ---
 
@@ -1195,7 +1195,7 @@ DB::transaction(function () use ($records) {
         Career::insert($chunk);
     }
 });
-```
+```text
 
 ### 7.3 Database Query Analysis
 
@@ -1231,7 +1231,7 @@ flowchart TD
     Poll --> Progress{Complete?}
     Progress -->|No| Poll
     Progress -->|Yes| Result
-```
+```text
 
 **Thresholds:**
 

@@ -109,7 +109,7 @@ Career run snapshots enable:
 
 ### 2.2 Component Locations
 
-```
+```text
 app/
 ├── Livewire/
 │   └── Career/
@@ -220,7 +220,7 @@ sequenceDiagram
     Controller-->>UI: Restoration result
     UI->>UI: Refresh career display
     UI-->>User: Display success + updated state
-```
+```text
 
 ### 3.2 Timeline Breakdown
 
@@ -247,7 +247,7 @@ sequenceDiagram
 
 ```
 Career Event → SnapshotService → Milestone Check → Create Snapshot
-```
+```text
 
 **Milestone Triggers:**
 
@@ -398,7 +398,7 @@ private function serializeCareerState(Career $career): array
         ],
     ];
 }
-```
+```text
 
 ### 4.3 Snapshot Creation
 
@@ -653,7 +653,7 @@ private function createWhatIfBranch(Career $career, array $state): Career
     
     return $whatIfCareer;
 }
-```
+```text
 
 ### 4.5 Snapshot History Management
 
@@ -740,7 +740,7 @@ private function canRestore(CareerSnapshot $snapshot): bool
   "created_at": "2026-01-28T10:30:00Z",
   "updated_at": "2026-01-28T10:30:00Z"
 }
-```
+```text
 
 ### 5.2 Snapshot Data Payload (Game-Accurate)
 
@@ -907,7 +907,7 @@ private function canRestore(CareerSnapshot $snapshot): bool
   "restore_mode": "create_what_if_branch",
   "confirm": true
 }
-```
+```text
 
 ### 5.4 Restore Response
 
@@ -1028,7 +1028,7 @@ sequenceDiagram
         Service-->>UI: Restored career
         UI-->>User: Display success + updated state
     end
-```
+```text
 
 ### 6.3 Transaction Rollback Scenarios
 
@@ -1108,7 +1108,7 @@ Note: Increased sizes reflect additional game-accurate data (aptitudes, support 
 CREATE INDEX idx_snapshots_career_created ON ucp_career_snapshots(career_id, created_at DESC);
 CREATE INDEX idx_snapshots_type ON ucp_career_snapshots(snapshot_type, created_at);
 CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
-```
+```text
 
 ---
 

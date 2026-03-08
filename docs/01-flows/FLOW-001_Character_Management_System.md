@@ -44,7 +44,7 @@ flowchart TD
     
     LocalStore --> Dashboard[Redirect to Dashboard]
     CloudStore --> Dashboard
-```
+```text
 
 ### 1.2 Step Details
 
@@ -126,7 +126,7 @@ flowchart TD
     
     S --> UI[Update UI Badge]
     G --> UI
-```
+```text
 
 ### 3.2 Stat Cap Notes
 
@@ -215,7 +215,7 @@ flowchart TD
     MarkDone --> UpdateUI[Update Goal Component]
     MarkGood --> UpdateUI
     AIAlert --> UpdateUI
-```
+```text
 
 ---
 
@@ -287,7 +287,7 @@ flowchart TD
     AggregateRisks --> AIInput[Send to Training Advisor Agent]
     AIInput --> SuggestAction[Suggest Infirmary/Rest/Date]
     SuggestAction --> UpdateDashboard[Update Dashboard Indicators]
-```
+```text
 
 ---
 

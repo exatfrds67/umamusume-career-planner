@@ -55,7 +55,7 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
 
 ### 2.1 Desktop Layout (≥1024px)
 
-```
+```text
 
 ┌──────────────────────────────────────────────────────────────────────┐
 │ Race Preparation: Kanto Okami Cup                            [≡]    │
@@ -172,7 +172,7 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
 
 ### 2.2 Tablet Layout (640px-1024px)
 
-```
+```text
 
 ┌────────────────────────────────────────────────────┐
 │ Race Preparation                               [≡]  │
@@ -222,7 +222,7 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
 
 ### 2.3 Mobile Layout (<640px)
 
-```
+```text
 
 ┌──────────────────────────────┐
 │ Race Prep              [≡]  │
@@ -336,7 +336,7 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
         </div>
     </div>
 </div>
-```
+```text
 
 ### 3.2 Readiness Assessment Component
 
@@ -371,7 +371,7 @@ class ReadinessAssessment extends Component
 
 **Visual Format**:
 
-```
+```text
 ┌────────────────────────────────────────┐
 │ Readiness Assessment                   │
 ├────────────────────────────────────────┤
@@ -425,7 +425,7 @@ class WinProbability extends Component
         ]);
     }
 }
-```
+```text
 
 **Visual Format**:
 
@@ -445,7 +445,7 @@ class WinProbability extends Component
 │ │ 1st  2nd  3rd  4th+              │  │
 │ └──────────────────────────────────┘  │
 └────────────────────────────────────────┘
-```
+```text
 
 ### 3.4 Stat Requirements Component
 
@@ -520,7 +520,7 @@ class RunningStyleRecommendation extends Component
         ]);
     }
 }
-```
+```text
 
 **Visual Format**:
 
@@ -546,7 +546,7 @@ class RunningStyleRecommendation extends Component
 │                                        │
 │ [VIEW SIMULATION]                      │
 └────────────────────────────────────────┘
-```
+```text
 
 **Running Style Match Scoring**:
 
@@ -614,7 +614,7 @@ class PreparationChecklist extends Component
 
 **Visual Format**:
 
-```
+```text
 ┌────────────────────────────────────────────────────┐
 │ Preparation Checklist (6/8 Complete)               │
 ├────────────────────────────────────────────────────┤
@@ -681,7 +681,7 @@ class AIStrategyAnalysis extends Component
         ]);
     }
 }
-```
+```text
 
 **Visual Format**:
 
@@ -709,7 +709,7 @@ class AIStrategyAnalysis extends Component
 │                                                    │
 │ [ASK FOLLOW-UP] [VIEW DETAILED ANALYSIS]           │
 └────────────────────────────────────────────────────┘
-```
+```text
 
 ---
 
@@ -802,7 +802,7 @@ sequenceDiagram
     AIService-->>PrepScreen: AI recommendation
     
     PrepScreen->>User: Display all analysis
-```
+```text
 
 ### 4.3 Cache Strategy
 
@@ -852,7 +852,7 @@ sequenceDiagram
     SimService-->>PrepScreen: Simulation result
     PrepScreen->>ResultModal: Display result
     ResultModal->>User: Show placement + stats
-```
+```text
 
 ### 5.3 AI Advisory Integration Flow
 
@@ -935,7 +935,7 @@ sequenceDiagram
 <div aria-live="assertive" aria-atomic="true" class="sr-only">
     Race entry confirmed. You are now registered for Kanto Okami Cup on turn 52.
 </div>
-```
+```text
 
 ---
 
@@ -1057,7 +1057,7 @@ test('user can run race simulation', function () {
         ->call('runSimulation')
         ->assertRedirect(route('race.simulation', ['race' => $race]));
 });
-```
+```text
 
 ### 8.3 E2E Tests (Playwright)
 
@@ -1222,7 +1222,7 @@ test.describe('WF-007: Accessibility', () => {
         await expect(page.getByRole('dialog')).toBeVisible();
     });
 });
-```
+```text
 
 ---
 

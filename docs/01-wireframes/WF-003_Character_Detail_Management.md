@@ -55,7 +55,7 @@ The Character Detail & Management screen provides a comprehensive view and manag
 
 ### 2.1 Desktop Layout (≥1024px)
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────┐
 │ [≡] Menu  |  Character: Mejiro Ardan                |  [?] Help      │
 ├──────────────────────────────────────────────────────────────────────┤
@@ -98,7 +98,7 @@ The Character Detail & Management screen provides a comprehensive view and manag
 
 ### 2.2 Tablet Layout (640px-1024px)
 
-```
+```text
 ┌────────────────────────────────────────────────────┐
 │ Character Detail: Mejiro Ardan              [≡]   │
 ├────────────────────────���───────────────────────────┤
@@ -159,7 +159,7 @@ The Character Detail & Management screen provides a comprehensive view and manag
 
 ### 2.3 Mobile Layout (<640px)
 
-```
+```text
 ┌──────────────────────────────┐
 │ Mejiro Ardan           [≡]  │
 ├──────────────────────────────┤
@@ -262,7 +262,7 @@ class OverviewCard extends Component
         // Logic to find next scheduled race
     }
 }
-```
+```text
 
 **Visual Elements**:
 
@@ -297,7 +297,7 @@ class OverviewCard extends Component
 Speed    A  (980)  ████████████████████ 81.7%
 Grade: A (850-949) | Rank: Top 15% | Growth: +20%
 Factor Bonus: ★★☆ (+12 from Parent A)
-```
+```text
 
 **Color Coding**:
 
@@ -381,7 +381,7 @@ class GoalsPanel extends Component
     ],
     // ... up to 3 races
 ]
-```
+```text
 
 **Readiness Calculation**:
 
@@ -411,7 +411,7 @@ flowchart TD
 
 **Display Format**:
 
-```
+```text
 ┌────────────────┬────────────────┬────────────────┐
 │ [Card Portrait]│ [Card Portrait]│ [Card Portrait]│
 │ Mejiro Dober   │ Tokai Teio     │ Kitasan Black  │
@@ -447,7 +447,7 @@ Deck Score: 92/100 (Excellent)
 
 **Display Elements**:
 
-```
+```text
 ┌──────────────────────────────────────┐
 │ Skills Summary                        │
 ├──────────────────────────────────────┤
@@ -504,7 +504,7 @@ class AIQuickAdvisor extends Component
         return view('livewire.character.ai-quick-advisor');
     }
 }
-```
+```text
 
 **Display Format**:
 
@@ -522,7 +522,7 @@ class AIQuickAdvisor extends Component
 │                                      │
 │ [Ask AI] [View Details] [Dismiss]    │
 └──────────────────────────────────────┘
-```
+```text
 
 **States**:
 
@@ -564,7 +564,7 @@ class AIQuickAdvisor extends Component
 ○ Turn 42: Power Training (+35 Power)
   Support: Mejiro Dober (+12)
   Energy: 82% → 62% (-20%)
-```
+```text
 
 **Highlighted Events** (filled circle ●):
 
@@ -627,7 +627,7 @@ Echo.private(`character.${characterId}`)
     .listen("RaceCompleted", (e) => {
         Livewire.dispatch("race-completed", e.result);
     });
-```
+```text
 
 ### 4.3 Cache Strategy
 
@@ -691,7 +691,7 @@ sequenceDiagram
     Service-->>GoalsPanel: Success
     GoalsPanel->>GoalsPanel: Refresh goals list
     GoalsPanel->>User: Show success feedback
-```
+```text
 
 ### 5.3 Stat Update Flow
 
@@ -762,7 +762,7 @@ sequenceDiagram
 <div aria-live="assertive" aria-atomic="true" class="sr-only">
     Warning: Energy level low at 32%. Consider resting.
 </div>
-```
+```text
 
 ---
 
@@ -883,7 +883,7 @@ test('user can add and delete goals', function () {
 
     expect($character->goals()->count())->toBe(0);
 });
-```
+```text
 
 ### 8.3 E2E Tests (Playwright)
 
@@ -993,7 +993,7 @@ test.describe("WF-003: Accessibility", () => {
         await expect(addGoalButton).toBeFocused();
     });
 });
-```
+```text
 
 ---
 

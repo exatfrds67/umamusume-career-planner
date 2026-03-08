@@ -79,7 +79,7 @@ flowchart TB
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fff3e0
-```
+```text
 
 ### 1.2 Component Hierarchy
 
@@ -119,7 +119,7 @@ Support Card Management System
     ├── SupportDeck
     ├── CardBond
     └── DeckSlot
-```
+```text
 
 ---
 
@@ -208,7 +208,7 @@ flowchart TD
     style Error1 fill:#ffcdd2
     style Error2 fill:#ffcdd2
     style Error3 fill:#ffcdd2
-```
+```text
 
 ### 2.3 Bond Level Tracking Flow
 
@@ -351,7 +351,7 @@ class SupportCard extends Model
         return $query->where('meta_tier', $tier);
     }
 }
-```
+```text
 
 **Migration**:
 
@@ -481,7 +481,7 @@ class SupportDeck extends Model
         return $totalBonuses;
     }
 }
-```
+```text
 
 **Migration**:
 
@@ -587,7 +587,7 @@ class CardBond extends Model
         $this->save();
     }
 }
-```
+```text
 
 **Migration**:
 
@@ -726,7 +726,7 @@ class DeckCompositionService
             ->exists();
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -946,7 +946,7 @@ class LimitBreakService
         }
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -1177,7 +1177,7 @@ test('friendship unlocks at 80% bond', function () {
     
     expect($bond->friendship_unlocked)->toBeTrue();
 });
-```
+```text
 
 **Deliverables**:
 
@@ -1241,7 +1241,7 @@ public function composeDeck(Character $character, array $cardIds, ?string $deckN
  * @return array<string, int> Stat bonuses
  */
 public function calculateTrainingBonuses(SupportDeck $deck, TrainingType $facility): array;
-```
+```text
 
 ---
 
@@ -1319,7 +1319,7 @@ erDiagram
         int bond_points
         boolean friendship_unlocked
     }
-```
+```text
 
 ---
 
@@ -1418,7 +1418,7 @@ flowchart TD
     "cached": false
   }
 }
-```
+```text
 
 ---
 

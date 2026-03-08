@@ -97,7 +97,7 @@ The Support Card Collection interface provides a comprehensive catalog of all av
 
 ### 2.1 Desktop Layout (≥1024px)
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────┐
 │ [≡] Menu  |  Support Card Collection                        [?]    │
 ├──────────────────────────────────────────────────────────────────────┤
@@ -135,7 +135,7 @@ The Support Card Collection interface provides a comprehensive catalog of all av
 
 ### 2.2 Tablet Layout (640px-1023px)
 
-```
+```text
 ┌────────────────────────────────────────────────────┐
 │ [≡] Menu  |  Support Cards                  [?]    │
 ├────────────────────────────────────────────────────┤
@@ -159,7 +159,7 @@ The Support Card Collection interface provides a comprehensive catalog of all av
 
 ### 2.3 Mobile Layout (<640px)
 
-```
+```text
 ┌──────────────────────────────┐
 │ [≡] Support Cards        [?] │
 ├──────────────────────────────┤
@@ -228,7 +228,7 @@ class CollectionOverview extends Component
         return view('livewire.support-cards.collection-overview');
     }
 }
-```
+```text
 
 **Visual Format**:
 
@@ -254,7 +254,7 @@ class CollectionOverview extends Component
 │ 🤝 Friendship Ready (≥80%): 42         │
 │ ★★★★★ MLB Cards: 12                    │
 └────────────────────────────────────────┘
-```
+```text
 
 ### 3.2 Support Card Search Component
 
@@ -474,7 +474,7 @@ class CardSearch extends Component
         </button>
     </div>
 </div>
-```
+```text
 
 **Card States**:
 
@@ -760,7 +760,7 @@ class MetaTierService
         </button>
     </div>
 </div>
-```
+```text
 
 ### 3.6 Bond Progression System
 
@@ -943,7 +943,7 @@ class CardCollection extends Component
         return view('livewire.support-cards.card-collection');
     }
 }
-```
+```text
 
 ### 4.2 Data Flow
 
@@ -1019,7 +1019,7 @@ flowchart TD
     ShowModal --> ModalAction{Modal Action?}
     ModalAction -->|Add to Deck| CheckDeck
     ModalAction -->|Close| Browse
-```
+```text
 
 ### 5.2 Bond Progression Flow
 
@@ -1069,7 +1069,7 @@ flowchart TD
     CheckLB4 -->|No| Empty5[☆ 5th Star Empty]
     Star5MLB --> Display[Display Complete]
     Empty5 --> Display
-```
+```text
 
 ---
 
@@ -1231,7 +1231,7 @@ test('returns null friendship bonus when below threshold', function () {
     
     expect($service->getFriendshipBonus($card))->toBeNull();
 });
-```
+```text
 
 **Test File**: `tests/Unit/Services/MetaTierServiceTest.php`
 
@@ -1390,7 +1390,7 @@ test('user cannot add more than 6 cards to deck', function () {
 
     expect($deck->fresh()->cards->count())->toBe(6);
 });
-```
+```text
 
 ### 8.3 E2E Tests (Playwright)
 
@@ -1595,7 +1595,7 @@ test.describe("WF-010: Accessibility", () => {
         await expect(page.getByRole("alert")).toBeVisible();
     });
 });
-```
+```text
 
 ---
 

@@ -116,7 +116,7 @@ flowchart TD
     style End fill:#c8e6c9
     style ValidateDeck fill:#fff3e0
     style CreateCareer fill:#f3e5f5
-```
+```text
 
 ### 2.2 Detailed State Diagram
 
@@ -201,7 +201,7 @@ stateDiagram-v2
 │                                                            │
 │                                    [← BACK]  [NEXT →]     │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **User Actions**:
 
@@ -274,7 +274,7 @@ stateDiagram-v2
 │                                                            │
 │                          [← CHANGE TRAINEE]  [NEXT →]     │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Scenario Types**:
 
@@ -403,7 +403,7 @@ class FactorInheritanceService
         };
     }
 }
-```
+```text
 
 **Validation Rules**:
 
@@ -522,7 +522,7 @@ class DeckSynergyCalculator
         return (int) $score;
     }
 }
-```
+```text
 
 **Validation Errors**:
 
@@ -600,7 +600,7 @@ class DeckSynergyCalculator
 │                                                            │
 │                          [← BACK]  [CREATE CAREER →]      │
 └───────────────────────────────────────���────────────────────┘
-```
+```text
 
 **User Actions**:
 
@@ -724,7 +724,7 @@ INSERT INTO ucp_stat_progress (
     'normal',
     NOW()
 );
-```
+```text
 
 **Initial State Configuration**:
 
@@ -844,7 +844,7 @@ class CreateCareerRequest extends FormRequest
         ];
     }
 }
-```
+```text
 
 ### 5.3 Deck Validation
 
@@ -953,7 +953,7 @@ test('career setup creates valid record', function () {
         ->and($career->energy)->toBe(100)
         ->and($career->mood->value)->toBe('normal');
 });
-```
+```text
 
 ---
 
@@ -1055,7 +1055,7 @@ flowchart LR
     FactorService --> CharacterRepo
     DeckService --> AIService
     CareerRepo --> Cache
-```
+```text
 
 ---
 

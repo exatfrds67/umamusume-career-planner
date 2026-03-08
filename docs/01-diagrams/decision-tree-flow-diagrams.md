@@ -69,7 +69,7 @@ flowchart TD
     style Condition fill:#fff3e0
     style Action fill:#f3e5f5
     style Result fill:#e8f5e9
-```
+```text
 
 ---
 
@@ -235,7 +235,7 @@ flowchart LR
     EnergyMod --> RiskLevel
     MoodMod --> RiskLevel
     ConditionMod --> RiskLevel
-```
+```text
 
 ---
 
@@ -418,7 +418,7 @@ flowchart LR
     AptScore --> Output
     SkillScore --> Output
     MoodScore --> Output
-```
+```text
 
 ---
 
@@ -588,7 +588,7 @@ flowchart LR
     MeetsReq -->|No| Keep
     HasSP -->|Yes| Evolve
     HasSP -->|No| Keep
-```
+```text
 
 ---
 
@@ -754,7 +754,7 @@ flowchart LR
     APISync --> MetaTier
     MetaTier --> CardList
     MetaTier --> DeckBuilder
-```
+```text
 
 ---
 
@@ -921,7 +921,7 @@ flowchart LR
     RecreationWhen --> Recreation
     InfirmaryWhen --> Infirmary
     ItemsWhen --> Items
-```
+```text
 
 ---
 
@@ -1062,7 +1062,7 @@ flowchart LR
     
     Score --> Accept
     Score --> Fallback
-```
+```text
 
 ---
 
@@ -1202,7 +1202,7 @@ flowchart TD
     
     style Start fill:#e3f2fd
     style End fill:#e8f5e9
-```
+```text
 
 ---
 

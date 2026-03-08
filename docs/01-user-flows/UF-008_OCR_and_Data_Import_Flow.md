@@ -124,7 +124,7 @@ flowchart TD
     style End fill:#c8e6c9
     style OCRExtraction fill:#fff3e0
     style ValidateData fill:#f3e5f5
-```
+```text
 
 ### 2.2 Detailed State Diagram
 
@@ -207,7 +207,7 @@ stateDiagram-v2
 
 #### 3.1.1 Import Options Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Data Import                                          [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -271,7 +271,7 @@ stateDiagram-v2
 
 #### 3.2.1 Screenshot Upload Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Upload Screenshot                                    [×]   │
 ├────────────────────────────────────────────────────────────┤
@@ -301,7 +301,7 @@ stateDiagram-v2
 
 #### 3.2.2 OCR Processing Status
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Processing Screenshot...                             [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -336,7 +336,7 @@ stateDiagram-v2
 
 #### 3.3.1 Validation Results Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Review Extracted Data                                [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -394,7 +394,7 @@ stateDiagram-v2
 
 #### 3.3.2 Manual Correction Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Correct Extracted Data                               [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -434,7 +434,7 @@ stateDiagram-v2
 
 #### 3.4.1 File Upload Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Import from File                                     [×]   │
 ├────────────────────────────────────────────────────────────┤
@@ -467,7 +467,7 @@ stateDiagram-v2
 
 #### 3.4.2 Import Preview Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Import Preview                                       [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -515,7 +515,7 @@ stateDiagram-v2
 
 #### 3.5.1 API Sync Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  External Data Sync                                   [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -560,7 +560,7 @@ stateDiagram-v2
 
 #### 3.5.2 Sync Progress Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Syncing External Data...                             [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -635,7 +635,7 @@ flowchart TD
     Success --> End
     ErrorImage --> End
     ErrorFormat --> End
-```
+```text
 
 ### 4.2 Key Decision Factors
 
@@ -710,7 +710,7 @@ class TesseractService
         ];
     }
 }
-```
+```text
 
 ### 5.3 Field Parsing
 
@@ -854,7 +854,7 @@ test('file import validates data correctly', function () {
     $response->assertOk()
         ->assertJsonPath('data.careers.0.validation.valid', true);
 });
-```
+```text
 
 ---
 
@@ -978,7 +978,7 @@ flowchart LR
     
     UmapyoiAPI --> Cache
     FallbackAPI --> Cache
-```
+```text
 
 ---
 

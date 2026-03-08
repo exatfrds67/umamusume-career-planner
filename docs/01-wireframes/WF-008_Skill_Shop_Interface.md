@@ -93,7 +93,7 @@ The Skill Shop Interface provides a comprehensive catalog of available skills, e
 │ │ ... │ │ ... │ │ ... │ │
 │ └──────────────────────┘ └──────────────────────┘ └────────────────┘ │
 └──────────────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 2.2 Tablet Layout (640px-1024px)
 
@@ -126,7 +126,7 @@ The Skill Shop Interface provides a comprehensive catalog of available skills, e
 │ [ LOAD MORE SKILLS ] │
 └────────────────────────────────────────────────────┘
 
-```
+```text
 
 ### 2.3 Mobile Layout (<640px)
 
@@ -163,7 +163,7 @@ The Skill Shop Interface provides a comprehensive catalog of available skills, e
 │ [🏠] [👤] [⚡] [🏆] [🤖] [⚙️] │
 └──────────────────────────────┘
 
-```
+```text
 
 ---
 
@@ -217,7 +217,7 @@ class SPBalanceWidget extends Component
 
 **Visual Format**:
 
-```
+```text
 ┌────────────────────────────────────────┐
 │ SP Balance                             │
 ├────────────────────────────────────────┤
@@ -291,7 +291,7 @@ class SkillSearch extends Component
         return view('livewire.skills.skill-search');
     }
 }
-```
+```text
 
 ### 3.3 Skill Card Component
 
@@ -489,7 +489,7 @@ class SkillHintService
         return $discount;
     }
 }
-```
+```text
 
 ### 3.5 AI Skill Recommendations
 
@@ -533,7 +533,7 @@ class AIRecommendations extends Component
 
 **Visual Format**:
 
-```
+```text
 ┌────────────────────────────────────────────────────┐
 │ AI Skill Recommendations                           │
 ├────────────────────────────────────────────────────┤
@@ -720,7 +720,7 @@ class AIRecommendations extends Component
         </button>
     </div>
 </div>
-```
+```text
 
 ---
 
@@ -820,7 +820,7 @@ sequenceDiagram
     SkillShop->>Database: Record acquisition
     Database-->>SkillShop: Success
     SkillShop->>User: Show success message
-```
+```text
 
 ### 4.3 Cache Strategy
 
@@ -884,7 +884,7 @@ sequenceDiagram
 
     SkillShop->>SkillShop: Apply client-side sorting
     SkillShop->>User: Update skill grid
-```
+```text
 
 ### 5.3 AI Recommendation Flow
 
@@ -960,7 +960,7 @@ sequenceDiagram
     AI recommends 3 skills for your build. Top recommendation: Endurance Master
     with 92% match score.
 </div>
-```
+```text
 
 ---
 
@@ -1118,7 +1118,7 @@ test('user cannot acquire skill with insufficient SP', function () {
 
     expect($character->skills->contains($skill))->toBeFalse();
 });
-```
+```text
 
 ### 8.3 E2E Tests (Playwright)
 
@@ -1271,7 +1271,7 @@ test.describe("WF-008: Accessibility", () => {
         await expect(page.getByRole("alert")).toBeVisible();
     });
 });
-```
+```text
 
 ---
 

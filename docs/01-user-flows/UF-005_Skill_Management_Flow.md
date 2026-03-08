@@ -135,7 +135,7 @@ flowchart TD
     style Dashboard fill:#c8e6c9
     style ExecutePurchase fill:#f3e5f5
     style ExecuteEvolution fill:#fff3e0
-```
+```text
 
 ### 2.2 Detailed State Diagram
 
@@ -215,7 +215,7 @@ stateDiagram-v2
 
 #### 3.1.1 Skill Catalog Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Skill Catalog                                        [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -323,7 +323,7 @@ class SkillCatalog extends Component
         ]);
     }
 }
-```
+```text
 
 ---
 
@@ -397,7 +397,7 @@ class SkillCatalog extends Component
 │                                                            │
 │                  [ACQUIRE NOW] [ADD TO PLAN] [CANCEL]      │
 └────────────────────────────────────────────────────────────┘
-```
+```text
 
 **Detail Components**:
 
@@ -457,7 +457,7 @@ class SkillPrerequisiteService
 
 #### 3.3.1 Purchase Confirmation Dialog
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Confirm Skill Acquisition                                 │
 ├────────────────────────────────────────────────────────────┤
@@ -513,7 +513,7 @@ sequenceDiagram
     Service->>Cache: Invalidate skill cache
     Service-->>UI: Acquisition success
     UI-->>User: Show success + evolution check
-```
+```text
 
 **Transaction Logic**:
 
@@ -586,7 +586,7 @@ class SkillAcquisitionService
 
 #### 3.4.1 Evolution Prompt Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Skill Evolution Available!                                │
 ├────────────────────────────────────────────────────────────┤
@@ -640,7 +640,7 @@ flowchart TD
     C --> M[Complete]
     L --> M
     H --> D
-```
+```text
 
 **Evolution Service**:
 
@@ -712,7 +712,7 @@ class SkillEvolutionService
 
 #### 3.5.1 Loadout Manager Interface
 
-```
+```text
 ┌────────────────────────────────────────────────────────────┐
 │  Skill Loadout Manager                                [≡]   │
 ├────────────────────────────────────────────────────────────┤
@@ -798,7 +798,7 @@ flowchart TD
     
     D7 -->|Yes| Browse[Browse More Skills]
     D7 -->|No| ViewPlan[Review Acquisition Plan]
-```
+```text
 
 ### 4.2 Key Decision Factors
 
@@ -886,7 +886,7 @@ mindmap
       Scenario Events
       Character Events
       Milestone Rewards
-```
+```text
 
 ### 5.4 Hint Tracking Service
 
@@ -1008,7 +1008,7 @@ test('skill acquisition flow completes successfully', function () {
         ->and($career->total_sp_available)->toBe(404) // 500 - 96
         ->and($career->skills()->where('skill_id', $skill->id)->exists())->toBeTrue();
 });
-```
+```text
 
 ---
 
@@ -1116,7 +1116,7 @@ flowchart LR
     AIService --> Cache
     SkillRepo --> Cache
     CareerRepo --> Cache
-```
+```text
 
 ---
 

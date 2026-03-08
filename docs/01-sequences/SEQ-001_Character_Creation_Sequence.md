@@ -143,7 +143,7 @@ The game uses an 8-grade aptitude scale (NO SS grade exists):
 
 ### 2.2 Component Locations
 
-```
+```text
 app/
 ├── Livewire/
 │   └── Character/
@@ -230,7 +230,7 @@ sequenceDiagram
     Controller-->>UI: 201 Created + character data
     UI->>UI: Update component state
     UI-->>User: Success message + redirect to Dashboard
-```
+```text
 
 ### 3.2 Character Selection Flow
 
@@ -291,7 +291,7 @@ sequenceDiagram
     
     FactorSvc-->>UI: Inheritance preview
     UI-->>User: Display potential bonuses
-```
+```text
 
 ### 3.4 Timeline Breakdown
 
@@ -314,7 +314,7 @@ sequenceDiagram
 
 ```
 User → Livewire Component → Controller
-```
+```text
 
 **Controller Action:**
 
@@ -347,7 +347,7 @@ public function create()
 
 **Request Flow:**
 
-```
+```text
 User → Livewire Component → FactorService
 ```
 
@@ -410,7 +410,7 @@ private function getFactorBonus(?Factor $factor): int
         default => 0,
     };
 }
-```
+```text
 
 **Aptitude Factor Processing (Red Factors):**
 
@@ -470,7 +470,7 @@ private function upgradeGrade(string $grade): string
 
 **Request Flow:**
 
-```
+```text
 User → Livewire Component → SupportDeckService
 ```
 
@@ -507,7 +507,7 @@ public function validate(array $cardIds, int $userId): ValidationResult
     
     return ValidationResult::success();
 }
-```
+```text
 
 ### 4.4 Step 4: Database Transaction
 
@@ -624,7 +624,7 @@ public function create(array $data): Character
     }
   ]
 }
-```
+```text
 
 ### 5.2 Factor Calculation Result
 
@@ -706,7 +706,7 @@ public function create(array $data): Character
   },
   "grade_scale": ["G", "F", "E", "D", "C", "B", "A", "S"]
 }
-```
+```text
 
 ### 5.4 Character Creation Response
 
@@ -794,7 +794,7 @@ sequenceDiagram
         Controller-->>UI: 201 Created
         UI-->>User: Success + redirect
     end
-```
+```text
 
 ### 6.3 Transaction Rollback Scenarios
 
@@ -863,7 +863,7 @@ CREATE INDEX idx_factors_character ON ucp_factors(character_id);
 CREATE INDEX idx_aptitudes_character ON ucp_aptitudes(character_id);
 CREATE INDEX idx_support_cards_user ON ucp_support_cards(user_id);
 CREATE INDEX idx_aptitudes_type_grade ON ucp_aptitudes(aptitude_type, grade);
-```
+```text
 
 ---
 

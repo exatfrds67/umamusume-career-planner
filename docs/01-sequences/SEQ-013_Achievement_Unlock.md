@@ -80,7 +80,7 @@ The achievement system enables:
 
 ### 2.2 Component Locations
 
-```
+```text
 app/
 ├── Services/
 │   ├── AchievementEngine.php
@@ -244,7 +244,7 @@ sequenceDiagram
         
         Engine-->>Event: Unlock complete
     end
-```
+```text
 
 ### 4.2 Stat Achievement Evaluation Flow
 
@@ -322,7 +322,7 @@ sequenceDiagram
     end
     
     Engine->>DB: Process queued achievements
-```
+```text
 
 ### 4.4 Timeline Breakdown
 
@@ -349,7 +349,7 @@ sequenceDiagram
 
 ```
 System Event → AchievementEngine → Trigger Evaluation → Unlock Execution
-```
+```text
 
 **Service Implementation:**
 
@@ -491,7 +491,7 @@ private function checkStatMilestone(AchievementTrigger $trigger, SystemEvent $ev
     return $event->stat === $criteria['stat'] &&
            $event->value >= $threshold;
 }
-```
+```text
 
 #### Class Rank Trigger (Fan Count Based)
 
@@ -542,7 +542,7 @@ private function checkRaceWin(AchievementTrigger $trigger, SystemEvent $event): 
     
     return true;
 }
-```
+```text
 
 #### Skill Acquisition Trigger
 
@@ -604,7 +604,7 @@ private function checkBondLevel(AchievementTrigger $trigger, SystemEvent $event)
     
     return false;
 }
-```
+```text
 
 #### Career Completion Trigger
 
@@ -701,7 +701,7 @@ class RewardService
         $inventory->update(['items' => $items]);
     }
 }
-```
+```text
 
 ### 5.4 Notification Delivery
 
@@ -819,7 +819,7 @@ private function calculateClassRank(int $totalFans): string
         default => 'debut',
     };
 }
-```
+```text
 
 ---
 
@@ -875,7 +875,7 @@ private function calculateClassRank(int $totalFans): string
   ],
   "created_at": "2026-01-28T10:00:00Z"
 }
-```
+```text
 
 ### 6.3 Achievement Unlock Model
 
@@ -910,7 +910,7 @@ private function calculateClassRank(int $totalFans): string
   },
   "is_active": true
 }
-```
+```text
 
 ### 6.5 Class Rank Trigger Configuration
 
@@ -958,7 +958,7 @@ private function calculateClassRank(int $totalFans): string
   },
   "timestamp": "2026-01-28T10:30:00Z"
 }
-```
+```text
 
 ---
 
@@ -1021,7 +1021,7 @@ if ($existingUnlock) {
     ]);
     return; // Skip unlock
 }
-```
+```text
 
 ---
 
@@ -1080,7 +1080,7 @@ CREATE INDEX idx_achievement_unlocks_user ON ucp_achievement_unlocks(user_id, ac
 CREATE INDEX idx_achievement_unlocks_created ON ucp_achievement_unlocks(created_at DESC);
 CREATE INDEX idx_achievements_category ON ucp_achievements(category, is_active);
 CREATE INDEX idx_careers_total_fans ON ucp_careers(user_id, total_fans);
-```
+```text
 
 ### 8.4 Cache Strategy
 

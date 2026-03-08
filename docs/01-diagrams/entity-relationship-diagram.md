@@ -102,7 +102,7 @@ mindmap
       ucp_external_data
       ucp_ocr_extractions
       ocr_extracted_skills
-```
+```text
 
 ---
 
@@ -274,7 +274,7 @@ erDiagram
         json effects
         json activation_conditions
     }
-```
+```text
 
 ### 3.2 Relationship Cardinality
 
@@ -406,7 +406,7 @@ erDiagram
         json bonus_values
         timestamp created_at
     }
-```
+```text
 
 **Aptitude Grades**: S (max), A, B, C, D, E, F, G (effectiveness: +5% to -90%)
 
@@ -529,7 +529,7 @@ erDiagram
         boolean is_active
         timestamp acquired_at
     }
-```
+```text
 
 **Skill Types**: Speed, Stamina, Power, Guts, Wit, Unique, Recovery
 
@@ -618,7 +618,7 @@ erDiagram
         boolean is_goal_race
         json eligibility_requirements
     }
-```
+```text
 
 **Race Grades**: G1, G2, G3, OP, Pre-OP
 
@@ -740,7 +740,7 @@ erDiagram
         string error_message
         timestamp checked_at
     }
-```
+```text
 
 **MCP Servers**: Memory, Filesystem, Fetch, Custom
 
@@ -913,7 +913,7 @@ ALTER TABLE character_support_cards ADD CONSTRAINT chk_deck_size
 -- Skill hint discount cap (max 40%)
 ALTER TABLE ucp_skill_hints ADD CONSTRAINT chk_hint_discount
     CHECK (discount_percentage BETWEEN 0 AND 40);
-```
+```text
 
 #### Referential Integrity Constraints
 
@@ -966,7 +966,7 @@ flowchart TD
     
     support_cards --&gt;|&#34;RESTRICT&#34;| deck
     skills[&#34;ucp_skills&#34;] --&gt;|&#34;RESTRICT&#34;| acquisitions
-```
+```text
 
 ---
 

@@ -74,7 +74,7 @@ flowchart TD
     Initialize --> Save[Save to Database/localStorage]
     Save --> Redirect[Redirect to Character Dashboard]
     Redirect --> End([Character Created])
-```
+```text
 
 ### 2.2 Step Sequence
 
@@ -127,7 +127,7 @@ sequenceDiagram
 
 ### 3.1 Desktop Layout (≥1024px)
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────┐
 │ Character Creation Wizard                                     [✕]    │
 ├──────────────────────────────────────────────────────────────────────┤
@@ -192,7 +192,7 @@ sequenceDiagram
 
 ### 3.2 Tablet Layout (640px-1024px)
 
-```
+```text
 ┌────────────────────────────────────────────────────┐
 │ Character Creation - Step 1 of 4            [✕]   │
 ├────────────────────────────────────────────────────┤
@@ -231,7 +231,7 @@ sequenceDiagram
 
 ### 3.3 Mobile Layout (<640px)
 
-```
+```text
 ┌──────────────────────────────┐
 │ Step 1 of 4            [✕]  │
 ├──────────────────────────────┤
@@ -333,7 +333,7 @@ sequenceDiagram
         Select
     </button>
 </div>
-```
+```text
 
 #### 3.4.2 Search and Filter Component
 
@@ -418,7 +418,7 @@ class TraineeSelector extends Component
 
 ### 4.1 Desktop Layout (≥1024px)
 
-```
+```text
 ┌─────────────────��────────────────────────────────────────────────────┐
 │ Character Creation Wizard                                     [✕]    │
 ├──────────────────────────────────────────────────────────────────────┤
@@ -485,7 +485,7 @@ class TraineeSelector extends Component
 
 ### 4.2 Tablet Layout (640px-1024px)
 
-```
+```text
 ┌────────────────────────────────────────────────────┐
 │ Character Creation - Step 2 of 4            [✕]   │
 ├────────────────────────────────────────────────────┤
@@ -529,7 +529,7 @@ class TraineeSelector extends Component
 
 ### 4.3 Mobile Layout (<640px)
 
-```
+```text
 ┌──────────────────────────────┐
 │ Step 2 of 4            [✕]  │
 ├──────────────────────────────┤
@@ -635,7 +635,7 @@ class FactorInheritanceService
         return $bonuses;
     }
 }
-```
+```text
 
 ### 4.5 Factor Rating System
 
@@ -740,7 +740,7 @@ class FactorInheritanceService
 │                                                                      │
 │                                    [← Back] [Next: Review →]        │
 └──────────────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 5.2 Card Selection Modal
 
@@ -767,7 +767,7 @@ class FactorInheritanceService
 │                                                                      │
 │ [Load More ▼]                                         [Cancel]      │
 └──────────────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 5.3 Deck Validation Logic
 
@@ -855,7 +855,7 @@ class DeckBuilder extends Component
 
 ### 6.1 Desktop Layout (≥1024px)
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────┐
 │ Character Creation Wizard                                     [✕]    │
 ├──────────────────────────────────────────────────────────────────────┤
@@ -970,7 +970,7 @@ sequenceDiagram
     CharacterService-->>Wizard: Success (character_id)
     
     Wizard->>User: Redirect to /characters/{id}
-```
+```text
 
 ### 6.3 Validation Summary
 
@@ -1061,7 +1061,7 @@ flowchart TD
     Step2 --> FactorCalc
     Step3 --> CardGrid
     Step4 --> StatPreview
-```
+```text
 
 ---
 
@@ -1153,7 +1153,7 @@ flowchart LR
 <div aria-live="polite" aria-atomic="true" class="sr-only">
     Character created successfully. Redirecting to character dashboard.
 </div>
-```
+```text
 
 ---
 
@@ -1311,7 +1311,7 @@ test('wizard calculates factor preview correctly', function () {
         ->and($preview['projected_stats']['speed'])->toBe(102) // 90 + 12
         ->and($preview['projected_stats']['stamina'])->toBe(91); // 70 + 21
 });
-```
+```text
 
 ### 10.3 E2E Tests (Playwright)
 
@@ -1546,7 +1546,7 @@ test.describe('WF-002: Accessibility', () => {
         await expect(errorRegion).toContainText('Deck must contain exactly 6 cards');
     });
 });
-```
+```text
 
 ### 10.5 Visual Regression Tests
 

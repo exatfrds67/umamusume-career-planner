@@ -81,7 +81,7 @@ flowchart TB
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fff3e0
-```
+```text
 
 ### 1.2 Component Hierarchy
 
@@ -122,7 +122,7 @@ Training Optimization System
     ├── TrainingPrediction
     ├── SupportCard
     └── SkillHint
-```
+```text
 
 ---
 
@@ -223,7 +223,7 @@ flowchart TD
     style Response fill:#c8e6c9
     style CheckFailure fill:#fff3e0
     style CheckFriendship fill:#ffccbc
-```
+```text
 
 ### 2.3 Support Card Bonus Calculation Flow
 
@@ -417,7 +417,7 @@ class StatGainCalculator
         };
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -561,7 +561,7 @@ class SkillHintProbabilityCalculator
         return array_merge($redHints, $normalHints);
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -805,7 +805,7 @@ class TrainingPredictionService
         };
     }
 }
-```
+```text
 
 **Deliverables**:
 
@@ -883,7 +883,7 @@ Schema::create('ucp_training_predictions', function (Blueprint $table) {
     
     $table->index(['character_id', 'expires_at']);
 });
-```
+```text
 
 ---
 
@@ -1085,7 +1085,7 @@ public function getPredictions(Character $character, ?SupportDeck $deck = null):
  * }
  */
 public function calculateBaseGains(Character $character, TrainingType $facility): array;
-```
+```text
 
 ---
 
@@ -1181,7 +1181,7 @@ erDiagram
         int discount_percentage
         boolean is_used
     }
-```
+```text
 
 ---
 
@@ -1233,7 +1233,7 @@ interface TrainingPredictionInterface
     public function calculatePrediction(Character $character, TrainingType $facility, ?SupportDeck $deck): array;
     public function invalidateCache(int $characterId): void;
 }
-```
+```text
 
 ---
 
@@ -1336,7 +1336,7 @@ pie title Test Distribution
     "Integration Tests" : 10
     "API Tests" : 8
     "Performance Tests" : 3
-```
+```text
 
 ---
 

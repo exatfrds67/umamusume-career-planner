@@ -51,7 +51,7 @@ flowchart TD
     
     AddRecord --> UpdateUI[Update Shop UI]
     UpdateUI --> TriggerAI[Trigger AI Re-evaluation]
-```
+```text
 
 ---
 
@@ -118,7 +118,7 @@ flowchart TD
     
     CalcDiscount --> NotifyUser[Toast Notification: Hint Lv Up]
     ApplyStats --> NotifyUser
-```
+```text
 
 ### 3.1 Hint Sources (Game-Accurate)
 
@@ -136,7 +136,7 @@ flowchart TD
 ```
 Final Discount = Base Hint Discount + Fast Learner Bonus (if active)
 Maximum Discount = 40% (Hint Level 5) + 10% (Fast Learner) = 50%
-```
+```text
 
 ---
 
@@ -189,7 +189,7 @@ flowchart TD
     
     UserAction -->|Auto-Buy| ExecuteBatch[Execute Batch Purchase]
     UserAction -->|Edit| ManualEdit[Open Manual Selection]
-```
+```text
 
 ---
 
@@ -244,7 +244,7 @@ flowchart TD
     ApplyEffect --> SetCooldown[Set Cooldown / Mark Used]
     
     SetCooldown --> LogActivation[Log for Replay/Analysis]
-```
+```text
 
 ---
 

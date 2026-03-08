@@ -81,7 +81,7 @@ Training resolution is the core gameplay loop that:
 
 The official training stat gain formula from Umamusume Pretty Derby (Global English Server):
 
-```
+```text
 Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
             × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
 ```
@@ -128,7 +128,7 @@ Stats have a soft cap at **1200** with diminishing returns:
 
 **Implementation:**
 
-```
+```text
 if (current_stat >= 1200):
     actual_gain = min(calculated_gain × 0.5, 50)
 else if (current_stat + calculated_gain > 1200):
@@ -214,7 +214,7 @@ Each training type affects multiple stats:
 
 ### 3.2 Component Locations
 
-```
+```text
 app/
 ├── Livewire/
 │   └── Training/
@@ -358,7 +358,7 @@ sequenceDiagram
     UI->>UI: Update reactive properties
     UI->>UI: Play training animation
     UI-->>User: Display results + stat changes
-```
+```text
 
 ### 4.2 Training Formula Calculation Flow
 
@@ -468,7 +468,7 @@ sequenceDiagram
     end
     
     FriendshipCalc-->>Caller: totalFriendshipMultiplier
-```
+```text
 
 ### 4.4 Timeline Breakdown
 
@@ -499,7 +499,7 @@ sequenceDiagram
 
 ```
 User → Livewire Component → TrainingController → TrainingPredictionService
-```
+```text
 
 **Service Implementation (Game-Accurate):**
 
@@ -743,7 +743,7 @@ class StatCalculator
         return $multiplier;
     }
 }
-```
+```text
 
 ### 5.3 Soft Cap Calculator
 
@@ -886,7 +886,7 @@ class BondCalculator
         };
     }
 }
-```
+```text
 
 ### 5.5 Risk Assessment
 
@@ -1042,7 +1042,7 @@ class TrainingExecutionService
         return $career->mood;
     }
 }
-```
+```text
 
 ---
 
@@ -1156,7 +1156,7 @@ class TrainingExecutionService
   "career_id": 157,
   "facility": "speed"
 }
-```
+```text
 
 ### 6.3 Training Execution Response (Game-Accurate)
 
@@ -1276,7 +1276,7 @@ sequenceDiagram
         Controller-->>UI: 200 OK
         UI-->>User: Display success + animation
     end
-```
+```text
 
 ### 7.3 Transaction Rollback Scenarios
 
@@ -1347,7 +1347,7 @@ CREATE INDEX idx_training_sessions_career_turn ON ucp_training_sessions(career_i
 CREATE INDEX idx_stat_progress_career_turn ON ucp_stat_progress(career_id, turn_number);
 CREATE INDEX idx_skill_hints_career ON ucp_skill_hints(career_id, is_used);
 CREATE INDEX idx_support_cards_bond ON ucp_support_cards(deck_id, bond_level);
-```
+```text
 
 ### 8.4 Cache Strategy
 

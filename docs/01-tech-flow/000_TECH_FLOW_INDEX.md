@@ -211,7 +211,7 @@ mindmap
       MySQL Database
       Redis Cache
       File Storage
-```
+```text
 
 ---
 
@@ -253,7 +253,7 @@ interface RepositoryInterface
     public function update(Model $model): Model;
     public function delete(int $id): bool;
 }
-```
+```text
 
 ### Caching Strategy
 

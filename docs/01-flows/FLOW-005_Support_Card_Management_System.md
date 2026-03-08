@@ -39,7 +39,7 @@ flowchart TD
     
     SaveCard --> RecalcStats[Recalculate Current Stats]
     RecalcStats --> UpdateUI[Refresh View]
-```
+```text
 
 ---
 
@@ -104,7 +104,7 @@ flowchart TD
     NotifyUser --> UpdateState
     
     UpdateState --> Persist[Persist Bond Levels]
-```
+```text
 
 ### 3.1 Bond Gain Values (Game-Accurate)
 
@@ -184,7 +184,7 @@ flowchart TD
     PresentUI --> UserAction{Accept?}
     UserAction -->|Yes| ApplyDeck[Apply to Builder]
     UserAction -->|No| Reroll[Adjust Criteria]
-```
+```text
 
 ---
 
@@ -235,7 +235,7 @@ flowchart TD
     ApplyEffect -->|Heal| UpdateEnergy
     
     UpdateStats --> LogHistory[Log Event History]
-```
+```text
 
 ---
 
