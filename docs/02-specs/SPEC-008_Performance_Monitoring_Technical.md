@@ -132,7 +132,7 @@ flowchart TB
     style Processing fill:#f3e5f5
     style Storage fill:#e8f5e9
     style Output fill:#fff3e0
-```
+```text
 
 ### 2.2 Data Flow Architecture
 
@@ -346,7 +346,7 @@ class ApmService
         return $total > 0 ? $totalHits / $total : 0.0;
     }
 }
-```
+```text
 
 ### 3.2 ApiPerformanceMonitoringService
 
@@ -790,7 +790,7 @@ class QueryOptimizationService
         return "Moderate improvement expected";
     }
 }
-```
+```text
 
 ### 3.4 PerformanceAlertingService
 
@@ -1025,7 +1025,7 @@ class PerformanceMonitoringMiddleware
         return $response;
     }
 }
-```
+```text
 
 ---
 
@@ -1138,7 +1138,7 @@ Aggregation jobs run via Laravel scheduler:
 Schedule::job(new AggregateMinuteMetrics)->everyMinute();
 Schedule::job(new AggregateHourMetrics)->hourly();
 Schedule::job(new AggregateDayMetrics)->daily();
-```
+```text
 
 ---
 
@@ -1199,7 +1199,7 @@ CREATE TABLE ucp_apm_metrics (
     INDEX idx_created_at (created_at),
     INDEX idx_duration (duration_ms)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ### 11.2 Table: `ucp_apm_alerts`
 
@@ -1244,7 +1244,7 @@ CREATE TABLE ucp_apm_aggregates (
     INDEX idx_period_start (period_start),
     INDEX idx_period_type (period_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ---
 
@@ -1323,7 +1323,7 @@ it('generates alerts when thresholds exceeded', function () {
     expect($alerts)->toHaveCount(3);
     expect($alerts[0]['type'])->toBe('high_response_time');
 });
-```
+```text
 
 ### 13.2 Integration Tests
 

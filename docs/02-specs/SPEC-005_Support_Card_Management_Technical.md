@@ -184,7 +184,7 @@ graph TB
     CardModel --> Cache
     
     CardSvc --> External
-```
+```text
 
 ### 2.2 Layer Responsibilities
 
@@ -407,7 +407,7 @@ enum SupportCardRarity: string
         };
     }
 }
-```
+```text
 
 **SupportCardType**:
 
@@ -529,7 +529,7 @@ class UserCardInventory extends Model
         return $this->supportCard->getBonusesAtLevel($this->limit_breaks);
     }
 }
-```
+```text
 
 ---
 
@@ -780,7 +780,7 @@ class SupportDeckCard extends Pivot
         };
     }
 }
-```
+```text
 
 ### 4.3 Deck Composition Validator
 
@@ -1045,7 +1045,7 @@ class BondProgressionService
         return $status;
     }
 }
-```
+```text
 
 ### 5.2 Limit Break Service
 
@@ -1367,7 +1367,7 @@ class SupportCardDeckService
         );
     }
 }
-```
+```text
 
 ### 6.2 Deck Management Service
 
@@ -1797,7 +1797,7 @@ class DeckSynergyService
         return "Good distribution. Minor optimizations possible.";
     }
 }
-```
+```text
 
 ---
 
@@ -1918,7 +1918,7 @@ class DeckSynergyService
         }
     ]
 }
-```
+```text
 
 **Success Response** (201 Created):
 
@@ -2009,7 +2009,7 @@ class DeckSynergyService
         "overall_score": 82.5
     }
 }
-```
+```text
 
 ### 7.5 Add Limit Break
 
@@ -2078,7 +2078,7 @@ CREATE TABLE ucp_support_cards (
     INDEX idx_external_source (external_source, external_id),
     FULLTEXT idx_search (name, character_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ### 8.2 Table: `ucp_user_card_inventory`
 
@@ -2123,7 +2123,7 @@ CREATE TABLE ucp_support_decks (
     INDEX idx_user_id (user_id),
     INDEX idx_is_active (is_active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ### 8.4 Table: `ucp_support_deck_cards`
 
@@ -2194,7 +2194,7 @@ Recommend optimal 6-card deck composition (5 owned + 1 borrowed).
     "synergy_notes": "Overall deck strategy explanation",
     "alternative_options": ["Alternative card suggestions"]
 }
-```
+```text
 
 **Available Tools**:
 
@@ -2308,7 +2308,7 @@ class DeckRecommendationService
         CONTEXT;
     }
 }
-```
+```text
 
 ---
 
@@ -2340,7 +2340,7 @@ Increment = (18 - 10) / 4 = 2
 2★: 14
 3★: 16
 4★: 18
-```
+```text
 
 ### 10.2 Friendship Training
 
@@ -2420,7 +2420,7 @@ if ($card->providesSkill($skillId)) {
         );
     }
 }
-```
+```text
 
 ### 11.3 Character System Integration
 
@@ -2447,7 +2447,7 @@ App\Exceptions\SupportCardException (Base)
 ├── CardNotOwnedException
 ├── DeckValidationException
 └── InsufficientCardsException
-```
+```text
 
 ### 12.2 Error Codes
 
@@ -2497,7 +2497,7 @@ Cache::tags(['user-inventory', "user:{$userId}"])->remember(
 
 // Meta rankings
 Cache::tags(['support-cards'])->remember('meta:rankings', now()->addDay(), ...);
-```
+```text
 
 ### 13.2 Query Optimization
 
@@ -2515,7 +2515,7 @@ $deck = SupportDeck::with([
 SupportCard::select(['id', 'name', 'specialization', 'meta_tier'])
     ->where('meta_tier', 'SS')
     ->get();
-```
+```text
 
 ### 13.3 Performance Targets
 
@@ -2564,7 +2564,7 @@ public function addToInventory(User $user, UserCardInventory $inventory): bool
 RateLimiter::for('deck-operations', function (Request $request) {
     return Limit::perMinute(30)->by($request->user()->id);
 });
-```
+```text
 
 ---
 
@@ -2776,7 +2776,7 @@ test('user can set active deck', function () {
     expect($deck1->is_active)->toBeFalse()
         ->and($deck2->is_active)->toBeTrue();
 });
-```
+```text
 
 ### 15.3 Integration Tests
 
@@ -2887,7 +2887,7 @@ test('AI provides valid deck recommendations', function () {
     ])
     ->and($recommendations['recommended_deck'])->toHaveCount(5); // 5 owned cards
 });
-```
+```text
 
 ### 15.5 Test Data Factories
 
@@ -2975,7 +2975,7 @@ class SupportDeckFactory extends Factory
         ]);
     }
 }
-```
+```text
 
 ---
 

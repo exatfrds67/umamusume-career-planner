@@ -195,7 +195,7 @@ graph TB
     AdvisorySvc --> DB
     RouterSvc --> Cache
     CostSvc --> DB
-```
+```text
 
 ### 2.2 Layer Responsibilities
 
@@ -430,7 +430,7 @@ PROMPT;
         ];
     }
 }
-```
+```text
 
 ### 3.3 Skill Advisor Agent
 
@@ -578,7 +578,7 @@ return [
         'require_alternatives' => false,
     ],
 ];
-```
+```text
 
 ### 3.5 Agent Tools
 
@@ -693,7 +693,7 @@ class GetCharacterStatsTool extends Tool
         ];
     }
 }
-```
+```text
 
 ---
 
@@ -904,7 +904,7 @@ class OllamaService
         return $this->model;
     }
 }
-```
+```text
 
 ### 4.3 Bedrock Service
 
@@ -1330,7 +1330,7 @@ class HybridAIService
         return $this->bedrock;
     }
 }
-```
+```text
 
 ### 4.5 AI Response DTO
 
@@ -1467,7 +1467,7 @@ return [
         'tool_execution_timeout' => 30,
     ],
 ];
-```
+```text
 
 ### 5.2 MCP Client Service
 
@@ -1783,7 +1783,7 @@ class MCPMonitoringService
             ->toArray();
     }
 }
-```
+```text
 
 ---
 
@@ -2169,7 +2169,7 @@ PROMPT;
     }
 }
 
-````
+````text
 
 ### 6.2 Context Builder
 
@@ -2399,7 +2399,7 @@ readonly class AIAdvice
         ];
     }
 }
-```
+```text
 
 ---
 
@@ -2482,7 +2482,7 @@ readonly class AIAdvice
         "cost_usd": 0.0
     }
 }
-```
+```text
 
 ### 7.3 Race Strategy Advice
 
@@ -2542,7 +2542,7 @@ readonly class AIAdvice
         "cost_usd": 0.0
     }
 }
-```
+```text
 
 ### 7.4 Skill Recommendations
 
@@ -2618,7 +2618,7 @@ readonly class AIAdvice
         "cost_usd": 0.0
     }
 }
-```
+```text
 
 ### 7.5 Interactive Conversation
 
@@ -2658,7 +2658,7 @@ readonly class AIAdvice
         "cost_usd": 0.0
     }
 }
-```
+```text
 
 ### 7.6 AI Usage Statistics
 
@@ -2733,7 +2733,7 @@ CREATE TABLE ucp_ai_conversations (
     INDEX idx_user_context (user_id, context_type),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ### 8.2 Table: `ucp_ai_recommendations`
 
@@ -2784,7 +2784,7 @@ CREATE TABLE ucp_ai_usage_daily (
     UNIQUE KEY unique_user_date_provider (user_id, usage_date, provider),
     INDEX idx_usage_date (usage_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ---
 
@@ -3037,7 +3037,7 @@ $predictions = app(TrainingPredictionService::class)->getPredictions($character)
 
 // AI uses predictions to formulate advice
 $context['training_options'] = $predictions;
-```
+```text
 
 ### 11.2 Race System Integration
 
@@ -3063,7 +3063,7 @@ $spBudget = app(SkillService::class)->getRemainingSP($character);
 
 $context['hints'] = $availableHints;
 $context['sp_remaining'] = $spBudget;
-```
+```text
 
 ---
 
@@ -3103,7 +3103,7 @@ App\Exceptions\AI\AIException (Base)
         "retry_after": 60
     }
 }
-```
+```text
 
 ---
 
@@ -3152,7 +3152,7 @@ Route::middleware('auth:sanctum')->prefix('ai')->group(function () {
     Route::post('/skills', [AIAdvisoryController::class, 'skills']);
     Route::post('/conversation', [AIAdvisoryController::class, 'conversation']);
 });
-```
+```text
 
 ### 14.2 Authorization
 
@@ -3179,7 +3179,7 @@ $query = Str::limit($query, 2000);
 $provider = in_array($request->provider, ['ollama', 'bedrock', 'auto'])
     ? $request->provider
     : 'auto';
-```
+```text
 
 ### 14.4 Rate Limiting
 
@@ -3253,7 +3253,7 @@ test('respects budget threshold', function () {
     expect(fn() => $service->generate('Test', null, ['force_cloud' => true]))
         ->toThrow(AIBudgetExceededException::class);
 });
-```
+```text
 
 ### 15.2 Feature Tests
 
@@ -3383,7 +3383,7 @@ test('training advisor agent provides structured recommendations', function () {
         'confidence',
     ]);
 });
-```
+```text
 
 ### 15.4 Test Data Factories
 
@@ -3522,7 +3522,7 @@ class AIRecommendationFactory extends Factory
         ]);
     }
 }
-```
+```text
 
 ---
 

@@ -168,7 +168,7 @@ graph TB
     CharService --> External
     
     Events -.->|Analytics| EventListeners[Event Listeners]
-```
+```text
 
 ### 2.2 Layer Responsibilities
 
@@ -413,7 +413,7 @@ class Aptitude extends Model
         $this->bonus_value = $this->grade->getBonusValue();
     }
 }
-```
+```text
 
 ### 3.3 Factor Model
 
@@ -490,7 +490,7 @@ enum ScenarioType: string
     case GrandMasters = 'grand_masters';
     case ProjectLArc = 'project_larc';
 }
-```
+```text
 
 **MoodStatus**:
 
@@ -632,7 +632,7 @@ enum AptitudeGrade: string
         };
     }
 }
-```
+```text
 
 ### 3.5 Value Objects
 
@@ -960,7 +960,7 @@ class CharacterStateService
         return $grade->value;
     }
 }
-```
+```text
 
 ### 4.2 CharacterStateService
 
@@ -1171,7 +1171,7 @@ class FactorService
         ];
     }
 }
-```
+```text
 
 ---
 
@@ -1244,7 +1244,7 @@ Accept: application/json
         }
     ]
 }
-```
+```text
 
 **Success Response** (201 Created):
 
@@ -1338,7 +1338,7 @@ Accept: application/json
     "message": "Unable to fetch character data from external source",
     "error_code": "EXTERNAL_API_UNAVAILABLE"
 }
-```
+```text
 
 ### 5.3 Update Character State
 
@@ -1390,7 +1390,7 @@ Accept: application/json
         "updated_at": "2026-01-24T11:30:00Z"
     }
 }
-```
+```text
 
 ### 5.4 Sync External Data
 
@@ -1444,7 +1444,7 @@ CREATE TABLE ucp_characters (
     INDEX idx_scenario_type (scenario_type),
     INDEX idx_deleted_at (deleted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ### 6.2 Table: `ucp_aptitudes`
 
@@ -1484,7 +1484,7 @@ CREATE TABLE ucp_factors (
     INDEX idx_character_id (character_id),
     INDEX idx_factor_type (factor_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ### 6.4 Indexes & Performance
 
@@ -1573,7 +1573,7 @@ Goals are stored as JSON arrays with the following structure:
     "progress": 850,
     "required": 1200
 }
-```
+```text
 
 **Validation Rules**:
 
@@ -1647,7 +1647,7 @@ $character = Cache::tags(['characters'])->remember(
 
 // Invalidation on write
 Cache::tags(['characters'])->forget("character:{$id}");
-```
+```text
 
 **Cache Keys**:
 
@@ -1695,7 +1695,7 @@ App\Exceptions\CharacterException (Base)
     'aptitudes' => 'required|array',
     'aptitudes.*.*.grade' => 'required|in:SS,S,A,B,C,D,E,F,G',
 ]
-```
+```text
 
 ---
 
@@ -1715,7 +1715,7 @@ Character::with(['aptitudes', 'factors', 'careerRuns'])->get();
 ```php
 // Load only required columns
 Character::select(['id', 'name', 'current_stats'])->get();
-```
+```text
 
 **Index Usage**:
 
@@ -1776,7 +1776,7 @@ public function delete(User $user, Character $character): bool
 ```php
 // Controller
 $this->authorize('update', $character);
-```
+```text
 
 ### 11.2 Input Sanitization
 
@@ -1816,7 +1816,7 @@ protected $guarded = [
     'id',
     'user_id', // Never mass-assignable
 ];
-```
+```text
 
 ---
 
@@ -1889,7 +1889,7 @@ test('user cannot view another users character', function () {
     
     $response->assertStatus(403);
 });
-```
+```text
 
 ### 12.3 Integration Tests
 
@@ -1952,7 +1952,7 @@ class CharacterFactory extends Factory
         ];
     }
 }
-```
+```text
 
 ---
 
@@ -2008,7 +2008,7 @@ class CharacterFactory extends Factory
     "guts": 10,
     "wit": 10
 }
-```
+```text
 
 **Stamina-focused Character** (e.g., Gold Ship):
 

@@ -185,7 +185,7 @@ graph TB
     
     BroadcastSvc --> Reverb
     ImageProcessor --> FileStorage
-```
+```text
 
 ### 2.2 Layer Responsibilities
 
@@ -582,7 +582,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
         return [];
     }
 }
-```
+```text
 
 ### 3.3 UmamusumeDB API Client
 
@@ -765,7 +765,7 @@ stateDiagram-v2
     HalfOpen: Testing Recovery
     HalfOpen: Allow limited probe requests
     HalfOpen: Evaluate success/failure
-```
+```text
 
 ### 4.2 Circuit Breaker Implementation
 
@@ -1130,7 +1130,7 @@ enum CircuitState: string
         };
     }
 }
-```
+```text
 
 ---
 
@@ -1389,7 +1389,7 @@ class ImageProcessingService
         return $path;
     }
 }
-```
+```text
 
 ### 5.3 Tesseract Service
 
@@ -1916,7 +1916,7 @@ class OCRParserService
         return ($baseConfidence * 0.6) + ($fieldAvg * 0.4);
     }
 }
-```
+```text
 
 ### 5.5 OCR Validation Service
 
@@ -2228,7 +2228,7 @@ class OCRProcessingService
         return $extraction;
     }
 }
-```
+```text
 
 ### 5.7 OCR Result DTO
 
@@ -2347,7 +2347,7 @@ flowchart TD
     GlobalChannel --> Client1
     GlobalChannel --> Client2
     GlobalChannel --> Client3
-```
+```text
 
 ### 6.2 Broadcast Events
 
@@ -2485,7 +2485,7 @@ class TrainingCompleted implements ShouldBroadcast
         ];
     }
 }
-```
+```text
 
 ### 6.3 WebSocket Service
 
@@ -2616,7 +2616,7 @@ Broadcast::channel('user.{userId}', function (User $user, string $userId) {
 Broadcast::channel('global.updates', function () {
     return true;
 });
-```
+```text
 
 ---
 
@@ -2825,7 +2825,7 @@ readonly class ShareResult
         ];
     }
 }
-```
+```text
 
 ---
 
@@ -3215,7 +3215,7 @@ readonly class SyncResult
         ];
     }
 }
-```
+```text
 
 ---
 
@@ -3323,7 +3323,7 @@ Get health status of external APIs.
         "checked_at": "2026-01-24T10:00:00Z"
     }
 }
-```
+```text
 
 #### POST /api/v1/external/sync
 
@@ -3358,7 +3358,7 @@ Trigger synchronization of external data.
         "completed_at": "2026-01-24T10:00:45Z"
     }
 }
-```
+```text
 
 ### 9.3 OCR Endpoints
 
@@ -3433,7 +3433,7 @@ Verify and correct OCR extraction data.
         "energy": 78
     }
 }
-```
+```text
 
 **Success Response** (200 OK):
 
@@ -3459,7 +3459,7 @@ Share career results to community.
 {
     "career_id": 456
 }
-```
+```text
 
 **Success Response** (201 Created):
 
@@ -3498,7 +3498,7 @@ Get shared career data (public endpoint).
         "view_count": 142
     }
 }
-```
+```text
 
 ---
 
@@ -3551,7 +3551,7 @@ CREATE TABLE ucp_ocr_extractions (
     INDEX idx_confidence (confidence_score),
     INDEX idx_verified (verified_by_user)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ### 10.3 Community Shares Table
 
@@ -3597,7 +3597,7 @@ CREATE TABLE ucp_circuit_breaker_states (
     UNIQUE KEY unique_service (service_key),
     INDEX idx_state (state)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ---
 
@@ -3685,7 +3685,7 @@ class CacheInvalidationService
         Cache::forget("community:tips:{$traineeId}");
     }
 }
-```
+```text
 
 ---
 
@@ -3741,7 +3741,7 @@ App\Exceptions\ExternalIntegrationException (Base)
         "cached_result": "..."
     }
 }
-```
+```text
 
 ---
 
@@ -3880,7 +3880,7 @@ class PerformanceMonitoringService
         ]);
     }
 }
-```
+```text
 
 ---
 
@@ -3989,7 +3989,7 @@ test('returns cached data when all APIs fail', function () {
     
     expect($result)->toHaveKey('name', 'Special Week (Cached)');
 });
-```
+```text
 
 ### 15.3 OCR Tests
 
@@ -4077,7 +4077,7 @@ test('WebSocket broadcasts on data sync', function () {
     
     Event::assertDispatched(\App\Events\DataSynced::class);
 });
-```
+```text
 
 ### 15.5 Test Data Factories
 
@@ -4213,7 +4213,7 @@ class CommunityShareFactory extends Factory
         ]);
     }
 }
-```
+```text
 
 ```php
 // database/factories/ExternalApiCacheFactory.php
@@ -4410,7 +4410,7 @@ class ExternalApiCacheFactory extends Factory
     "record_count": 247,
     "timestamp": "2026-01-24T06:00:00Z"
 }
-```
+```text
 
 ### Appendix E: Error Code Reference
 
@@ -4480,7 +4480,7 @@ return [
         'denoise' => true,
     ],
 ];
-```
+```text
 
 ### Appendix G: Change Log
 

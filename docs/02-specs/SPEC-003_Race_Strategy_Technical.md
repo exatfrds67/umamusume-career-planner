@@ -176,7 +176,7 @@ graph TB
     Analyzers --> ReqAnalyzer[RequirementAnalyzer]
     Analyzers --> WinCalc[WinProbabilityCalculator]
     Analyzers --> StyleOpt[StyleOptimizer]
-```
+```text
 
 ### 2.2 Layer Responsibilities
 
@@ -632,7 +632,7 @@ class WinProbabilityCalculator
         return $probability;
     }
 }
-```
+```text
 
 ### 3.3 Running Style Optimizer
 
@@ -1006,7 +1006,7 @@ class WeatherImpactCalculator
         };
     }
 }
-```
+```text
 
 ---
 
@@ -1335,7 +1335,7 @@ class RaceConditionService
         };
     }
 }
-```
+```text
 
 ### 4.3 Neuron\RaceStrategyService
 
@@ -1469,7 +1469,7 @@ class RaceStrategyService
 GET /api/v1/races/101/analysis?character_id=123&track_condition=good
 Authorization: Bearer {token}
 Accept: application/json
-```
+```text
 
 **Success Response** (200 OK):
 
@@ -1550,7 +1550,7 @@ Accept: application/json
     "character_id": 123,
     "race_definition_id": 101
 }
-```
+```text
 
 **Success Response** (200 OK):
 
@@ -1598,7 +1598,7 @@ Accept: application/json
         }
     }
 }
-```
+```text
 
 **Success Response** (201 Created):
 
@@ -1652,7 +1652,7 @@ CREATE TABLE ucp_race_definitions (
     INDEX idx_distance_type (distance_type),
     INDEX idx_month_half (month, half)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ### 6.2 Table: `ucp_race_results`
 
@@ -1723,7 +1723,7 @@ Determine the optimal running style and provide actionable preparation advice.
     "weather_note": "Advice for non-optimal conditions",
     "preparation_advice": "Training recommendations before race"
 }
-```
+```text
 
 **Available Tools**:
 
@@ -1774,7 +1774,7 @@ Bonuses:
 - First G1 Win: +50%
 - Scenario Key Race: +30%
 - Perfect Aptitude Match (SS/SS): +20%
-```
+```text
 
 ### 8.4 Running Style Mechanics
 
@@ -1834,7 +1834,7 @@ $ocrResult = app(OCRService::class)->extractRaceResult($imagePath);
     'placement' => 1,
     'fans_gained' => 15000,
 ]
-```
+```text
 
 ### 9.3 Character Service Integration
 
@@ -1858,7 +1858,7 @@ App\Exceptions\RaceException (Base)
 ├── InvalidPlacementException
 ├── RaceDefinitionSyncException
 └── AnalysisFailedException
-```
+```text
 
 ### 10.2 Error Codes
 
@@ -1903,7 +1903,7 @@ public function analyze(User $user, RaceDefinition $race, Character $character):
 {
     return $user->id === $character->user_id;
 }
-```
+```text
 
 ### 12.2 Input Validation
 
@@ -1983,7 +1983,7 @@ test('distance type determination is accurate', function () {
         ->and($service->determineDistanceType(2000))->toBe('medium')
         ->and($service->determineDistanceType(2800))->toBe('long');
 });
-```
+```text
 
 ### 13.2 Feature Tests
 
@@ -2159,7 +2159,7 @@ test('race analysis aggregates all components correctly', function () {
     ->and($analysis['aptitude_match']['distance'])->toBe('A')
     ->and($analysis['aptitude_match']['surface'])->toBe('S');
 });
-```
+```text
 
 ### 13.4 Performance Tests
 
@@ -2256,7 +2256,7 @@ class RaceDefinitionFactory extends Factory
         ]);
     }
 }
-```
+```text
 
 ```php
 // database/factories/RaceResultFactory.php

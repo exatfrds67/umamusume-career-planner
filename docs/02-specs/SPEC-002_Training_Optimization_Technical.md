@@ -172,7 +172,7 @@ graph TB
     Calculators --> BonusCalc[SupportBonusCalculator]
     Calculators --> RiskCalc[RiskCalculator]
     Calculators --> HintCalc[SkillHintCalculator]
-```
+```text
 
 ### 2.2 Layer Responsibilities
 
@@ -488,7 +488,7 @@ class SupportBonusCalculator
         return 0;
     }
 }
-```
+```text
 
 ### 3.3 Risk Calculator
 
@@ -704,7 +704,7 @@ class SkillHintCalculator
             ->toArray();
     }
 }
-```
+```text
 
 ---
 
@@ -1285,7 +1285,7 @@ class TrainingService
         return $gained;
     }
 }
-```
+```text
 
 ---
 
@@ -1318,7 +1318,7 @@ Accept: application/json
     "career_run_id": "uuid-here",
     "current_turn": 45
 }
-```
+```text
 
 **Success Response** (200 OK):
 
@@ -1401,7 +1401,7 @@ Accept: application/json
         "career_run_id": ["The career_run_id field is required."]
     }
 }
-```
+```text
 
 ### 5.3 Execute Training
 
@@ -1456,7 +1456,7 @@ Accept: application/json
         "mood_status": "great"
     }
 }
-```
+```text
 
 **Failure Response** (200 OK):
 
@@ -1516,7 +1516,7 @@ CREATE TABLE ucp_training_sessions (
     INDEX idx_training_type (training_type),
     INDEX idx_success (was_successful)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ### 6.2 Table: `ucp_careers` (Updates)
 
@@ -1538,7 +1538,7 @@ Bond level updates during training:
 ```sql
 -- Pivot table fields
 bond_level TINYINT UNSIGNED NOT NULL DEFAULT 0 CHECK (bond_level BETWEEN 0 AND 100)
-```
+```text
 
 ---
 
@@ -1593,7 +1593,7 @@ Provide a recommendation in JSON format:
     'StatAnalysisTool' => 'Analyze stat gaps vs goals',
     'RaceRequirementTool' => 'Check race readiness',
 ]
-```
+```text
 
 ### 7.2 Hybrid AI Routing
 
@@ -1692,7 +1692,7 @@ $mood = $character->mood_status;
 $character->updateStats(['speed' => 42, 'power' => 12]);
 $character->energy_level = $character->clampEnergy($energy - 22);
 $character->save();
-```
+```text
 
 ### 9.2 Support Card Service Integration
 
@@ -1722,7 +1722,7 @@ foreach ($hintsGained as $hint) {
         source: 'training'
     );
 }
-```
+```text
 
 ### 9.4 Event Broadcasting
 
@@ -1777,7 +1777,7 @@ App\Exceptions\TrainingException (Base)
     'career_run_id' => 'required|uuid|exists:ucp_careers,id',
     'current_turn' => 'required|integer|min:1|max:78',
 ]
-```
+```text
 
 ---
 
@@ -1820,7 +1820,7 @@ $career = CareerRun::with([
     'character.aptitudes',
     'supportDeck.cards',
 ])->findOrFail($id);
-```
+```text
 
 **Selective Loading**:
 
@@ -1855,7 +1855,7 @@ public function execute(User $user, CareerRun $career): bool
 {
     return $user->id === $career->character->user_id;
 }
-```
+```text
 
 ### 12.2 Input Validation
 
@@ -1902,7 +1902,7 @@ test('risk increases exponentially below 30 energy', function () {
     
     expect($result['risk'])->toBeGreaterThan(30);
 });
-```
+```text
 
 ### 13.2 Feature Tests
 
@@ -1955,7 +1955,7 @@ test('predictions include all training types', function () {
     expect($predictions)->toHaveCount(6) // 5 facilities + rest
         ->and($predictions[0])->toHaveKeys(['type', 'gains', 'risk', 'score']);
 });
-```
+```text
 
 ---
 
@@ -1985,7 +1985,7 @@ Base Risk (Energy):
 - Energy > 50: 0%
 - Energy 30-50: 15% × (50 - Energy) / 20
 - Energy < 30: 15% + 55% × ((30 - Energy) / 30)²
-```
+```text
 
 ### Appendix B: Support Card Bonuses
 

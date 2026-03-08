@@ -103,7 +103,7 @@ Players often rely on intuition for training decisions, leading to suboptimal st
 
 **Stat Calculation Formula** (Game-Accurate):
 
-```
+```text
 Stat Gain = (Base + StatBonus)
           × (1 + GrowthRate)
           × (1 + MoodMultiplier × (1 + MoodEffect))

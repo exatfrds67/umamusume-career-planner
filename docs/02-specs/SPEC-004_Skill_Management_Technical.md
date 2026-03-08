@@ -179,7 +179,7 @@ graph TB
     SkillModel --> Cache
     
     SkillSvc --> External
-```
+```text
 
 ### 2.2 Layer Responsibilities
 
@@ -424,7 +424,7 @@ enum SkillType: string
     case Debuff = 'debuff';
     case Special = 'special';
 }
-```
+```text
 
 **SkillRarity**:
 
@@ -468,7 +468,7 @@ enum SkillCategory: string
     case Debuff = 'debuff';
     case Passive = 'passive';
 }
-```
+```text
 
 ### 3.3 Skill Search and Filtering
 
@@ -697,7 +697,7 @@ class SkillHint extends Model
         return $this->level >= 5;
     }
 }
-```
+```text
 
 ### 4.2 SP Cost Calculator
 
@@ -917,7 +917,7 @@ class SkillAcquisition extends Model
         return $this->belongsTo(Skill::class);
     }
 }
-```
+```text
 
 ---
 
@@ -1348,7 +1348,7 @@ class SkillService
         }
     }
 }
-```
+```text
 
 ---
 
@@ -1430,7 +1430,7 @@ class SkillService
     "career_run_id": "uuid-here",
     "use_hint": true
 }
-```
+```text
 
 **Success Response** (201 Created):
 
@@ -1467,7 +1467,7 @@ class SkillService
     "target_skill_id": 201,
     "career_run_id": "uuid-here"
 }
-```
+```text
 
 **Success Response** (200 OK):
 
@@ -1523,7 +1523,7 @@ class SkillService
         "average_discount": 18.5
     }
 }
-```
+```text
 
 ---
 
@@ -1588,7 +1588,7 @@ CREATE TABLE ucp_skill_hints (
     INDEX idx_skill_id (skill_id),
     INDEX idx_level (level)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+```text
 
 ### 8.3 Table: `ucp_skill_acquisitions`
 
@@ -1666,7 +1666,7 @@ Recommend top 5 skills to acquire, prioritizing race relevance and cost efficien
     "total_cost": 450,
     "strategy_note": "Overall skill build strategy"
 }
-```
+```text
 
 **Available Tools**:
 
@@ -1789,7 +1789,7 @@ class SkillRecommendationService
         CONTEXT;
     }
 }
-```
+```text
 
 ---
 
@@ -1854,7 +1854,7 @@ if ($hintGained) {
         sourceType: 'training'
     );
 }
-```
+```text
 
 ### 11.2 Support Card Integration
 
@@ -1886,7 +1886,7 @@ $raceContext = [
 ];
 
 $effectiveness = $skill->getEffectiveness($raceContext);
-```
+```text
 
 ---
 
@@ -1936,7 +1936,7 @@ App\Exceptions\SkillException (Base)
     'level' => 'required|integer|min:1|max:5',
     'source_type' => 'required|in:training,event,race,support_card',
 ]
-```
+```text
 
 ---
 
@@ -1966,7 +1966,7 @@ $character = Character::with([
     'skillHints.skill',
     'skillAcquisitions.skill',
 ])->findOrFail($id);
-```
+```text
 
 **Indexed Queries**:
 
@@ -2013,7 +2013,7 @@ public function evolve(User $user, Character $character): bool
 // Controller
 $this->authorize('acquire', $character);
 $this->authorize('evolve', $character);
-```
+```text
 
 ### 14.2 Input Validation
 
@@ -2054,7 +2054,7 @@ DB::transaction(function () {
 RateLimiter::for('skill-acquisition', function (Request $request) {
     return Limit::perMinute(30)->by($request->user()->id);
 });
-```
+```text
 
 ### 14.5 Mass Assignment Protection
 
@@ -2156,7 +2156,7 @@ test('skill rejects mismatched conditions', function () {
     
     expect($skill->matchesConditions($context))->toBeFalse();
 });
-```
+```text
 
 ### 15.2 Feature Tests
 
@@ -2435,7 +2435,7 @@ test('external skill sync updates database', function () {
         'base_sp_cost' => 120,
     ]);
 });
-```
+```text
 
 ### 15.4 AI Integration Tests
 
@@ -2496,7 +2496,7 @@ test('bulk cost calculation is performant', function () {
     
     expect($executionTime)->toBeLessThan(30); // 30ms target
 });
-```
+```text
 
 ### 15.6 Test Data Factories
 
@@ -2596,7 +2596,7 @@ class SkillHintFactory extends Factory
         ]);
     }
 }
-```
+```text
 
 ---
 
