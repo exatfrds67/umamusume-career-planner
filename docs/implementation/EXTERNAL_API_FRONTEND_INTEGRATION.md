@@ -54,7 +54,7 @@ This document outlines the complete implementation of external API integration w
 ```http
 GET /api/characters/prefill/search?q=special+week
 Authorization: Bearer {token}
-```
+```text
 
 **Response:**
 
@@ -81,7 +81,7 @@ Authorization: Bearer {token}
 ```http
 GET /api/characters/prefill/1001
 Authorization: Bearer {token}
-```
+```text
 
 **Response:**
 
@@ -137,7 +137,7 @@ Authorization: Bearer {token}
 ```http
 GET /api/external/support-cards
 Authorization: Bearer {token}
-```
+```text
 
 **Response:**
 
@@ -180,7 +180,7 @@ Content-Type: application/json
   "image_url": "https://gametora.com/images/umamusume/supports/tex_support_card_30001.png",
   "source": "umapyoi.net"
 }
-```
+```text
 
 **Response:**
 
@@ -284,7 +284,7 @@ function characterWizard() {
         }
     };
 }
-```
+```text
 
 ### Support Card Import
 
@@ -400,7 +400,7 @@ foreach ($request->input('aptitudes.distance') as $distance => $grade) {
 }
 
 // ... similar for surface and style aptitudes
-```
+```text
 
 ### Support Card Import Process
 
@@ -455,7 +455,7 @@ foreach ($supportCardIds as $cardId) {
         ->where('support_card_id', $cardId)
         ->increment('friendship_level');
 }
-```
+```text
 
 ### Race Integration
 
@@ -494,7 +494,7 @@ $skillAcquisition = SkillAcquisition::create([
     'hint_level' => $hintLevel, // 0-5 hint levels (0=no hints, 5=40% max discount)
     'acquired_at_turn' => $career->current_turn,
 ]);
-```
+```text
 
 ## Testing
 

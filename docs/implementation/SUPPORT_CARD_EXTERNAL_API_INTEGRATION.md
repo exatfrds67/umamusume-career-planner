@@ -139,7 +139,7 @@ Alpine.js (Show Notification)
 Page Reload
     ↓
 Card Appears in Collection
-```
+```text
 
 ## API Endpoints
 
@@ -187,7 +187,7 @@ Response: {
     already_imported: false
   }
 }
-```
+```text
 
 ## Database Schema
 
@@ -363,7 +363,7 @@ window.location.reload()
 
 // Card now appears in collection
 // Available for deck building
-```
+```text
 
 ## Related Documentation
 

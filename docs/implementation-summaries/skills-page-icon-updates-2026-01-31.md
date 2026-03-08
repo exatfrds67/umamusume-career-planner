@@ -76,7 +76,7 @@ Updated `x-text` binding:
 
 ```blade
 x-text="getSkillGrade(skill)"  // Instead of: getSkillGrade(skill) + ' Grade'
-```
+```text
 
 ### 5. Updated Stat Colors
 
@@ -98,7 +98,7 @@ Aligned stat badge colors with official game design:
 
 ```text
 [S] [🏃 SPD] 120 SP
-```
+```text
 
 ## Benefits
 

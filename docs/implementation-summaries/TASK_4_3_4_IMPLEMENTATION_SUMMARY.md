@@ -139,7 +139,7 @@ public function addBranchMessage(
     string $messageContent,
     array $metadata = []
 ): ConversationMessage
-```
+```text
 
 **Database Fields**:
 
@@ -335,7 +335,7 @@ public function addAgentFeedback(
     ?string $feedback = null,
     array $improvementSuggestions = []
 ): void
-```
+```text
 
 **Database Fields**:
 
@@ -517,7 +517,7 @@ POST   /api/v1/conversations/{id}/messages      - Add message
 GET    /api/v1/conversations/{id}/messages      - Get messages
 POST   /api/v1/conversations/{id}/branch        - Create branch
 GET    /api/v1/conversations/{id}/branches      - List branches
-```
+```text
 
 **Analytics**:
 
@@ -536,7 +536,7 @@ GET    /api/v1/conversations/{id}/export/markdown - Export as Markdown
 GET    /api/v1/conversations/{id}/export/pdf    - Export as PDF
 POST   /api/v1/conversations/{id}/share         - Generate share link
 POST   /api/v1/conversations/import             - Import workflow
-```
+```text
 
 **Feedback**:
 
@@ -601,7 +601,7 @@ $message = $service->addMessage(
         'cost_estimate' => 0.00525,
     ]
 );
-```
+```text
 
 ### Creating a Branch
 
@@ -709,7 +709,7 @@ $link = $export->generateShareableLink(
     conversation: $conversation,
     expiresInDays: 7
 );
-```
+```text
 
 ### Adding Feedback
 

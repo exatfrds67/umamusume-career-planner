@@ -107,7 +107,7 @@ php artisan tinker --execute="
 "
 
 # Output: Characters with aptitudes: 52
-```
+```text
 
 ## Character Diversity
 

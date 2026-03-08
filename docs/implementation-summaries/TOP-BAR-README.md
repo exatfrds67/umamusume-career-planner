@@ -110,7 +110,7 @@ public function index()
     
     return view('your.view', compact('topStatus'));
 }
-```
+```text
 
 ---
 

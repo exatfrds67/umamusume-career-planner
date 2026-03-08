@@ -101,7 +101,7 @@ protected function validateDataIntegrity(mixed $data, array $integrityRules): ar
 protected function validateBusinessRules(mixed $data, array $businessRules): array
 protected function validateDataQuality(mixed $data, array $qualityRules): array
 protected function calculateValidationScore(array $validationResult): float
-```
+```text
 
 **Validation Rules**:
 
@@ -243,7 +243,7 @@ protected function analyzeDetailedChanges(mixed $lastData, mixed $currentData): 
 protected function triggerSynchronization(string $dataSource, array $changes): void
 public function getChangeLog(string $dataSource, int $limit = 10): array
 public function getMonitoringStatus(): array
-```
+```text
 
 **Change Detection**:
 
@@ -349,7 +349,7 @@ DataSynchronizationAgentService
 // Update Detection
 'update_detection:{data_source}:state'
 'change_log:{data_source}'
-```
+```text
 
 ---
 
@@ -439,7 +439,7 @@ echo "Completeness: {$result['dimensions']['completeness']}\n";
 foreach ($result['recommendations'] as $recommendation) {
     echo "- $recommendation\n";
 }
-```
+```text
 
 ### 5. Update Detection
 

@@ -42,7 +42,7 @@ that visits ALL routes like a thorough manual tester.
 php artisan test:traversal
 php artisan test:traversal --open-report
 php artisan test:traversal --scope=public
-```
+```text
 
 **Reports:** `storage/app/test-reports/traversal-{timestamp}.html`
 
@@ -106,7 +106,7 @@ php artisan test --group=keyboard
 php artisan test tests/Browser/UserJourneyTest.php
 php artisan test --filter="registration flow"
 php artisan test --group=e2e
-```
+```text
 
 ### 4. Smoke Test Suite ✅
 
@@ -163,7 +163,7 @@ capture and cross-browser verification.
 php artisan test tests/Browser/VisualRegressionTest.php
 php artisan test --group=screenshots
 php artisan test --group=cross-browser
-```
+```text
 
 **Screenshots:** `storage/app/screenshots/` (with organized subdirectories)
 
@@ -240,7 +240,7 @@ storage/app/
 └── test-reports/         # Traversal test reports
     ├── .gitignore
     └── README.md
-```
+```text
 
 ### Documentation Updates
 
@@ -305,7 +305,7 @@ php artisan test --group=browser
 # Run with specific group combinations
 php artisan test --group=browser --group=critical
 php artisan test --group=accessibility --group=wcag
-```
+```text
 
 ### By Use Case
 
@@ -354,7 +354,7 @@ jobs:
       - run: composer install
       - run: php artisan test:traversal
       - run: php artisan test --group=smoke
-```
+```text
 
 ## PHPStan Notes
 

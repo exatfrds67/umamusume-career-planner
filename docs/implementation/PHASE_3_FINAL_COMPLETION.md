@@ -187,7 +187,7 @@ component library that forms the foundation for the application's user interface
 ❌ 0 tests failed
 📊 14000+ assertions
 ⚡ Average execution: < 5 minutes
-```
+```text
 
 ---
 
@@ -338,7 +338,7 @@ php artisan test --compact tests/Feature/
 
 ```bash
 npm run playwright:test
-```
+```text
 
 ### Generate Coverage Report
 

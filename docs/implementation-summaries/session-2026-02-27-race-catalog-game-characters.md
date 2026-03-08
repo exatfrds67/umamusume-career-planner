@@ -143,7 +143,7 @@ Added missing entry:
 
 ```php
 'silence_suzuka' => 'Silence Suzuka',
-```
+```text
 
 #### Fix 2 — `buildLocalImageMap()` manual overrides
 
@@ -172,7 +172,7 @@ if (
 ) {
     $character->update(['avatar_url' => $this->localImageMap->get($characterName)]);
 }
-```
+```text
 
 #### DB Fix
 
@@ -226,7 +226,7 @@ SELECT COUNT(*) as total, COUNT(DISTINCT name) as unique_names
 FROM ucp_characters
 WHERE user_id = 28;
 -- Result: total=169, unique_names=169 ✅
-```
+```text
 
 ### Duplicate Origin
 

@@ -56,7 +56,7 @@ protected function mcpServers(): array
         'filesystem' => ['exclude' => ['delete_file', 'write_file']],
     ];
 }
-```
+```text
 
 ### 3. MCP Demo Agent (`app/Neuron/Agents/McpDemoAgent.php`)
 
@@ -215,7 +215,7 @@ protected function mcpServers(): array
               │  • Fetch       │
               │  • Custom      │
               └────────────────┘
-```
+```text
 
 ### Tool Discovery Flow
 
@@ -296,7 +296,7 @@ class SecureAgent extends BaseAgent
         ];
     }
 }
-```
+```text
 
 ### Combined Custom and MCP Tools
 

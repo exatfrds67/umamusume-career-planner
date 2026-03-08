@@ -155,7 +155,7 @@ git checkout app/View/Components/StatRadarChart.php
 
 # Rebuild assets
 npm run build
-```
+```text
 
 ## Related Documentation
 

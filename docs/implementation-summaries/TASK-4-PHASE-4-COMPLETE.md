@@ -12,7 +12,7 @@ Successfully completed Phase 4 of the Enhanced Character Baseline Data implement
 
 ### Coverage Achievement
 
-```
+```text
 ✅ Total Characters: 161/161 (100%)
 ✅ Characters with Base Stats: 161 (100%)
 ✅ Specialized Base Stats: 50+ characters
@@ -94,7 +94,7 @@ Implemented a sophisticated base stats system that assigns realistic starting va
     'guts' => 45,       // 30-60 range
     'wit' => 45,        // 30-60 range
 ]
-```
+```text
 
 ### Stat Ranges
 
@@ -156,7 +156,7 @@ Implemented a sophisticated base stats system that assigns realistic starting va
 'current_stats' => $this->getBaseStats($characterName),
 // Example for Silence Suzuka:
 // ['speed' => 60, 'stamina' => 40, 'power' => 45, 'guts' => 40, 'wit' => 50]
-```
+```text
 
 ## Character Examples
 
@@ -186,7 +186,7 @@ Implemented a sophisticated base stats system that assigns realistic starting va
 ]
 // Total: 240
 // Grade: B+ (600-700 range equivalent)
-```
+```text
 
 ### Power Specialist: Oguri Cap
 
@@ -214,7 +214,7 @@ Implemented a sophisticated base stats system that assigns realistic starting va
 ]
 // Total: 240
 // Grade: B+ (600-700 range equivalent)
-```
+```text
 
 ## Design Rationale
 
@@ -348,7 +348,7 @@ vendor/bin/pint database/seeders/EnhancedRealUmaMusumeCharactersSeeder.php
 ✅ 1 file formatted
 ✅ 1 style issue fixed
 ✅ PSR-12 compliant
-```
+```text
 
 ## Testing Recommendations
 

@@ -107,7 +107,7 @@ public function show(Character $character): View
         'topStatus' => $topStatus,
     ]);
 }
-```
+```text
 
 ---
 

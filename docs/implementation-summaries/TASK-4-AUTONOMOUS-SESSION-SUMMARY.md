@@ -56,7 +56,7 @@ Aptitude records: 624
 Phase 1 status: In Progress
 Phase 2 status: Complete (100%)
 Phase 3 status: Not Started
-```
+```text
 
 ### After Session
 
@@ -105,7 +105,7 @@ php artisan db:seed --class=EnhancedRealUmaMusumeCharactersSeeder
 php artisan db:seed --class=EnhancedRealUmaMusumeCharactersSeeder
 # Result: Created aptitudes for 10 characters
 # Verification: 82 characters with 984 aptitude records
-```
+```text
 
 ## Quality Assurance
 

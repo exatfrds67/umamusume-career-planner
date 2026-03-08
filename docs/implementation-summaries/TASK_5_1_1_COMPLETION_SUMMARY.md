@@ -38,7 +38,7 @@ Added comprehensive OCR and image processing configuration:
     'max_file_size' => 10485760, // 10MB
     'security_scan_enabled' => true,
 ],
-```
+```text
 
 ### 2. Service Classes
 

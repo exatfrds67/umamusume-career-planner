@@ -72,7 +72,7 @@ window.raceCalendarData = {
 window.apmDashboardData = {
     lastUpdated: '{{ now()->format('H:i:s') }}'
 };
-```
+```text
 
 ---
 
@@ -159,7 +159,7 @@ const savedPolling = localStorage.getItem('apm_polling');
 if (savedPolling === 'true') {
     this.isPolling = true;
 }
-```
+```text
 
 ### 3. **Touch Gesture Handling**
 
@@ -320,7 +320,7 @@ php artisan test --compact
 
 # Check for JavaScript errors
 npm run build 2>&1 | grep -i error
-```
+```text
 
 ---
 

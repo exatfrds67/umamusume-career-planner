@@ -18,7 +18,7 @@ Discovered GameTora CDN stores card art using the Umapyoi `external_source_id`:
 
 ```text
 https://gametora.com/images/umamusume/supports/tex_support_card_{external_source_id}.png
-```
+```text
 
 ### Files Created / Modified
 
@@ -95,4 +95,4 @@ app/Console/Commands/PopulateSupportCardArtworkCommand.php  [NEW]
 app/Services/ExternalDataService.php                        [MODIFIED]
 tests/Feature/.../PopulateSupportCardArtworkCommandTest.php [NEW]
 resources/views/components/app/sidebar.blade.php            [MODIFIED]
-```
+```text

@@ -32,7 +32,7 @@ $speedPenalty = $service->calculateSpeedPenalty('heavy', 'dirt');
 // Stamina drain
 $staminaDrain = $service->calculateStaminaDrain('heavy', 'dirt');
 // Returns: 2.0 (2% per second)
-```
+```text
 
 ### Apply Penalties to Character Stats
 
@@ -90,7 +90,7 @@ $description = $service->getConditionImpactDescription('heavy', 'dirt');
 
 $description = $service->getConditionImpactDescription('firm', 'turf');
 // Returns: "Optimal conditions - no penalties"
-```
+```text
 
 ### Calculate Performance Impact Score
 
@@ -204,7 +204,7 @@ class RacePredictionService
         ];
     }
 }
-```
+```text
 
 ### Example 2: Race Strategy Service
 
@@ -329,7 +329,7 @@ RaceConditionService::CONDITION_FIRM   // 'firm'
 RaceConditionService::CONDITION_GOOD   // 'good'
 RaceConditionService::CONDITION_SOFT   // 'soft'
 RaceConditionService::CONDITION_HEAVY  // 'heavy'
-```
+```text
 
 ### Surface Types
 
@@ -394,7 +394,7 @@ if (!$service->isValidTrackCondition($condition)) {
 if (!$service->isValidSurface($surface)) {
     throw new InvalidArgumentException("Invalid surface: {$surface}");
 }
-```
+```text
 
 ### 2. Cache Condition Calculations
 
@@ -446,7 +446,7 @@ php artisan test --filter=RaceConditionServiceTest
 
 Tests:    51 passed (78 assertions)
 Duration: 4.43s
-```
+```text
 
 Test coverage includes:
 

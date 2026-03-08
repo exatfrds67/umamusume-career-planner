@@ -20,7 +20,7 @@ characters with aptitudes.
 ✅ Total Aptitude Records: 408 (34 characters × 12 aptitudes)
 ✅ Coverage: 21.1% (target: 100%)
 ✅ Remaining: 127 characters
-```
+```text
 
 ### Characters Added
 
@@ -158,7 +158,7 @@ El Condor Pasa, Admire Vega, Fine Motion, Tosen Jordan, Kawakami Princess
     "guts": 1.0,      // Normal guts training
     "wit": 1.0        // Normal wit training
 }
-```
+```text
 
 ### Growth Rate Distribution
 

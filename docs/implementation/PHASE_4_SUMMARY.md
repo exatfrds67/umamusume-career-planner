@@ -78,7 +78,7 @@ turn-by-turn and strategically allocate skill points across their character's av
     <button @click="nextTurn()" :disabled="!canGoForward">Next Turn</button>
     <div x-text="`Turn ${currentTurn} of ${totalTurns}`"></div>
 </div>
-```
+```text
 
 ---
 
@@ -330,7 +330,7 @@ turn-by-turn and strategically allocate skill points across their character's av
     :skills="$character->skills" 
     :allocations="$plan->skill_allocations ?? []" 
 />
-```
+```text
 
 ---
 

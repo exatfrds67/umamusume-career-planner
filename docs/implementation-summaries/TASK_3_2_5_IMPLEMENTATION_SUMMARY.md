@@ -122,7 +122,7 @@ async getAIRecommendations() {
     const data = await response.json();
     this.recommendations = data.data;
 }
-```
+```text
 
 ---
 
@@ -341,7 +341,7 @@ public function __construct(
     private SkillHintService $hintService,
     private SkillOptimizationOrchestrationService $orchestrationService
 ) {}
-```
+```text
 
 ---
 

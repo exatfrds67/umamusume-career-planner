@@ -57,7 +57,7 @@ This guide provides step-by-step instructions for updating the Blade templates t
     </script>
     @vite(['resources/js/pages/characters/create.js'])
 @endsection
-```
+```text
 
 **Note**: The trainee data array is massive. If `$trainees` is not passed from the controller, you may need to add it.
 Check the controller method that renders this view.
@@ -181,7 +181,7 @@ Check the controller method that renders this view.
     </script>
     @vite(['resources/js/pages/profile/show.js'])
 @endsection
-```
+```text
 
 **Note**: Remove the entire `@push('scripts')` section and replace with the data injection + @vite directive.
 
@@ -252,7 +252,7 @@ Or for development with hot reload:
 
 ```bash
 npm run dev
-```
+```text
 
 ---
 
@@ -338,7 +338,7 @@ Navigate to each page and check the browser console:
 
 ```javascript
 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-```
+```text
 
 ### Issue: "Route not found"
 

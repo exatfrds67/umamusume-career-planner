@@ -90,7 +90,7 @@ php artisan cache:warm --type=meta
 
 # Force refresh even if cached
 php artisan cache:warm --force
-```
+```text
 
 **Features**:
 
@@ -207,7 +207,7 @@ $strategies = [
 // Adjust cost based on size
 $sizeMB = $estimatedSize / 1024 / 1024;
 $strategy['cost'] += $sizeMB * 0.0001;
-```
+```text
 
 ## Performance Metrics
 
@@ -312,7 +312,7 @@ $stats = $cacheManager->getHitRateStatistics();
 // Get API response time stats
 $apiStats = $cacheManager->getApiResponseTimeStats('umapyoi_characters');
 // Returns: ['avg' => 123.45, 'p50' => 110.0, 'p95' => 250.0, 'p99' => 350.0, ...]
-```
+```text
 
 ### 5. Cost Optimization
 

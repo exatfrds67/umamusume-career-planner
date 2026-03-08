@@ -52,7 +52,7 @@ Windows 10 (version 19045.6466) does not support WSL mirrored networking:
 ```text
 wsl: Mirrored networking mode is not supported: Windows version 19045.6466 
 does not have the required features. Falling back to NAT networking.
-```
+```text
 
 Port forwarding bridges the gap between Windows and WSL's NAT network.
 
@@ -145,7 +145,7 @@ php artisan test --filter=APIMonitoringDashboardTest --compact
 
 ## Architecture
 
-```
+```text
 
 ┌─────────────────────────────────────────────────────────────┐
 │                    Windows 10 (XAMPP)                       │
@@ -218,7 +218,7 @@ netsh interface portproxy show all
 # Clear Laravel cache
 php artisan config:clear
 php artisan cache:clear
-```
+```text
 
 ---
 

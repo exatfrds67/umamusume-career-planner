@@ -253,7 +253,7 @@ Response: { success: true, data: [...], total: N }
 
 GET /api/characters/prefill/{externalId}
 Response: { success: true, data: {...}, source: "umapyoi.net" }
-```
+```text
 
 ### Database Schema
 

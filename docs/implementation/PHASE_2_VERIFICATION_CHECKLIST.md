@@ -154,7 +154,7 @@ SELECT * FROM support_card_definitions
 WHERE external_source_id = '{CARD_ID}' 
 ORDER BY created_at DESC 
 LIMIT 1;
-```
+```text
 
 **Expected Results:**
 

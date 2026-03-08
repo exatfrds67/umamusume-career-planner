@@ -89,7 +89,7 @@ Slow API Threshold: 2000ms
 Very Slow API Threshold: 5000ms
 Success Rate Warning: <90%
 Circuit Breaker Threshold: 5 consecutive failures
-```
+```text
 
 **Anomaly Types Detected**:
 
@@ -268,7 +268,7 @@ if ($apiHealthMonitor->isCircuitBreakerOpen('umapyoi')) {
     // Use cached data or fallback API
     $data = Cache::get('umapyoi_fallback_data');
 }
-```
+```text
 
 ### ✅ Requirement 56.4: MCP Integration and Agent Performance
 
@@ -372,7 +372,7 @@ try {
         'message' => 'Health check failed: ' . $e->getMessage(),
     ];
 }
-```
+```text
 
 **Circuit Breaker Pattern**:
 
@@ -490,7 +490,7 @@ echo "Failed Recoveries: " . count($recovery['failed']) . "\n";
 foreach ($recovery['recovery_details'] as $component => $details) {
     echo "{$component}: {$details['message']} ({$details['recovery_time']}ms)\n";
 }
-```
+```text
 
 ### 4. Get Cost Optimization Recommendations
 
@@ -629,7 +629,7 @@ test('generates comprehensive dashboard data', function () {
         'uptime_percentage',
     ]);
 });
-```
+```text
 
 ### Integration Tests
 

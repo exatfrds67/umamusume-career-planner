@@ -12,7 +12,7 @@ status. The error was:
 ```text
 POST http://127.0.0.1:8000/characters/4/toggle-pin
 403 This action is unauthorized
-```
+```text
 
 ## Root Cause
 
@@ -69,7 +69,7 @@ Used Laravel Boost tinker to update the existing admin user in the database:
 $user = \App\Models\User::where('email', 'admin@umamusume.local')->first();
 $user->is_admin = true;
 $user->save();
-```
+```text
 
 ## Verification
 

@@ -90,7 +90,7 @@ CREATE TABLE support_deck_cards (
     FOREIGN KEY (support_card_id) REFERENCES support_card_definitions(id) ON DELETE CASCADE,
     UNIQUE KEY unique_deck_position (support_deck_id, position)
 );
-```
+```text
 
 ### Task 3.2: Support Bonus Calculator Service ⏳
 
@@ -157,7 +157,7 @@ ALTER TABLE skill_acquisitions
 ADD COLUMN hint_level INT DEFAULT 0 CHECK (hint_level BETWEEN 0 AND 2),
 ADD COLUMN hint_sources JSON NULL COMMENT 'Array of support card IDs that provided hints',
 ADD COLUMN sp_discount_applied INT DEFAULT 0 COMMENT 'SP discount from hints (0-40%)';
-```
+```text
 
 **Functionality**:
 

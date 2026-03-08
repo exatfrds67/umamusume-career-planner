@@ -118,7 +118,7 @@ curl -X POST http://127.0.0.1:8000/api/advisory/training/outcome \
 curl -X POST http://127.0.0.1:8000/api/advisory/training/recommendations \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json"
-```
+```text
 
 ## Integration Points
 

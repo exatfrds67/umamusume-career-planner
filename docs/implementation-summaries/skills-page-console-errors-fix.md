@@ -131,7 +131,7 @@ Created a complete `buildPlanner` Alpine component in `resources/js/pages/skills
 
 ### Console Output (After Fix)
 
-```
+```text
 
 [ConnectivityMonitor] Initialized
 [SW] Service Worker registered

@@ -65,7 +65,7 @@ $deckData = $currentDeck
     })
     ->values()
     ->toArray();
-```
+```text
 
 ### 3. Updated Component Initialization
 

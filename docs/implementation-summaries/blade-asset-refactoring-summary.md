@@ -67,7 +67,7 @@ In JS file:
 
 ```javascript
 const { characterId, deck, routes } = window.pageData || {};
-```
+```text
 
 ## Files Refactored
 

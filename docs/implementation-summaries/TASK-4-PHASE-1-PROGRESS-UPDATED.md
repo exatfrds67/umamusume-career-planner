@@ -17,7 +17,7 @@ Successfully expanded aptitude data coverage from 10 characters to 52 characters
 ✅ Total Aptitude Records: 624 (52 characters × 12 aptitudes)
 ✅ Coverage: 32.3% (target: 100%)
 ✅ Remaining: 109 characters
-```
+```text
 
 ## Batch History
 

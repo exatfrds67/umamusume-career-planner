@@ -59,7 +59,7 @@
     :completed="[0, 1]"
     variant="default"
 />
-```
+```text
 
 ---
 
@@ -130,7 +130,7 @@
 <x-tooltip content="This is helpful information" position="top" :delay="500">
     <button>Hover me</button>
 </x-tooltip>
-```
+```text
 
 ---
 
@@ -261,7 +261,7 @@
         </button>
     </div>
 </div>
-```
+```text
 
 ---
 

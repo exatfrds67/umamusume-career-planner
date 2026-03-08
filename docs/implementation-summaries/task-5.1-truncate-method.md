@@ -114,7 +114,7 @@ php artisan db:seed --class=UcpSkillsSeeder
 
 # Fresh seeding (requires calling fresh() programmatically)
 # Note: --fresh option not implemented as command option
-```
+```text
 
 ## Requirements Validated
 

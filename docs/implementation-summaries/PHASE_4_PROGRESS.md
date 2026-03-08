@@ -268,7 +268,7 @@ vendor/bin/pint
 
 # Run tests
 php artisan test --compact
-```
+```text
 
 ## Verification
 

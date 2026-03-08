@@ -126,7 +126,7 @@ TrainingAdvisoryService (Orchestrator)
 ├── GameMechanicsEngine (Game formulas)
 ├── CriticalSituationDetector (Alert generation)
 └── PredictionAccuracyTracker (Learning system)
-```
+```text
 
 ### Data Flow
 

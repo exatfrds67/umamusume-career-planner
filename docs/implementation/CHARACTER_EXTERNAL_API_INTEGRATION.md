@@ -117,7 +117,7 @@ Implemented full integration of external API (umapyoi.net) data into the charact
 
 ## Data Flow
 
-```
+```text
 User Input (Search Query)
     ↓
 Alpine.js (searchExternalCharacters)
@@ -183,7 +183,7 @@ Database Save (with external_source_id)
   ],
   "total": 1
 }
-```
+```text
 
 ### Prefill Data Response
 
@@ -324,7 +324,7 @@ POST /characters
   stats: { speed: 98, ... },
   aptitudes: { ... }
 }
-```
+```text
 
 ## Related Documentation
 

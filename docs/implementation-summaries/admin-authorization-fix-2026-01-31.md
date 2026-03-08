@@ -47,7 +47,7 @@ public function show(Character $character): View
     $character->load([...]);
     return view('characters.show', compact('character', 'aiTip'));
 }
-```
+```text
 
 **Problem**: While the policy allowed viewing seeded characters, there was no explicit `$this->authorize('view',
 $character)` call for consistency and proper authorization flow.
@@ -156,7 +156,7 @@ public function isAdmin(): bool
 
 All 15 CharacterPolicy tests passing:
 
-```
+```text
 
 ✓ Regular User Authorization → user can view their own character
 ✓ Regular User Authorization → user can delete their own character

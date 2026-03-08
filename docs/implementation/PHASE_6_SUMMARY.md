@@ -43,7 +43,7 @@ Phase 6 Components (10 Total)
     ├── support-card-mini.blade.php - Compact card component
     ├── skill-icon.blade.php - Skill type indicator
     └── (Additional utility components as created)
-```
+```text
 
 ### Design Patterns
 
@@ -175,7 +175,7 @@ addNotification(config)           // Add to queue
 removeNotification(id)            // Remove from queue
 dismissAll()                      // Clear all notifications
 executeAction(notification)       // Run notification action
-```
+```text
 
 **Configuration**:
 
@@ -278,7 +278,7 @@ addToSearchHistory(query)        // Add to history
 saveCurrentFilter(name)          // Save filter combo
 applySavedFilter(id)             // Load saved filter
 exportResults()                  // CSV export
-```
+```text
 
 ---
 
@@ -346,7 +346,7 @@ formatShortcut(shortcut)       // Display format
   'showCloseButton' => true,
   'closeOnBackdrop' => true,
 ])
-```
+```text
 
 ---
 
@@ -427,7 +427,7 @@ power    → 💛 Yellow (#FBBF24)
 guts     → 💜 Purple (#A855F7)
 wit      → 💙 Blue (#3B82F6)
 unique   → 💗 Pink (#EC4899)
-```
+```text
 
 ---
 
@@ -559,7 +559,7 @@ Save to localStorage
 Dispatch 'plan-saved'
     ↓
 Toast: "Plan saved to draft"
-```
+```text
 
 ### Import Flow
 
@@ -606,7 +606,7 @@ Dispatch 'search-results-updated'
 Add Query to History
     ↓
 Display Results + Count
-```
+```text
 
 ---
 

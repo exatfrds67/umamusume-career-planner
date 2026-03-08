@@ -172,7 +172,7 @@ IMAGE_MIN_HEIGHT=240
 IMAGE_MAX_WIDTH=4096
 IMAGE_MAX_HEIGHT=4096
 IMAGE_SECURITY_SCAN_ENABLED=true
-```
+```text
 
 ### Windows-Specific Configuration
 
@@ -188,7 +188,7 @@ For WSL, use the Linux path:
 
 ```env
 TESSERACT_PATH=/usr/bin/tesseract
-```
+```text
 
 ## Verification
 
@@ -225,7 +225,7 @@ php artisan tinker
 $imageService = app(\App\Services\ImageProcessingService::class);
 $available = $imageService->isAvailable();
 var_dump($available); // Should return true
-```
+```text
 
 ### Run Unit Tests
 
@@ -273,7 +273,7 @@ php artisan test --filter=TesseractServiceTest
 ```bash
 sudo chmod +x /usr/bin/tesseract
 sudo chmod -R 755 /usr/share/tesseract-ocr/
-```
+```text
 
 #### 5. Poor OCR Accuracy
 
@@ -347,7 +347,7 @@ Run with:
 
 ```bash
 php tests/Manual/TestOCR.php
-```
+```text
 
 ## Performance Optimization
 

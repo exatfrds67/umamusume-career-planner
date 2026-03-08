@@ -237,7 +237,7 @@ Push to main → Build → Test → Deploy to Staging → (Manual Trigger) → D
                                                               (On Failure)
                                                                     ↓
                                                             Automatic Rollback
-```
+```text
 
 ### Monitoring Stack
 

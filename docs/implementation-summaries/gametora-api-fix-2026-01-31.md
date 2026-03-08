@@ -10,7 +10,7 @@ The `UcpSkillsSeeder` was attempting to fetch additional skills from the gametor
 
 ```text
 https://gametora.com/data/umamusume/skills.2174f78e.json
-```
+```text
 
 This endpoint returned HTTP 404, indicating the API is no longer publicly available or the URL has changed.
 
@@ -57,7 +57,7 @@ Continuing with curated skills only.
 
 ```text
 Gametora API fetch disabled - using curated skills only
-```
+```text
 
 ## Current Skill Data
 

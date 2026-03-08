@@ -80,7 +80,7 @@ Upload and process a screenshot for OCR extraction.
     "raw_text": "スピード: 850\nスタミナ: 720..."
   }
 }
-```
+```text
 
 **Error Response** (422):
 
@@ -157,7 +157,7 @@ All configuration is stored in `config/services.php`:
     'temp_file_ttl' => env('IMAGE_TEMP_TTL', 3600), // 1 hour
     'cleanup_enabled' => env('IMAGE_CLEANUP_ENABLED', true),
 ],
-```
+```text
 
 ### OpenCV Preprocessing Settings
 
@@ -248,7 +248,7 @@ CREATE TABLE ucp_ocr_extractions (
     INDEX idx_user_status (user_id, status),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-```
+```text
 
 ## Security Features
 

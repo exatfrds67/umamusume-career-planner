@@ -27,7 +27,7 @@ not actual code errors, but rather limitations in the language server's understa
 
 ```php
 'races_completed' => $user->races()->whereNotNull('finish_position')->count(),
-```
+```text
 
 **Why This Fixes It:**
 
@@ -124,7 +124,7 @@ Added inline comments to clarify business logic:
 // Update user with validated data
 /** @phpstan-ignore-next-line */
 $user->update($request->validated());
-```
+```text
 
 ```php
 // Count races where finish_position is not null (completed races)

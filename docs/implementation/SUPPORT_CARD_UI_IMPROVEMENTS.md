@@ -91,7 +91,7 @@
 │ ID: 30001           │
 │ [Import Button]     │
 └─────────────────────┘
-```
+```text
 
 ### After
 
@@ -161,7 +161,7 @@ class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-col
 
 ```html
 <div class="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-2 text-center">
-```
+```text
 
 ### Scale Animation
 

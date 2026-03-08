@@ -37,7 +37,7 @@ Added to `package.json`:
 
 ```json
 "@alpinejs/collapse": "^3.15.5"
-```
+```text
 
 ### 2. Updated resources/js/app.js
 

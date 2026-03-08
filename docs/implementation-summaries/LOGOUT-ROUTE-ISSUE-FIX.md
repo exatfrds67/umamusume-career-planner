@@ -84,7 +84,7 @@ Created comprehensive test suite (`tests/Feature/Auth/LogoutRouteTest.php`):
 ```bash
 Tests:    4 passed (7 assertions)
 Duration: 19.10s
-```
+```text
 
 ## Files Modified
 

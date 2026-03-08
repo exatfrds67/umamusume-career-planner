@@ -39,7 +39,7 @@ proper implementations or clarifying comments.
 
 ```php
 // TODO: Factor in facility levels from character data if available
-```
+```text
 
 **Resolution:**
 
@@ -120,7 +120,7 @@ proper implementations or clarifying comments.
 
 ```php
 // TODO: Implement chat history retrieval when Neuron AI provides public API
-```
+```text
 
 **Resolution:**
 
@@ -200,7 +200,7 @@ proper implementations or clarifying comments.
 
 ```php
 // TODO: Implement actual MCP agent call
-```
+```text
 
 **Resolution:**
 
@@ -281,7 +281,7 @@ proper implementations or clarifying comments.
 
 ```php
 // TODO: Implement tool usage tracking
-```
+```text
 
 **Resolution:**
 

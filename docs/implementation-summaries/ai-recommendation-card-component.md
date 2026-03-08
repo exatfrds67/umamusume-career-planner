@@ -220,7 +220,7 @@ Aligns with upcoming race',
         'confidence_score' => 0.92,
     ]"
 />
-```
+```text
 
 ## Integration Points
 

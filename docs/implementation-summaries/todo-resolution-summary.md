@@ -89,7 +89,7 @@ savePlan() {
         alert("Failed to save race plan. Please try again or save locally.");
     });
 }
-```
+```text
 
 **Additional Changes**:
 
@@ -255,7 +255,7 @@ The following API endpoint should be implemented to support the race plan submis
   "message": "Race plan saved successfully",
   "races_count": 3
 }
-```
+```text
 
 ## Future Enhancements
 

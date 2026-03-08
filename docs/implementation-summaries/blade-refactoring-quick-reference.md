@@ -32,7 +32,7 @@ window.myPageData = {
 </script>
 
 @vite(['resources/js/pages/my-page.js'])
-```
+```text
 
 **JS file** (`resources/js/pages/my-page.js`):
 
@@ -103,7 +103,7 @@ window.myComponentData = {
 </div>
 
 @vite(['resources/js/pages/my-component.js'])
-```
+```text
 
 **JS file**:
 
@@ -187,7 +187,7 @@ window.myGlobalFunction = myGlobalFunction;
 <button onclick="myGlobalFunction()">Click Me</button>
 
 @vite(['resources/js/pages/my-page.js'])
-```
+```text
 
 ---
 
@@ -255,7 +255,7 @@ window.dispatchEvent(new CustomEvent('toast', {
         message: 'Something went wrong' 
     }
 }));
-```
+```text
 
 ---
 
@@ -324,7 +324,7 @@ const userId = {{ $user->id }};
 <script>
 window.userData = { id: @json($user->id) };
 </script>
-```
+```text
 
 ```javascript
 // In JS file
@@ -358,7 +358,7 @@ fetch('/api/endpoint', {
 
 ```javascript
 // File created but not added to Vite config = won't be compiled
-```
+```text
 
 ### ✅ Do: Always update vite.config.js
 

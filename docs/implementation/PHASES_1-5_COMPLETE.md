@@ -183,7 +183,7 @@ php artisan test --filter="RaceConditionService|TrainingCalculation|SkillHint"
 
 Tests:    132 passed (426 assertions)
 Duration: 8.60s
-```
+```text
 
 ### Breakdown
 

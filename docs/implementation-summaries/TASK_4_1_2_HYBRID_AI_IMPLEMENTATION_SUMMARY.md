@@ -143,7 +143,7 @@ MCP_AGENTCORE_ENABLED=true
 AI_MONITORING_ENABLED=true
 AI_TRACK_COSTS=true
 AI_TRACK_PERFORMANCE=true
-```
+```text
 
 ## Model Pricing
 
@@ -222,7 +222,7 @@ $response = $hybridAI->processRequest(
 
 // Get conversation history
 $history = $hybridAI->getConversationHistory($characterId, $conversationId);
-```
+```text
 
 ### Service Status
 

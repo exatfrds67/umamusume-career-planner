@@ -37,7 +37,7 @@ Target JS:   resources/js/pages/dashboard.js
 
 Source Component: resources/views/components/skill-card.blade.php
 Target CSS:       resources/css/components/skill-card.css
-```
+```text
 
 ### Handling PHP Variables in JavaScript
 

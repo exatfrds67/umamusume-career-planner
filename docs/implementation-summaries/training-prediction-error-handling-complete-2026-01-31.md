@@ -66,7 +66,7 @@ try {
 
 ### All Tests Passing ✅
 
-```
+```text
 
 Tests:    43 passed (150 assertions)
 Duration: 7.34s

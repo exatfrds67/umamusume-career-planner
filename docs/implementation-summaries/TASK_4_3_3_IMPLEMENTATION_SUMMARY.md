@@ -75,7 +75,7 @@ public function invalidateCharacterContext(int $characterId): void
     'session' => [...],
     'unified_context' => [...]
 ]
-```
+```text
 
 ### 2. Career State Synchronization (Requirement 13.2)
 
@@ -237,7 +237,7 @@ public function createCustomTemplate(
     string $pattern,
     array $config = []
 ): array
-```
+```text
 
 **Template Structure**:
 
@@ -433,7 +433,7 @@ public function executeWorkflowWithMemory(
 
 ## Architecture Diagram
 
-```
+```text
 
 ┌─────────────────────────────────────────────────────────────────┐
 │           Context-Aware Agent Orchestration System              │
@@ -539,7 +539,7 @@ $memoryService->storeKnowledge('training_agent', 'optimal_training_patterns', [
 // Retrieve memories
 $episodes = $memoryService->getEpisodes('training_agent', 10);
 $knowledge = $memoryService->getKnowledge('training_agent', 'optimal_training_patterns');
-```
+```text
 
 ### Example 4: Create Context-Aware Workflow
 

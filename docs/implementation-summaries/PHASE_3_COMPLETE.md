@@ -111,7 +111,7 @@ Or for development:
 
 ```bash
 npm run dev
-```
+```text
 
 ### Step 3: Test Functionality
 

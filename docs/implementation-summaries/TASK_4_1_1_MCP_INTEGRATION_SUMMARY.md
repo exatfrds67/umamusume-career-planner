@@ -127,7 +127,7 @@ The service tracks three key health metrics for each server:
 'health_check_interval' => 300,  // 5 minutes
 'connection_timeout' => 10,       // 10 seconds
 'max_concurrent_calls' => 5,      // Maximum concurrent MCP calls
-```
+```text
 
 ### 3. Test Coverage
 
@@ -212,7 +212,7 @@ The service tracks three key health metrics for each server:
 Unit Tests:    22 passed (59 assertions)  Duration: 1.49s
 Feature Tests: 14 passed (52 assertions)  Duration: 2.63s
 Total:         36 passed (111 assertions) Duration: 4.12s
-```
+```text
 
 **Test Success Rate**: 100%
 **Code Coverage**: Comprehensive coverage of all public methods and error paths
@@ -343,7 +343,7 @@ if ($mcpClient->isStrandsAgentsAvailable()) {
 if ($mcpClient->isAgentCoreAvailable()) {
     // Use agentcore for production deployment
 }
-```
+```text
 
 ### Server Configuration
 
@@ -417,7 +417,7 @@ return [
     'connection_timeout' => 10,
     'max_concurrent_calls' => 5,
 ];
-```
+```text
 
 ---
 

@@ -70,7 +70,7 @@ $characters = Character::query()
     ->orderBy('is_pinned', 'desc')
     ->orderBy('updated_at', 'desc')
     ->get();
-```
+```text
 
 ### 4. Registered JavaScript Module (`resources/js/app.js`)
 

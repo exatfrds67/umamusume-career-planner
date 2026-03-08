@@ -32,7 +32,7 @@ predictStatGains(Character $character, array $trainingOption): array
 optimizeTrainingSequence(Character $character, int $turns, array $goals): array
 isAvailable(): bool
 getStatus(): array
-```
+```text
 
 **Response Structure**:
 
@@ -74,7 +74,7 @@ generateRaceSchedule(Character $character, array $constraints): array
 trackMilestoneProgress(Character $character, array $milestones): array
 isAvailable(): bool
 getStatus(): array
-```
+```text
 
 **Response Structure**:
 
@@ -118,7 +118,7 @@ recommendRaceStrategy(Character $character, array $raceDetails): array
 analyzePostRacePerformance(Character $character, array $raceResult): array
 isAvailable(): bool
 getStatus(): array
-```
+```text
 
 **Response Structure**:
 
@@ -159,7 +159,7 @@ recommendSkillBuild(Character $character, array $goals): array
 analyzeSkillSynergies(Character $character, array $skills): array
 isAvailable(): bool
 getStatus(): array
-```
+```text
 
 **Response Structure**:
 
@@ -196,7 +196,7 @@ executeComprehensiveAnalysis(Character $character, array $goals): array
 executeParallelWorkflow(Character $character, array $tasks): array
 executeSequentialWorkflow(Character $character, array $steps): array
 getStatus(): array
-```
+```text
 
 **Workflow Patterns**:
 
@@ -329,7 +329,7 @@ return [
 
 ### Agent Collaboration Pattern
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │         Agent Orchestration Service                     │
 ├─────────────────────────────────────────────────────────┤
@@ -392,7 +392,7 @@ $response = $hybridAI->processRequest($prompt, [
     'character_id' => $characterId,
     'training_options' => $options
 ]);
-```
+```text
 
 ### MCPClientService Integration
 

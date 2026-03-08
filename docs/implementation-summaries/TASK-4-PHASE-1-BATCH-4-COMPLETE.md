@@ -106,7 +106,7 @@ php artisan tinker --execute="..."
 # With aptitudes: 72
 # Total aptitude records: 864
 # Coverage: 44.7%
-```
+```text
 
 ## Character Diversity
 
@@ -241,7 +241,7 @@ feat: add aptitude data for 20 more characters (Batch 4)
 - Total aptitude records: 864 (72 × 12)
 - Progress: +12.4% coverage increase
 - Crossed 40% milestone ✅
-```
+```text
 
 ## Conclusion
 

@@ -181,7 +181,7 @@ Visit: `http://127.0.0.1:8000/components-demo`
     trend="up"
     :turns-active="3"
 />
-```
+```text
 
 ### EnergyGauge
 
@@ -228,7 +228,7 @@ Visit: `http://127.0.0.1:8000/components-demo`
         'bond_level' => 85
     ]"
 />
-```
+```text
 
 ---
 

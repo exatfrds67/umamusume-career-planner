@@ -16,7 +16,7 @@ The character show view (`/characters/{id}`) was throwing a `MissingAttributeExc
 ```text
 Illuminate\Database\Eloquent\MissingAttributeException
 The attribute [description] either does not exist or was not retrieved for model [App\Models\Factor].
-```
+```text
 
 **Stack Trace Location**: `resources/views/characters/show.blade.php:536`
 

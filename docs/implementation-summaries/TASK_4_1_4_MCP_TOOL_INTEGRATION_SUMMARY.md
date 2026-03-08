@@ -182,7 +182,7 @@ ToolChainingService
 ├── AWSAPIService → MCPClientService
 ├── Context7Service → MCPClientService
 └── FetchService → MCPClientService
-```
+```text
 
 ## Usage Examples
 
@@ -274,7 +274,7 @@ $steps = [
 ];
 
 $result = $toolChaining->executeChain($steps);
-```
+```text
 
 ## Performance Characteristics
 

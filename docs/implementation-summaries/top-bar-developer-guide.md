@@ -21,7 +21,7 @@ public function index()
     
     return view('your.view', compact('topStatus'));
 }
-```
+```text
 
 ### Full Setup (All Features)
 
@@ -104,7 +104,7 @@ public function index()
     
     return view('dashboard.index', compact('topStatus', 'currentRun'));
 }
-```
+```text
 
 ### Example 2: Training Page with Energy Focus
 
@@ -160,7 +160,7 @@ class Dashboard extends Component
         return view('livewire.career-run.dashboard', compact('topStatus'));
     }
 }
-```
+```text
 
 ### Example 4: Minimal Setup (Backward Compatible)
 
@@ -198,7 +198,7 @@ $topStatus = [
     'mood' => null,           // Not displayed
     'careerStage' => null,    // Not displayed
 ];
-```
+```text
 
 ---
 
@@ -230,7 +230,7 @@ The energy indicator automatically color-codes based on value:
 
 // Gray badge (Unknown)
 'storageMode' => null       // [—] (gray)
-```
+```text
 
 ---
 
@@ -296,7 +296,7 @@ class RunSelector extends Component
         return view('livewire.dashboard.run-selector');
     }
 }
-```
+```text
 
 ---
 
@@ -360,7 +360,7 @@ public function boot()
         }
     });
 }
-```
+```text
 
 ### Pattern 3: Middleware
 
@@ -455,7 +455,7 @@ class TopBarTest extends TestCase
         $response->assertSee('text-red-600');
     }
 }
-```
+```text
 
 ---
 
@@ -491,7 +491,7 @@ $topStatus = [
     'energy' => 78,        // Add this
     'mood' => 'good',      // Add this
 ];
-```
+```text
 
 ### Issue: Storage badge wrong color
 
@@ -512,7 +512,7 @@ $topStatus = [
 ```php
 $currentRun = 'Mejiro Ardan';
 return view('your.view', compact('topStatus', 'currentRun'));
-```
+```text
 
 ---
 

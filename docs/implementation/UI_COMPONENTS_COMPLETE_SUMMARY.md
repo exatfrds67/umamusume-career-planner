@@ -84,7 +84,7 @@ Successfully implemented **Phases 1-3** of the UI Foundation and Interactive Com
 
 ```blade
 <x-stat-bar stat="speed" :current="1350" :max="2000" :target="1600" :factor-bonus="50" />
-```
+```text
 
 ---
 
@@ -120,7 +120,7 @@ Successfully implemented **Phases 1-3** of the UI Foundation and Interactive Com
 
 ```blade
 <x-condition-badge condition="GREAT" trend="up" :turns-active="3" />
-```
+```text
 
 ---
 
@@ -180,7 +180,7 @@ Successfully implemented **Phases 1-3** of the UI Foundation and Interactive Com
     :limit-break="4"
     :bond-level="85"
 />
-```
+```text
 
 ---
 
@@ -301,7 +301,7 @@ No SS grade exists in the game
 
 ✅ **Build successful** - All assets compiled without errors
 
-```
+```text
 ✓ 69 modules transformed
 ✓ CSS: 160.52 kB (gzip: 23.54 kB)
 ✓ JS: 52.08 kB (gzip: 19.52 kB)

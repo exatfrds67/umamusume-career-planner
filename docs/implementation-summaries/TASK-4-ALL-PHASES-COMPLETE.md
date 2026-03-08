@@ -13,7 +13,7 @@ Successfully completed all 4 phases of the Enhanced Character Baseline Data impl
 
 ### Overall Completion
 
-```
+```text
 ✅ Phase 1: Aptitude Data Collection - 100% (161/161 characters)
 ✅ Phase 2: Character Growth Rates - 100% (161/161 characters)
 ✅ Phase 3: Factor Inheritance System - 100% (Foundation Complete)
@@ -290,7 +290,7 @@ php artisan test --filter=FactorServiceTest --compact
 Tests:    20 passed (75 assertions)
 Duration: 83.78s
 Status:   ✅ 100% PASSING
-```
+```text
 
 **Test Coverage**:
 
@@ -321,7 +321,7 @@ Result: ✅ Success
 - Created 94 sample factors
 - 10 characters with factors
 - All 4 factor types represented
-```
+```text
 
 ### Code Quality
 

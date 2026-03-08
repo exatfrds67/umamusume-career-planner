@@ -206,7 +206,7 @@ Comprehensive test suite with 10 tests covering:
 │  │  • Comprehensive Summary                        │  │
 │  └─────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
-```
+```text
 
 ### Data Flow
 

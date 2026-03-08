@@ -73,7 +73,7 @@ Visit the support cards page to see your actual card images:
 
 ```text
 http://127.0.0.1:8000/support-cards
-```
+```text
 
 The 7 cards with actual images will now display your uploaded artwork instead of placeholders!
 

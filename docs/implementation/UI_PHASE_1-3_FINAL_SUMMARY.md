@@ -243,7 +243,7 @@ All components implement verified game mechanics from `docs/research/game-mechan
 ✓ CSS: 167.15 kB (gzip: 24.10 kB)
 ✓ JS: 52.08 kB (gzip: 19.52 kB)
 ✓ Built in 8.05s
-```
+```text
 
 ---
 

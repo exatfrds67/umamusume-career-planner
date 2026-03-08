@@ -117,7 +117,7 @@ Aptitudes (12 per character) {
     "guts": 1.0,
     "wit": 1.0
 }
-```
+```text
 
 **Future Enhancement**: Character-specific growth rates based on official game data
 
@@ -233,7 +233,7 @@ $this->aptitudeData = [
     'guts' => 1.1,
     'wit' => 0.9,
 ]
-```
+```text
 
 **Source**: Game data mining or community calculators
 
@@ -314,7 +314,7 @@ php artisan tinker --execute="
 
 **Expected Output**:
 
-```
+```text
 
 Characters: 161
 Aptitudes: 120

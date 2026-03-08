@@ -93,7 +93,7 @@ Stat Gain = (Base + StatBonus)
           × (1 + TrainingEffect)
           × (1 + 0.05 × NumSupportCards)
           × FriendshipMultiplier
-```
+```text
 
 **Key Components Implemented**:
 

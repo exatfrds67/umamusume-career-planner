@@ -208,7 +208,7 @@ docs/
 ├── setup-guides/          ✓ Referenced
 ├── testing/               ✓ Referenced
 └── verification-reports/  ✓ Referenced
-```
+```text
 
 ## Usage Examples
 

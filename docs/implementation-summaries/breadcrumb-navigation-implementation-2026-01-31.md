@@ -239,7 +239,7 @@ The following pages require controller updates to pass dynamic breadcrumb data:
 <x-breadcrumb :items="[
     ['label' => 'Dashboard']
 ]" />
-```
+```text
 
 ### Pattern 2: Two-Level Navigation (Main Pages)
 
@@ -281,7 +281,7 @@ public function show(Character $character)
         // Breadcrumb data can be passed explicitly or built in the view
     ]);
 }
-```
+```text
 
 Then in the view:
 

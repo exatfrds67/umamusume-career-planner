@@ -160,7 +160,7 @@ The badge is designed to be placed in the application header alongside other nav
     <x-ai.critical-alert-badge :alert-count="$criticalAlertCount ?? 0" />
     <button type="button">Notifications</button>
 </div>
-```
+```text
 
 ### Event Handling
 
@@ -206,7 +206,7 @@ Duration: 6.11s
 
 {{-- With alerts --}}
 <x-ai.critical-alert-badge :alert-count="3" />
-```
+```text
 
 ### Size Variations
 

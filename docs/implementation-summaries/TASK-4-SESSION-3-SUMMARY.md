@@ -77,7 +77,7 @@ completing the character baseline data system.
 'Silence Suzuka' => ['speed' => 60, 'stamina' => 40, 'power' => 45, 'guts' => 40, 'wit' => 50],
 'Fuji Kiseki' => ['speed' => 60, 'stamina' => 35, 'power' => 50, 'guts' => 40, 'wit' => 45],
 'Taiki Shuttle' => ['speed' => 65, 'stamina' => 30, 'power' => 55, 'guts' => 40, 'wit' => 40],
-```
+```text
 
 **Stamina Specialists** (14 characters):
 
@@ -115,7 +115,7 @@ completing the character baseline data system.
     'guts' => 0,
     'wit' => 0,
 ],
-```
+```text
 
 **After**:
 

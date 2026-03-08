@@ -54,7 +54,7 @@
     'active_cards' => [...],
     'total_cards' => 6
 ]
-```
+```text
 
 ### Task 3.3: Skill Hint Service ✅ COMPLETE
 
@@ -160,7 +160,7 @@
 - is_borrowed (boolean, default false)
 - created_at, updated_at
 - UNIQUE(support_deck_id, position)
-```
+```text
 
 ### Modified Tables
 
@@ -215,7 +215,7 @@ Base Bonus = Sum of all card bonuses (based on rarity + limit breaks)
 Friendship Multiplier = 1.2 if 3+ cards at 80+ bond, else 1.0
 Final Bonus = Base Bonus × Friendship Multiplier
 Final Stat Gain = Base Stat Gain × (1 + Final Bonus / 100)
-```
+```text
 
 ### Skill Hint Mechanics
 

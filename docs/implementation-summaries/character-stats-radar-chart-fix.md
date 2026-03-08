@@ -29,7 +29,7 @@ This mismatch caused the grid lines and data points to be calculated at position
     $centerY = $svgSize / 2;
     $maxRadius = $svgSize / 2.2;
 @endphp
-```
+```text
 
 **After (Correct)**:
 
@@ -95,7 +95,7 @@ Character ID: 162 (Special Week)
 
 ### Calculated Points (size=sm, viewBox 64x64)
 
-```
+```text
 [
   "32,17.454545454545",      // Speed (top)
   "44.450194395137,27.954686619092",  // Stamina (top-right)
@@ -130,7 +130,7 @@ php artisan test --compact tests/Unit/View/Components/StatRadarChartTest.php
 
 # Verify no console errors
 # Check browser logs for JavaScript errors
-```
+```text
 
 ## Impact
 

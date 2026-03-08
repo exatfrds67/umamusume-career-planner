@@ -95,7 +95,7 @@ return view('training.show', [
     'trainingTypes' => $this->getTrainingTypes(),
     'topStatus' => $topStatus, // ← Added
 ]);
-```
+```text
 
 #### DashboardController::index()
 

@@ -68,7 +68,7 @@ it('includes accessibility system JavaScript', function () {
     expect($jsContent)->toContain('setupFocusManagement');
     expect($jsContent)->toContain('setupSkipLinks');
 });
-```
+```text
 
 **Impact**: 14 tests now passing
 
@@ -118,7 +118,7 @@ php artisan test --filter="SupportCardAutoSlotTest|FocusManagementTest" --compac
 ```text
 Tests:    19 passed (74 assertions)
 Duration: 4.66s
-```
+```text
 
 ### Full Test Suite
 

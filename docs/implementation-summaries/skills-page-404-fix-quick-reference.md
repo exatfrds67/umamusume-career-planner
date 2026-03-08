@@ -34,7 +34,7 @@ vendor/bin/pint --dirty
 
 # Build assets
 npm run build
-```
+```text
 
 ## ✅ Results
 

@@ -53,7 +53,7 @@ redis-server
 
 # Or as a Windows service
 net start Redis
-```
+```text
 
 ## Option 2: Temporarily Disable Redis Dependency
 

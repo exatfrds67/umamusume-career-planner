@@ -63,7 +63,7 @@ $status = $service->getBatchQueueStatus();
     ],
     'duration_ms' => 123.45
 ]
-```
+```text
 
 ### 2. Connection Pooling
 
@@ -193,7 +193,7 @@ $requests = [
 
 // Execute in parallel
 $result = $service->fetchParallel($requests);
-```
+```text
 
 #### Response Format
 
@@ -257,7 +257,7 @@ $parallelStats = $metrics->getParallelFetchStats();
 
 ```php
 $compressionStats = $metrics->getCompressionStats();
-```
+```text
 
 ## Best Practices
 
@@ -430,7 +430,7 @@ Run tests:
 
 ```bash
 php artisan test --filter=PerformanceOptimizationServiceTest
-```
+```text
 
 ## Configuration Reference
 

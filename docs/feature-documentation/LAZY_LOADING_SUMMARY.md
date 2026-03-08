@@ -92,7 +92,7 @@ Added native browser lazy loading to all images across the application for bette
 <img src="{{ $url }}" 
     loading="eager"
     alt="Description">
-```
+```text
 
 ### Browser Behavior
 
@@ -236,7 +236,7 @@ http://127.0.0.1:8000/support-cards
 
 # Open DevTools → Network → Img filter
 # Observe progressive image loading
-```
+```text
 
 ### Quick Reference Documentation
 

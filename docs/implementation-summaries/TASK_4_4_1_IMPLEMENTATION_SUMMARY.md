@@ -195,7 +195,7 @@ App\Providers\ExternalAPIServiceProvider::class,
 
 ### Test Results
 
-```
+```text
 
 ✅ 32 tests passing
 ✅ 95 assertions

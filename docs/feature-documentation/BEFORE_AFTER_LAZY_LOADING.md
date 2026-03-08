@@ -38,7 +38,7 @@ Page Load Sequence:
 Total Initial Load: ~3MB
 Time to Interactive: ~2.5 seconds
 User Experience: Slow, waiting...
-```
+```text
 
 #### AFTER Lazy Loading ✅
 
@@ -110,7 +110,7 @@ IMG15                ████████
                               ↑
                          Interactive
                          at ~2.5s
-```
+```text
 
 ### AFTER Lazy Loading
 
@@ -169,7 +169,7 @@ User Views 6 Cards:
 │ ─────────────────────────────    │
 │ WASTED:          1,800KB (51%)   │ ← Problem!
 └──────────────────────────────────┘
-```
+```text
 
 ### AFTER Lazy Loading (Bandwidth)
 
@@ -219,7 +219,7 @@ User Journey:
 │ User Experience: 😤 Frustrating         │
 │ Bounce Rate: High                       │
 └─────────────────────────────────────────┘
-```
+```text
 
 ### AFTER Lazy Loading (3G Connection)
 
@@ -344,7 +344,7 @@ User Journey:
     loading="lazy"
     decoding="async"
     class="w-full h-full object-cover">
-```
+```text
 
 **Result**: Images load progressively as needed
 

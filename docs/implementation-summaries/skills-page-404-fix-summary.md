@@ -17,7 +17,7 @@ When users clicked "Get AI Recommendations" on the Skills Management page, the b
 
 ```text
 POST /api/characters/123/skill-recommendations 404 (Not Found)
-```
+```text
 
 The existing endpoint was at `/api/skill-recommendations/recommendations` with a different path structure, causing a
 mismatch between the frontend JavaScript and backend routing.
@@ -88,7 +88,7 @@ npm run build
 POST /api/characters/123/skill-recommendations
 Authorization: Bearer {token}
 Content-Type: application/json
-```
+```text
 
 **Response** (200 OK):
 
@@ -136,7 +136,7 @@ Output:
 
 ```text
 POST api/characters/{characterId}/skill-recommendations
-```
+```text
 
 ### 2. Test Verification
 

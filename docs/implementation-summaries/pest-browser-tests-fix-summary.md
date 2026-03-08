@@ -45,7 +45,7 @@ $page = visit('/dashboard');
 
 // CORRECT: wait() method with seconds (not milliseconds)
 $page->wait(2); // Wait 2 seconds
-```
+```text
 
 ### Available Wait Methods
 
@@ -136,7 +136,7 @@ Added comprehensive comments explaining:
 
 ### Before Fixes
 
-```
+```text
 
 Tests:    8 failed, 379 passed
 
@@ -210,7 +210,7 @@ $page->wait(2);
 
 // ✅ Good: Auto-waiting assertions
 $page->assertSee('Success'); // Waits automatically
-```
+```text
 
 ### 2. Use Debug Methods for Troubleshooting
 

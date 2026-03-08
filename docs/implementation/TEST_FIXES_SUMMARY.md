@@ -14,7 +14,7 @@
 
 **Error**:
 
-```
+```text
 SQLSTATE[HY000]: General error: 1 table ucp_characters has no column named external_source_id
 ```
 
@@ -38,7 +38,7 @@ SQLSTATE[HY000]: General error: 1 table ucp_characters has no column named exter
 
 **Error**:
 
-```
+```text
 Failed asserting that false is true.
 Missing required field: name_en
 ```
@@ -74,7 +74,7 @@ The tests were using old/incorrect field names that don't match the actual API r
     'category_label' => 'Speed',
     'thumb_img' => 'https://example.com/image1.png',
 ]
-```
+```text
 
 #### Test 2: Validates each item in array
 
@@ -110,7 +110,7 @@ The tests were using old/incorrect field names that don't match the actual API r
     'name_jp' => 'テストキャラクター',
     'category_label' => 'Speed',
 ]
-```
+```text
 
 **Files Modified**:
 

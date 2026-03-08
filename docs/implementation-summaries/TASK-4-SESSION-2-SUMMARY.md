@@ -65,7 +65,7 @@ From Session 1, we had:
 ✅ 94 factors created
 ✅ All factor types represented
 ✅ Realistic combinations
-```
+```text
 
 ### 3. Comprehensive Unit Tests
 
@@ -137,7 +137,7 @@ Phase 4: Not started
 
 ### After Session
 
-```
+```text
 
 Phase 1: 50.9% complete (82/161 characters)
 Phase 2: 100% complete (all characters)
@@ -403,7 +403,7 @@ Add factor support:
 
 **Commit Message**:
 
-```
+```text
 
 feat: implement Phase 3 Factor Inheritance System foundation
 

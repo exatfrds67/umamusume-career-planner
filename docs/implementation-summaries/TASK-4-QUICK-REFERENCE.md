@@ -26,7 +26,7 @@ Base Stats Records: 161 (all characters)
 Factor Records: 94 (sample data)
 Test Coverage: 100% (FactorService)
 Tests Passing: 20/20 ✅
-```
+```text
 
 ## Current Session Status
 
@@ -63,7 +63,7 @@ tests/Unit/Services/FactorServiceTest.php - Unit tests
 ```text
 database/seeders/EnhancedRealUmaMusumeCharactersSeeder.php - Main seeder
 database/seeders/FactorSeeder.php                          - Factor seeder
-```
+```text
 
 ### Documentation
 
@@ -99,7 +99,7 @@ php artisan test --filter=FactorServiceTest --compact
 
 # Run all tests
 php artisan test --compact
-```
+```text
 
 ## Code Formatting
 
@@ -125,7 +125,7 @@ vendor/bin/pint
 
 ### Red Factors (Aptitude Upgrades)
 
-```
+```text
 
 1★: +1 grade
 Additional grades: 3★ per grade
@@ -145,7 +145,7 @@ Powerful race bonuses
 
 ### White Factors (Normal Skills)
 
-```
+```text
 
 1★, 2★, or 3★
 Common racing skills
@@ -170,7 +170,7 @@ Total: 225-250 per character
 
 ### Specialization Categories
 
-```
+```text
 
 Speed Specialists: 9 characters (high speed, low stamina)
 Stamina Specialists: 14 characters (high stamina, high guts)

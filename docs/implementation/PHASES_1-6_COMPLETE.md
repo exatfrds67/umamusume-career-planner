@@ -108,7 +108,7 @@ Duration: ~15 seconds
 ```bash
 Tests:    3418 passed (13401 assertions)
 Duration: ~13 minutes
-```
+```text
 
 ---
 

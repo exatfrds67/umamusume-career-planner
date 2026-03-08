@@ -123,7 +123,7 @@ Successfully implemented a complete support card management system for the Umamu
     }
   ]
 }
-```
+```text
 
 ### 6. Testing ✅
 

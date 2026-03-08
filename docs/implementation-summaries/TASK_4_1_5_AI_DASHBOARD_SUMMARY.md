@@ -104,7 +104,7 @@ getServerHealthHistory(string $serverName, int $hours): array
 getServerUptimeStats(string $serverName, int $hours): array
 getAllServersUptimeSummary(int $hours): array
 getMonitoringDashboard(): array
-```
+```text
 
 #### CostTrackingService
 
@@ -195,7 +195,7 @@ deleteOldConversations(int $daysToKeep): int
   "message": "Error description",
   "error": "Detailed error message"
 }
-```
+```text
 
 ### 4. Frontend Views ✅
 
@@ -492,7 +492,7 @@ Route::prefix('ai/dashboard')->name('api.ai.dashboard.')->group(function () {
 
 **Web Interface**:
 
-```
+```text
 
 <http://localhost/ai/dashboard>
 
@@ -566,7 +566,7 @@ $uptimeStats = $monitoring->getServerUptimeStats('strands-agents', hours: 24);
 
 // Get monitoring dashboard
 $dashboard = $monitoring->getMonitoringDashboard();
-```
+```text
 
 ## Conclusion
 

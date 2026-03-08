@@ -17,7 +17,7 @@ A form field element should have an id or name attribute
 
 A form field element has neither an `id` nor a `name` attribute. 
 This might prevent the browser from correctly autofilling the form.
-```
+```text
 
 **Affected Elements**: 7 form inputs across 3 Blade components
 
@@ -83,7 +83,7 @@ Multiple form input elements across several Blade components used on the trainin
 <input type="checkbox" id="auto-fallback-toggle" name="auto_fallback" 
     x-model="settings.performance.auto_fallback" 
     @change="$dispatch('update-performance-setting', {...})">
-```
+```text
 
 #### 3. `resources/views/components/analytics/trend-analysis-chart.blade.php`
 
@@ -178,7 +178,7 @@ All new `id` and `name` attributes follow these conventions:
 [TTFB] 442.50 (good)
 [ImageOptimization] Initialized
 [LCP] 3704.00 (needs-improvement)
-```
+```text
 
 **Result**: Zero errors, zero warnings ✅
 

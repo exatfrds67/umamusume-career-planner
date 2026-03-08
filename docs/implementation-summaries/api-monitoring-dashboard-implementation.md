@@ -192,7 +192,7 @@ curl http://localhost/api/monitoring/dashboard
 
 ```bash
 curl http://localhost/api/monitoring/response-times?source=umapyoi
-```
+```text
 
 ### Get Cache Performance
 
@@ -216,7 +216,7 @@ curl http://localhost/api/monitoring/realtime
 
 ```bash
 curl -X POST http://localhost/api/monitoring/alerts/{alertId}/acknowledge
-```
+```text
 
 ### Reset Circuit Breaker
 

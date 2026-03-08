@@ -55,7 +55,7 @@ const selector = [
     "[href]:not([aria-hidden='true'])",
     // ...
 ].join(", ");
-```
+```text
 
 #### Improved Focus Management
 
@@ -160,7 +160,7 @@ public function render(): View
     <svg class="animate-spin h-3 w-3">...</svg>
     <span>Updating...</span>
 </span>
-```
+```text
 
 ### 4. Database Optimization
 

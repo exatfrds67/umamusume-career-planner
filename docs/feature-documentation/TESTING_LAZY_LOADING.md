@@ -30,7 +30,7 @@ Navigate to: **<http://127.0.0.1:8000/support-cards>**
 
 ```text
 15 images × ~200KB = ~3MB loaded immediately
-```
+```text
 
 **After Lazy Loading**:
 
@@ -174,7 +174,7 @@ document.querySelectorAll('img[loading="lazy"]').forEach(img => {
     img.loading = 'eager';
 });
 // Reload and measure
-```
+```text
 
 **After Lazy Loading**:
 
@@ -247,7 +247,7 @@ ls -la public/images/support_cards/
 // Check in console
 document.querySelector('img').loading
 // Should return "lazy" or "eager"
-```
+```text
 
 ### Layout Shifts When Loading
 

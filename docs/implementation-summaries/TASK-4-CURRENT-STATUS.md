@@ -17,7 +17,7 @@ coverage of the 161-character roster.
 ✅ Phase 2: Character-Specific Growth Rates - 100% COMPLETE (all characters)
 ⏳ Phase 3: Factor Inheritance System - NOT STARTED
 ⏳ Phase 4: Character Base Stats - NOT STARTED
-```
+```text
 
 ## Phase 1: Aptitude Data Collection (32.3% Complete)
 

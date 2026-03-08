@@ -109,7 +109,7 @@ $skill->calculateFinalCost(5); // 40% discount (max)
 // 3 hints: 84 SP (30% off)
 // 4 hints: 78 SP (35% off)
 // 5 hints: 72 SP (40% off - maximum)
-```
+```text
 
 ### 4. Skill Evolution System
 
@@ -202,7 +202,7 @@ $acquisition = SkillAcquisition::create([
 
 // Calculate efficiency
 $efficiency = $acquisition->getSpEfficiency(); // 40.0%
-```
+```text
 
 ### 6. Skill Analysis Service
 
@@ -307,7 +307,7 @@ $analysis = $service->analyzeSkillBuild($character, $skills);
         'meta_tier_recommendations',
     ],
 ],
-```
+```text
 
 #### Available Agents
 
@@ -400,7 +400,7 @@ if ($normalSkill->canEvolve()) {
     
     echo "Total Evolution Cost: {$totalCost} SP\n";
 }
-```
+```text
 
 ### Example 3: Analyze Skill Build
 

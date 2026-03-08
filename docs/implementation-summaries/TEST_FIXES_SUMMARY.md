@@ -61,7 +61,7 @@ php artisan test --filter="SupportCardAutoSlotTest|FocusManagementTest" --compac
 
 Expected output:
 
-```
+```text
 
 Tests:    19 passed (74 assertions)
 

@@ -72,7 +72,7 @@ standards.
 
 ```blade
 <x-bond-meter :value="92" :threshold="80" />
-```
+```text
 
 **Files**:
 
@@ -211,7 +211,7 @@ standards.
 
 ```blade
 <x-turn-counter :current="35" :total="78" />
-```
+```text
 
 **Files**:
 

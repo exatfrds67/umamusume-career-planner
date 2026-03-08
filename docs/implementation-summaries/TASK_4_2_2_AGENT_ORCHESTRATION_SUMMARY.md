@@ -81,7 +81,7 @@ $workflow = $orchestration->createWorkflow(
 );
 
 $result = $orchestration->executeWorkflow($workflow['id'], ['source' => 'database']);
-```
+```text
 
 **Parallel Workflow**:
 
@@ -169,7 +169,7 @@ public function createSharedContext(string $contextId, array $initialData = []):
 public function joinSharedContext(string $contextId, string $agentId): bool
 public function updateSharedContext(string $contextId, string $agentId, array $updates): bool
 public function getSharedContext(string $contextId): ?array
-```
+```text
 
 #### Communication Examples
 
@@ -250,7 +250,7 @@ public function terminateAgent(string $agentId): bool
 // Agent queries
 public function getActiveAgents(): array
 public function getAgentHistory(string $agentId): array
-```
+```text
 
 #### Lifecycle Examples
 
@@ -420,7 +420,7 @@ $result = $orchestration->executeWorkflow($workflow['id'], [
     'character_stats' => $stats,
     'available_skills' => $skills,
 ]);
-```
+```text
 
 ### Example 3: Agent Communication and Data Sharing
 

@@ -231,7 +231,7 @@ $service->addToBatch('/api/characters', 'GET', ['id' => 3]);
 
 // Execute all batches
 $result = $service->executeAllBatches();
-```
+```text
 
 ### Parallel Fetching Usage
 
@@ -313,7 +313,7 @@ php artisan test --filter=PerformanceOptimizationServiceTest
 
 # Run with coverage
 php artisan test --filter=PerformanceOptimizationServiceTest --coverage
-```
+```text
 
 ## Future Enhancements
 

@@ -35,7 +35,7 @@ private const DISCOUNT_PER_HINT = 20.0;
 private const MAX_DISCOUNT_PERCENTAGE = 40.0;
 
 // Result: 1 hint = 20%, 2 hints = 40% (MAX)
-```
+```text
 
 **Verified Game Mechanics** (from game-mechanics-research-report.md):
 
@@ -111,7 +111,7 @@ expect()->extend('toBeValidStat', function (): Pest\Expectation {
 });
 
 // Multiple validation points enforce 1200 max
-```
+```text
 
 **Verified Game Mechanics**:
 
@@ -161,7 +161,7 @@ Stat Gain = (Base + StatBonus)
           × (1 + TrainingEffect)
           × (1 + 0.05 × NumSupportCards)
           × FriendshipMultiplier
-```
+```text
 
 **Missing Components**:
 
@@ -239,7 +239,7 @@ Stat Gain = (Base + StatBonus)
 
 #### Phase 1: Skill Hint System Correction (Week 1)
 
-```
+```text
 Spec: skill-hint-system-correction
 ├── Requirements
 │   ├── Update discount calculation (10%/20%/30%/35%/40%)
@@ -261,17 +261,17 @@ Spec: skill-hint-system-correction
 
 **Subagent Invocation**:
 
-```
+```text
 invokeSubAgent(
   name: "requirements-first-workflow",
   prompt: "Create spec for correcting skill hint discount system from 20%/40% (max 2 hints) to 10%/20%/30%/35%/40% (max 5 hints) based on verified game mechanics",
   explanation: "Critical business logic correction for SP cost calculations"
 )
-```
+```text
 
 #### Phase 2: Aptitude Grade Correction (Week 1)
 
-```
+```text
 Spec: aptitude-grade-system-correction
 ├── Requirements
 │   ├── Remove SS rank from enum
@@ -291,7 +291,7 @@ Spec: aptitude-grade-system-correction
 
 #### Phase 3: Stat Range & Soft Cap (Week 2)
 
-```
+```text
 Spec: stat-range-soft-cap-implementation
 ├── Requirements
 │   ├── Remove 1200 hard cap
@@ -309,11 +309,11 @@ Spec: stat-range-soft-cap-implementation
     ├── Create UI soft cap component
     ├── Implement special mechanics
     └── Update all tests
-```
+```text
 
 #### Phase 4: Training Formula Alignment (Week 3)
 
-```
+```text
 Spec: training-calculation-formula-alignment
 ├── Requirements
 │   ├── Implement verified multiplicative formula
@@ -392,7 +392,7 @@ it('discount increases monotonically with hint count', function () {
         expect($current)->toBeLessThanOrEqual(40.0);
     }
 });
-```
+```text
 
 ### 4.2 Validation Against Game Data
 
@@ -448,7 +448,7 @@ public function up(): void
     
     // RECOMMENDED: Option A (backward compatible)
 }
-```
+```text
 
 **Backward Compatibility**:
 
@@ -694,7 +694,7 @@ class SkillHintService
     
     // ... rest of service
 }
-```
+```text
 
 ### A.2 Corrected Aptitude Migration
 

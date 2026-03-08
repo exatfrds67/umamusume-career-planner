@@ -16,7 +16,7 @@ D  - Below Average
 E  - Poor
 F  - Very Poor
 G  - Unsuitable (worst)
-```
+```text
 
 ### Aptitude Categories
 
@@ -151,7 +151,7 @@ private function loadAptitudeData(): void
     'betweener' => 'S',
     'chaser' => 'A',
 ],
-```
+```text
 
 ### Step 4: Verify Character Name
 
@@ -228,7 +228,7 @@ php artisan tinker --execute="
 'turf_long' => 'G',
 'runner' => 'S',
 'leader' => 'A',
-```
+```text
 
 ### Long Distance Runners
 
@@ -314,7 +314,7 @@ Before committing aptitude data:
 
 ## Example Commit Message
 
-```
+```text
 
 feat: add aptitude data for 20 characters
 

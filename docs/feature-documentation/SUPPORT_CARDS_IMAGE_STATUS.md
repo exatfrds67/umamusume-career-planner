@@ -14,7 +14,7 @@ All 522 support cards were populated with artwork URLs using the GameTora CDN pa
 
 ```text
 https://gametora.com/images/umamusume/supports/tex_support_card_{external_source_id}.png
-```
+```text
 
 ### Artisan Command
 
@@ -109,7 +109,7 @@ Use this naming convention:
 
 ```text
 {Character_Name}_{Card_Title}.{ext}
-```
+```text
 
 Examples:
 
@@ -128,7 +128,7 @@ public/images/support_cards/
 
 ```bash
 php artisan tinker --execute="DB::table('ucp_support_cards')->where('internal_id', 'GLOBAL_SC_BIKOPEGASUS_CARROT')->update(['artwork_url' => '/images/support_cards/Biko_Pegasus_Double_Carrot_Punch.png']);"
-```
+```text
 
 #### Option B: Using SQL
 
@@ -144,7 +144,7 @@ Update `database/seeders/SupportCardSeeder.php` with the new artwork_url, then:
 
 ```bash
 php artisan db:seed --class=SupportCardSeeder
-```
+```text
 
 ### Step 5: Verify
 

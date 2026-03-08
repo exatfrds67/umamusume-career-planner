@@ -98,7 +98,7 @@ Successfully implemented the foundation and core data display components for the
     show-percentage
     show-soft-cap
 />
-```
+```text
 
 **Files Created**:
 
@@ -177,7 +177,7 @@ Successfully implemented the foundation and core data display components for the
     show-trend
     show-duration
 />
-```
+```text
 
 **Files Created**:
 
@@ -342,7 +342,7 @@ The following components are ready to be implemented based on the design documen
     <x-grade-badge grade="B" size="md" show-label label="Sprint" />
     <x-grade-badge grade="A" size="md" show-label label="Mile" />
 </div>
-```
+```text
 
 ### Condition Display
 

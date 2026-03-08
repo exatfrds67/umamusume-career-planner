@@ -183,7 +183,7 @@ than isolated component tests
  M resources/js/deck-builder.js
  M resources/views/components/memories-grid.blade.php
  M resources/views/support-cards/deck-builder.blade.php
-```
+```text
 
 ### New Files Created (13)
 
@@ -224,7 +224,7 @@ Tests:    3731 passed ✅
 Total Assertions: 14,208
 Duration: 912 seconds
 Test Coverage: 99.8%
-```
+```text
 
 **Status**: The Phase 2 components are functional and the test suite remains healthy.
 

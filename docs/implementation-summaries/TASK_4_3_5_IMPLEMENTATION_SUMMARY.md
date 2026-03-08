@@ -390,7 +390,7 @@ Created comprehensive factories for testing:
     "daily_costs": [...]
   }
 }
-```
+```text
 
 ### Recommendations Response
 

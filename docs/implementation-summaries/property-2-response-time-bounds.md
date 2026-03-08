@@ -133,7 +133,7 @@ php artisan test --filter="generates local AI recommendations within 2 seconds"
 
 # Run with groups
 php artisan test --group=property,performance
-```
+```text
 
 ## Code Quality
 

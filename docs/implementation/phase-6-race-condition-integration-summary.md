@@ -50,7 +50,7 @@ public function __construct(
     $this->conditionService = $conditionService;
     // ...
 }
-```
+```text
 
 #### 2. Race Performance Prediction with Conditions
 
@@ -193,7 +193,7 @@ $prediction = $raceAgent->predictRacePerformance($character, $raceDetails);
 $impactScore = $prediction['condition_impact']['impact_score']; // 92.0
 $description = $prediction['condition_impact']['description']; // "Power -50, Speed -50, Stamina drain +2%/sec"
 $recommendedSkills = $prediction['condition_impact']['recommended_skills']; // ['Rainy Days ◯', 'Wet Conditions ◯']
-```
+```text
 
 ### Example 2: Strategy with Condition-Aware Skills
 

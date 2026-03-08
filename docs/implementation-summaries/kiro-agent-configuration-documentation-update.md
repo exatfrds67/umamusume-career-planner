@@ -47,7 +47,7 @@ Comprehensive update to project documentation including Kiro AI agent configurat
 
 **New Structure**:
 
-```
+```text
 .kiro/skills/
 ├── README.md                          # Skill system documentation
 ├── laravel-testing-SKILL.md          # Testing best practices
@@ -143,7 +143,7 @@ Comprehensive update to project documentation including Kiro AI agent configurat
 
 ### File Structure
 
-```
+```text
 .kiro/
 ├── agents/                    # Local project agents
 │   ├── laravel-dev.json
@@ -192,7 +192,7 @@ Comprehensive update to project documentation including Kiro AI agent configurat
     ]
   }
 }
-```
+```text
 
 **Domain Expert Agent** (`.kiro/agents/uma-musume-expert.json`):
 
@@ -226,7 +226,7 @@ description: Specific description of when to use this skill. Include key use cas
 # Skill Content
 
 ...
-```
+```text
 
 ### Progressive Loading Benefits
 

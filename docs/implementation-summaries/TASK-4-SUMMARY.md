@@ -49,7 +49,7 @@ Uma Musume characters with aptitude grades, growth rates, and proper database re
 ✅ 10 with complete aptitude data (120 aptitude records)
 ✅ 100% image coverage
 ✅ Ready for user customization
-```
+```text
 
 ## Files Created/Modified
 

@@ -87,7 +87,7 @@ public function attemptAllRecovery(): array
 public function getDegradationStatus(): array
 public function getDegradationMetrics(): array
 public function getDegradationMessage(string $apiName): array
-```
+```text
 
 **Degradation Strategies**:
 
@@ -277,7 +277,7 @@ if ($elapsedTime >= CIRCUIT_BREAKER_TIMEOUT) {
     $this->resetFailureCount($apiName);
     // Circuit breaker is now closed, allow retry
 }
-```
+```text
 
 ### 2. Graceful Degradation Flow
 
@@ -321,7 +321,7 @@ Max Retries? → No → Re-queue Job
 Record Failure in History
     ↓
 Send Failure Alert
-```
+```text
 
 ### 4. Alert Flow
 
@@ -417,7 +417,7 @@ $result = $degradationService->getDataWithFallback('umapyoi', $apiResult, [
 // Attempt recovery
 $recovery = $degradationService->attemptRecovery('umapyoi');
 // Returns: ['recovered' => true, 'api' => 'umapyoi', 'message' => '...']
-```
+```text
 
 ### 3. Background Sync
 

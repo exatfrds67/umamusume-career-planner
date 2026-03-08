@@ -154,7 +154,7 @@ resources/
 │       └── turn-counter.css
 └── views/
     └── ...                             # Blade templates
-```
+```text
 
 ### Data Injection Pattern
 
@@ -203,7 +203,7 @@ const { userId, routes } = window.pageData || {};
     });
 </script>
 @endpush
-```
+```text
 
 **After** (Extracted - ✅):
 
@@ -291,7 +291,7 @@ try {
 
 ```javascript
 document.getElementById('element').addEventListener('click', handler);
-```
+```text
 
 **After**:
 
@@ -387,7 +387,7 @@ npm run build 2>&1 | grep -i error
 
 # Check bundle sizes
 npm run build -- --mode production
-```
+```text
 
 ## Code Quality
 

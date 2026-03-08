@@ -44,7 +44,7 @@ public function __construct(
     private Skill $skillModel,
     private RaceConditionService $conditionService
 ) {}
-```
+```text
 
 #### 2. Enhanced Race Context with Condition Analysis
 
@@ -189,7 +189,7 @@ $strategy = $service->getStrategy($characterId, $raceData, $userId);
 // - Performance Score: 100/100
 // - Recommended Skills: ['Sunny Days ◯', 'Firm Conditions ◯']
 // - Effective Stats (no penalties)
-```
+```text
 
 ### Example 3: Strategy Without Condition Data
 

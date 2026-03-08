@@ -52,7 +52,7 @@ npm run build
 
 # Or run dev server
 npm run dev
-```
+```text
 
 ## 5. Cache Issues
 
@@ -133,7 +133,7 @@ Should return an object. If undefined, Alpine.js isn't loading.
 
 ```javascript
 window.avatarUploader
-```
+```text
 
 Should return a function. If undefined, the script isn't loading.
 

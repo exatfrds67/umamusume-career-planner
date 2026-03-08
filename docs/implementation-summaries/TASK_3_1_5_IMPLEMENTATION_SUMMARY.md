@@ -230,7 +230,7 @@ Spirit Burst indicators, and recommendation rankings as specified in Task 3.1.5.
     }
   ]
 }
-```
+```text
 
 ### Accessibility Features
 

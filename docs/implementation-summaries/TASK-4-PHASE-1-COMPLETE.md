@@ -18,7 +18,7 @@ comprehensive, official aptitude grades for every character across all distance/
 ✅ Total Characters: 161/161 (100%)
 ✅ Total Aptitude Records: 1,932 (161 × 12)
 ✅ Completion Status: PHASE 1 COMPLETE
-```
+```text
 
 ### Batch Breakdown
 
@@ -239,7 +239,7 @@ vendor/bin/pint database/seeders/EnhancedRealUmaMusumeCharactersSeeder.php
 ✅ 1 file formatted
 ✅ 1 style issue fixed
 ✅ PSR-12 compliant
-```
+```text
 
 ## User Impact
 

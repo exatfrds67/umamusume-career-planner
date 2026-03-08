@@ -48,7 +48,7 @@ Updated the Blade templates to:
         {{ strtoupper(substr($character->name, 0, 2)) }}
     </div>
 @endif
-```
+```text
 
 **List View - Before**:
 
@@ -101,7 +101,7 @@ Updated the Blade templates to:
         aria-label="{{ $character->name }} avatar" role="img">
     </div>
 @endif
-```
+```text
 
 ## Results
 

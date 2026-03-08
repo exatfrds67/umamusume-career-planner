@@ -77,7 +77,7 @@ Enhanced SP cost display to show:
 
 Example display:
 
-```
+```text
 
 120 SP → 72 SP -40%
 Save 48 SP!

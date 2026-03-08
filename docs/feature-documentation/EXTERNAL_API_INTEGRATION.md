@@ -121,7 +121,7 @@ $result = $client->getRaceStrategy([
     'surface' => 'turf',
     'character_stats' => [...],
 ]);
-```
+```text
 
 #### Endpoints
 
@@ -317,7 +317,7 @@ All API methods return a consistent error format:
     'source' => 'error',
     'error' => 'Error message describing what went wrong',
 ]
-```
+```text
 
 ### Fallback Behavior
 
@@ -426,7 +426,7 @@ $facade->getCharacters();
 
 // ❌ Avoid - Direct client usage bypasses context management
 $umapyoiClient->getCharacters();
-```
+```text
 
 ### 2. Handle Errors Gracefully
 
@@ -470,7 +470,7 @@ $contextService->storeCharacterContext($characterId, [
     'last_api_call' => now(),
     'preferred_data_source' => 'umapyoi',
 ]);
-```
+```text
 
 ## Troubleshooting
 

@@ -88,7 +88,7 @@ $rareSkill = Skill::factory()->rare()->evolved()->create();
 // Link evolution relationship
 $normalSkill->update(['evolution_target_id' => $rareSkill->id]);
 $rareSkill->update(['evolution_source_id' => $normalSkill->id]);
-```
+```text
 
 **Features**:
 
@@ -196,7 +196,7 @@ $result = $evolutionService->evolveSkill($character, $normalSkill);
 // Creates new Rare skill acquisition
 // Applies hint discounts
 // Records evolution metadata
-```
+```text
 
 ### ✅ Requirement 31.2: Prerequisite Checking for Evolution Chains
 
@@ -232,7 +232,7 @@ $plan = $evolutionService->planEvolutionTiming($character, $targetSkills);
 // Returns timing: 'immediate' or 'delayed'
 // Provides recommendations: "Ready to evolve now" or "Wait until: [reason]"
 // Sorts by optimal timing
-```
+```text
 
 ### ✅ Requirement 31.5: SP Efficiency Calculations
 
@@ -271,7 +271,7 @@ $roadmap = $evolutionService->getEvolutionRoadmap($character);
 // Provides complete evolution strategy
 // Calculates total potential SP savings
 // Generates prioritized recommendations
-```
+```text
 
 ---
 
@@ -301,7 +301,7 @@ $result = $evolutionService->evolveSkill($character, $normalSkill);
 // Discount: 72 SP (40% at level 5)
 // Final cost: 108 SP
 // SP saved: 72 SP
-```
+```text
 
 ### 3. SP Efficiency Comparison
 
@@ -341,7 +341,7 @@ $roadmap = $evolutionService->getEvolutionRoadmap($character);
         ],
     ],
 ]
-```
+```text
 
 ---
 
@@ -365,7 +365,7 @@ $roadmap = $evolutionService->getEvolutionRoadmap($character);
 - evolutionSource: Rare → Normal
 - canEvolve(): Evolution capability check
 - isEvolved(): Evolution status check
-```
+```text
 
 ### With SkillAcquisition Model
 
@@ -392,7 +392,7 @@ if ($evolutionService->canEvolve($character, $normalSkill)) {
     $reason = $evolutionService->getEvolutionBlockReason($character, $normalSkill);
     echo "Cannot evolve: {$reason}";
 }
-```
+```text
 
 ### Perform Evolution
 
@@ -418,7 +418,7 @@ if ($efficiency['comparison']['is_evolution_better']) {
 } else {
     echo "Direct acquisition is more efficient";
 }
-```
+```text
 
 ### Get Evolution Roadmap
 
@@ -451,7 +451,7 @@ foreach ($roadmap['recommendations'] as $recommendation) {
 Cache::remember("evolution_opportunities_{$character->id}", 300, function () use ($character) {
     return $this->evolutionService->getEvolutionOpportunities($character);
 });
-```
+```text
 
 ---
 

@@ -93,7 +93,7 @@ The phase builds on Phase 4's training foundation by adding:
     variant="pyramid"
     height="h-96"
 />
-```
+```text
 
 **Alpine Data Context**:
 
@@ -324,7 +324,7 @@ The phase builds on Phase 4's training foundation by adding:
 
 ## File Structure
 
-```
+```text
 
 Phase 5 Files Created:
 
@@ -451,7 +451,7 @@ it('supports three display variants')
 it('displays events in chronological order')
 it('formats relative times correctly')
 it('paginates events properly')
-```
+```text
 
 ### E2E Tests (Playwright)
 
@@ -594,7 +594,7 @@ $recentActivity = [];  // Event timeline data
 
 **Commit bddcd93** (Part 1 - Components):
 
-```
+```text
 
 feat: Phase 5 - Race Planning & Analytics components (Part 1)
 
@@ -619,7 +619,7 @@ feat: Phase 5 - Dashboard integration & Alpine registration (Part 2)
 
 **Commit adf4a21** (Part 3 - Views):
 
-```
+```text
 
 feat: Phase 5 - Race targets planning view (Part 3)
 

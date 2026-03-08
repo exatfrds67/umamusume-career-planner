@@ -88,7 +88,7 @@ The Blade view includes visual hints for the keyboard shortcut:
       opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
     Alt+A
 </span>
-```
+```text
 
 **Footer Hint**:
 
@@ -199,7 +199,7 @@ Run browser tests:
 
 ```bash
 php artisan dusk --filter=AdvisoryPanelInteractivityTest::test_panel_toggles_with_alt_a_shortcut
-```
+```text
 
 Run all advisory panel tests:
 

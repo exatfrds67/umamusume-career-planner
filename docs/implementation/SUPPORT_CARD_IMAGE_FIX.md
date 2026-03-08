@@ -32,7 +32,7 @@ Support card images are hosted on **gametora.com** following a predictable URL p
 
 ```text
 https://gametora.com/images/umamusume/supports/tex_support_card_{CARD_ID}.png
-```
+```text
 
 **Example**:
 
@@ -95,7 +95,7 @@ body: JSON.stringify({
     image_url: imageUrl,  // ✅ Properly constructed URL
     source: 'umapyoi.net'
 })
-```
+```text
 
 ---
 

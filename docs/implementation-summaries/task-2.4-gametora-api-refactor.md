@@ -33,7 +33,7 @@ $curatedMetadataFields = ['meta_tier', 'strategic_notes', 'synergy_skills', 'des
 if ($preserveCuratedMetadata && \in_array($key, $curatedMetadataFields, true)) {
     continue;
 }
-```
+```text
 
 ### 2. Updated `processSkill()` Method
 
@@ -95,7 +95,7 @@ All 23 tests pass successfully:
 ```text
 Tests:    23 passed (1729 assertions)
 Duration: 5.89s
-```
+```text
 
 ## Behavior Matrix
 

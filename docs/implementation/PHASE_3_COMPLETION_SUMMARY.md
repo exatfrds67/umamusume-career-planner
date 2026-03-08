@@ -200,7 +200,7 @@ Create `tests/Feature/TrainingWithSupportCardsTest.php`:
 
 All endpoints are implemented, tested manually, and ready for frontend integration:
 
-```
+```text
 GET  /api/training/{character}/predictions
 GET  /api/training/{character}/facility/{facility}
 POST /api/training/{character}/execute
@@ -213,7 +213,7 @@ GET  /api/training/{character}/deck
 
 ```sql
 id, character_id, name, is_active, created_at, updated_at
-```
+```text
 
 ### support_deck_cards (pivot)
 
@@ -223,7 +223,7 @@ id, support_deck_id, support_card_id, position, bond_level, is_borrowed, created
 
 ## Service Architecture
 
-```
+```text
 TrainingController
 ├── TrainingPredictionService
 │   └── SupportBonusCalculator

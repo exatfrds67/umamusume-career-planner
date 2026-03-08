@@ -30,7 +30,7 @@ Total Progress: 100% complete
 - Phase 2: 100% × 25% weight = 25.0%
 - Phase 3: 100% × 25% weight = 25.0%
 - Phase 4: 100% × 25% weight = 25.0%
-```
+```text
 
 ## Phase 1: Aptitude Data Collection
 

@@ -110,7 +110,7 @@ navigation capabilities.
     'mood' => null,             // Mood string
     'careerStage' => null,      // 'junior', 'classic', or 'senior'
 ])
-```
+```text
 
 ### Color Coding Logic
 

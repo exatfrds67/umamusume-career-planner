@@ -50,7 +50,7 @@ sorted.sort((a, b) => {
     // Then apply alphabetical sort
     return a.name.localeCompare(b.name);
 });
-```
+```text
 
 **Verification**:
 

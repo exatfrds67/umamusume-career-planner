@@ -169,7 +169,7 @@ public function getModelsByTier(string $tier): array
 // Configuration summary
 public function getConfigurationSummary(): array
 public function getRequiredPermissions(): array
-```
+```text
 
 ### 3. Enhanced BedrockService
 
@@ -310,7 +310,7 @@ protected function initializeClient(): void
 
 ### 5. Test Results
 
-```
+```text
 
 Unit Tests:    26 passed (108 assertions)  Duration: 6.45s
 Feature Tests: 21 passed (91 assertions)   Duration: 2.14s
@@ -442,7 +442,7 @@ models
     ],
     // ... additional models
 ],
-```
+```text
 
 ---
 
@@ -516,7 +516,7 @@ if ($health['healthy']) {
 $apiStatus = $bedrockConfig->getAPIStatus();
 echo "API Status: {$apiStatus['status']}\n";
 echo "Response Time: {$apiStatus['response_time']}s\n";
-```
+```text
 
 ### Model Filtering
 
@@ -607,7 +607,7 @@ Required IAM permissions for Bedrock access:
     }
   ]
 }
-```
+```text
 
 ---
 

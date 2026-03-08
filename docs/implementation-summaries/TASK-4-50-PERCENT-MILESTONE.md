@@ -19,7 +19,7 @@ This milestone marks the completion of the first half of Phase 1 and provides a 
 ✅ Characters with Aptitudes: 82 (50.9%)
 ✅ Total Aptitude Records: 984 (82 × 12)
 ✅ Remaining Characters: 79 (49.1%)
-```
+```text
 
 ### Batch History
 

@@ -41,7 +41,7 @@ public function isAdmin(): bool
 {
     return $this->email === 'admin@umamusume.local';
 }
-```
+```text
 
 **Location**: `app/Models/User.php`
 
@@ -181,7 +181,7 @@ $user = Auth::user();
 if ($user->isAdmin()) {
     // User has full admin privileges
 }
-```
+```text
 
 ### Authorization in Controllers
 
@@ -251,7 +251,7 @@ public function isAdmin(): bool
     
     return in_array($this->email, $adminEmails);
 }
-```
+```text
 
 ## Security Considerations
 

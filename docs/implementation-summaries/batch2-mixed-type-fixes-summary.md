@@ -57,7 +57,7 @@ $prompt = str_replace(
     ],
     (string) $template
 );
-```
+```text
 
 #### Fixed: `buildRaceStrategyPrompt` Method
 
@@ -98,7 +98,7 @@ $skills = is_array($skillsRaw) ? array_map('strval', $skillsRaw) : [];
 
 $risksRaw = $content['risk_factors'] ?? [];
 $risks = is_array($risksRaw) ? array_map('strval', $risksRaw) : [];
-```
+```text
 
 ### 3. AdvisoryController.php ✅
 
@@ -126,7 +126,7 @@ $skillId = $skillIdRaw !== null ? (int) $skillIdRaw : null;
 
 $expectedImpact = $recommendation->expectedOutcomes['expected_impact'] ?? 'Improves character performance';
 assert(is_string($expectedImpact));
-```
+```text
 
 #### Fixed: `getRaceStrategy` Method
 
@@ -165,7 +165,7 @@ $character->available_sp = $availableSp;
 $acquiredSkills = $validated['acquired_skills'];
 assert(is_array($acquiredSkills));
 $character->acquired_skills = $acquiredSkills;
-```
+```text
 
 #### Fixed: `calculateWinProbability` Method
 
@@ -192,7 +192,7 @@ $distanceKey = 'distance_'.$distance;
 $distanceGrade = $aptitudes[$distanceKey] ?? 'C';
 
 $reasoning .= "Character has {$distanceGrade}-grade aptitude for {$distance} distance races. ";
-```
+```text
 
 #### Fixed: `identifyRisks` Method
 
@@ -234,7 +234,7 @@ $skillHints = $context['skill_hints'] ?? [];
 
 /** @var array<int> $supportBonds */
 $supportBonds = $context['support_bonds'] ?? [];
-```
+```text
 
 #### Fixed: `recordTrainingOutcome` Method
 
@@ -300,7 +300,7 @@ $finishTime = isset($actualResultData['finish_time'])
     : null;
 
 $fanGain = (int) ($actualResultData['fan_gain'] ?? 0);
-```
+```text
 
 ## Remaining Issues (49 errors)
 
@@ -342,7 +342,7 @@ Most remaining errors are "Cannot cast mixed" warnings where Laravel's validatio
 (int) ($array['key'] ?? 0)
 (float) ($array['key'] ?? 0.0)
 (bool) ($array['key'] ?? false)
-```
+```text
 
 ### 3. Assertions for Runtime Safety
 
@@ -358,7 +358,7 @@ assert(is_string($value));
 $value = $array['key'] ?? 'default';
 assert(is_string($value));
 // Now PHPStan knows $value is string
-```
+```text
 
 ### 5. Type-Safe Array Mapping
 

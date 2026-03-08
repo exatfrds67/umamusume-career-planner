@@ -151,7 +151,7 @@ expect($html)->toContain('expected-class')
 
 // Dark mode
 ->toContain('dark:bg-gray-800')
-```
+```text
 
 ---
 

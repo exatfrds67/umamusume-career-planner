@@ -107,7 +107,7 @@ Hint Level: 0-5 (max 5 hint levels per skill)
 SP Discount: Progressive (10%/20%/30%/35%/40%)
 Max Discount: 40% (5 hint levels)
 Final SP Cost = Base SP Cost × (1 - Discount / 100)
-```
+```text
 
 ### Bond Progression
 

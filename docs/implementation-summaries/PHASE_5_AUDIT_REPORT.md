@@ -181,7 +181,7 @@ window.Alpine && Alpine.data('myComponent', function(config) {
 });
 </script>
 @endpush
-```
+```text
 
 **After** (Extracted):
 
@@ -205,7 +205,7 @@ document.addEventListener('alpine:init', () => {
         // component logic
     }));
 });
-```
+```text
 
 ### Pattern for Multiple Instances
 

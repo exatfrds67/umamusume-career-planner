@@ -27,7 +27,7 @@ tracking have been successfully implemented.
 
 ```php
 'training_sessions' => $user->trainingSessions()->count(),
-```
+```text
 
 **Implementation Details:**
 
@@ -108,7 +108,7 @@ public function races(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
 {
     return $this->hasManyThrough(Race::class, Character::class);
 }
-```
+```text
 
 **Benefits:**
 
@@ -180,7 +180,7 @@ $g1Races = $user->races()
     ->where('race_grade', 'G1')
     ->whereNotNull('finish_position')
     ->count();
-```
+```text
 
 ---
 
@@ -270,7 +270,7 @@ test('profile shows correct statistics', function () {
             && $stats['races_completed'] === 5;
     });
 });
-```
+```text
 
 ---
 

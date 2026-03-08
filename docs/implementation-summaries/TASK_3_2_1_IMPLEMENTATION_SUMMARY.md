@@ -195,7 +195,7 @@ $skill->calculateFinalCost(5); // 72 SP (40% discount - maximum)
 $normalSkill->evolutionTarget; // Rare version
 $rareSkill->evolutionSource; // Normal version
 $skill->getEvolutionChain(); // [Normal, Rare]
-```
+```text
 
 ### 3. Synergy Analysis
 

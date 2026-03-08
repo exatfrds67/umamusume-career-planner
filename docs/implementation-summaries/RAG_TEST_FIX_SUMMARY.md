@@ -15,7 +15,7 @@ existing tests failed with:
 ```text
 ArgumentCountError: Too few arguments to function App\Services\AI\HybridAIService::__construct(), 
 4 passed in...HybridAIServiceTest.php on line 42 and exactly 5 expected
-```
+```text
 
 ### Root Cause
 
@@ -62,7 +62,7 @@ use App\Services\AI\VectorStoreService;
 /** @var VectorStoreService&Mockery\MockInterface $vectorStore */
 $vectorStore = Mockery::mock(VectorStoreService::class);
 $this->vectorStore = $vectorStore;
-```
+```text
 
 ### 3. Updated Constructor Call
 
@@ -93,7 +93,7 @@ Duration: ~6s
 
 **After Fix:**
 
-```
+```text
 
 Tests:    1 skipped, 78 passed (314 assertions)
 Duration: 6.58s
@@ -144,7 +144,7 @@ PASS   121 files
 
 ### Full Test Suite Status
 
-```
+```text
 
 Total Tests:     3391
 Passed:          3383

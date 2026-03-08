@@ -73,7 +73,7 @@ window.pageData = {
 ```blade
 {{-- No data injection needed - pure validation logic --}}
 @vite(['resources/js/pages/characters/edit.js'])
-```
+```text
 
 **Key Patterns**:
 
@@ -208,7 +208,7 @@ function characterWizard() {
     // ~1900 lines of JavaScript
 }
 </script>
-```
+```text
 
 **With**:
 
@@ -260,7 +260,7 @@ window.avatarUploader = function avatarUploader() {
 }
 </script>
 @endpush
-```
+```text
 
 **With**:
 

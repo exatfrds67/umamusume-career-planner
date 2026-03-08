@@ -145,7 +145,7 @@ $svgSize = $size === 'sm' ? 64 : ($size === 'lg' ? 192 : 128);
 
 ### Before Fix
 
-```
+```text
 
 Pentagon with all stats clustered near center:
 
@@ -178,7 +178,7 @@ Pentagon with stats properly distributed:
 
 ```bash
 php artisan serve
-```
+```text
 
 ### Step 2: Login to Application
 

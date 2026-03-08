@@ -69,7 +69,7 @@ Create 3 migrations to add missing columns:
 ```php
 $table->tinyInteger('hint_level')->unsigned()->default(0);
 $table->tinyInteger('sp_discount_applied')->unsigned()->default(0);
-```
+```text
 
 **Migration 2**: Add to `ucp_support_cards`
 
@@ -81,7 +81,7 @@ $table->tinyInteger('limit_break')->unsigned()->default(0);
 
 ```php
 $table->string('name_en')->nullable();
-```
+```text
 
 ### 2. Run Migrations
 
@@ -93,7 +93,7 @@ php artisan migrate
 
 ```bash
 php artisan test --compact tests/Unit/Services/Training/
-```
+```text
 
 Expected result: All 21 tests should pass
 
@@ -131,7 +131,7 @@ POST /api/training/{character}/execute
 
 GET  /api/training/{character}/deck
      Returns: Active support deck with cards and bond levels
-```
+```text
 
 ## Key Features Implemented
 

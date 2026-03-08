@@ -41,7 +41,7 @@ Line 541: </div><!-- End Alpine component -->
 ↑ ALPINE COMPONENT ENDS
 
 Line 542: @endsection
-```
+```text
 
 ## Variables Used (All should be accessible)
 

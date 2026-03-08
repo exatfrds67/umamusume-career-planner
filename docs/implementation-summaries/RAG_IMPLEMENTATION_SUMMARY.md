@@ -95,7 +95,7 @@ Created structured markdown documentation for game mechanics:
 Knowledge sources used:
 • stat-system.md
 • training-system.md
-```
+```text
 
 ## How It Works
 
@@ -178,7 +178,7 @@ Leverages Laravel's cache system (Redis recommended):
 ```text
 Tests:    12 passed (29 assertions)
 Duration: 5.85s
-```
+```text
 
 ## Performance Characteristics
 
@@ -372,7 +372,7 @@ Log::info('[HybridAI] RAG enrichment', [
     'knowledge_length' => strlen($knowledgeContext),
     'sources' => $sources,
 ]);
-```
+```text
 
 ## Conclusion
 

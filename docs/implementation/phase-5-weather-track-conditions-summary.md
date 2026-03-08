@@ -247,7 +247,7 @@ $speedPenalty = $service->calculateSpeedPenalty('heavy', 'dirt');
 // Calculate stamina drain
 $staminaDrain = $service->calculateStaminaDrain('heavy', 'dirt');
 // Returns: 2.0 (2%/sec)
-```
+```text
 
 ### Apply Penalties to Stats
 

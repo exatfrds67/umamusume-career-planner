@@ -60,7 +60,7 @@ Added `decoding="async"` attribute to allow browser to decode images asynchronou
     loading="lazy"
     decoding="async"
     class="w-full h-full object-cover">
-```
+```text
 
 **Usage**: Card list view on support cards index page
 
@@ -120,7 +120,7 @@ Added `decoding="async"` attribute to allow browser to decode images asynchronou
     loading="eager"
     width="40" height="40"
     class="h-10 w-10 shrink-0">
-```
+```text
 
 **Usage**: Sidebar logo (always visible, needs immediate load)
 
@@ -322,7 +322,7 @@ Show low-quality placeholder while loading:
         decoding="async"
         alt="{{ $card->name }}">
 </picture>
-```
+```text
 
 **Benefits**: WebP images are 25-35% smaller than JPEG/PNG
 

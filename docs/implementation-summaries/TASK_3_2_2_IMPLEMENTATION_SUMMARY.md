@@ -258,7 +258,7 @@ Response:
     "hints": [...]
   }
 }
-```
+```text
 
 ### Example: Predict Opportunities
 

@@ -76,7 +76,7 @@ protected function avatarUrl(): Attribute
         }
     );
 }
-```
+```text
 
 ### Routes Added
 
@@ -168,7 +168,7 @@ function avatarUploader() {
 
 ### Test Results
 
-```
+```text
 
 Tests:    29 passed (77 assertions)
 Duration: 5.10s
@@ -198,7 +198,7 @@ Response: 200 OK
 
 ### Delete Avatar
 
-```
+```text
 
 DELETE /profile/avatar
 DELETE /api/v1/profile/avatar

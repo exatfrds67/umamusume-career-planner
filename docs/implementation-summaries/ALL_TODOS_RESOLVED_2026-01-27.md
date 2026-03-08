@@ -247,7 +247,7 @@ php artisan test --compact
 # Format code
 vendor/bin/pint --dirty
 # Result: All files formatted
-```
+```text
 
 ---
 

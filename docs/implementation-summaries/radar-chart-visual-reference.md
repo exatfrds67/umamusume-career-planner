@@ -31,7 +31,7 @@
  /                                           \
 /                                             \
 *-----------------------------------------------*
-```
+```text
 
 ### Grid Levels (from center outward)
 
@@ -127,7 +127,7 @@ Starting from top and going clockwise:
 
 ```text
 [•] Speed  [•] Stamina  [•] Power  [•] Guts  [•] Wit
-```
+```text
 
 Compact, single line (wraps if needed), with:
 
@@ -200,7 +200,7 @@ Inspect the data polygon element:
   <!-- Points should be distributed across the viewBox -->
   <!-- Not all clustered near center (64,64) -->
 </polygon>
-```
+```text
 
 ### Check Grid Labels
 

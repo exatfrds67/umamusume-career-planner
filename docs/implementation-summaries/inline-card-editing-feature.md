@@ -80,7 +80,7 @@ saveCardDetails()
 
 ```php
 public function updateCardDetails(Request $request, Character $character, int $position): JsonResponse
-```
+```text
 
 **Features:**
 
@@ -129,7 +129,7 @@ Route::put('/cards/{position}/details', [DeckManagementController::class, 'updat
 
 **Full Route Path:**
 
-```
+```text
 
 PUT /api/v1/characters/{character}/deck/cards/{position}/details
 
@@ -207,7 +207,7 @@ No schema changes required - feature uses existing columns.
   "success": false,
   "message": "Card not found at specified position"
 }
-```
+```text
 
 **Validation Errors (422):**
 

@@ -58,7 +58,7 @@ undefined.
         
     </div> <!-- Grid closes -->
 </div> <!-- Alpine closes -->
-```
+```text
 
 ### Fix 2: Simplified Component Initialization
 
@@ -152,7 +152,7 @@ After fixes, you should see:
 
 These warnings appear in console but are from the navigation menu (not deck builder):
 
-```
+```text
 
 Alpine Warning: You can't use [x-collapse] without first installing the "Collapse" plugin
 

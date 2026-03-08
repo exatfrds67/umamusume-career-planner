@@ -208,7 +208,7 @@ php artisan tinker
 $user = User::where('email', 'admin@example.com')->first();
 $user->is_admin = true;
 $user->save();
-```
+```text
 
 **Via Admin Panel:**
 Once you have at least one admin user, you can toggle admin status for other users through the admin panel.

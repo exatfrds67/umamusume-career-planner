@@ -128,7 +128,7 @@ protected function attemptServerReconnection(string $serverName, int $attempt = 
 
 ```blade
 <x-ai.performance-metrics :refresh-interval="30000" />
-```
+```text
 
 #### Agent Progress Tracker Component
 
@@ -382,7 +382,7 @@ console.log(toolData.data.tool_statistics);
 const metrics = await fetch('/api/ai/chat/performance-metrics');
 const perf = await metrics.json();
 console.log(perf.data.comparison.fastest_provider); // 'ollama'
-```
+```text
 
 ## Security Considerations
 

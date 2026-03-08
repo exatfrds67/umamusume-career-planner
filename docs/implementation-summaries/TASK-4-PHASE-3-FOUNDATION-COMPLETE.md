@@ -188,7 +188,7 @@ $bonuses = $factorService->calculateStatBonuses($character);
 
 $statsWithBonuses = $factorService->applyStatBonuses($character);
 // ['speed' => 121, 'stamina' => 100, 'power' => 100, 'guts' => 100, 'wit' => 100]
-```
+```text
 
 ### Red Factors (Aptitude Upgrades)
 
@@ -309,7 +309,7 @@ $normalSkills = $factorService->getNormalSkills($character);
 
 ```bash
 php artisan test --filter=FactorServiceTest --compact
-```
+```text
 
 **Results**:
 

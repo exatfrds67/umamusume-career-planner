@@ -72,7 +72,7 @@ Implemented full external API integration for support card management, allowing 
 10001-19999 => R (134 cards, 27.5%)
 20001-29999 => SR (89 cards, 18.3%)
 30001-39999 => SSR (264 cards, 54.2%)
-```
+```text
 
 ### Card Type Inference
 
@@ -91,7 +91,7 @@ Implemented full external API integration for support card management, allowing 
 ```php
 // Input: "10001-special-week"
 // Output: "Special Week"
-```
+```text
 
 ## User Flow
 

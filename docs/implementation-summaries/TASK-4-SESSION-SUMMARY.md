@@ -68,7 +68,7 @@ Characters: 161
 With aptitudes: 34
 Aptitude records: 408
 Coverage: 21.1%
-```
+```text
 
 **After**:
 
@@ -210,7 +210,7 @@ Akebono, Yukino Bijin, Meisho Doto, Nice Nature
 
 **Commit Message**:
 
-```
+```text
 
 feat: add aptitude data for 20 more characters (Batch 3)
 

@@ -60,7 +60,7 @@ Unit tests have been created for all training services, but they are currently f
 ```php
 $table->tinyInteger('hint_level')->unsigned()->default(0)->after('hint_sources');
 $table->tinyInteger('sp_discount_applied')->unsigned()->default(0)->after('hint_level');
-```
+```text
 
 ### 2. ucp_support_cards Table
 
@@ -84,7 +84,7 @@ $table->tinyInteger('limit_break')->unsigned()->default(0)->after('rarity');
 
 ```php
 $table->string('name_en')->nullable()->after('name');
-```
+```text
 
 ## Test Results
 
@@ -116,7 +116,7 @@ php artisan migrate
 
 ```bash
 php artisan test --compact tests/Unit/Services/Training/
-```
+```text
 
 ### 4. Fix Any Remaining Issues (10 minutes)
 

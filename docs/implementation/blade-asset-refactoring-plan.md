@@ -29,7 +29,7 @@ This document tracks the refactoring of inline `<style>` and `<script>` blocks f
 
 ### 2. File Structure
 
-```
+```text
 resources/
 ├── css/
 │   ├── app.css (global styles)
@@ -124,7 +124,7 @@ resources/
 @push('scripts')
     @vite(['resources/js/pages/dashboard.js'])
 @endpush
-```
+```text
 
 ```javascript
 // In dashboard.js
@@ -163,7 +163,7 @@ if (window.Alpine) {
 @push('scripts')
     @vite(['resources/js/pages/dashboard.js'])
 @endpush
-```
+```text
 
 ```javascript
 // In dashboard.js
@@ -261,7 +261,7 @@ export function dashboardManager() {
 
 ```javascript
 input: ["resources/css/app.css", "resources/js/app.js"]
-```
+```text
 
 ### Required Updates
 

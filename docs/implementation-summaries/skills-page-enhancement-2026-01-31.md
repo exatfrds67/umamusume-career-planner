@@ -113,7 +113,7 @@ The system properly calculates SP costs based on character's current hint levels
 3 hints = 30% discount
 4 hints = 35% discount
 5 hints = 40% discount (MAXIMUM)
-```
+```text
 
 **Example**:
 

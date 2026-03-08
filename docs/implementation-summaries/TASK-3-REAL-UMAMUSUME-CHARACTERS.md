@@ -147,7 +147,7 @@ $englishCharacters = collect($characters)->filter(function ($char) {
 ```bash
 php artisan tinker --execute="echo App\Models\Character::count() . ' characters total';"
 # Output: 161 characters total
-```
+```text
 
 ## Web Interface Verification
 
@@ -407,7 +407,7 @@ Characters with local images include:
 
 ### Console Output
 
-```
+```text
 
 Found 161 English global server characters
 Found 64 local character images
