@@ -21,20 +21,31 @@ powered by AI.
 
 - **AI-Powered Recommendations**: Training, race strategy, and skill
   recommendations via Neuron AI agents with hybrid local (Ollama) and
-  cloud (AWS Bedrock) providers
+  cloud (AWS Bedrock) providers, plus real-time streaming chat, Wit
+  adequacy checks, inheritance timing awareness, and race calendar context
 - **Character Career Tracking**: Turn-by-turn stat progression (Speed,
-  Stamina, Power, Guts, Wit) with visualization
-- **Skill Management**: Search, track, and manage skills with SP cost
-  calculations and evolution paths
+  Stamina, Power, Guts, Wit) with Chart.js visualization
+- **Skill Management**: 182+ curated skills with full descriptions, SP cost
+  calculations, hint tracking, evolution paths, and plan/acquire/remove workflow
 - **Support Card Deck Building**: Build and validate six-card decks with
-  synergy scoring
+  synergy scoring, bond tracking, friendship training status, and deck
+  optimization
 - **Race Strategy Planning**: Race preparation analysis with readiness
-  scoring and competitor evaluation
+  scoring, competitor evaluation, 72-turn career calendar planning, and
+  outcome advisory
 - **Dual Storage Modes**: Local (browser localStorage) and Account
   (database) storage with seamless conversion
 - **Import/Export**: JSON, CSV, and Excel export with schema versioning
   and legacy format migration
 - **OCR Data Intake**: Screenshot processing for automated data extraction
+- **Admin Panel**: User management, database tools, queue monitor, log
+  viewer, and system settings
+- **Privacy & Data Control**: Consent management, deletion requests, and
+  GDPR-aligned user data handling
+- **Snapshot & History**: Point-in-time career snapshots, comparison, and
+  historical analytics
+- **Offline Support**: Connectivity monitoring with graceful degradation
+  and draft preservation
 - **Performance Monitoring**: APM dashboards, cache monitoring, and cost
   tracking for AI services
 
@@ -85,7 +96,7 @@ powered by AI.
 | Component | Technology | Version |
 | --------- | ---------- | ------- |
 | Framework | Laravel | v12 |
-| Frontend Reactivity | Livewire | v3 |
+| Frontend Reactivity | Livewire | v4 |
 | PHP Runtime | PHP | 8.4.11 |
 | Database | MySQL/MariaDB/SQLite | 8.0+ / 10.5+ / 3.35+ |
 | Cache | Redis (WSL) | 6.0+ |
@@ -98,9 +109,11 @@ powered by AI.
 | Component | Technology | Version |
 | --------- | ---------- | ------- |
 | Client Interactivity | Alpine.js | v3 |
-| State Persistence | @alpinejs/persist | Latest |
+| State Persistence | @alpinejs/persist | v3 |
+| Collapse Plugin | @alpinejs/collapse | v3 |
 | Styling | TailwindCSS | v4 |
 | Build Tool | Vite | v7 |
+| Charts | Chart.js | v4 |
 | Icons | Heroicons | Latest |
 
 ### AI & Integration
@@ -120,9 +133,10 @@ powered by AI.
 | Type | Tool | Version |
 | ---- | ---- | ------- |
 | Backend Unit/Feature | Pest | v4 |
+| Browser Testing | Pest Browser Plugin | v4 |
 | Static Analysis | Larastan | v3 |
 | Code Formatting | Laravel Pint | v1 |
-| E2E Testing | Playwright | Latest |
+| E2E/Traversal | Playwright | v1.58 |
 | Accessibility | axe-core | Latest |
 
 ---
@@ -307,14 +321,26 @@ HORIZON_ENABLED=true
 ```text
 umamusume-career-planner/
 ├── app/
+│   ├── Collections/          # Custom collection classes
 │   ├── Console/
 │   │   └── Commands/
+│   ├── Enums/
+│   │   ├── AlertType.php
+│   │   ├── CareerPhase.php
+│   │   ├── ConsentType.php
+│   │   ├── DeletionStatus.php
+│   │   ├── Mood.php
+│   │   ├── Priority.php
+│   │   ├── RaceDistance.php
+│   │   ├── RecommendationType.php
+│   │   ├── RunningStyle.php
+│   │   └── StorageMode.php
 │   ├── Events/
 │   │   └── GameVersionUpdated.php
 │   ├── Helpers/
 │   │   └── ImageOptimizationHelper.php
 │   ├── Http/
-│   │   ├── Controllers/
+│   │   ├── Controllers/      # 64 controllers (web + api + admin)
 │   │   ├── Middleware/
 │   │   ├── Requests/
 │   │   └── Resources/
@@ -323,20 +349,57 @@ umamusume-career-planner/
 │   │   └── WarmCacheJob.php
 │   ├── Listeners/
 │   │   └── InvalidateCacheOnGameUpdate.php
+│   ├── Livewire/
+│   │   ├── Admin/            # APM dashboard & admin panels
+│   │   ├── Analytics/
+│   │   ├── Privacy/
+│   │   ├── Settings/
+│   │   ├── Simulation/
+│   │   ├── AdvisoryPanel.php
+│   │   └── NotificationDropdown.php
 │   ├── MCP/
 │   │   └── SubagentCoordinationService.php
 │   ├── Models/
-│   │   ├── Character.php
-│   │   ├── Career.php
-│   │   ├── Skill.php
-│   │   ├── SupportCard.php
-│   │   ├── TrainingSession.php
+│   │   ├── AdvisoryRecommendation.php
 │   │   ├── AIConversation.php
+│   │   ├── AiCost.php
+│   │   ├── Aptitude.php
+│   │   ├── Career.php
+│   │   ├── Character.php
+│   │   ├── CharacterSupportCard.php
+│   │   ├── ChatMessage.php
+│   │   ├── ConsentRecord.php
+│   │   ├── ConversationMessage.php
+│   │   ├── CriticalAlert.php
+│   │   ├── DeletionRequest.php
+│   │   ├── Event.php
+│   │   ├── ExternalData.php
+│   │   ├── Factor.php
+│   │   ├── GameCharacter.php
+│   │   ├── GameRace.php
 │   │   ├── MCPAgent.php
 │   │   ├── MCPServer.php
-│   │   └── MCPToolUsage.php
+│   │   ├── MCPToolUsage.php
+│   │   ├── OcrExtractedSkill.php
+│   │   ├── OCRExtraction.php
+│   │   ├── PredictionAccuracy.php
+│   │   ├── PushSubscription.php
+│   │   ├── Race.php
+│   │   ├── RunSnapshot.php
+│   │   ├── Skill.php
+│   │   ├── SkillAcquisition.php
+│   │   ├── SkillBuild.php
+│   │   ├── SkillHint.php
+│   │   ├── SupportCard.php
+│   │   ├── SupportCardDefinition.php
+│   │   ├── SupportDeck.php
+│   │   ├── TrainingPrediction.php
+│   │   ├── TrainingSession.php
+│   │   ├── User.php
+│   │   └── UserPreference.php
 │   ├── Neuron/
-│   │   ├── Agents/
+│   │   ├── Agents/           # TrainingAdvisor, RaceStrategy, SkillRecommendation,
+│   │   │                     # CareerPlanning, McpDemo
 │   │   ├── Responses/
 │   │   └── Support/
 │   ├── Policies/
@@ -344,64 +407,42 @@ umamusume-career-planner/
 │   ├── Repositories/
 │   │   ├── CharacterRepositoryInterface.php
 │   │   └── EloquentCharacterRepository.php
-│   ├── Services/
+│   ├── Services/             # 184 service classes across subdirectories
 │   │   ├── Agents/
 │   │   ├── AI/
+│   │   ├── Analytics/
+│   │   ├── BladeAssetExtraction/
 │   │   ├── ExternalAPI/
 │   │   ├── MCP/
-│   │   ├── Neuron/
+│   │   ├── Neuron/           # Agent-specific service wrappers
 │   │   ├── OCR/
+│   │   ├── Offline/          # Offline mode handling
+│   │   ├── Privacy/          # GDPR-aligned data management
+│   │   ├── Share/
+│   │   ├── Simulation/
 │   │   ├── Training/
-│   │   ├── ApiPerformanceMonitoringService.php
-│   │   ├── ApiResponseCachingService.php
-│   │   ├── ApmService.php
-│   │   ├── BackupService.php
-│   │   ├── BenchmarkingService.php
-│   │   ├── CacheManagementService.php
-│   │   ├── CareerAnalyticsService.php
-│   │   ├── DataExportService.php
-│   │   ├── DataImportService.php
-│   │   ├── DataMigrationService.php
-│   │   ├── DeckOptimizationService.php
-│   │   ├── ExternalDataService.php
-│   │   ├── ImageProcessingService.php
-│   │   ├── MCPMonitoringService.php
-│   │   ├── PerformanceAlertingService.php
-│   │   ├── QueryOptimizationService.php
-│   │   ├── RedisCacheOptimizationService.php
-│   │   ├── SkillAnalysisService.php
-│   │   ├── SkillHintService.php
-│   │   ├── SupportCardMetaService.php
-│   │   ├── TesseractService.php
-│   │   └── TrainingPredictionService.php
-│   ├── View/
-│   │   └── Components/
-│   └── Providers/
-│       ├── AppServiceProvider.php
-│       ├── CacheServiceProvider.php
-│       ├── ExternalAPIServiceProvider.php
-│       ├── HorizonServiceProvider.php
-│       ├── MCPToolsServiceProvider.php
-│       ├── MemoryGuardServiceProvider.php
-│       ├── RedisCacheOptimizationServiceProvider.php
-│       └── TelescopeServiceProvider.php
-├── config/
+│   │   └── [core service files]
+│   ├── ValueObjects/
+│   └── View/
+│       └── Components/
+├── config/                   # 20+ configuration files
 ├── database/
-│   ├── migrations/
-│   ├── factories/
-│   └── seeders/
+│   ├── migrations/           # 63 migrations
+│   ├── factories/            # 32 model factories
+│   └── seeders/              # 14 seeders incl. curated skill catalog
 ├── resources/
-│   ├── views/
+│   ├── views/                # Blade templates (40+ page modules)
 │   ├── css/
 │   └── js/
+│       └── pages/            # Alpine.js page modules
 ├── routes/
 │   ├── web.php
 │   └── api.php
 ├── tests/
-│   ├── Feature/
-│   ├── Unit/
-│   └── e2e/
-└── docs/
+│   ├── Feature/              # 187 feature test files
+│   ├── Unit/                 # 93 unit test files
+│   └── Browser/              # 17 browser/E2E test files
+└── docs/                     # Full documentation suite
 ```
 
 ---
@@ -420,6 +461,7 @@ Track character progression with comprehensive stat management:
 - **Conditions**: Positive/negative status effects
 - **Avatar Management**: Character images with optimization
 - **SP Tracking**: Available skill points calculation
+- **Character Prefill**: Auto-populate stats from external API data
 
 ### Training Optimization (SPEC-002)
 
@@ -429,6 +471,8 @@ AI-powered training recommendations:
 - Skill hint tracking and SP cost reduction
 - Training option ranking algorithm
 - Scenario-specific mechanics (URA Finale, Unity Cup)
+- Training loop simulation with turn-by-turn prediction
+- Training prediction accuracy tracking
 
 ### Race Strategy (SPEC-003)
 
@@ -439,15 +483,19 @@ Comprehensive race preparation:
 - Weather impact calculation
 - Skill recommendation engine
 - Win probability prediction
+- Race outcome advisory feedback
 
 ### Skill Management (SPEC-004)
 
 Complete skill lifecycle management:
 
-- Skill catalog with categories (Normal, Rare, Unique)
+- **Curated skill catalog**: 182+ skills with full descriptions, categories and SP costs
+- Skill categories: Normal, Rare, Unique Inherit, Scenario-specific
 - Hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max)
 - Evolution system (Normal → Rare)
 - SP optimization strategies
+- Per-character skill planning with acquire/plan/remove workflow
+- Skill analysis and build recommendation
 
 ### Support Card Management (SPEC-005)
 
@@ -460,6 +508,67 @@ Deck building and optimization:
 - Bond level tracking (1-5)
 - Support deck persistence and management
 - External API integration for card data (umapyoi.net)
+- Deck optimization algorithms
+
+### AI Advisory & Chat
+
+Conversational AI assistant with context-aware recommendations:
+
+- Real-time AI chat with streaming responses
+- Multi-model routing (Ollama local / AWS Bedrock cloud)
+- Training, race strategy, and skill advice endpoints
+- Critical situation detection and alerts
+- AI cost tracking and performance metrics
+- Advisory recommendation persistence
+- Model selection (Claude, Nova, local Ollama models)
+
+### Admin Panel
+
+Full administrative control panel:
+
+- **User Management**: View, edit, toggle admin roles, remove users
+- **Database Tools**: Migrations, optimization, backups, seeders, fresh database
+- **Queue Monitor**: View/retry/delete queued jobs, restart workers, flush queues
+- **Logs Viewer**: Application log streaming, download, clear
+- **System Settings**: Cache clear/optimize/warm operations
+- **APM Dashboard**: Application performance monitoring via Livewire
+
+### Data Privacy & Consent
+
+GDPR-aligned data management:
+
+- Consent record tracking per user
+- Data deletion request workflows (`DeletionStatus` enum)
+- Push notification subscription management
+- User preference persistence
+- Privacy settings panel (Livewire component)
+
+### Snapshot & History
+
+Point-in-time career state management:
+
+- Career run snapshots (`RunSnapshot` model)
+- Snapshot creation, restore, and diff
+- Data operation history tracking
+- Historical analytics and career comparison
+- Career comparison service across multiple runs
+
+### Simulation
+
+Career scenario simulation:
+
+- Training scenario simulation with configurable parameters
+- Career outcome projections
+- Simulation Livewire component for interactive modeling
+
+### Offline / Connectivity
+
+Resilient offline behavior:
+
+- Connectivity monitoring with real-time status indicator
+- Graceful offline degradation for Account mode
+- Local draft preservation during connectivity loss
+- Fallback recovery service for failed operations
 
 ---
 
@@ -495,11 +604,11 @@ The system uses a hybrid approach with local-first AI:
 
 | Agent | Purpose | Status |
 | ----- | ------- | ------ |
-| TrainingAdvisorAgent | Training recommendations | Implemented |
-| RaceStrategyAgent | Race preparation | Implemented |
-| SkillRecommendationAgent | Skill build planning | Implemented |
-| DeckOptimizationAgent | Support card deck building | Planned |
-| CareerPlanningAgent | Long-term career strategy | Planned |
+| TrainingAdvisorAgent | Training recommendations | ✅ Implemented |
+| RaceStrategyAgent | Race preparation | ✅ Implemented |
+| SkillRecommendationAgent | Skill build planning | ✅ Implemented |
+| CareerPlanningAgent | Long-term career strategy | ✅ Implemented |
+| McpDemoAgent | MCP tool demonstration | ✅ Implemented |
 
 ### MCP Integration
 
@@ -510,14 +619,14 @@ Model Context Protocol servers provide additional capabilities:
 - **Fetch Server**: External API integration and web scraping
 - **GitKraken Server**: Git operations and repository management
 - **Chrome DevTools Server**: Browser automation and testing
-- **Sequential Thinking Server**: Advanced reasoning and problem-solving
+- **Sequential Thinking Server**: Advanced step-by-step reasoning
 
 ### MCP Monitoring
 
-- Real-time tool usage tracking
+- Real-time tool usage tracking with `MCPToolUsage` model
 - Server health monitoring
-- Performance metrics and cost tracking
-- Error logging and alerting
+- Performance metrics and cost tracking by agent/server
+- Error logging, alerting, and MCP dashboard (`/mcp`)
 
 ---
 
@@ -552,6 +661,14 @@ Source Data ──► Detect Format ──► Validate Schema ──► Transfor
 ---
 
 ## Testing
+
+### Test Coverage
+
+| Suite | Files | Notes |
+| ----- | ----- | ----- |
+| Feature (Pest) | 187 | HTTP, Livewire, service, API, UI |
+| Unit (Pest) | 93 | Business logic and calculation validation |
+| Browser (Pest Browser) | 17 | E2E, traversal, accessibility, visual regression |
 
 ### Test Coverage Targets
 
@@ -627,6 +744,45 @@ See [tests/Browser/README.md](tests/Browser/README.md) for details.
 
 ---
 
+## Recent Changes
+
+### v2.1.0 — March 1, 2026
+
+#### Bug Fixes
+
+- **Skill delete modal** — Fixed Alpine.js order-of-execution bug where `closeSkillModal()` was
+  called before `openRemoveModal(selectedSkill)`, causing `selectedSkill` to be `null` when the
+  confirmation modal opened. The "Yes, Remove" button now correctly removes the targeted skill.
+- **Skill plan/remove double-encoding** — `SkillManagementController` was manually calling
+  `json_encode()` before writing to `career_metadata`, causing double-encoding since the `Career`
+  model already has an `'array'` cast. Fixed by assigning the PHP array directly and letting
+  Eloquent's cast handle serialization.
+
+#### Enhancements
+
+- **Skill catalog descriptions** — All 182 curated skills have been given full, accurate
+  in-game descriptions covering passive skills, unique skills, inherit skills, and scenario-specific
+  skills (URA Finale, Unity Cup).
+- **Livewire upgraded to v4** — Frontend reactivity framework updated from v3 with improved
+  performance and new lifecycle hooks.
+- **Pest upgraded to v4** — Testing framework updated including the `pest-plugin-browser`
+  integration for in-process browser testing.
+- **Chart.js added** — v4 charting library integrated for stat progression visualization.
+- **Admin panel expanded** — Database maintenance tools, queue monitor, log viewer, and system
+  settings pages added to the admin area.
+- **CareerPlanningAgent implemented** — Long-term career strategy Neuron agent is now fully
+  implemented.
+- **McpDemoAgent added** — Demonstration agent for MCP tool orchestration.
+- **Privacy & consent system** — GDPR-aligned consent tracking, data deletion request handling,
+  and user preference management added.
+- **Simulation module** — Career outcome scenario simulation with interactive Livewire component.
+- **Offline resilience** — Connectivity monitoring, graceful offline degradation, and fallback
+  recovery service for failed operations.
+- **Snapshot system** — `RunSnapshot` model + service for point-in-time career state, restore,
+  and diff workflows.
+
+---
+
 ## Documentation
 
 ### Core Documentation
@@ -654,20 +810,47 @@ See [tests/Browser/README.md](tests/Browser/README.md) for details.
 | [Sequences](docs/01-sequences/) | Sequence diagrams (15 flows) |
 | [Diagrams](docs/01-diagrams/) | ERD, DFD, and process flows |
 
+### Gameplay Guides
+
+| Guide | Description |
+| ----- | ----------- |
+| [Skill System Guide](docs/guides/SKILL_SYSTEM_GUIDE.md) | Wit activation, skill phases, hint discounts, and build planning |
+| [Inheritance and Legacy System Guide](docs/guides/INHERITANCE_LEGACY_GUIDE.md) | 3-generation inheritance, spark types, affinity, and parent planning |
+| [Race Calendar and Career Scheduling Guide](docs/guides/RACE_CALENDAR_GUIDE.md) | 72-turn planning, race tiers, seasonal camps, and fan milestones |
+| [Support Card Strategy Guide](docs/guides/SUPPORT_CARD_STRATEGY_GUIDE.md) | Bond progression, friendship activation, support bonuses, and deck strategy |
+
 ### API Documentation
 
-| Endpoint | Method | Description |
-| -------- | ------ | ----------- |
+| Endpoint Group | Methods | Description |
+| -------------- | ------- | ----------- |
 | `/api/characters` | GET, POST | Character management |
-| `/api/characters/{id}` | GET, PUT, DELETE | Character operations |
+| `/api/characters/{id}` | GET, PUT, DELETE | Character CRUD + prefill |
+| `/api/characters/{id}/skill-hints` | GET | Per-character skill hints |
 | `/api/careers` | GET, POST | Career run management |
+| `/api/skills` | GET | Skill listing with character filter |
 | `/api/skills/search` | GET | Skill autocomplete |
+| `/api/skills/plan` | POST | Add skill to career plan |
+| `/api/skills/acquire` | POST | Mark skill as acquired |
+| `/api/skills/remove` | DELETE | Remove skill from plan |
+| `/api/skills/hints` | GET, POST, DELETE | Skill hint management |
+| `/api/skills/recommendations` | POST | AI skill build advice |
 | `/api/support-cards` | GET | Support card catalog |
-| `/api/support-decks` | GET, POST | Support deck management |
+| `/api/support-decks` | GET, POST, PUT, DELETE | Support deck management |
 | `/api/training/predictions` | POST | Training predictions |
-| `/api/ai/conversations` | POST | AI chat interactions |
-| `/api/external-data/sync` | POST | External API sync |
+| `/api/advisory/training/recommendations` | POST | AI training advice |
+| `/api/advisory/race/strategy` | POST | AI race strategy |
+| `/api/advisory/skills/advice` | POST | AI skill advice |
+| `/api/advisory/critical/detect` | POST | Critical situation detection |
+| `/api/ai/chat/message` | POST | AI chat (standard + stream) |
+| `/api/ai/dashboard/*` | GET | AI costs, agents, performance |
+| `/api/cache/*` | GET, POST | Cache management & monitoring |
+| `/api/backup/*` | GET, POST, DELETE | Backup create/restore/schedule |
 | `/api/ocr/extract` | POST | OCR screenshot processing |
+| `/api/external-data/*` | GET, POST | External API sync & browse |
+| `/api/local-storage/*` | GET, POST | Local storage sync |
+| `/api/snapshot/*` | GET, POST | Career run snapshots |
+| `/api/notifications` | GET, POST | Push notification management |
+| `/api/connectivity/check` | GET | Connectivity status probe |
 
 For detailed API documentation, see [openapi.yaml](docs/deployment/openapi.yaml)
 
@@ -742,8 +925,8 @@ For support, please:
 
 ---
 
-**Version**: 2.0.0  
-**Last Updated**: January 26, 2026  
+**Version**: 2.1.0  
+**Last Updated**: March 1, 2026  
 **PHP**: 8.4.11  
 **Laravel**: v12  
 **Status**: Active Development

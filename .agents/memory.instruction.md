@@ -290,6 +290,41 @@ In Tailwind CSS utility class pairs for dark mode muted text:
 
 - **Structured response mocking (NeuronAI)**: When mocking `AIProviderInterface::structured`, return an `AssistantMessage` containing JSON that matches the target schema/class instead of returning the DTO directly. The agent pipeline expects a `Message` instance; it will deserialize JSON into the response class via `processResponse()`.
 
+### Character Database Fix (2026-01)
+
+- **Problem**: Character Database on `/characters/create` showed "No trainees match your filters" — empty list
+- **Root Cause**: `CharacterController::create()` queried `ExternalData` model for `data_type='trainee'|'character'` but those records don't exist. Actual character data is in `ucp_game_characters` table (61 records) via `GameCharacter` model.
+- **Solution**: Replaced `ExternalData` query with `GameCharacter::query()->orderBy('name_en')->get()->map(...)`, mapping fields like `name_en`, `title_en`, `primary_distance`, `preferred_style`, `image_path`, growth rates.
+- **JS Filter Fix**: `filteredTrainees()` in Alpine uses `trainee.strategy`, but controller originally mapped as `style`. Fixed by providing both `style` and `strategy` keys.
+- **Filter UI Fix**: Replaced non-functional Rarity filter (all characters are SSR) with Style/Strategy filter (Escape/Leader/Betweener/Chaser).
+
+### Alpine formData.aptitudes Undefined Fix (2026-01)
+
+- **Problem**: 10+ Alpine errors on `/characters/create`: `Cannot read properties of undefined (reading 'sprint')` on `formData.aptitudes.distance.sprint` etc.
+- **Root Cause**: Step 3 (Aptitudes) uses `x-show` (not `x-if`), so bindings fire on page load. `loadDraft()` replaced entire `formData` with `this.formData = parsed.formData`, potentially loading a draft with corrupted/missing aptitudes structure. Also `selectTrainee()` did `this.formData.aptitudes = { ...trainee.aptitudes }` where aptitudes was `[]` (empty array), spreading to `{}`.
+- **Solution**:
+  1. Added `deepMerge()` helper method to characterWizard Alpine component
+  2. `loadDraft()` now does `this.formData = this.deepMerge(defaults, parsed.formData)` preserving nested structure
+  3. `selectTrainee()` now checks `typeof === 'object' && !Array.isArray()` before merging aptitudes
+  4. `isStep3Valid()` now uses optional chaining (`this.formData.aptitudes?.distance`) with null-safety fallback
+
+### Help Page Layout Fix (2026-01)
+
+- **Problem**: Help page used `layouts.guest` (no sidebar for logged-in users), minimal content
+- **Solution**: Full rewrite with `layouts.app`, breadcrumbs, Quick Start Guide (3 steps), Resource Cards (Getting Started, Accessibility, Privacy & Data, Feedback), FAQ accordion (5 questions with Alpine.js)
+
+### Profile Page Spacing Fix (2026-01)
+
+- **Problem**: Profile content pushed below fold due to excessive spacing
+- **Solution**: Reduced `space-y-6` to `space-y-4`, `pb-5` to `pb-3`, heading `text-3xl` to `text-2xl sm:text-3xl`
+- **Keyboard Nav Fix**: Added missing `tabs[]`, `focusNextTab()`, `focusPrevTab()`, `focusFirstTab()`, `focusLastTab()` to Alpine `profileManager` component
+
+### Settings Delete Account Button Fix (2026-01)
+
+- **Problem**: Delete Account button text invisible — used `border-error-300` / `dark:text-error-300` but `error-300` doesn't exist in the theme
+- **Solution**: Changed to `border-error-200` / `dark:text-error-200`
+- **Note**: Theme error colors defined: 50, 100, 200, 500, 600, 700 — NO 300 or 400
+
 ## Curated Skills Data Architecture
 
 - **File**: `database/seeders/data/curated_skills.php` — 176 real game skills from uma.guide Global server
@@ -805,3 +840,266 @@ Content here...
 
 - `aria-labelledby="modal-title"` on dialog div
 - `id="modal-title"` on h3 INSIDE `<template x-if="selectedSkill">` — works because x-if renders to DOM when condition is true
+
+## Phase 6 – WCAG 2.1 AA Support Cards Page ✅ (2026-07-23)
+
+### Support Cards Page Accessibility Fixes (`resources/views/support-cards/`)
+
+**`index.blade.php` changes:**
+
+- Page title: Added `@section('title', 'Support Cards - ' . config('app.name'))` for descriptive `<title>`
+- aria-expanded: Changed `aria-expanded="showExternalImport"` to `:aria-expanded="showExternalImport.toString()"` + added `aria-controls="external-import-panel"`
+- Import panel: Added `id="external-import-panel"`, `role="region"`, `aria-label="External API Import"`
+- Card grid: Changed `md:grid-cols-2` to `sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` for better responsive layout
+- SVG aria-hidden: Added `aria-hidden="true"` to filter button, search icon, clear filters icon, external import toggle icon
+- Clear filters: Added `aria-label="Clear all filters"` to clear button
+
+**`show.blade.php` changes:**
+
+- Page title: Added `@section('title', $supportCard->name . ' - Support Cards - ' . config('app.name'))`
+
+**`partials/external-import.blade.php` changes:**
+
+- Heading hierarchy: Changed `<h3>` to `<h2>` (was breaking H1→H3 skip)
+- SVG aria-hidden: Added `aria-hidden="true"` to globe icon, refresh button SVG, loading spinner, error icon, dismiss button SVG, two empty state SVGs (7 total)
+- Dismiss error button: Added `aria-label="Dismiss error"`
+
+**`components/support-card-tile.blade.php` changes (full rewrite):**
+
+- Outer element: Changed `<div>` to `<a>` tag wrapping entire card for keyboard accessibility
+- Focus styles: `focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900`
+- aria-label: Comprehensive label with card name, rarity, type, and tier
+- CLS fix: Changed `h-48` to `aspect-video` for intrinsic aspect ratio (fixed CLS 0.47)
+- Image `alt=""`: Decorative within labeled link
+- Placeholder SVG: Added `aria-hidden="true"`
+- Stat bonuses: Added `role="list"` / `role="listitem"` semantics
+- Removed redundant "View Details" button (entire card is now the link)
+
+**Layout change (`layouts/app.blade.php`):**
+
+- Title: Changed from `{{ config('app.name') }}` to `@yield('title', config('app.name', 'Umamusume Career Planner'))`
+
+### Tests Created
+
+- `tests/Feature/SupportCardAccessibilityTest.php` — 10 Pest tests, 37 assertions
+- Tests cover: page titles, aria-expanded, import panel, heading hierarchy, grid layout, keyboard-accessible links, aria-hidden SVGs, clear filters label, semantic landmarks
+
+### Pattern: Dynamic Page Titles
+
+```blade
+{{-- In layout: --}}
+<title>@yield('title', config('app.name', 'Default'))</title>
+
+{{-- In child views: --}}
+@section('title', 'Page Name - ' . config('app.name'))
+```
+
+### Pattern: Alpine aria-expanded String Binding
+
+```blade
+<button :aria-expanded="showPanel.toString()" aria-controls="panel-id">
+<div id="panel-id" x-show="showPanel" role="region" aria-label="Panel description">
+```
+
+### Pattern: Full-Card Accessible Link (Card Tile)
+
+```blade
+<a href="{{ route('...') }}"
+   class="block ... focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+   aria-label="{{ $card->name }} - {{ $card->rarity }} {{ $card->card_type }}">
+   {{-- Card content with decorative images (alt="") and aria-hidden SVGs --}}
+</a>
+```
+
+## Phase 7 – WCAG 2.1 AA AI & Tools + External Resources Pages ✅ (2026-07-24)
+
+### AI Dashboard (`resources/views/ai/dashboard.blade.php`)
+
+- Converted from `<x-app-layout>` to `@extends('layouts.app')` for title support
+- Added `@section('title', 'AI Management Dashboard')`
+- Added `<x-breadcrumb>` (Home > AI & Tools)
+- Added `<h1>` page header with subtitle
+- Added `scope="col"` to all 5 `<th>` elements in Performance Comparison table
+- Removed duplicate `<!-- Summary Cards -->` comment
+- Replaced `@push('scripts')` with inline `@vite`
+
+### AI Chat (`resources/views/ai/chat.blade.php`)
+
+- Added `aria-hidden="true"` to 4 decorative SVGs (person icon, 3 quick action icons)
+- Added `role="region" aria-label="Chat conversation"` to chat container
+- Converted Quick Actions wrapper from `<div>` to `<section aria-label="Quick Actions">`
+
+### MCP Dashboard (`resources/views/mcp/dashboard.blade.php`)
+
+- Converted from `<x-app-layout>` to `@extends('layouts.app')` with title
+- Added breadcrumb (Home > AI & Tools > MCP Dashboard)
+- Added `<h1>` with descriptive subtitle
+- Full ARIA tab pattern: `role="tablist"`, 6 `role="tab"` with `aria-selected`/`aria-controls`/`id`, 6 `role="tabpanel"` with `aria-labelledby`
+- `aria-hidden="true"` on 7 decorative SVGs
+- Replaced `@push('scripts')` with inline `@vite`
+
+### OCR Upload (`resources/views/ocr/upload.blade.php`)
+
+- Spinner: Added `role="status"`, `aria-label`, sr-only loading text
+- Drop zone SVG: Added `aria-hidden="true"`
+- Drop zone: Added `aria-describedby="upload-format-info"` linking to format text
+- Format info: Added `id="upload-format-info"`
+
+### OCR Results (`resources/views/ocr/results.blade.php`)
+
+- Added breadcrumb (Home > AI & Tools > OCR Upload > OCR Results)
+- Fixed confidence score dark mode colors (`dark:text-green-400`, `dark:text-yellow-400`, `dark:text-red-400`)
+- Wrapped warning emoji in `<span aria-hidden="true">`
+- Added `role="alert"` to low-confidence warning span
+- Added `aria-label="Back to OCR Upload page"` on back link
+
+### OCR Partials (4 files)
+
+- `character-stats-form.blade.php`: 2 emoji `aria-hidden` wraps
+- `training-session-form.blade.php`: 1 emoji `aria-hidden` wrap
+- `skill-list-form.blade.php`: 1 emoji `aria-hidden` wrap
+- `race-result-form.blade.php`: 1 emoji `aria-hidden` wrap
+
+### Test Fix
+
+- `OCRUIWorkflowTest.php`: Updated `assertSee('⚠️ Review recommended')` → `assertSee('Review recommended')` (emoji now in aria-hidden span)
+
+### Pattern: Layout Conversion for Title Support
+
+When converting from `<x-app-layout>` to `@extends('layouts.app')`:
+
+```blade
+{{-- Replace component wrapper --}}
+@extends('layouts.app')
+@section('title', 'Page Title')
+@section('content')
+  {{-- page content --}}
+@endsection
+
+{{-- Replace @push('scripts') with --}}
+@vite('resources/js/pages/module/page.js')
+```
+
+### Verified via Chrome DevTools (all 5 pages)
+
+- AI Dashboard: title, breadcrumb, h1, named regions, table headers with scope
+- AI Chat: breadcrumb, h1, chat conversation region, quick actions section, no decorative SVGs in a11y tree
+- MCP Dashboard: breadcrumb, h1, ARIA tabs with selected state switching, panel visibility
+- OCR Upload: breadcrumb, h1, status spinner with live region, combobox labels, drop zone description
+- OCR Results: breadcrumb (4-level), h1, back link with aria-label
+- External Data Browse: confirmed still working from prior session fixes
+- No JS errors on any page
+
+## Phase 8 – WCAG 2.1 AA Admin Panel Pages ✅ (2026-07-24)
+
+### performance/dashboard.blade.php (488 lines)
+
+- Added `aria-hidden="true"` to 9 decorative SVGs (metric icons, alert severity icons, regression icon)
+- Changed 4 `<div class="mt-5 grid grid-cols-2 gap-4">` → `<dl>` for Database/Cache/API/System metric sections
+- Added `role="list"` to alerts container + `role="listitem"` on each alert item
+- Added `role="list"` to regressions container + `role="listitem"` on each regression item
+
+### admin/queue/index.blade.php (404 lines)
+
+- Added `role="progressbar"`, `aria-valuenow`, `aria-valuemin="0"`, `aria-valuemax="100"`, `aria-label="Job batch progress"` to batch progress bars
+- Added `role="status"` to Redis Connected/Disconnected badges
+- Added `role="status"` to Horizon Active/Error/Inactive badges
+- Fixed keyspace hit rate contrast: `text-gray-400 dark:text-gray-500` → `text-gray-500 dark:text-gray-400`
+
+### admin/users/edit.blade.php (90 lines)
+
+- Added `aria-describedby="bio-error"` and `aria-invalid="true"` on bio textarea (on error)
+- Added `id="bio-error"` to bio error `<p>` element
+- Added `aria-describedby="password-error"` on password input (on error)
+- Added `id="password-error"` to password error `<p>` element
+
+### admin-layout.blade.php (117 lines)
+
+- Added `aria-current` attributes to all 6 mobile nav links (desktop links already had them)
+- Added `@keydown.escape.window="mobileOpen = false"` to mobile menu for Escape key dismissal
+
+### Pages already WCAG compliant (no changes needed)
+
+- `admin/users/index.blade.php` — full compliance (search role, sr-only labels, table caption/scope, aria-labels)
+- `admin/system-settings/index.blade.php` — full compliance (dl, role="status", heading hierarchy)
+- `admin/logs/index.blade.php` — full compliance (search role, sr-only labels, time elements, level text labels)
+- `admin/database/maintenance.blade.php` — full compliance (table caption/scope, confirm actions)
+- `admin/database/seeders.blade.php` — full compliance (heading hierarchy, aria-labels)
+- `admin-confirm-action.blade.php` — full compliance (role="dialog", aria-modal, aria-labelledby, focus-visible)
+- `livewire/admin/apm-dashboard.blade.php` — full compliance (aria-pressed, aria-live, role="list", sr-only, caption/scope)
+
+### Verified via Chrome DevTools (all admin pages)
+
+- Users index: navigation landmark, search role, table caption, descriptive action buttons/links
+- Users edit: labeled form fields, password describedby hint, proper checkbox
+- System Settings: status roles on health indicators, heading hierarchy, confirm action buttons
+- Database Maintenance: heading hierarchy, pre-formatted migration output, table with caption/scope
+- Queue Monitor: `status` role on Redis/Horizon badges, heading hierarchy, labeled buttons
+- Performance Dashboard: heading hierarchy (h1>h2>h3), labeled controls, breadcrumb, switch role
+- Logs: search role, aria-labels, level badges with text (not color-only)
+- No JS errors on performance dashboard page
+
+## Phase 9 – WCAG 2.1 AA Profile, Settings & Help Pages ✅ (2026-07-25)
+
+### profile/show.blade.php (189 lines)
+
+- Added `aria-hidden="true"` to 7 decorative SVGs (5 tab button icons + 2 alert message icons)
+- Added roving `tabindex` (`:tabindex="activeTab === 'TABNAME' ? 0 : -1"`) on all 5 tab buttons
+- Added arrow key navigation (`@keydown.arrow-right/left/home/end`) on `<nav role="tablist">` element
+- Already had: `role="tablist"`, `role="tab"`, `role="tabpanel"`, `aria-selected`, `aria-controls`, `aria-labelledby`
+
+### profile/partials/account-tab-content.blade.php
+
+- Added `@class` with conditional error borders on name/email inputs
+- Added `aria-describedby="name-error"` + `aria-invalid="true"` for name field error state
+- Added `aria-describedby="email-error"` + `aria-invalid="true"` for email field error state
+- Added `aria-describedby="bio-help"` + `id="bio-help"` on bio textarea help text
+- Added `aria-hidden="true"` on 4 decorative SVGs (spinner, verified badge, change/remove avatar icons)
+- Added `id="name-error" role="alert"` and `id="email-error" role="alert"` on error paragraphs
+
+### profile/partials/notifications-tab-content.blade.php
+
+- Changed 4 `<h3>` elements to `<label for="notif_XXXX">` elements with cursor-pointer
+- Added `id="notif_email"`, `id="notif_training"`, `id="notif_race"`, `id="notif_ai"` to corresponding checkboxes
+
+### profile/partials/security-tab.blade.php
+
+- Added `aria-hidden="true"` to 2 decorative SVGs (monitor icon, warning triangle)
+- Added `role="dialog"` + `aria-modal="true"` + `aria-labelledby="delete-account-title"` to delete modal
+- Added `id="delete-account-title"` to modal heading
+- Added `aria-required="true"` on delete password field
+- Added `aria-describedby="delete-confirm-help"` on confirmation input + `id="delete-confirm-help"` on error paragraph
+
+### settings/index.blade.php (1265 lines)
+
+- Added `@section('title', 'Settings')` (was missing)
+- Added `role="tablist"` to nav container
+- Added `id="tab-{section}"`, `role="tab"`, `:aria-selected`, `aria-controls` to all 8 nav links
+- Added `role="tabpanel"` + `aria-labelledby="tab-{section}"` to all 8 content panels
+- Password modal: `role="dialog"` + `aria-modal="true"` + `aria-labelledby="password-modal-title"` + `@keydown.escape`
+- Delete modal: `role="dialog"` + `aria-modal="true"` + `aria-labelledby="delete-modal-title"` + `@keydown.escape`
+- Delete confirmation: `aria-describedby="delete-confirm-instructions"` on input + `id` on instruction paragraph
+- Theme selector: `role="radiogroup" aria-label="Theme selection"` on grid + `role="radio"` + `:aria-checked` on 3 buttons
+- Font size slider: `:aria-valuetext="fontSize + '% font size'"`
+
+### help/index.blade.php
+
+- Added `aria-label="Help and support resources"` to `<section>` element
+- Already had: `@section('title', 'Help & Support')`, proper h1/h2 heading hierarchy
+
+### Pages already WCAG compliant (no changes needed)
+
+- `profile/partials/privacy-tab-content.blade.php` — proper `<label for>` associations
+- `profile/partials/preferences-tab-content.blade.php` — proper label associations
+- `settings/accessibility.blade.php` — wrapper with Livewire component, structurally fine
+- `settings/notifications.blade.php` — wrapper with Livewire component, structurally fine
+
+### Verified via Chrome DevTools
+
+- Profile: `tablist "Profile sections"` with 5 tab elements (all selectable), `tabpanel "Account"`, form labels, `textbox "Bio" description="Brief description..."`, SVGs hidden
+- Settings: `tablist "Settings navigation"` with 8 tab elements, `tabpanel "Account"`/`"Appearance"`, `radiogroup "Theme selection"` with 3 radio elements, `slider "Font Size: 100%" valuetext="100% font size"`, `switch` roles on toggles
+- Help: `region "Help and support resources"`, heading hierarchy h1>h2, all links labeled, skip link present
+
+### Tests (40 passed, 103 assertions)
+
+- ProfileTest.php + SettingsControllerTest.php — all green

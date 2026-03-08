@@ -14,8 +14,10 @@
     "pestphp.pestPath": "vendor/bin/pest",
     "pestphp.enable": true,
 
+    "php.validate.enable": false,
     "php.validate.executablePath": null,
 
+    "intelephense.diagnostics.enable": false,
     "intelephense.diagnostics.undefinedMethods": false,
     "intelephense.diagnostics.undefinedProperties": false,
     "intelephense.diagnostics.undefinedFunctions": false,
@@ -96,6 +98,30 @@
         "zlib"
     ],
     "chatgpt.openOnStartup": false,
+    "markdownlint.ignore": [
+        "vendor/**",
+        "**/vendor/**",
+        "node_modules/**",
+        "**/node_modules/**",
+        ".agents/**",
+        "**/.agents/**",
+        ".amazonq/**",
+        "**/.amazonq/**",
+        ".kiro/**",
+        "**/.kiro/**",
+        ".github/copilot-instructions.md",
+        "**/.github/copilot-instructions.md",
+        "public/images/**",
+        "**/public/images/**",
+        "tests/**/*.md",
+        "**/tests/**/*.md",
+        "test-results.md",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "GEMINI.md",
+        "TESTING.md",
+        "SKILLS.md"
+    ],
 
     // Blade files contain @json() Blade directives inside <script> tags which VS Code's
     // JS linter misinterprets as JS decorator syntax. Disable the built-in JS validator
