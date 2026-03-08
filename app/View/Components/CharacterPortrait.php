@@ -28,7 +28,7 @@ class CharacterPortrait extends Component
         public ?string $badge = null,
         public string $badgePosition = 'top-right',
         public bool $showBorder = true,
-        public string $borderColor = 'border-gray-300 dark:border-gray-600',
+        public string $borderColor = 'border-neutral-300 dark:border-neutral-600',
     ) {}
 
     /**

@@ -39,7 +39,7 @@ class PotentialBadge extends Component
         return match (true) {
             $this->level >= 7 => 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
             $this->level >= 4 => 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white',
-            default => 'bg-gray-500 text-white',
+            default => 'bg-neutral-500 text-white',
         };
     }
 

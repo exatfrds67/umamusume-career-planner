@@ -62,7 +62,7 @@ class BondMeter extends Component
             return 'text-pink-600 dark:text-pink-400 font-bold';
         }
 
-        return 'text-gray-700 dark:text-gray-300';
+        return 'text-neutral-700 dark:text-neutral-300';
     }
 
     /**

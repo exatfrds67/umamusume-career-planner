@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Aptitude;
 use App\Models\Character;
 use App\Models\User;
+use App\Services\CharacterGameDataResolver;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -51,6 +52,8 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
         // Build local image map
         $this->buildLocalImageMap();
 
+        $resolver = app(CharacterGameDataResolver::class);
+
         // Load official aptitude data
         $this->loadAptitudeData();
 
@@ -85,6 +88,7 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
             foreach ($englishCharacters as $charData) {
                 $characterName = $charData['name_en'];
                 $normalizedName = $this->normalizeCharacterName($characterName);
+                $gameCharacter = $resolver->findByCharacterName($characterName);
 
                 // Check if character already exists — try exact name first,
                 // then fall back to a variant with U+00A0 before the last word,
@@ -137,6 +141,7 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
                     $statsQuery->where('id', '=', $character->id)->update([
                         'current_stats' => json_encode($this->getBaseStats($normalizedName)),
                         'growth_rates' => json_encode($this->getGrowthRates($normalizedName)),
+                        'game_character_id' => $character->game_character_id ?? $gameCharacter?->id,
                     ]);
 
                     $skipped++;
@@ -156,6 +161,7 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
                     'user_id' => $user->id,
                     'name' => $characterName,
                     'avatar_url' => $avatarUrl,
+                    'game_character_id' => $gameCharacter?->id,
                     'scenario_type' => 'ura_finale',
                     'career_stage' => 'junior',
                     'current_turn' => 1,

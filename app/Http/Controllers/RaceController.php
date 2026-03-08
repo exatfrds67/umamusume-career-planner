@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Character;
 use App\Models\GameRace;
 use App\Models\Race;
+use App\Services\RaceExecutionService;
 use Illuminate\Http\Request;
 
 class RaceController extends Controller
 {
+    public function __construct(
+        protected RaceExecutionService $raceService
+    ) {}
+
     /**
      * Display the race catalog and recent race history.
      */
@@ -126,5 +132,40 @@ class RaceController extends Controller
             ]);
 
         return view('races.targets', compact('character', 'races'));
+    }
+
+    /**
+     * Enter a character into a race and simulate the result.
+     */
+    public function enter(Character $character, GameRace $gameRace): \Illuminate\Http\RedirectResponse
+    {
+        $this->authorize('update', $character);
+
+        $result = $this->raceService->enterRace($character, $gameRace);
+
+        if (! ($result['success'] ?? false)) {
+            return redirect()
+                ->route('races.show', $gameRace->slug)
+                ->with('error', $result['message'] ?? 'Failed to enter race.');
+        }
+
+        $raceResult = $result['result'] ?? [];
+        $finishPosition = is_array($raceResult) ? ($raceResult['finish_position'] ?? null) : null;
+        $position = is_int($finishPosition) ? (string) $finishPosition : '?';
+        $won = is_array($raceResult) && ($raceResult['won_race'] ?? false);
+
+        $message = $won
+            ? "Won {$gameRace->name_en}! Finished 1st place!"
+            : 'Finished '.$position."th in {$gameRace->name_en}.";
+
+        if ($result['career_completed'] ?? false) {
+            return redirect()
+                ->route('characters.show', $character)
+                ->with('success', "{$message} Career run completed!");
+        }
+
+        return redirect()
+            ->route('training.index', $character)
+            ->with($won ? 'success' : 'warning', $message);
     }
 }

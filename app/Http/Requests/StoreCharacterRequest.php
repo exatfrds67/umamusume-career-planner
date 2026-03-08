@@ -50,6 +50,15 @@ class StoreCharacterRequest extends FormRequest
             'external_source_id' => ['nullable', 'string', 'max:50'],
             'external_source' => ['nullable', 'string', 'max:100'],
             'avatar_url' => ['nullable', 'string', 'max:500'],
+            'trainee_id' => ['nullable', 'integer', 'exists:ucp_game_characters,id'],
+            'title' => ['nullable', 'string', 'max:100'],
+
+            // Image transform fields
+            'image_x' => ['nullable', 'numeric'],
+            'image_y' => ['nullable', 'numeric'],
+            'image_zoom' => ['nullable', 'numeric', 'min:0.5', 'max:2'],
+            'image_rotation' => ['nullable', 'integer', 'min:0', 'max:359'],
+            'image_flip_h' => ['nullable'],
 
             // Stats validation (0-1200 range with integer enforcement)
             'stats' => ['required', 'array'],

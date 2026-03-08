@@ -74,7 +74,7 @@ class EnergyGauge extends Component
             'high' => 'text-green-600 dark:text-green-400',
             'medium' => 'text-amber-600 dark:text-amber-400',
             'low' => 'text-red-600 dark:text-red-400',
-            default => 'text-gray-600 dark:text-gray-400',
+            default => 'text-neutral-600 dark:text-neutral-400',
         };
     }
 
@@ -87,7 +87,7 @@ class EnergyGauge extends Component
             'critical' => 'bg-red-500 dark:bg-red-600',
             'low' => 'bg-orange-500 dark:bg-orange-600',
             'normal' => 'bg-green-500 dark:bg-green-600',
-            default => 'bg-gray-500 dark:bg-gray-600',
+            default => 'bg-neutral-500 dark:bg-neutral-600',
         };
     }
 
@@ -100,7 +100,7 @@ class EnergyGauge extends Component
             'high' => 'bg-gradient-to-r from-green-400 to-green-500',
             'medium' => 'bg-gradient-to-r from-amber-400 to-amber-500',
             'low' => 'bg-gradient-to-r from-red-400 to-red-500',
-            default => 'bg-gray-500',
+            default => 'bg-neutral-500',
         };
     }
 
@@ -140,7 +140,7 @@ class EnergyGauge extends Component
         return match ($this->trend) {
             'up' => 'text-green-600 dark:text-green-400',
             'down' => 'text-red-600 dark:text-red-400',
-            default => 'text-gray-600 dark:text-gray-400',
+            default => 'text-neutral-600 dark:text-neutral-400',
         };
     }
 

@@ -6,8 +6,10 @@ use App\Http\Requests\StoreCharacterRequest;
 use App\Http\Requests\UpdateCharacterRequest;
 use App\Models\Aptitude;
 use App\Models\Character;
-use App\Models\ExternalData;
 use App\Models\Factor;
+use App\Models\GameCharacter;
+use App\Services\AvatarProcessingService;
+use App\Services\CharacterGameDataResolver;
 use App\Services\CharacterStateService;
 use App\Services\FactorService;
 use Illuminate\Http\RedirectResponse;
@@ -21,7 +23,9 @@ class CharacterController extends Controller
 {
     public function __construct(
         protected CharacterStateService $characterStateService,
-        protected FactorService $factorService
+        protected FactorService $factorService,
+        protected CharacterGameDataResolver $characterGameDataResolver,
+        protected AvatarProcessingService $avatarProcessingService
     ) {}
 
     /**
@@ -29,19 +33,33 @@ class CharacterController extends Controller
      */
     public function index(Request $request): View
     {
-        // Load all characters for client-side filtering (instant search)
+        // Load all characters with game character goal races for client-side filtering
         $characters = Character::query()
-            ->with(['aptitudes'])
+            ->with(['aptitudes', 'gameCharacter.goalRaces', 'currentCareer'])
             ->orderBy('is_pinned', 'desc')
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        // Add progress percentage to each character
+        // Add progress percentage and goal races to each character
         $characters->transform(function (Character $character): Character {
-            // Calculate progress percentage
             $progress = $character->getProgressPercentage();
-            // Add progress as a dynamic property for the view
             $character->setAttribute('progress', $progress);
+
+            // Attach goal races from the linked game character
+            $goalRaces = [];
+            if ($character->gameCharacter) {
+                $goalRaces = $character->gameCharacter->goalRaces->map(fn ($race) => [
+                    'name' => $race->name_en,
+                    'grade' => $race->grade,
+                    'distance' => $race->distance_meters,
+                    'distance_category' => $race->distance_category,
+                    'phase' => $race->phase,
+                    'venue' => $race->venue,
+                    'priority' => $race->pivot->priority,
+                    'notes' => $race->pivot->notes,
+                ])->sortBy('priority')->values()->toArray();
+            }
+            $character->setAttribute('goal_races', $goalRaces);
 
             return $character;
         });
@@ -67,7 +85,7 @@ class CharacterController extends Controller
                 ],
                 'topStatus' => [
                     'currentTurn' => $character->current_turn,
-                    'maxTurns' => 78,
+                    'maxTurns' => $character->getMaxTurns(),
                     'spAvailable' => $character->available_sp ?? 0,
                     'storageMode' => 'account',
                     'energy' => $character->energy_level,
@@ -85,31 +103,33 @@ class CharacterController extends Controller
      */
     public function create(): View
     {
-        // Fetch trainee data from external_data table (type: 'trainee')
-        $trainees = ExternalData::where('data_type', 'trainee')
-            ->orWhere('data_type', 'character')
-            ->get()
-            ->map(function (ExternalData $item): array {
-                /** @var array<string, mixed> $data */
-                $data = $item->data_content ?? [];
+        $trainees = GameCharacter::query()
+            ->orderBy('name_en', 'asc')
+            ->get(['*'])
+            ->map(function (GameCharacter $gc): array {
+                $avatarUrl = $this->resolveGameCharacterAvatarUrl($gc);
 
                 return [
-                    'id' => $item->id,
-                    'name' => \is_string($data['name'] ?? null) ? $data['name'] : 'Unknown',
-                    'rarity' => \is_int($data['rarity'] ?? null) ? $data['rarity'] : 3,
-                    'surface' => \is_string($data['surface'] ?? null) ? $data['surface'] : 'Turf',
-                    'distance' => \is_string($data['distance'] ?? null) ? $data['distance'] : 'Medium',
-                    'style' => \is_string($data['style'] ?? null) ? $data['style'] : 'Runner',
-                    'aptitudes' => \is_array($data['aptitudes'] ?? null) ? $data['aptitudes'] : [],
-                    'image' => \is_string($data['image'] ?? null) ? $data['image'] : null,
-                    'stats' => \is_array($data['stats'] ?? null) ? $data['stats'] : [
+                    'id' => $gc->id,
+                    'name' => $gc->name_en,
+                    'title' => $gc->title,
+                    'rarity' => 'SSR',
+                    'surface' => 'Turf',
+                    'distance' => ucfirst($gc->primary_distance ?? 'medium'),
+                    'style' => ucfirst($gc->preferred_style ?? 'leader'),
+                    'strategy' => ucfirst($gc->preferred_style ?? 'leader'),
+                    'aptitudes' => [],
+                    'avatar_url' => $avatarUrl,
+                    'image' => $avatarUrl,
+                    'image_path' => $gc->image_path,
+                    'stats' => [
                         'speed' => 0,
                         'stamina' => 0,
                         'power' => 0,
                         'guts' => 0,
                         'wisdom' => 0,
                     ],
-                    'growth' => \is_array($data['growth'] ?? null) ? $data['growth'] : [
+                    'growth' => [
                         'speed' => 0,
                         'stamina' => 0,
                         'power' => 0,
@@ -123,6 +143,11 @@ class CharacterController extends Controller
         return view('characters.create', compact('trainees'));
     }
 
+    protected function resolveGameCharacterAvatarUrl(GameCharacter $gameCharacter): ?string
+    {
+        return $this->characterGameDataResolver->resolveAvatarUrlForGameCharacter($gameCharacter);
+    }
+
     /**
      * Store a newly created character in storage
      */
@@ -132,11 +157,19 @@ class CharacterController extends Controller
             DB::beginTransaction();
 
             // Create the character with all required JSON fields
+            $traineeId = $request->input('trainee_id');
             $character = Character::create([
                 'user_id' => Auth::id(),
                 'name' => $request->input('name'),
+                'title' => $request->input('title'),
                 'avatar_url' => $request->input('avatar_url'),
+                'image_x' => $request->float('image_x', 0.0),
+                'image_y' => $request->float('image_y', 0.0),
+                'image_zoom' => $request->float('image_zoom', 1.0),
+                'image_rotation' => $request->integer('image_rotation', 0),
+                'image_flip_h' => $request->boolean('image_flip_h'),
                 'scenario_type' => $request->input('scenario_type'),
+                'game_character_id' => $traineeId !== null ? $request->integer('trainee_id') : null,
                 'career_stage' => 'junior',
                 'current_turn' => 1,
                 'current_stats' => $request->input('stats'),
@@ -170,6 +203,28 @@ class CharacterController extends Controller
 
             DB::commit();
 
+            // Process avatar (outside transaction — non-critical)
+            if ($character->avatar_url && $character->avatar_url !== 'custom_upload') {
+                $processed = $this->avatarProcessingService->processAvatar(
+                    $character->avatar_url,
+                    [
+                        'image_x' => $character->image_x,
+                        'image_y' => $character->image_y,
+                        'image_zoom' => $character->image_zoom,
+                        'image_rotation' => $character->image_rotation,
+                        'image_flip_h' => $character->image_flip_h,
+                    ],
+                    $character->id,
+                );
+
+                if ($processed['square'] || $processed['circular']) {
+                    $character->update(array_filter([
+                        'avatar_processed' => $processed['square'],
+                        'avatar_circular' => $processed['circular'],
+                    ]));
+                }
+            }
+
             return redirect()
                 ->route('characters.show', $character)
                 ->with('success', 'Character created successfully!');
@@ -201,6 +256,7 @@ class CharacterController extends Controller
             'aptitudes',
             'factors',
             'supportCards.supportCard',
+            'gameCharacter.goalRaces',
         ]);
 
         $aiTip = $this->getAiTip($character);
@@ -615,10 +671,11 @@ class CharacterController extends Controller
         ]);
 
         try {
-            $factor->update([
+            $factor->fill([
                 'factor_name' => $request->input('factor_name'),
                 'source_character_name' => $request->input('source_character_name'),
             ]);
+            $factor->save();
 
             return redirect()
                 ->route('characters.factors.manage', $character)
@@ -647,9 +704,10 @@ class CharacterController extends Controller
         }
 
         try {
-            $factor->update([
+            $factor->fill([
                 'is_active' => ! $factor->is_active,
             ]);
+            $factor->save();
 
             $status = $factor->is_active ? 'activated' : 'deactivated';
 
@@ -680,7 +738,7 @@ class CharacterController extends Controller
         }
 
         try {
-            $factor->delete();
+            Factor::destroy($factor->id);
 
             return redirect()
                 ->route('characters.factors.manage', $character)

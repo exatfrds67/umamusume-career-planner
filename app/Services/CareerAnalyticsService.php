@@ -220,7 +220,7 @@ class CareerAnalyticsService
             $analysis = $career->performance_analysis ?? [];
             $grade = (is_array($analysis) && isset($analysis['final_grade']) ? $analysis['final_grade'] : null);
 
-            if ($grade && isset($gradeValues[$grade])) {
+            if ($grade && is_string($grade) && isset($gradeValues[$grade])) {
                 $totalValue += $gradeValues[$grade];
                 $count++;
             }

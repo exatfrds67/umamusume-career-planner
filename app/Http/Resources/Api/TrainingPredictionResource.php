@@ -35,10 +35,25 @@ class TrainingPredictionResource extends JsonResource
          *     friendship_multiplier?: float,
          *     facility_bonus?: float,
          *     total_multiplier?: float,
-         *     per_training_cap?: string
+         *     per_training_cap?: string,
+         *     friendship_status?: array<string, mixed>
          * } $breakdown
          */
         $breakdown = \is_array($resource['breakdown'] ?? null) ? $resource['breakdown'] : [];
+
+        // Extract friendship training status
+        $friendshipStatus = \is_array($breakdown['friendship_status'] ?? null) ? $breakdown['friendship_status'] : [
+            'is_active' => false,
+            'friendship_card_count' => 0,
+            'cards_at_threshold' => [],
+            'threshold' => 80,
+        ];
+        $cardsAtThreshold = \is_array($friendshipStatus['cards_at_threshold'] ?? null) ? $friendshipStatus['cards_at_threshold'] : [];
+        $cardsNeedingBond = \is_array($friendshipStatus['cards_needing_bond'] ?? null) ? $friendshipStatus['cards_needing_bond'] : [];
+
+        // Extract current Wit stat value for adequacy calculation
+        $currentStats = \is_array($resource['current_stats'] ?? null) ? $resource['current_stats'] : [];
+        $witValue = \is_int($currentStats['wit'] ?? null) ? $currentStats['wit'] : 0;
 
         return [
             'training_type' => $resource['training_type'] ?? null,
@@ -46,6 +61,16 @@ class TrainingPredictionResource extends JsonResource
             'energy_cost' => $resource['energy_cost'] ?? 0,
             'failure_risk' => $resource['failure_risk'] ?? 0.0,
             'total_bonus' => $resource['total_bonus'] ?? 0.0,
+            'wit_adequacy' => $this->getWitAdequacy($witValue),
+            'friendship_training' => [
+                'is_active' => $friendshipStatus['is_active'] ?? false,
+                'multiplier_base' => 1.2, // 20% bonus when active
+                'status_text' => $this->getFriendshipStatusText($friendshipStatus),
+                'cards_at_threshold' => $cardsAtThreshold,
+                'total_cards_at_threshold' => count($cardsAtThreshold),
+                'cards_needing_bond' => $cardsNeedingBond,
+                'estimated_turns_until_active' => $friendshipStatus['estimated_turns_until_active'] ?? null,
+            ],
             'breakdown' => [
                 'base_gains' => \is_array($breakdown['base_gains'] ?? null) ? $breakdown['base_gains'] : [],
                 'stat_bonus' => \is_array($breakdown['stat_bonus'] ?? null) ? $breakdown['stat_bonus'] : [],
@@ -74,6 +99,80 @@ class TrainingPredictionResource extends JsonResource
                 'timestamp' => $resource['timestamp'] ?? now()->toIso8601String(),
             ],
         ];
+    }
+
+    /**
+     * Generate Wit-based skill activation adequacy data.
+     *
+     * Uses the formula: max(100 - 9000 / BaseWit, 20%)
+     *
+     * @return array{wit_value: int, activation_chance: float, status: string, status_text: string, threshold_met: bool}
+     */
+    private function getWitAdequacy(int $witValue): array
+    {
+        if ($witValue <= 0) {
+            return [
+                'wit_value' => 0,
+                'activation_chance' => 0.0,
+                'status' => 'unknown',
+                'status_text' => '❓ Wit unknown — cannot calculate skill activation chance',
+                'threshold_met' => false,
+            ];
+        }
+
+        // Formula: max(100 - 9000 / BaseWit, 20)
+        $activationChance = max(100 - (9000 / $witValue), 20.0);
+        $activationChance = round($activationChance, 1);
+
+        if ($witValue >= 600) {
+            $status = 'excellent';
+            $statusText = "✅ Wit {$witValue} — excellent ({$activationChance}% skill activation)";
+        } elseif ($witValue >= 400) {
+            $status = 'reliable';
+            $statusText = "✅ Wit {$witValue} — reliable ({$activationChance}% skill activation)";
+        } elseif ($witValue >= 300) {
+            $status = 'marginal';
+            $statusText = "⚠ Wit {$witValue} — marginal ({$activationChance}% activation; consider raising Wit)";
+        } else {
+            $statusText = "❌ Wit {$witValue} — critical: skills frequently misfire ({$activationChance}% activation; floor is 20%)";
+            $status = 'critical';
+        }
+
+        return [
+            'wit_value' => $witValue,
+            'activation_chance' => $activationChance,
+            'status' => $status,
+            'status_text' => $statusText,
+            'threshold_met' => $witValue >= 400,
+        ];
+    }
+
+    /**
+     * Generate human-readable friendship training status text
+     *
+     * @param  array<string, mixed>  $status
+     */
+    private function getFriendshipStatusText(array $status): string
+    {
+        $cardsAtThreshold = \is_array($status['cards_at_threshold'] ?? null) ? $status['cards_at_threshold'] : [];
+        $cardsNeedingBond = \is_array($status['cards_needing_bond'] ?? null) ? $status['cards_needing_bond'] : [];
+
+        if ($status['is_active'] ?? false) {
+            $count = count($cardsAtThreshold);
+
+            return "✅ Friendship Training ACTIVE ({$count} cards at bond ≥80)";
+        }
+
+        $current = count($cardsAtThreshold);
+        $needing = count($cardsNeedingBond);
+        $estimatedValue = $status['estimated_turns_until_active'] ?? 'unknown';
+        $estimated = \is_scalar($estimatedValue) ? (string) $estimatedValue : 'unknown';
+
+        if ($current > 0) {
+            return "⏳ Friendship Training: {$current}/3 cards ready (est. {$estimated} turns)";
+        }
+
+        return "❌ Friendship Training: {$needing} cards need bond development";
     }
 
     /**

@@ -44,11 +44,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */
-/**
- * @property int $id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- */
 class Career extends Model
 {
     /** @use HasFactory<\Database\Factories\CareerFactory> */
@@ -198,5 +193,25 @@ class Career extends Model
     public function runSnapshots(): HasMany
     {
         return $this->hasMany(RunSnapshot::class);
+    }
+
+    /**
+     * Get the parent characters for this career.
+     *
+     * @return HasMany<ParentCharacter, $this>
+     */
+    public function parentCharacters(): HasMany
+    {
+        return $this->hasMany(ParentCharacter::class);
+    }
+
+    /**
+     * Get the inheritance events for this career.
+     *
+     * @return HasMany<InheritanceEvent, $this>
+     */
+    public function inheritanceEvents(): HasMany
+    {
+        return $this->hasMany(InheritanceEvent::class);
     }
 }

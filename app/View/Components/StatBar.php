@@ -8,6 +8,68 @@ use Illuminate\View\Component;
 
 class StatBar extends Component
 {
+    /**
+     * Semantic token map for stat-specific UI colors.
+     *
+     * @var array<string, array<int, string>>
+     */
+    private const STAT_TOKEN_MAP = [
+        'speed' => [
+            '200' => '--color-stat-speed-200',
+            '300' => '--color-stat-speed-300',
+            '400' => '--color-stat-speed-400',
+            '500' => '--color-stat-speed-500',
+            '600' => '--color-stat-speed-600',
+            '700' => '--color-stat-speed-700',
+            '800' => '--color-stat-speed-800',
+        ],
+        'stamina' => [
+            '200' => '--color-stat-stamina-200',
+            '300' => '--color-stat-stamina-300',
+            '400' => '--color-stat-stamina-400',
+            '500' => '--color-stat-stamina-500',
+            '600' => '--color-stat-stamina-600',
+            '700' => '--color-stat-stamina-700',
+            '800' => '--color-stat-stamina-800',
+        ],
+        'power' => [
+            '200' => '--color-stat-power-200',
+            '300' => '--color-stat-power-300',
+            '400' => '--color-stat-power-400',
+            '500' => '--color-stat-power-500',
+            '600' => '--color-stat-power-600',
+            '700' => '--color-stat-power-700',
+            '800' => '--color-stat-power-800',
+        ],
+        'guts' => [
+            '200' => '--color-stat-guts-200',
+            '300' => '--color-stat-guts-300',
+            '400' => '--color-stat-guts-400',
+            '500' => '--color-stat-guts-500',
+            '600' => '--color-stat-guts-600',
+            '700' => '--color-stat-guts-700',
+            '800' => '--color-stat-guts-800',
+        ],
+        'wit' => [
+            '200' => '--color-stat-wit-200',
+            '300' => '--color-stat-wit-300',
+            '400' => '--color-stat-wit-400',
+            '500' => '--color-stat-wit-500',
+            '600' => '--color-stat-wit-600',
+            '700' => '--color-stat-wit-700',
+            '800' => '--color-stat-wit-800',
+        ],
+        'wisdom' => [
+            '200' => '--color-stat-wit-200',
+            '300' => '--color-stat-wit-300',
+            '400' => '--color-stat-wit-400',
+            '500' => '--color-stat-wit-500',
+            '600' => '--color-stat-wit-600',
+            '700' => '--color-stat-wit-700',
+            '800' => '--color-stat-wit-800',
+        ],
+    ];
+
     public string $stat;
 
     public int $current;
@@ -68,6 +130,38 @@ class StatBar extends Component
             'wit', 'wisdom' => 'stat-wit',
             default => 'primary',
         };
+    }
+
+    /**
+     * Get CSS variable tokens for the current stat.
+     *
+     * @return array<int, string>
+     */
+    public function getStatTokens(): array
+    {
+        return self::STAT_TOKEN_MAP[$this->stat] ?? [
+            '200' => '--color-primary-200',
+            '300' => '--color-primary-300',
+            '400' => '--color-primary-400',
+            '500' => '--color-primary-500',
+            '600' => '--color-primary-600',
+            '700' => '--color-primary-700',
+            '800' => '--color-primary-800',
+        ];
+    }
+
+    /**
+     * Get inline CSS custom properties for semantic stat rendering.
+     */
+    public function getStatStyle(): string
+    {
+        $tokens = $this->getStatTokens();
+
+        return implode('; ', array_map(
+            static fn (int $shade, string $token): string => "--stat-{$shade}: var({$token})",
+            array_keys($tokens),
+            $tokens,
+        ));
     }
 
     /**

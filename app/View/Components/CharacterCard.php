@@ -53,13 +53,22 @@ class CharacterCard extends Component
      */
     public function getAvatarUrl(): ?string
     {
-        $url = $this->character['avatar_url'] ?? $this->character['avatar_path'] ?? null;
+        $candidates = [
+            $this->character['avatar_url'] ?? null,
+            $this->character['image'] ?? null,
+            $this->character['image_url'] ?? null,
+            $this->character['thumb_img'] ?? null,
+            $this->character['avatar_path'] ?? null,
+            $this->character['image_path'] ?? null,
+        ];
 
-        if ($url === null) {
-            return null;
+        foreach ($candidates as $url) {
+            if (is_string($url) && $url !== '') {
+                return $url;
+            }
         }
 
-        return \is_string($url) ? $url : null;
+        return null;
     }
 
     /**

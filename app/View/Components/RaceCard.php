@@ -41,9 +41,9 @@ class RaceCard extends Component
 
         return match ($grade) {
             'G1' => 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white',
-            'G2' => 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-900',
+            'G2' => 'bg-gradient-to-r from-neutral-300 to-neutral-400 text-neutral-900',
             'G3' => 'bg-gradient-to-r from-amber-600 to-amber-700 text-white',
-            default => 'bg-gray-500 text-white',
+            default => 'bg-neutral-500 text-white',
         };
     }
 
@@ -53,7 +53,7 @@ class RaceCard extends Component
     public function getReadinessColorClasses(): string
     {
         if ($this->readiness === null) {
-            return 'text-gray-500 dark:text-gray-400';
+            return 'text-neutral-500 dark:text-neutral-400';
         }
 
         if ($this->readiness >= 80) {

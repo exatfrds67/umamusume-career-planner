@@ -57,6 +57,13 @@ class TrainingController extends Controller
     {
         $this->authorize('update', $character);
 
+        // Validate turn limit
+        if ($character->current_turn >= 78) {
+            return redirect()
+                ->route('characters.show', $character)
+                ->with('error', 'Career has reached maximum turns. The career run is complete.');
+        }
+
         $validated = $request->validate([
             'training_type' => 'required|string|in:speed,stamina,power,guts,wit',
         ]);
@@ -76,15 +83,29 @@ class TrainingController extends Controller
             $gains
         );
 
-        if ($result['success'] ?? false) {
+        if (! ($result['success'] ?? false)) {
+            $message = $result['message'] ?? 'Training failed. Please try again.';
+
             return redirect()
                 ->route('training.index', $character)
-                ->with('success', ucfirst($validated['training_type']).' training completed successfully!');
+                ->with('error', $message);
+        }
+
+        $message = ucfirst($validated['training_type']).' training completed successfully!';
+
+        if ($result['training_failed'] ?? false) {
+            $message = ucfirst($validated['training_type']).' training failed! Stats were reduced due to low energy.';
+        }
+
+        if ($result['career_completed'] ?? false) {
+            return redirect()
+                ->route('characters.show', $character)
+                ->with('success', 'Career run completed! Final stats have been recorded.');
         }
 
         return redirect()
             ->route('training.index', $character)
-            ->with('error', 'Training failed. Please try again.');
+            ->with($result['training_failed'] ? 'warning' : 'success', $message);
     }
 
     /**

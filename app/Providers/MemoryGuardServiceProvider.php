@@ -29,7 +29,55 @@ class MemoryGuardServiceProvider extends ServiceProvider
             $limitToApply = $testingLimit;
         }
 
-        // Apply the limit early in the application lifecycle
-        @ini_set('memory_limit', $limitToApply);
+        $currentLimit = ini_get('memory_limit');
+
+        // Only raise the limit when needed. Do not clobber a higher CLI value.
+        if (self::shouldApplyMemoryLimit(is_string($currentLimit) ? $currentLimit : null, $limitToApply)) {
+            @ini_set('memory_limit', $limitToApply);
+        }
+    }
+
+    public static function shouldApplyMemoryLimit(?string $currentLimit, string $targetLimit): bool
+    {
+        $targetBytes = self::memoryLimitToBytes($targetLimit);
+
+        if ($targetBytes === null) {
+            return false;
+        }
+
+        $currentBytes = self::memoryLimitToBytes($currentLimit);
+
+        if ($currentBytes === null) {
+            return false;
+        }
+
+        return $currentBytes < $targetBytes;
+    }
+
+    public static function memoryLimitToBytes(?string $limit): ?int
+    {
+        if (! is_string($limit)) {
+            return null;
+        }
+
+        $normalizedLimit = trim($limit);
+
+        if ($normalizedLimit === '' || $normalizedLimit === '-1') {
+            return null;
+        }
+
+        if (! preg_match('/^(\d+)([KMG]?)$/i', $normalizedLimit, $matches)) {
+            return null;
+        }
+
+        $value = (int) $matches[1];
+        $suffix = strtoupper($matches[2]);
+
+        return match ($suffix) {
+            'G' => $value * 1024 * 1024 * 1024,
+            'M' => $value * 1024 * 1024,
+            'K' => $value * 1024,
+            default => $value,
+        };
     }
 }

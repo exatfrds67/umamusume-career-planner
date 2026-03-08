@@ -151,12 +151,13 @@ class TrainingPredictionService
         }
 
         // Define base gains per facility (these are game mechanics)
+        // SP is earned with every training session
         $facilityGains = [
-            'speed' => ['speed' => 20, 'power' => 5],
-            'stamina' => ['stamina' => 20, 'guts' => 5],
-            'power' => ['power' => 20, 'speed' => 5],
-            'guts' => ['guts' => 20, 'wit' => 5],
-            'wit' => ['wit' => 20, 'stamina' => 5],
+            'speed' => ['speed' => 20, 'power' => 5, 'sp' => 3],
+            'stamina' => ['stamina' => 20, 'guts' => 5, 'sp' => 3],
+            'power' => ['power' => 20, 'speed' => 5, 'sp' => 3],
+            'guts' => ['guts' => 20, 'wit' => 5, 'sp' => 3],
+            'wit' => ['wit' => 20, 'stamina' => 5, 'sp' => 5],
         ];
 
         $gains = $facilityGains[$facility] ?? [];

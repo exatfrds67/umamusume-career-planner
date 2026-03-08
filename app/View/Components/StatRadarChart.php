@@ -90,12 +90,12 @@ class StatRadarChart extends Component
     public function getStatColor(string $stat): string
     {
         return match (\strtolower($stat)) {
-            'speed' => 'text-blue-500 dark:text-blue-400',
-            'stamina' => 'text-green-500 dark:text-green-400',
-            'power' => 'text-orange-500 dark:text-orange-400',
-            'guts' => 'text-amber-500 dark:text-amber-400',
-            'wit' => 'text-sky-500 dark:text-sky-400',
-            default => 'text-gray-500 dark:text-gray-400',
+            'speed' => 'text-stat-speed-500 dark:text-stat-speed-400',
+            'stamina' => 'text-stat-stamina-500 dark:text-stat-stamina-400',
+            'power' => 'text-stat-power-500 dark:text-stat-power-400',
+            'guts' => 'text-stat-guts-500 dark:text-stat-guts-400',
+            'wit' => 'text-stat-wit-500 dark:text-stat-wit-400',
+            default => 'text-neutral-500 dark:text-neutral-400',
         };
     }
 
@@ -105,12 +105,12 @@ class StatRadarChart extends Component
     public function getSvgFillColor(string $stat): string
     {
         return match (\strtolower($stat)) {
-            'speed' => '#3b82f6',  // blue-500
-            'stamina' => '#22c55e', // green-500
-            'power' => '#f97316',   // orange-500
-            'guts' => '#fbbf24',    // amber-500
-            'wit' => '#0ea5e9',     // sky-500
-            default => '#6b7280',   // gray-500
+            'speed' => '#3b82f6',   // --color-stat-speed-500
+            'stamina' => '#22c55e', // --color-stat-stamina-500
+            'power' => '#f97316',   // --color-stat-power-500
+            'guts' => '#f59e0b',    // --color-stat-guts-500
+            'wit' => '#0ea5e9',     // --color-stat-wit-500
+            default => '#737373',   // --color-neutral-500
         };
     }
 

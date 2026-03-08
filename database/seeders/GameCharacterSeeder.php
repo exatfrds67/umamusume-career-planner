@@ -22,11 +22,16 @@ use Illuminate\Database\Seeder;
  */
 class GameCharacterSeeder extends Seeder
 {
+    private const DEBUT_RACE_SLUG = 'debut-race';
+
+    private const ARIMA_KINEN_SLUG = 'arima-kinen';
+
     public function run(): void
     {
         $races = GameRace::query()->pluck('id', 'slug');
 
         foreach ($this->characters() as $data) {
+            $data = $this->normalizeCharacterData($data);
             $targets = $data['targets'] ?? [];
             unset($data['targets']);
 
@@ -52,6 +57,153 @@ class GameCharacterSeeder extends Seeder
     }
 
     /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function normalizeCharacterData(array $data): array
+    {
+        $targets = $data['targets'] ?? [];
+        $sources = $data['goal_race_sources'] ?? [];
+        $notes = $data['notes'] ?? [];
+
+        unset($data['goal_race_sources']);
+
+        $data['targets'] = $this->normalizeTargets(is_array($targets) ? $targets : []);
+        $data['notes'] = $this->buildNotes(
+            is_array($notes) ? $notes : [],
+            is_array($sources) ? $sources : []
+        );
+
+        return $data;
+    }
+
+    /**
+     * @param  array<int, array<int, int|string|null>>  $targets
+     * @return array<int, array{0: string, 1: string, 2: int, 3: string|null}>
+     */
+    private function normalizeTargets(array $targets): array
+    {
+        $debutTarget = [
+            self::DEBUT_RACE_SLUG,
+            'required',
+            0,
+            'Junior Make Debut — career start',
+        ];
+
+        $arimaTarget = [
+            self::ARIMA_KINEN_SLUG,
+            'goal',
+            0,
+            'Terminal career goal before URA Finale or Unity Cup progression',
+        ];
+
+        $orderedTargets = [];
+
+        foreach ($targets as $target) {
+            if (! is_array($target) || count($target) < 4) {
+                continue;
+            }
+
+            [$raceSlug, $raceType, $priority, $notes] = $target;
+
+            if (! is_string($raceSlug) || ! is_string($raceType)) {
+                continue;
+            }
+
+            $normalizedTarget = [
+                $raceSlug,
+                $raceType,
+                is_int($priority) ? $priority : (int) $priority,
+                is_string($notes) || $notes === null ? $notes : null,
+            ];
+
+            if ($raceSlug === self::DEBUT_RACE_SLUG) {
+                $debutTarget = [
+                    self::DEBUT_RACE_SLUG,
+                    'required',
+                    0,
+                    $normalizedTarget[3] ?? $debutTarget[3],
+                ];
+
+                continue;
+            }
+
+            if ($raceSlug === self::ARIMA_KINEN_SLUG) {
+                $arimaTarget = [
+                    self::ARIMA_KINEN_SLUG,
+                    'goal',
+                    0,
+                    $normalizedTarget[3] ?? $arimaTarget[3],
+                ];
+
+                continue;
+            }
+
+            if (! array_key_exists($raceSlug, $orderedTargets)) {
+                $orderedTargets[$raceSlug] = $normalizedTarget;
+            }
+        }
+
+        $normalizedTargets = [$debutTarget, ...array_values($orderedTargets), $arimaTarget];
+
+        return array_map(
+            fn (array $target, int $index): array => [$target[0], $target[1], $index + 1, $target[3]],
+            $normalizedTargets,
+            array_keys($normalizedTargets),
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $notes
+     * @param  array<int, array<string, mixed>>  $sources
+     * @return array<string, mixed>
+     */
+    private function buildNotes(array $notes, array $sources): array
+    {
+        return array_replace_recursive($notes, [
+            'goal_race_policy' => [
+                'starts_with' => self::DEBUT_RACE_SLUG,
+                'ends_with' => self::ARIMA_KINEN_SLUG,
+                'mode_extensions' => [
+                    'ura_finale' => ['ura-preliminary', 'ura-semifinal', 'ura-finals'],
+                ],
+            ],
+            'goal_race_research' => [
+                'status' => 'pending-character-goal-verification',
+                'verified' => false,
+                'verification_scope' => [
+                    'character_goal_races' => 'pending',
+                    'career_boundary' => 'community-supported',
+                    'ura_finale_extension' => 'official-jp-portal',
+                    'unity_cup_extension' => 'unverified',
+                ],
+            ],
+            'goal_race_policy_sources' => [
+                [
+                    'label' => 'Official JP scenario index',
+                    'url' => 'https://umamusume.jp/contents/game/scenario/',
+                    'scope' => 'scenario-policy',
+                    'language' => 'jp',
+                ],
+                [
+                    'label' => 'Official JP URA Finals scenario page',
+                    'url' => 'https://umamusume.jp/contents/game/scenario/ura/',
+                    'scope' => 'ura-extension',
+                    'language' => 'jp',
+                ],
+                [
+                    'label' => 'Official JP Twinkle Legends scenario page',
+                    'url' => 'https://umamusume.jp/contents/game/scenario/thetwinklelegends/',
+                    'scope' => 'scenario-audit',
+                    'language' => 'jp',
+                    'notes' => 'Official scenario page exposes Dream Fest, not Unity Cup.',
+                ],
+            ],
+            'goal_race_sources' => array_values($sources),
+        ]);
+    }
+
+    /**
      * @return array<int, array<string, mixed>>
      */
     private function characters(): array
@@ -68,12 +220,14 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Special Week',
                 'targets' => [
-                    ['japan-derby', 'goal', 1, "Her dream — become Japan's No. 1 horse"],
-                    ['japan-cup', 'goal', 2, 'Beat all of Japan and the world'],
-                    ['tenno-sho-autumn', 'story', 3, 'Key rivalry event'],
-                    ['arima-kinen', 'story', 4, 'Year-end climax'],
-                    ['kikuka-sho', 'recommended', 5, 'Triple Crown third leg'],
-                    ['takarazuka-kinen', 'recommended', 6, 'Mid-year prestige target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['hopeful-stakes', 'required', 2, 'Junior Late Dec — Win G1 medium race (fan requirement)'],
+                    ['japan-derby', 'goal', 3, "Her dream — become Japan's No. 1 horse"],
+                    ['japan-cup', 'goal', 4, 'Beat all of Japan and the world'],
+                    ['tenno-sho-spring', 'goal', 5, 'Spring long-distance crown'],
+                    ['tenno-sho-autumn', 'story', 6, 'Key rivalry event with Silence Suzuka'],
+                    ['arima-kinen', 'story', 7, 'Year-end climax'],
+                    ['kikuka-sho', 'recommended', 8, 'Triple Crown third leg'],
                 ],
             ],
 
@@ -87,11 +241,13 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Silence Suzuka',
                 'targets' => [
-                    ['takarazuka-kinen', 'goal', 1, 'Story-critical race (real-life Tenno Sho accident reimagined)'],
-                    ['nhk-mile-cup', 'story', 2, 'Classic mile triumph'],
-                    ['japan-cup', 'story', 3, 'Her ultimate dream confrontation'],
-                    ['mile-championship', 'recommended', 4, 'Natural mile specialist target'],
-                    ['victoria-mile', 'recommended', 5, 'Spring G1 mile fit'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['mainichi-okan', 'required', 2, 'Classic Autumn — place top 3 (G2 mile prep race)'],
+                    ['takarazuka-kinen', 'goal', 3, 'Story-critical Classic race (real-life Tenno Sho accident reimagined)'],
+                    ['japan-cup', 'goal', 4, 'Her ultimate dream — run freely on the world stage'],
+                    ['nhk-mile-cup', 'story', 5, 'Classic year mile triumph'],
+                    ['victoria-mile', 'recommended', 6, 'Spring G1 mile fit'],
+                    ['mile-championship', 'recommended', 7, 'Natural mile specialist autumn target'],
                 ],
             ],
 
@@ -105,11 +261,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Tokai Teio',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Triple Crown attempt begins here'],
-                    ['japan-derby', 'goal', 2, 'Triple Crown second leg — comeback story pivot'],
-                    ['osaka-hai', 'goal', 3, 'Comeback race after long injury'],
-                    ['arima-kinen', 'story', 4, 'Legendary comeback Arima win'],
-                    ['tenno-sho-spring', 'recommended', 5, 'Long-distance showcase'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'required', 2, 'Classic G1 — Triple Crown first leg (place top 3)'],
+                    ['japan-derby', 'goal', 3, 'Triple Crown second leg — comeback story pivot'],
+                    ['osaka-hai', 'required', 4, 'Senior — comeback race after long injury (place top 3)'],
+                    ['arima-kinen', 'goal', 5, 'Legendary comeback Arima win — year-end triumph'],
+                    ['tenno-sho-spring', 'recommended', 6, 'Long-distance showcase'],
                 ],
             ],
 
@@ -123,12 +280,13 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Narita Brian',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Triple Crown leg one'],
-                    ['japan-derby', 'goal', 2, 'Triple Crown leg two'],
-                    ['kikuka-sho', 'goal', 3, 'Triple Crown completion'],
-                    ['tenno-sho-spring', 'story', 4, 'Post-injury comeback stamina test'],
-                    ['arima-kinen', 'story', 5, 'Year-end championship goal'],
-                    ['takarazuka-kinen', 'recommended', 6, 'Mid-year G1 prestige'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'required', 2, 'Classic G1 — Triple Crown first leg (place top 3)'],
+                    ['japan-derby', 'required', 3, 'Classic G1 — Triple Crown second leg (place top 3)'],
+                    ['kikuka-sho', 'goal', 4, 'Triple Crown completion — autumn stamina king'],
+                    ['tenno-sho-spring', 'story', 5, 'Post-injury comeback stamina test'],
+                    ['arima-kinen', 'story', 6, 'Year-end championship goal'],
+                    ['takarazuka-kinen', 'recommended', 7, 'Mid-year G1 prestige'],
                 ],
             ],
 
@@ -142,12 +300,13 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Biwa Hayahide',
                 'targets' => [
-                    ['japan-derby', 'goal', 1, 'Sibling rivalry with Narita Brian'],
-                    ['kikuka-sho', 'goal', 2, 'Real-life win — stamina showcase'],
-                    ['tenno-sho-spring', 'story', 3, 'Long-distance pinnacle'],
-                    ['takarazuka-kinen', 'story', 4, 'Real-life win'],
-                    ['arima-kinen', 'recommended', 5, 'Year-end goal'],
-                    ['satsuki-sho', 'recommended', 6, 'Narita Brian rivalry begins'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['japan-derby', 'goal', 2, 'Sibling rivalry with Narita Brian — actual real-life win'],
+                    ['kikuka-sho', 'goal', 3, 'Real-life win — stamina showcase against rivals'],
+                    ['takarazuka-kinen', 'goal', 4, 'Real-life 1994 Takarazuka Kinen win'],
+                    ['tenno-sho-spring', 'story', 5, 'Long-distance pinnacle stamina goal'],
+                    ['arima-kinen', 'recommended', 6, 'Year-end Grand Prix target'],
+                    ['satsuki-sho', 'recommended', 7, 'Narita Brian rivalry begins here'],
                 ],
             ],
 
@@ -161,11 +320,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Vodka',
                 'targets' => [
-                    ['japan-derby', 'goal', 1, 'Historic win against males in 2007'],
-                    ['tenno-sho-autumn', 'goal', 2, 'Real-life consecutive wins — story rivalry with Daiwa Scarlet'],
-                    ['victoria-mile', 'story', 3, 'Filly G1 showcase'],
-                    ['mile-championship', 'story', 4, 'Mile specialist peak'],
-                    ['arima-kinen', 'recommended', 5, 'Year-end prestige target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['japan-derby', 'goal', 2, 'Historic win against males in 2007 — trailblazer moment'],
+                    ['tenno-sho-autumn', 'goal', 3, 'Real-life consecutive wins — intense story rivalry with Daiwa Scarlet'],
+                    ['victoria-mile', 'story', 4, 'Filly G1 showcase — feminine force of nature'],
+                    ['mile-championship', 'story', 5, 'Mile specialist autumn peak'],
+                    ['arima-kinen', 'recommended', 6, 'Year-end Grand Prix prestige target'],
                 ],
             ],
 
@@ -179,11 +339,13 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Daiwa Scarlet',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Real-life Satsuki Sho win vs Vodka'],
-                    ['victoria-mile', 'goal', 2, 'Key story race showcasing her style'],
-                    ['tenno-sho-autumn', 'story', 3, 'Intense rivalry with Vodka'],
-                    ['queen-elizabeth-cup', 'story', 4, 'Autumn filly championship'],
-                    ['arima-kinen', 'recommended', 5, 'Year-end undefeated dream'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['shuka-sho', 'required', 2, 'Classic Autumn filly G1 — place top 3 (1,500 fans required)'],
+                    ['satsuki-sho', 'goal', 3, 'Real-life Satsuki Sho win — beating the colts'],
+                    ['victoria-mile', 'goal', 4, 'Spring G1 showcasing her dominant escape style'],
+                    ['tenno-sho-autumn', 'story', 5, 'Intense and defining rivalry with Vodka'],
+                    ['queen-elizabeth-cup', 'story', 6, 'Autumn filly championship target'],
+                    ['arima-kinen', 'recommended', 7, 'Year-end undefeated dream finish'],
                 ],
             ],
 
@@ -197,11 +359,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Gold Ship',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Real-life win by 5 lengths'],
-                    ['kikuka-sho', 'goal', 2, 'Real-life win'],
-                    ['tenno-sho-spring', 'story', 3, 'Real-life 2x winner — unpredictable fashion'],
-                    ['takarazuka-kinen', 'story', 4, 'Real-life win — chaos included'],
-                    ['arima-kinen', 'story', 5, 'Real-life 3 wins — year-end legend'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'required', 2, 'Classic G1 — Triple Crown first leg (place top 3)'],
+                    ['kikuka-sho', 'goal', 3, 'Real-life win — Triple Crown stamina king'],
+                    ['tenno-sho-spring', 'goal', 4, 'Real-life 2x winner — stamina god showcase'],
+                    ['takarazuka-kinen', 'goal', 5, 'Real-life 2x win — wildly unpredictable chaos'],
+                    ['arima-kinen', 'goal', 6, 'Real-life 3 wins — year-end legend of chaos and guts'],
                 ],
             ],
 
@@ -215,11 +378,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Mejiro McQueen',
                 'targets' => [
-                    ['tenno-sho-spring', 'goal', 1, 'Real-life 3x consecutive winner'],
-                    ['kikuka-sho', 'story', 2, 'Classic triumph'],
-                    ['takarazuka-kinen', 'story', 3, 'Mid-year G1 win'],
-                    ['arima-kinen', 'recommended', 4, 'Year-end crowd favourite'],
-                    ['hanshin-daishogai', 'recommended', 5, 'Long-distance warm-up in senior year'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['kikuka-sho', 'goal', 2, 'Real-life Classic win — autumn distance specialist peak'],
+                    ['tenno-sho-spring', 'goal', 3, 'Real-life 3x consecutive winner — noble supremacy'],
+                    ['takarazuka-kinen', 'goal', 4, 'Real-life win — mid-year noble triumph'],
+                    ['arima-kinen', 'recommended', 5, 'Year-end Grand Prix crowd favourite'],
+                    ['hanshin-daishogai', 'recommended', 6, 'Senior G2 long-distance warm-up'],
                 ],
             ],
 
@@ -233,11 +397,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Air Groove',
                 'targets' => [
-                    ['japan-derby', 'goal', 1, 'Real-life win — she beat the colts'],
-                    ['tenno-sho-autumn', 'goal', 2, 'Real-life consecutive wins'],
-                    ['queen-elizabeth-cup', 'story', 3, 'Autumn filly crown'],
-                    ['arima-kinen', 'story', 4, 'Year-end prestige'],
-                    ['osaka-hai', 'recommended', 5, 'Senior medium G1'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['japan-derby', 'goal', 2, 'Real-life win — Queen of the Turf beats the colts'],
+                    ['tenno-sho-autumn', 'goal', 3, 'Real-life consecutive wins — autumn dominance'],
+                    ['queen-elizabeth-cup', 'story', 4, 'Autumn filly crown story arc'],
+                    ['arima-kinen', 'story', 5, 'Year-end Grand Prix prestige story'],
+                    ['osaka-hai', 'recommended', 6, 'Senior medium G1 target'],
                 ],
             ],
 
@@ -251,10 +416,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'El Condor Pasa',
                 'targets' => [
-                    ['nhk-mile-cup', 'goal', 1, 'Classic G1 mile dominance'],
-                    ['japan-cup', 'goal', 2, 'Ultimate goal — beat the world at Japan Cup'],
-                    ['takarazuka-kinen', 'story', 3, 'Mid-year story event'],
-                    ['mile-championship', 'recommended', 4, 'Natural mile target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['nhk-mile-cup', 'required', 2, 'Classic G1 mile — place top 3 (mandatory Classic race)'],
+                    ['japan-cup', 'goal', 3, 'Ultimate goal — beat the world at Japan Cup'],
+                    ['takarazuka-kinen', 'story', 4, 'Mid-year story event before Japan Cup dream'],
+                    ['mile-championship', 'recommended', 5, 'Natural mile specialist autumn target'],
                 ],
             ],
 
@@ -268,10 +434,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Grass Wonder',
                 'targets' => [
-                    ['arima-kinen', 'goal', 1, 'Real-life 2 wins — story centrepiece'],
-                    ['asahi-hai-futurity', 'story', 2, 'Dominant junior G1 debut story'],
-                    ['takarazuka-kinen', 'story', 3, 'Mid-year rivalry with Special Week'],
-                    ['japan-cup', 'recommended', 4, 'High-profile late season target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['asahi-hai-futurity', 'story', 2, 'Dominant junior G1 showcase story — Silver Bullet arrives'],
+                    ['takarazuka-kinen', 'goal', 3, 'Real-life win — mid-year G1 triumph'],
+                    ['arima-kinen', 'goal', 4, 'Real-life 2 wins — year-end story centrepiece'],
+                    ['japan-cup', 'recommended', 5, 'High-profile late season international target'],
                 ],
             ],
 
@@ -285,11 +452,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Oguri Cap',
                 'targets' => [
-                    ['arima-kinen', 'goal', 1, 'Legendary retirement comeback win'],
-                    ['tenno-sho-autumn', 'story', 2, 'Major career G1 win'],
-                    ['nhk-mile-cup', 'story', 3, 'Versatile distance showcase'],
-                    ['mile-championship', 'recommended', 4, 'Mile fan-favourite target'],
-                    ['japan-cup', 'recommended', 5, 'Prestige long-season goal'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['tenno-sho-autumn', 'goal', 2, "Real-life consecutive G1 win — People's Hero autumn peak"],
+                    ['arima-kinen', 'goal', 3, 'Legendary retirement comeback win — year-end Grand Prix'],
+                    ['nhk-mile-cup', 'story', 4, 'Versatile distance range showcase'],
+                    ['mile-championship', 'recommended', 5, 'Mile fan-favourite target'],
+                    ['japan-cup', 'recommended', 6, 'Prestige long-season international goal'],
                 ],
             ],
 
@@ -303,12 +471,13 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Symboli Rudolf',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Triple Crown first leg — undefeated run'],
-                    ['japan-derby', 'goal', 2, 'Triple Crown second leg'],
-                    ['kikuka-sho', 'goal', 3, 'Triple Crown completion — Grand Slam goal'],
-                    ['tenno-sho-autumn', 'story', 4, 'Senior dominance'],
-                    ['japan-cup', 'story', 5, 'International prestige beat'],
-                    ['arima-kinen', 'story', 6, 'Year-end crown'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'required', 2, 'Classic G1 — Triple Crown first leg (place top 3)'],
+                    ['japan-derby', 'required', 3, 'Classic G1 — Triple Crown second leg (place top 3)'],
+                    ['kikuka-sho', 'goal', 4, 'Triple Crown completion — Grand Slam coronation'],
+                    ['tenno-sho-autumn', 'story', 5, 'Senior dominance — undefeated Emperor'],
+                    ['japan-cup', 'story', 6, 'International prestige beat — world conquered'],
+                    ['arima-kinen', 'goal', 7, 'Year-end crown — Emperor seals the Grand Slam'],
                 ],
             ],
 
@@ -322,10 +491,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Taiki Shuttle',
                 'targets' => [
-                    ['nhk-mile-cup', 'goal', 1, 'Classic mile G1 target'],
-                    ['mile-championship', 'goal', 2, 'Real-life win — definitive mile champion'],
-                    ['sprinters-stakes', 'story', 3, 'Showed sprint capability too'],
-                    ['victoria-mile', 'recommended', 4, 'Spring G1 mile fit'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['nhk-mile-cup', 'required', 2, 'Classic G1 mile — place top 3 (fan requirement)'],
+                    ['mile-championship', 'goal', 3, 'Real-life win — definitive mile champion'],
+                    ['sprinters-stakes', 'story', 4, 'Showed sprint capability — versatile distance range'],
+                    ['victoria-mile', 'recommended', 5, 'Spring G1 mile fit'],
                 ],
             ],
 
@@ -339,9 +509,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Agnes Tachyon',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Undefeated streak ends in glorious win before retirement'],
-                    ['yayoi-sho', 'story', 2, 'Important Classic prep race — real-life dominant win'],
-                    ['japan-derby', 'recommended', 3, 'Dream race she never ran (retired after Satsuki Sho)'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['yayoi-sho', 'story', 2, 'Classic G2 prep race — real-life dominant undefeated win'],
+                    ['satsuki-sho', 'goal', 3, 'Undefeated streak peaks in glorious G1 win before retirement'],
+                    ['japan-derby', 'recommended', 4, 'Dream race she never ran (retired after Satsuki Sho injury)'],
                 ],
             ],
 
@@ -355,9 +526,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Sakura Bakushin O',
                 'targets' => [
-                    ['sprinters-stakes', 'goal', 1, 'Real-life 2x consecutive Sprinters Stakes winner'],
-                    ['asahi-hai-futurity', 'story', 2, 'Junior G1 showcase — dominated the mile sprint'],
-                    ['mile-championship', 'recommended', 3, 'Tried but heart is in the sprint'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['sprinters-stakes', 'goal', 2, 'Real-life 2x consecutive Sprinters Stakes winner — sprint crown'],
+                    ['takamatsunomiya-kinen', 'goal', 3, 'Spring sprint G1 crown — ultimate speed showcase'],
+                    ['asahi-hai-futurity', 'story', 4, 'Junior G1 mile showcase — dominated despite longer distance'],
+                    ['mile-championship', 'recommended', 5, 'Tried mile range but heart is in the sprint'],
                 ],
             ],
 
@@ -371,10 +544,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Rice Shower',
                 'targets' => [
-                    ['kikuka-sho', 'goal', 1, 'Upset win over Mihono Bourbon — Triple Crown derailed'],
-                    ['tenno-sho-spring', 'goal', 2, 'Real-life 2x winner — stamina pinnacle'],
-                    ['arima-kinen', 'story', 3, 'Long-distance year-end target'],
-                    ['takarazuka-kinen', 'recommended', 4, 'Medium-long prestige target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['kikuka-sho', 'goal', 2, 'Upset win over Mihono Bourbon — derails rival Triple Crown'],
+                    ['tenno-sho-spring', 'goal', 3, 'Real-life 2x winner — stamina pinnacle for the Black Assassin'],
+                    ['arima-kinen', 'story', 4, 'Year-end long-distance Grand Prix target'],
+                    ['takarazuka-kinen', 'recommended', 5, 'Medium-long summer G1 prestige target'],
                 ],
             ],
 
@@ -388,10 +562,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Mihono Bourbon',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Triple Crown leg one — perfect pace'],
-                    ['japan-derby', 'goal', 2, 'Triple Crown leg two'],
-                    ['kikuka-sho', 'goal', 3, 'Triple Crown broken by Rice Shower'],
-                    ['arima-kinen', 'recommended', 4, 'Year-end challenge'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'required', 2, 'Classic G1 — Triple Crown first leg (place top 3)'],
+                    ['japan-derby', 'required', 3, 'Classic G1 — Triple Crown second leg (place top 3)'],
+                    ['kikuka-sho', 'goal', 4, 'Triple Crown third leg — broken by Rice Shower'],
+                    ['arima-kinen', 'recommended', 5, 'Year-end Grand Prix challenge'],
                 ],
             ],
 
@@ -405,14 +580,15 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'T.M. Opera O',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Classic G1 — Millennium Grand Slam opener'],
-                    ['japan-derby', 'goal', 2, 'Millennium Grand Slam race two'],
-                    ['tenno-sho-autumn', 'goal', 3, 'Millennium sweep central race'],
-                    ['japan-cup', 'goal', 4, 'Millennium Grand Slam G1'],
-                    ['arima-kinen', 'goal', 5, 'Grand Slam final win — Year 2000'],
-                    ['tenno-sho-spring', 'story', 6, 'Year 3 crown — defense of spring title'],
-                    ['takarazuka-kinen', 'story', 7, 'Mid-year prestige win'],
-                    ['osaka-hai', 'recommended', 8, 'Senior year opener'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'required', 2, 'Classic G1 — Millennium Grand Slam opener (place top 3)'],
+                    ['japan-derby', 'required', 3, 'Classic G1 — Millennium Grand Slam race two (place top 3)'],
+                    ['tenno-sho-autumn', 'goal', 4, 'Millennium sweep central race — autumn dominance'],
+                    ['japan-cup', 'goal', 5, 'Millennium Grand Slam international G1 — world beat'],
+                    ['arima-kinen', 'goal', 6, 'Grand Slam final win — Year 2000 year-end coronation'],
+                    ['tenno-sho-spring', 'story', 7, 'Year 3 crown — defence of spring title'],
+                    ['takarazuka-kinen', 'story', 8, 'Mid-year prestige win — Millennium sweep continues'],
+                    ['osaka-hai', 'recommended', 9, 'Senior year opener target'],
                 ],
             ],
 
@@ -426,10 +602,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Maruzensky',
                 'targets' => [
-                    ['asahi-hai-futurity', 'goal', 1, 'Junior G1 — undefeated showcase'],
-                    ['hopeful-stakes', 'story', 2, 'Junior G1 medium distance win'],
-                    ['nhk-mile-cup', 'recommended', 3, 'Classic mile mastery'],
-                    ['mile-championship', 'recommended', 4, 'Natural distance fit'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['asahi-hai-futurity', 'goal', 2, 'Junior G1 — undefeated showcase in mile sprint'],
+                    ['nhk-mile-cup', 'goal', 3, 'Classic G1 mile mastery — uncrowned king claims crown'],
+                    ['hopeful-stakes', 'story', 4, 'Junior G1 medium — dual Classic year strength'],
+                    ['mile-championship', 'recommended', 5, 'Autumn G1 mile natural fit'],
                 ],
             ],
 
@@ -443,9 +620,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Admire Vega',
                 'targets' => [
-                    ['japan-derby', 'goal', 1, 'Real-life win — her defining moment'],
-                    ['satsuki-sho', 'story', 2, 'Classic journey begins'],
-                    ['kikuka-sho', 'recommended', 3, 'Triple Crown final leg aim'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'story', 2, 'Classic journey begins — star of the stars enters the stage'],
+                    ['japan-derby', 'goal', 3, 'Real-life win — her defining moment as Child of the Stars'],
+                    ['kikuka-sho', 'recommended', 4, 'Triple Crown final leg — the unfinished dream'],
                 ],
             ],
 
@@ -459,11 +637,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Agnes Digital',
                 'targets' => [
-                    ['mile-championship', 'goal', 1, 'Real-life win — all-rounder peak'],
-                    ['sprinters-stakes', 'story', 2, 'Real-life sprint G1 win'],
-                    ['nhk-mile-cup', 'story', 3, 'Classic year mile showcase'],
-                    ['victoria-mile', 'recommended', 4, 'Spring G1 mile fit'],
-                    ['tenno-sho-autumn', 'recommended', 5, 'Versatile medium distance aim'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['mile-championship', 'goal', 2, 'Real-life win — all-rounder all-surface peak'],
+                    ['sprinters-stakes', 'story', 3, 'Real-life sprint G1 win — speed versatility proven'],
+                    ['nhk-mile-cup', 'story', 4, 'Classic year mile showcase — idols shine bright'],
+                    ['victoria-mile', 'recommended', 5, 'Spring G1 mile fit'],
+                    ['tenno-sho-autumn', 'recommended', 6, 'Versatile medium distance longer aim'],
                 ],
             ],
 
@@ -477,10 +656,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'King Halo',
                 'targets' => [
-                    ['mile-championship', 'goal', 1, 'Real-life dramatic comeback win'],
-                    ['nhk-mile-cup', 'story', 2, 'Classic year mile target'],
-                    ['satsuki-sho', 'story', 3, 'Early story arc — trying to be a classic horse'],
-                    ['japan-derby', 'recommended', 4, 'His attempt at the big medium-distance races'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['mile-championship', 'goal', 2, 'Real-life dramatic comeback win — eccentric king prevails'],
+                    ['nhk-mile-cup', 'story', 3, 'Classic year mile target — proving mile mastery'],
+                    ['satsuki-sho', 'story', 4, 'Early story arc — trying to be a classic horse'],
+                    ['japan-derby', 'recommended', 5, 'His attempt at big medium-distance races'],
                 ],
             ],
 
@@ -494,10 +674,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Seiun Sky',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Real-life win — frontrunner dominance'],
-                    ['kikuka-sho', 'goal', 2, 'Real-life win — Triple Crown two-thirds complete'],
-                    ['yayoi-sho', 'story', 3, 'Classic prep — important lead-up'],
-                    ['tenno-sho-spring', 'recommended', 4, 'Stamina-heavy target for his style'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['yayoi-sho', 'story', 2, 'Classic G2 prep — important lead-up showcasing frontrunner style'],
+                    ['satsuki-sho', 'goal', 3, 'Real-life win — frontrunner dominance in Classic opener'],
+                    ['kikuka-sho', 'goal', 4, 'Real-life win — Triple Crown two-thirds complete'],
+                    ['tenno-sho-spring', 'recommended', 5, 'Stamina-heavy target fitting his frontrunner style'],
                 ],
             ],
 
@@ -511,9 +692,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Narita Taishin',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Real-life upset win over Biwa Hayahide'],
-                    ['arima-kinen', 'story', 2, 'Real-life Arima win — underdog triumph'],
-                    ['japan-derby', 'recommended', 3, 'Classic season second leg aim'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'goal', 2, 'Real-life upset win over Biwa Hayahide — underdog triumph'],
+                    ['arima-kinen', 'story', 3, 'Real-life Arima Kinen win — underdog legend confirmed'],
+                    ['japan-derby', 'recommended', 4, 'Classic season second leg aim'],
                 ],
             ],
 
@@ -527,9 +709,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Mejiro Ryan',
                 'targets' => [
-                    ['takarazuka-kinen', 'goal', 1, 'Real-life win — her crowning achievement'],
-                    ['arima-kinen', 'story', 2, 'Chasing Mejiro McQueen here'],
-                    ['osaka-hai', 'recommended', 3, 'Senior medium distance target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['takarazuka-kinen', 'goal', 2, 'Real-life win — her crowning achievement in the sun'],
+                    ['arima-kinen', 'story', 3, 'Year-end Grand Prix — chasing Mejiro McQueen'],
+                    ['osaka-hai', 'recommended', 4, 'Senior medium G1 distance target'],
                 ],
             ],
 
@@ -543,10 +726,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Nice Nature',
                 'targets' => [
-                    ['arima-kinen', 'goal', 1, '3rd place 3 consecutive years — legendary bronze story'],
-                    ['satsuki-sho', 'story', 2, 'Classic rivalry race'],
-                    ['japan-derby', 'recommended', 3, 'Classic target'],
-                    ['kikuka-sho', 'recommended', 4, 'Third leg long-distance aim'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['arima-kinen', 'goal', 2, '3rd place 3 consecutive years — legendary bronze collector story'],
+                    ['satsuki-sho', 'story', 3, 'Classic year rivalry race — chasing the big names'],
+                    ['japan-derby', 'recommended', 4, 'Classic second leg target'],
+                    ['kikuka-sho', 'recommended', 5, 'Third leg long-distance stamina aim'],
                 ],
             ],
 
@@ -560,10 +744,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Manhattan Cafe',
                 'targets' => [
-                    ['kikuka-sho', 'goal', 1, 'Real-life win — stamina king of her year'],
-                    ['tenno-sho-spring', 'goal', 2, 'Real-life win — long-distance specialist'],
-                    ['arima-kinen', 'story', 3, 'Year-end championship goal'],
-                    ['takarazuka-kinen', 'recommended', 4, 'Medium-long G1 fit'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['kikuka-sho', 'goal', 2, 'Real-life win — stamina king of the Classic year'],
+                    ['tenno-sho-spring', 'goal', 3, 'Real-life win — long-distance specialist proves dominance'],
+                    ['arima-kinen', 'story', 4, 'Year-end Grand Prix night wanderer story'],
+                    ['takarazuka-kinen', 'recommended', 5, 'Medium-long prestige G1 summer target'],
                 ],
             ],
 
@@ -577,11 +762,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Mayano Top Gun',
                 'targets' => [
-                    ['tenno-sho-spring', 'goal', 1, 'Real-life win — epic frontrunner dominance'],
-                    ['takarazuka-kinen', 'goal', 2, 'Real-life win'],
-                    ['arima-kinen', 'goal', 3, 'Real-life win — year-end legend'],
-                    ['kikuka-sho', 'story', 4, 'Classic stamina base'],
-                    ['osaka-hai', 'recommended', 5, 'Senior medium G1'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['kikuka-sho', 'story', 2, 'Classic stamina base — builds toward senior greatness'],
+                    ['tenno-sho-spring', 'goal', 3, 'Real-life win — epic Wild One frontrunner dominance'],
+                    ['takarazuka-kinen', 'goal', 4, 'Real-life win — chaos and guts in mid-year showdown'],
+                    ['arima-kinen', 'goal', 5, 'Real-life win — year-end Wild One legend cemented'],
+                    ['osaka-hai', 'recommended', 6, 'Senior medium G1 opener target'],
                 ],
             ],
 
@@ -595,10 +781,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Meisho Doto',
                 'targets' => [
-                    ['tenno-sho-autumn', 'goal', 1, 'Finally beat T.M. Opera O — defining win'],
-                    ['arima-kinen', 'story', 2, 'Year-end rivalry conclusion'],
-                    ['japan-cup', 'story', 3, 'T.M. Opera O era prestige race'],
-                    ['osaka-hai', 'recommended', 4, 'Senior G1 — revenge story fuel'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['tenno-sho-autumn', 'goal', 2, 'Finally beat T.M. Opera O — defining win of the Eternal Second'],
+                    ['arima-kinen', 'story', 3, 'Year-end rivalry conclusion with T.M. Opera O'],
+                    ['japan-cup', 'story', 4, 'Millennium era prestige race — close but never quite there'],
+                    ['osaka-hai', 'recommended', 5, 'Senior G1 revenge story fuel'],
                 ],
             ],
 
@@ -612,9 +799,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Twin Turbo',
                 'targets' => [
-                    ['tenno-sho-spring', 'goal', 1, 'Legendary frontrunner upset win'],
-                    ['takarazuka-kinen', 'story', 2, 'Mid-year escape strategy showcase'],
-                    ['osaka-hai', 'recommended', 3, 'Senior medium G1 target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['tenno-sho-spring', 'goal', 2, 'Legendary frontrunner upset win — berserker breaks free'],
+                    ['takarazuka-kinen', 'story', 3, 'Mid-year escape strategy showcase — all or nothing'],
+                    ['osaka-hai', 'recommended', 4, 'Senior medium G1 — frontrunner warmup target'],
                 ],
             ],
 
@@ -628,10 +816,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Fine Motion',
                 'targets' => [
-                    ['mile-championship', 'goal', 1, 'Real-life dominant win'],
-                    ['queen-elizabeth-cup', 'story', 2, 'Autumn filly championship target'],
-                    ['victoria-mile', 'recommended', 3, 'Spring G1 mile fit'],
-                    ['shuka-sho', 'recommended', 4, 'Autumn classic filly race'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['queen-cup', 'required', 2, 'Classic Feb — place top 3 (G3 filly mile prep)'],
+                    ['mile-championship', 'goal', 3, 'Real-life dominant win — Prairie Wind blows them away'],
+                    ['queen-elizabeth-cup', 'story', 4, 'Autumn filly championship target — queen claims throne'],
+                    ['victoria-mile', 'recommended', 5, 'Spring G1 mile fit'],
+                    ['shuka-sho', 'recommended', 6, 'Classic autumn filly G1 alternative target'],
                 ],
             ],
 
@@ -645,9 +835,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Kawakami Princess',
                 'targets' => [
-                    ['queen-elizabeth-cup', 'goal', 1, 'Real-life win — upset classic'],
-                    ['shuka-sho', 'story', 2, 'Autumn filly classic target'],
-                    ['takarazuka-kinen', 'recommended', 3, 'Mid-year prestige'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['shuka-sho', 'story', 2, 'Classic autumn filly G1 target — building to the upset'],
+                    ['queen-elizabeth-cup', 'goal', 3, 'Real-life win — Midsummer Princess upset classic victory'],
+                    ['takarazuka-kinen', 'recommended', 4, 'Mid-year G1 prestige against mixed field'],
                 ],
             ],
 
@@ -661,9 +852,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Ikuno Dictus',
                 'targets' => [
-                    ['queen-elizabeth-cup', 'goal', 1, 'Real-life win — stamina mare'],
-                    ['takarazuka-kinen', 'story', 2, 'Medium-long prestige target'],
-                    ['tenno-sho-autumn', 'recommended', 3, 'Medium G1 long-range fit'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['queen-elizabeth-cup', 'goal', 2, 'Real-life win — Iron Mare stamina greatness'],
+                    ['takarazuka-kinen', 'story', 3, 'Medium-long summer G1 prestige target'],
+                    ['tenno-sho-autumn', 'recommended', 4, 'Medium G1 longer-range fit'],
                 ],
             ],
 
@@ -677,13 +869,14 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Kitasan Black',
                 'targets' => [
-                    ['osaka-hai', 'goal', 1, 'Real-life win — Senior opener'],
-                    ['tenno-sho-spring', 'goal', 2, 'Real-life win — long stamina peak'],
-                    ['japan-cup', 'goal', 3, 'Real-life win — international stage'],
-                    ['arima-kinen', 'goal', 4, 'Real-life win — retirement finale'],
-                    ['tenno-sho-autumn', 'story', 5, 'Real-life win — dominant run'],
-                    ['takarazuka-kinen', 'story', 6, 'Mid-year prestige story'],
-                    ['satsuki-sho', 'recommended', 7, 'Classic year opener'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'story', 2, 'Classic year — People\'s Champion first Classic appearance'],
+                    ['osaka-hai', 'goal', 3, 'Real-life win — Senior opener dominance'],
+                    ['tenno-sho-spring', 'goal', 4, 'Real-life win — long stamina peak'],
+                    ['tenno-sho-autumn', 'story', 5, 'Real-life win — dominant autumn run'],
+                    ['japan-cup', 'goal', 6, 'Real-life win — international stage glory'],
+                    ['arima-kinen', 'goal', 7, 'Real-life win — legendary retirement finale'],
+                    ['takarazuka-kinen', 'story', 8, 'Mid-year prestige — People\'s Champion mid-year story'],
                 ],
             ],
 
@@ -697,10 +890,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Satono Diamond',
                 'targets' => [
-                    ['tenno-sho-spring', 'goal', 1, 'Real-life win — stamina showcase'],
-                    ['japan-cup', 'goal', 2, 'Real-life win — international glory'],
-                    ['arima-kinen', 'story', 3, 'Year-end rivalry with Kitasan Black'],
-                    ['kikuka-sho', 'recommended', 4, 'Classic stamina long race'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['kikuka-sho', 'story', 2, 'Classic G1 long stamina — rivalry with Kitasan Black begins'],
+                    ['tenno-sho-spring', 'goal', 3, 'Real-life win — Diamond shines in spring stamina showcase'],
+                    ['japan-cup', 'goal', 4, 'Real-life win — international glory on the world stage'],
+                    ['arima-kinen', 'story', 5, 'Year-end rivalry climax with Kitasan Black'],
                 ],
             ],
 
@@ -714,9 +908,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Nakayama Festa',
                 'targets' => [
-                    ['takarazuka-kinen', 'goal', 1, 'Real-life surprise win'],
-                    ['arima-kinen', 'story', 2, 'Real-life strong performance — Nakayama home track'],
-                    ['japan-cup', 'recommended', 3, 'International challenger story'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['takarazuka-kinen', 'goal', 2, 'Real-life surprise win — Nakayama Specialist conquers Hanshin'],
+                    ['arima-kinen', 'story', 3, 'Real-life strong performance — Nakayama home-track pride'],
+                    ['japan-cup', 'recommended', 4, 'International challenger story target'],
                 ],
             ],
 
@@ -730,10 +925,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Zenno Rob Roy',
                 'targets' => [
-                    ['tenno-sho-autumn', 'goal', 1, 'Real-life dominant autumn sweep'],
-                    ['mile-championship', 'story', 2, 'Real-life win — mile versatility'],
-                    ['arima-kinen', 'story', 3, 'Year-end story arc'],
-                    ['japan-cup', 'recommended', 4, 'Prestigious autumn target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['mainichi-okan', 'required', 2, 'Classic Autumn G2 mile prep — place top 3 (fan requirement)'],
+                    ['tenno-sho-autumn', 'goal', 3, 'Real-life dominant autumn sweep — Autumn Champion peak'],
+                    ['mile-championship', 'story', 4, 'Real-life win — mile versatility story'],
+                    ['arima-kinen', 'story', 5, 'Year-end Grand Prix story arc'],
+                    ['japan-cup', 'recommended', 6, 'Prestigious autumn international target'],
                 ],
             ],
 
@@ -747,10 +944,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Tosen Jordan',
                 'targets' => [
-                    ['mile-championship', 'goal', 1, 'Real-life win — career peak'],
-                    ['tenno-sho-autumn', 'goal', 2, 'Real-life win — medium distance range'],
-                    ['japan-cup', 'story', 3, 'International prestige target'],
-                    ['osaka-hai', 'recommended', 4, 'Senior G1 fit'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['mile-championship', 'goal', 2, 'Real-life win — Tactician\'s career peak'],
+                    ['tenno-sho-autumn', 'goal', 3, 'Real-life win — medium distance autumn dominance'],
+                    ['japan-cup', 'story', 4, 'International prestige target — Tactician on world stage'],
+                    ['osaka-hai', 'recommended', 5, 'Senior G1 medium fit'],
                 ],
             ],
 
@@ -764,10 +962,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Hishi Amazon',
                 'targets' => [
-                    ['takarazuka-kinen', 'goal', 1, 'Real-life win — filly vs males'],
-                    ['arima-kinen', 'story', 2, 'Year-end aspirations'],
-                    ['japan-derby', 'story', 3, 'Bold challenge — filly vs the colts'],
-                    ['queen-elizabeth-cup', 'recommended', 4, 'Autumn filly crown'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['shuka-sho', 'required', 2, 'Classic Autumn filly G1 — place top 3 (fan requirement)'],
+                    ['takarazuka-kinen', 'goal', 3, 'Real-life win — Indomitable Amazon beats the colts'],
+                    ['japan-derby', 'story', 4, 'Bold challenge — filly storms the Classic against the colts'],
+                    ['arima-kinen', 'story', 5, 'Year-end Grand Prix aspirations — Amazon refuses to yield'],
+                    ['queen-elizabeth-cup', 'recommended', 6, 'Autumn filly crown — natural home race'],
                 ],
             ],
 
@@ -781,9 +981,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Fuji Kiseki',
                 'targets' => [
-                    ['nhk-mile-cup', 'goal', 1, 'Real-life win — career peak before retirement'],
-                    ['satsuki-sho', 'story', 2, 'Favoured Triple Crown contender before injury'],
-                    ['mile-championship', 'recommended', 3, 'Natural mile specialist target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['spring-stakes', 'required', 2, 'Classic G2 mile prep — place top 3 (fan requirement)'],
+                    ['satsuki-sho', 'story', 3, 'Favoured Triple Crown contender — story ends before Classic begins'],
+                    ['nhk-mile-cup', 'goal', 4, 'Real-life win — definitive career peak before retirement'],
+                    ['mile-championship', 'recommended', 5, 'Natural mile specialist autumn target'],
                 ],
             ],
 
@@ -797,9 +999,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Mejiro Dober',
                 'targets' => [
-                    ['mile-championship', 'goal', 1, 'Real-life 3 consecutive wins'],
-                    ['nhk-mile-cup', 'story', 2, 'Classic year win'],
-                    ['victoria-mile', 'recommended', 3, 'Spring G1 mile target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['queen-cup', 'required', 2, 'Classic Feb G3 filly mile prep — place top 3 (fan requirement)'],
+                    ['mile-championship', 'goal', 3, 'Real-life 3 consecutive wins — Resilient Contender peak'],
+                    ['nhk-mile-cup', 'story', 4, 'Classic year G1 mile win story'],
+                    ['victoria-mile', 'recommended', 5, 'Spring senior G1 mile target'],
                 ],
             ],
 
@@ -813,11 +1017,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Mister C.B.',
                 'targets' => [
-                    ['satsuki-sho', 'goal', 1, 'Triple Crown first leg'],
-                    ['japan-derby', 'goal', 2, 'Triple Crown second leg'],
-                    ['kikuka-sho', 'goal', 3, 'Triple Crown third leg — Mihono Bourbon rival era'],
-                    ['tenno-sho-autumn', 'recommended', 4, 'Medium G1 senior aim'],
-                    ['japan-cup', 'recommended', 5, 'Prestigious senior target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'required', 2, 'Classic G1 — Triple Crown first leg (place top 3)'],
+                    ['japan-derby', 'required', 3, 'Classic G1 — Triple Crown second leg (place top 3)'],
+                    ['kikuka-sho', 'goal', 4, 'Triple Crown third leg — Rebel wins it from behind'],
+                    ['tenno-sho-autumn', 'recommended', 5, 'Senior medium G1 — Rebel range extended'],
+                    ['japan-cup', 'recommended', 6, 'Prestigious international senior target'],
                 ],
             ],
 
@@ -831,10 +1036,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Nishino Flower',
                 'targets' => [
-                    ['nhk-mile-cup', 'goal', 1, 'Real-life win — classic mile'],
-                    ['mile-championship', 'story', 2, 'Autumn mile championship aim'],
-                    ['victoria-mile', 'recommended', 3, 'Spring G1 mile fit'],
-                    ['sprinters-stakes', 'recommended', 4, 'Sprint range viable'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['tulip-sho', 'required', 2, 'Classic Mar G3 filly sprint — place top 3 (fan requirement)'],
+                    ['nhk-mile-cup', 'goal', 3, 'Real-life Classic G1 win — Blooming Flower in full bloom'],
+                    ['mile-championship', 'story', 4, 'Autumn mile championship aim — flower petal storm'],
+                    ['victoria-mile', 'recommended', 5, 'Spring senior G1 mile natural fit'],
+                    ['sprinters-stakes', 'recommended', 6, 'Sprint range viable for speed-heavy build'],
                 ],
             ],
 
@@ -848,9 +1055,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Smart Falcon',
                 'targets' => [
-                    ['antares-stakes', 'goal', 1, 'Best available dirt target in the catalog'],
-                    ['hyacinth-stakes', 'story', 2, 'Dirt mile Classic year opener'],
-                    ['sprinters-stakes', 'recommended', 3, 'Most accessible G1 for non-standard runs'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['antares-stakes', 'goal', 2, 'Best available dirt target in the catalog — JBC King at home'],
+                    ['hyacinth-stakes', 'story', 3, 'Dirt mile Classic year story opener'],
+                    ['sprinters-stakes', 'recommended', 4, 'Most accessible G1 for non-standard dirt runs'],
                 ],
             ],
 
@@ -864,10 +1072,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Haru Urara',
                 'targets' => [
-                    ['niiza-kinenkai', 'story', 1, 'She tries her best and bonds with supporters'],
-                    ['baba-kinenkai', 'story', 2, 'Another brave attempt at Baba'],
-                    ['kokura-nisai-stakes', 'recommended', 3, 'Sprint race in her range'],
-                    ['sapporo-nisai-stakes', 'recommended', 4, 'Her story is about participating, not winning'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['niiza-kinenkai', 'goal', 2, "Her dream — win at least one race at Kochi's Niiza track"],
+                    ['baba-kinenkai', 'goal', 3, 'Second dream — prove herself on a new track against all odds'],
+                    ['kokura-nisai-stakes', 'story', 4, 'Sprint race in her range — Never Give Up hearts on'],
+                    ['sapporo-nisai-stakes', 'story', 5, 'Her story is about never giving up, not winning'],
                 ],
             ],
 
@@ -881,9 +1090,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Mejiro Palmer',
                 'targets' => [
-                    ['takarazuka-kinen', 'goal', 1, 'Real-life win in dominant frontrunner style'],
-                    ['arima-kinen', 'story', 2, 'Escape artist at year end'],
-                    ['mile-championship', 'recommended', 3, 'Mile specialist aim'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['takarazuka-kinen', 'goal', 2, 'Real-life win — dominant frontrunner style mid-year triumph'],
+                    ['arima-kinen', 'goal', 3, 'Real-life 1991 Arima Kinen win — legendary escape victory'],
+                    ['mile-championship', 'recommended', 4, 'Mile specialist autumn G1 aim'],
                 ],
             ],
 
@@ -897,10 +1107,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Mejiro Ardan',
                 'targets' => [
-                    ['arima-kinen', 'story', 1, 'His claim to fame — near-miss at Arima'],
-                    ['mile-championship', 'story', 2, 'Real-life win — mile talent'],
-                    ['japan-derby', 'recommended', 3, 'Classic aim'],
-                    ['tenno-sho-spring', 'recommended', 4, 'Long-distance showcase'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['japan-derby', 'story', 2, 'Classic year medium aim — Strong Finisher tests his range'],
+                    ['mile-championship', 'goal', 3, 'Real-life win — ultimate mile goal achieved'],
+                    ['arima-kinen', 'goal', 4, 'His defining pursuit — near-miss that became a legend'],
+                    ['tenno-sho-spring', 'recommended', 5, 'Long-distance stamina showcase option'],
                 ],
             ],
 
@@ -914,9 +1125,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Shinko Windy',
                 'targets' => [
-                    ['victoria-mile', 'goal', 1, 'Real-life Victoria Mile win'],
-                    ['mile-championship', 'story', 2, 'Autumn mile crown aim'],
-                    ['nhk-mile-cup', 'recommended', 3, 'Classic year mile fit'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['tulip-sho', 'required', 2, 'Classic Mar G3 filly sprint — place top 3 (fan requirement)'],
+                    ['victoria-mile', 'goal', 3, 'Real-life Victoria Mile win — Wind Runner at her finest'],
+                    ['mile-championship', 'story', 4, 'Autumn mile crown story arc — wind carries her home'],
+                    ['nhk-mile-cup', 'recommended', 5, 'Classic year G1 mile natural fit'],
                 ],
             ],
 
@@ -930,9 +1143,15 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Curren Chan',
                 'targets' => [
-                    ['sprinters-stakes', 'goal', 1, 'Real-life sprint G1 win'],
-                    ['mile-championship', 'story', 2, 'Extended sprint range target'],
-                    ['nhk-mile-cup', 'recommended', 3, 'Classic year option'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['fillies-revue', 'required', 2, 'Classic Year Early Mar — place top 5 (1,750 fans required)'],
+                    ['aoi-stakes', 'required', 3, 'Classic Year Late May — place top 5 (1,250 fans required)'],
+                    ['hakodate-sprint-stakes', 'required', 4, 'Classic Year Late Jun — place top 3 (1,250 fans required)'],
+                    ['sprinters-stakes', 'goal', 5, 'Sprint G1 goal — top 3 Classic Year Late Sep, then win Senior Year Late Sep'],
+                    ['ocean-stakes', 'required', 6, 'Senior Year Early Mar — place top 3 (1,500 fans required)'],
+                    ['takamatsunomiya-kinen', 'goal', 7, 'Senior Year Late Mar — place 1st (15,000 fans required)'],
+                    ['mile-championship', 'story', 8, 'Extended sprint range target'],
+                    ['nhk-mile-cup', 'recommended', 9, 'Classic year mile option'],
                 ],
             ],
 
@@ -946,9 +1165,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'tracking',
                 'real_horse_name' => 'Yaeno Muteki',
                 'targets' => [
-                    ['arima-kinen', 'goal', 1, 'Real-life win — year-end warrior'],
-                    ['japan-derby', 'story', 2, 'Classic journey highlight'],
-                    ['tenno-sho-autumn', 'recommended', 3, 'Medium G1 senior target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['satsuki-sho', 'story', 2, 'Classic journey highlight — Yaeno Muteki steps onto the G1 stage'],
+                    ['arima-kinen', 'goal', 3, 'Real-life win — Invincible year-end warrior'],
+                    ['tenno-sho-autumn', 'recommended', 4, 'Senior medium G1 range target'],
                 ],
             ],
 
@@ -962,9 +1182,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Hishi Akebono',
                 'targets' => [
-                    ['nhk-mile-cup', 'goal', 1, 'Real-life Classic win'],
-                    ['japan-derby', 'story', 2, 'Classic second leg aim'],
-                    ['tenno-sho-autumn', 'recommended', 3, 'Medium senior G1'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['nhk-mile-cup', 'goal', 2, 'Real-life Classic G1 win — Rising Sun shines brightest'],
+                    ['japan-derby', 'story', 3, 'Classic second leg aim — Rising Sun refuses to back down'],
+                    ['tenno-sho-autumn', 'recommended', 4, 'Senior medium G1 distance target'],
                 ],
             ],
 
@@ -978,8 +1199,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Ines Fujin',
                 'targets' => [
-                    ['sprinters-stakes', 'goal', 1, 'Sprint specialist peak race'],
-                    ['nhk-mile-cup', 'recommended', 2, 'Classic year longer option'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['aoi-stakes', 'required', 2, 'Classic Late May G3 sprint — place top 3 (fan requirement)'],
+                    ['sprinters-stakes', 'goal', 3, 'Sprint specialist G1 peak race — Wind Goddess speed peak'],
+                    ['takamatsunomiya-kinen', 'goal', 4, 'Spring sprint G1 crown — Wind Goddess sweeps the sprint scene'],
+                    ['nhk-mile-cup', 'recommended', 5, 'Classic year mile option for longer range build'],
                 ],
             ],
 
@@ -993,9 +1217,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Matikane Fukukitaru',
                 'targets' => [
-                    ['satsuki-sho', 'story', 1, 'Classic era highlight'],
-                    ['tenno-sho-autumn', 'recommended', 2, 'Medium G1 target'],
-                    ['arima-kinen', 'recommended', 3, 'Year-end goal'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['nhk-mile-cup', 'goal', 2, 'Real-life career-peak win — Good Luck Charm delivers fortune'],
+                    ['tenno-sho-autumn', 'goal', 3, 'Medium G1 dream target — autumn classics fortune strikes'],
+                    ['satsuki-sho', 'story', 4, 'Classic era highlight — lucky charm enters the big stage'],
+                    ['arima-kinen', 'recommended', 5, 'Year-end Grand Prix target'],
                 ],
             ],
 
@@ -1009,9 +1235,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'insert',
                 'real_horse_name' => 'Matikane Tannhauser',
                 'targets' => [
-                    ['takarazuka-kinen', 'story', 1, 'Mid-year prestige target'],
-                    ['tenno-sho-autumn', 'recommended', 2, 'Autumn medium G1'],
-                    ['arima-kinen', 'recommended', 3, 'Year-end aim'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['takarazuka-kinen', 'goal', 2, 'Real-life 1994 Takarazuka Kinen win — blessed mid-year triumph'],
+                    ['arima-kinen', 'goal', 3, 'Real-life 1994 Arima Kinen win — Blessed Runner year-end triumph'],
+                    ['tenno-sho-autumn', 'story', 4, 'Senior autumn medium G1 — blessed journey continues'],
                 ],
             ],
 
@@ -1025,8 +1252,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'escape',
                 'real_horse_name' => 'Sakura Chiyono O',
                 'targets' => [
-                    ['nhk-mile-cup', 'goal', 1, 'Real-life Classic win'],
-                    ['mile-championship', 'recommended', 2, 'Autumn mile target'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['spring-stakes', 'required', 2, 'Classic Mar G2 mile prep — place top 3 (fan requirement)'],
+                    ['nhk-mile-cup', 'goal', 3, 'Real-life Classic G1 win — Cherry Blossom blooms in May'],
+                    ['mile-championship', 'recommended', 4, 'Autumn G1 mile natural target for Classic winner'],
                 ],
             ],
 
@@ -1040,9 +1269,11 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Tamamo Cross',
                 'targets' => [
-                    ['tenno-sho-spring', 'goal', 1, 'Real-life win — beloved farm horse legend'],
-                    ['takarazuka-kinen', 'story', 2, 'Real-life win — crowd favourite'],
-                    ['arima-kinen', 'recommended', 3, 'Year-end goal'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['mainichi-okan', 'required', 2, 'Classic Autumn G2 mile prep — place top 3 (fan requirement)'],
+                    ['tenno-sho-spring', 'goal', 3, 'Real-life win — beloved countryside farm horse legend peaks'],
+                    ['takarazuka-kinen', 'goal', 4, 'Real-life win — crowd favourite mid-year triumph'],
+                    ['arima-kinen', 'recommended', 5, 'Year-end Grand Prix endurance goal'],
                 ],
             ],
 
@@ -1056,9 +1287,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Gold City',
                 'targets' => [
-                    ['sprinters-stakes', 'goal', 1, 'Real-life sprint G1 target'],
-                    ['asahi-hai-futurity', 'story', 2, 'Junior sprint showcase'],
-                    ['mile-championship', 'recommended', 3, 'Extended range attempt'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['aoi-stakes', 'required', 2, 'Classic Late May G3 sprint — place top 3 (fan requirement)'],
+                    ['sprinters-stakes', 'goal', 3, 'Real-life sprint G1 target — Gold City speed pays off'],
+                    ['takamatsunomiya-kinen', 'goal', 4, 'Spring sprint G1 crown — Gold City shines brightest'],
+                    ['asahi-hai-futurity', 'story', 5, 'Junior G1 sprint showcase — gold gleams early'],
+                    ['mile-championship', 'recommended', 6, 'Extended range attempt for gold-themed versatility'],
                 ],
             ],
 
@@ -1072,9 +1306,10 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Yukino Bijin',
                 'targets' => [
-                    ['tenno-sho-spring', 'story', 1, 'Long stamina race for her style'],
-                    ['sapporo-kinen', 'recommended', 2, 'Sapporo summer — fits her snow namesake'],
-                    ['arima-kinen', 'recommended', 3, 'Year-end endurance goal'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['tenno-sho-spring', 'goal', 2, 'Real-life win — 1993 Tenno Sho Spring champion — Snow Beauty prevails'],
+                    ['sapporo-kinen', 'goal', 3, 'Summer G2 goal — Snow Beauty shines at Hokkaido namesake track'],
+                    ['arima-kinen', 'recommended', 4, 'Year-end Grand Prix endurance test'],
                 ],
             ],
 
@@ -1088,10 +1323,12 @@ class GameCharacterSeeder extends Seeder
                 'preferred_style' => 'leader',
                 'real_horse_name' => 'Winning Ticket',
                 'targets' => [
-                    ['japan-derby', 'goal', 1, "Real-life win — the lucky star's defining race"],
-                    ['satsuki-sho', 'story', 2, 'Narita Brian rivalry begins'],
-                    ['kikuka-sho', 'recommended', 3, 'Triple Crown final leg aim'],
-                    ['arima-kinen', 'recommended', 4, 'Year-end fan favourite goal'],
+                    ['debut-race', 'required', 1, 'Junior Make Debut — career start'],
+                    ['spring-stakes', 'required', 2, 'Classic Mar G2 mile prep — place top 3 (fan requirement)'],
+                    ['satsuki-sho', 'story', 3, 'Narita Brian rivalry begins — Lucky Star vs Shadow of Century'],
+                    ['japan-derby', 'goal', 4, "Real-life win — Lucky Star's defining race on largest stage"],
+                    ['kikuka-sho', 'recommended', 5, 'Triple Crown final leg aim — lucky streak continues'],
+                    ['arima-kinen', 'recommended', 6, 'Year-end Grand Prix fan favourite goal'],
                 ],
             ],
 

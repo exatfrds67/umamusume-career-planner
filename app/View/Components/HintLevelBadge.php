@@ -53,7 +53,7 @@ class HintLevelBadge extends Component
     public function getColorClasses(): string
     {
         if ($this->level === 0) {
-            return 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600';
+            return 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-300 dark:border-neutral-600';
         }
 
         if ($this->level >= 5) {

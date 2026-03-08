@@ -66,7 +66,7 @@ class TurnCounter extends Component
             'Junior' => 'text-green-600 dark:text-green-400',
             'Classic' => 'text-blue-600 dark:text-blue-400',
             'Senior' => 'text-purple-600 dark:text-purple-400',
-            default => 'text-gray-600 dark:text-gray-400',
+            default => 'text-neutral-600 dark:text-neutral-400',
         };
     }
 

@@ -95,6 +95,8 @@ class AIChatController extends Controller
                 ],
                 'conversation_id' => $conversationId,
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('AI chat message failed', [
                 'error' => $e->getMessage(),
@@ -181,6 +183,11 @@ class AIChatController extends Controller
                         'knowledge_sources' => $response['knowledge_sources'] ?? [],
                     ],
                     'conversation_id' => $conversationId,
+                ])."\n\n";
+                flush();
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                echo 'data: '.json_encode([
+                    'error' => 'Character not found.',
                 ])."\n\n";
                 flush();
             } catch (\Exception $e) {
@@ -497,6 +504,7 @@ class AIChatController extends Controller
             }
 
             $character = Character::with(['currentCareer', 'aptitudes', 'skills', 'factors'])
+                ->where('user_id', Auth::id())
                 ->findOrFail($characterId);
 
             $context['character'] = [
@@ -718,37 +726,54 @@ class AIChatController extends Controller
         array $response = []
     ): void {
         try {
-            \App\Models\AIConversation::create([
+            $convId = $conversationId ?? Str::uuid()->toString();
+
+            $conversation = \App\Models\AIConversation::firstOrCreate(
+                ['conversation_id' => $convId],
+                [
+                    'user_id' => $userId,
+                    'conversation_type' => 'general_help',
+                    'status' => 'active',
+                    'message_count' => 0,
+                    'started_at' => now(),
+                    'last_activity_at' => now(),
+                    'ai_model' => $response['model'] ?? 'unknown',
+                    'ai_version' => '1.0',
+                ]
+            );
+
+            ConversationMessage::create([
+                'conversation_id' => $conversation->id,
                 'user_id' => $userId,
-                'character_id' => $characterId,
-                'conversation_id' => $conversationId ?? Str::uuid()->toString(),
                 'message_type' => 'user',
                 'message_content' => $message,
-                'ai_model_used' => null,
-                'processing_time' => null,
-                'tokens_used' => null,
-                'cost_estimate' => null,
+                'status' => 'completed',
+                'sent_at' => now(),
             ]);
 
-            \App\Models\AIConversation::create([
+            ConversationMessage::create([
+                'conversation_id' => $conversation->id,
                 'user_id' => $userId,
-                'character_id' => $characterId,
-                'conversation_id' => $conversationId ?? Str::uuid()->toString(),
                 'message_type' => 'ai',
-                'message_content' => $response['content'],
-                'ai_model_used' => $response['model'],
-                'processing_time' => $response['processing_time'],
+                'message_content' => $response['content'] ?? '',
+                'ai_model_used' => $response['model'] ?? null,
+                'processing_time' => $response['processing_time'] ?? null,
                 'tokens_used' => $response['tokens'] ?? null,
-                'cost_estimate' => $response['cost'],
-                'metadata' => json_encode([
-                    'provider' => $response['provider'],
+                'cost_estimate' => $response['cost'] ?? null,
+                'message_metadata' => [
+                    'provider' => $response['provider'] ?? null,
                     'agent' => $response['agent'] ?? null,
                     'confidence' => $response['confidence'] ?? null,
-                    'tools_used' => $response['tools_used'],
+                    'tools_used' => $response['tools_used'] ?? [],
                     'rag_enhanced' => $response['rag_enhanced'] ?? false,
                     'knowledge_sources' => $response['knowledge_sources'] ?? [],
-                ]),
+                ],
+                'status' => 'completed',
+                'sent_at' => now(),
             ]);
+
+            $conversation->increment('message_count', 2);
+            $conversation->update(['last_activity_at' => now()]);
         } catch (\Exception $e) {
             Log::error('Failed to log conversation', [
                 'error' => $e->getMessage(),

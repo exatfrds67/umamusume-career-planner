@@ -74,7 +74,7 @@ class ConditionBadge extends Component
             'GOOD' => 'bg-blue-500 text-white dark:bg-blue-600',
             'NORMAL' => 'bg-orange-500 text-white dark:bg-orange-600',
             'BAD' => 'bg-red-500 text-white dark:bg-red-600',
-            default => 'bg-gray-500 text-white dark:bg-gray-600',
+            default => 'bg-neutral-500 text-white dark:bg-neutral-600',
         };
     }
 

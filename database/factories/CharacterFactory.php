@@ -30,7 +30,7 @@ class CharacterFactory extends Factory
                 'stamina' => fake()->numberBetween(0, 1200),
                 'power' => fake()->numberBetween(0, 1200),
                 'guts' => fake()->numberBetween(0, 1200),
-                'wisdom' => fake()->numberBetween(0, 1200),
+                'wit' => fake()->numberBetween(0, 1200),
             ],
             'stat_priorities' => [],
             'stat_breakpoints' => [],

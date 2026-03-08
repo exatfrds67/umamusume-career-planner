@@ -131,7 +131,7 @@ class CharacterPrefillController extends Controller
      * Transform external character data to prefill format
      *
      * @param  array<string, mixed>  $character
-     * @return array{external_id: mixed, name: string, name_en: string, name_jp: string, image_url: string|null, category: string|null, color: string, stats: array{speed: int, stamina: int, power: int, guts: int, wit: int}, aptitudes: array{distance: array{sprint: string, mile: string, medium: string, long: string}, surface: array{turf: string, dirt: string}, style: array{front_runner: string, pace_chaser: string, late_surger: string, end_closer: string}}, metadata: array{source: string, fetched_at: string}}
+     * @return array{external_id: mixed, name: string, name_en: string, name_jp: string, avatar_url: string|null, image: string|null, image_url: string|null, category: string|null, color: string, stats: array{speed: int, stamina: int, power: int, guts: int, wit: int}, aptitudes: array{distance: array{sprint: string, mile: string, medium: string, long: string}, surface: array{turf: string, dirt: string}, style: array{front_runner: string, pace_chaser: string, late_surger: string, end_closer: string}}, metadata: array{source: string, fetched_at: string}}
      */
     protected function transformToPrefillFormat(array $character): array
     {
@@ -149,6 +149,8 @@ class CharacterPrefillController extends Controller
             'name' => $nameEn !== '' ? $nameEn : $nameJp,
             'name_en' => $nameEn,
             'name_jp' => $nameJp,
+            'avatar_url' => $thumbImg,
+            'image' => $thumbImg,
             'image_url' => $thumbImg,
             'category' => $categoryLabel,
             'color' => $colorMain,

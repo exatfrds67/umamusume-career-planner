@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\Career;
 use App\Models\Character;
 use App\Models\User;
+use App\Services\CharacterGameDataResolver;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -28,6 +29,7 @@ class PlanCharactersSeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('email', 'admin@umamusume.local')->firstOrFail();
+        $resolver = app(CharacterGameDataResolver::class);
 
         // Guard: skip if Biwa Hayahide already exists as an admin-owned plan character
         $alreadySeeded = Character::where('user_id', $admin->id)
@@ -45,11 +47,15 @@ class PlanCharactersSeeder extends Seeder
         $plans = $this->planDefinitions();
 
         foreach ($plans as $careerId => $plan) {
+            $gameCharacter = $resolver->findByCharacterName($plan['name']);
+
             $character = Character::create([
                 'user_id' => $admin->id,
                 'uuid' => Str::uuid()->toString(),
                 'name' => $plan['name'],
+                'avatar_url' => $resolver->resolveAvatarUrlForGameCharacter($gameCharacter),
                 'scenario_type' => $plan['scenario_type'],
+                'game_character_id' => $gameCharacter?->id,
                 'career_stage' => $plan['career_stage'],
                 'current_turn' => $plan['current_turn'],
                 'current_stats' => $plan['current_stats'],

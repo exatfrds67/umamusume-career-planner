@@ -18,10 +18,18 @@ use Illuminate\Support\Facades\DB;
  */
 class TrainingService
 {
+    /**
+     * Maximum turns per career scenario.
+     */
+    private const MAX_TURNS_URA = 72;
+
+    private const MAX_TURNS_UNITY_CUP = 78;
+
     public function __construct(
         protected SupportBonusCalculator $bonusCalculator,
         protected BondProgressionService $bondService,
-        protected SkillHintService $hintService
+        protected SkillHintService $hintService,
+        protected CharacterStateService $stateService
     ) {}
 
     /**
@@ -32,6 +40,16 @@ class TrainingService
      */
     public function executeTraining(Character $character, string $trainingType, array $actualGains): array
     {
+        // Check turn limit before executing
+        $maxTurns = $this->getMaxTurns($character);
+        if ($character->current_turn >= $maxTurns) {
+            return [
+                'success' => false,
+                'message' => 'Career has reached the maximum number of turns.',
+                'turn_limit_reached' => true,
+            ];
+        }
+
         return DB::transaction(function () use ($character, $trainingType, $actualGains) {
             $activeDeck = $character->activeSupportDeck;
 
@@ -40,8 +58,43 @@ class TrainingService
                 ? $this->bonusCalculator->calculateBonuses($activeDeck, $trainingType)
                 : $this->getEmptyBonuses();
 
-            // Update character stats
-            $this->updateCharacterStats($character, $actualGains);
+            // Calculate energy cost
+            $energyCost = $this->calculateEnergyCost($trainingType);
+
+            // Simulate training failure based on energy level
+            $failureResult = $this->simulateFailure($character, $trainingType);
+
+            // If training failed, reduce gains significantly
+            $effectiveGains = $actualGains;
+            if ($failureResult['failed']) {
+                $effectiveGains = $this->applyFailurePenalty($actualGains);
+            }
+
+            // Update character stats (stats + SP)
+            $this->updateCharacterStats($character, $effectiveGains);
+
+            // Consume energy (or recover for rest-type)
+            if ($energyCost > 0) {
+                $this->stateService->consumeEnergy($character, $energyCost);
+            } elseif ($energyCost < 0) {
+                $character->energy_level = min(100, (int) $character->energy_level + abs($energyCost));
+                $character->save();
+            }
+
+            // Progress turn and phase
+            $turnResult = $this->stateService->progressTurn($character);
+
+            // Update career phase/turn if career exists
+            $career = $character->currentCareer;
+            if ($career) {
+                $career->current_turn = $turnResult['turn'];
+                $newPhase = $turnResult['stage'];
+                if (\in_array($newPhase, ['junior', 'classic', 'senior'], true)) {
+                    /** @var 'junior'|'classic'|'senior' $newPhase */
+                    $career->current_phase = $newPhase;
+                }
+                $career->save();
+            }
 
             // Update bond levels if deck exists
             $bondUpdates = [];
@@ -66,25 +119,41 @@ class TrainingService
             $session = $this->recordTrainingSession(
                 $character,
                 $trainingType,
-                $actualGains,
+                $effectiveGains,
                 $bonuses,
                 $bondUpdates,
                 $skillHints
             );
 
+            // Check if career should end
+            $maxTurns = $this->getMaxTurns($character);
+            $careerCompleted = $turnResult['turn'] >= $maxTurns;
+
+            if ($careerCompleted && $career) {
+                $career->status = 'completed';
+                $career->save();
+
+                $character->status = 'completed';
+                $character->save();
+            }
+
             return [
                 'success' => true,
+                'training_failed' => $failureResult['failed'],
+                'failure_message' => $failureResult['message'],
                 'session' => $session,
-                'stat_gains' => $actualGains,
+                'stat_gains' => $effectiveGains,
                 'bond_updates' => $bondUpdates,
                 'skill_hints' => $skillHints,
                 'is_friendship' => $bonuses['is_friendship'],
+                'turn_result' => $turnResult,
+                'career_completed' => $careerCompleted,
             ];
         });
     }
 
     /**
-     * Update character stats.
+     * Update character stats and SP.
      *
      * @param  array<string, int>  $gains
      */
@@ -93,15 +162,20 @@ class TrainingService
         $currentStats = $character->current_stats;
 
         foreach ($gains as $stat => $gain) {
+            if ($stat === 'sp') {
+                continue;
+            }
             if (isset($currentStats[$stat])) {
                 $currentStats[$stat] = min(1200, $currentStats[$stat] + $gain);
             }
         }
 
-        $character->update([
+        $spGain = $gains['sp'] ?? 0;
+        $character->fill([
             'current_stats' => $currentStats,
-            'current_turn' => $character->current_turn + 1,
+            'available_sp' => (int) $character->available_sp + $spGain,
         ]);
+        $character->save();
     }
 
     /**
@@ -206,7 +280,63 @@ class TrainingService
             'rest' => -30,
             'recreation' => -20,
             'infirmary' => -10,
+            'wit' => 10,
             default => 20,
+        };
+    }
+
+    /**
+     * Simulate training failure based on energy level.
+     *
+     * @return array{failed: bool, message: string, failure_rate: int}
+     */
+    protected function simulateFailure(Character $character, string $trainingType): array
+    {
+        $energyLevel = (int) ($character->energy_level ?? 100);
+
+        $failureRate = match (true) {
+            $energyLevel >= 50 => 0,
+            $energyLevel >= 30 => 20,
+            $energyLevel >= 10 => 40,
+            default => 60,
+        };
+
+        if ($failureRate === 0) {
+            return ['failed' => false, 'message' => '', 'failure_rate' => 0];
+        }
+
+        $roll = mt_rand(1, 100);
+        $failed = $roll <= $failureRate;
+
+        return [
+            'failed' => $failed,
+            'message' => $failed ? 'Training failed! Stats gained were reduced.' : '',
+            'failure_rate' => $failureRate,
+        ];
+    }
+
+    /**
+     * Apply failure penalty to gains (50% reduction on failure).
+     *
+     * @param  array<string, int>  $gains
+     * @return array<string, int>
+     */
+    protected function applyFailurePenalty(array $gains): array
+    {
+        return array_map(
+            fn (int $gain): int => (int) round($gain * 0.5),
+            $gains
+        );
+    }
+
+    /**
+     * Get the maximum number of turns for this character's scenario.
+     */
+    protected function getMaxTurns(Character $character): int
+    {
+        return match ($character->scenario_type) {
+            'unity_cup' => self::MAX_TURNS_UNITY_CUP,
+            default => self::MAX_TURNS_URA,
         };
     }
 

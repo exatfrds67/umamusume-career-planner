@@ -138,21 +138,22 @@ final readonly class SupportCard
     /**
      * Get the Friendship Training bonus multiplier based on limit breaks
      *
-     * - 0 stars: +10%
-     * - 1 star: +15%
-     * - 2 stars: +20%
-     * - 3 stars: +25%
-     * - 4 stars: +30%
+     * Per docs (LB multipliers on card training contribution):
+     * - 0 stars: +0%  (1.0×)
+     * - 1 star:  +10% (1.1×)
+     * - 2 stars: +20% (1.2×)
+     * - 3 stars: +25% (1.3×)
+     * - 4 stars: +40% (1.4×)
      */
     public function getFriendshipBonus(): float
     {
         return match ($this->limitBreak) {
-            0 => 0.10,
-            1 => 0.15,
+            0 => 0.00,
+            1 => 0.10,
             2 => 0.20,
-            3 => 0.25,
-            4 => 0.30,
-            default => 0.10,
+            3 => 0.30,
+            4 => 0.40,
+            default => 0.00,
         };
     }
 

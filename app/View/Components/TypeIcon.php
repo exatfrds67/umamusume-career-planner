@@ -45,7 +45,7 @@ class TypeIcon extends Component
             'guts' => 'text-amber-500 dark:text-amber-400',
             'wit', 'wisdom' => 'text-sky-500 dark:text-sky-400',
             'friend' => 'text-pink-500 dark:text-pink-400',
-            default => 'text-gray-500 dark:text-gray-400',
+            default => 'text-neutral-500 dark:text-neutral-400',
         };
     }
 
@@ -103,7 +103,7 @@ class TypeIcon extends Component
             'guts' => 'bg-amber-100 dark:bg-amber-900/30',
             'wit', 'wisdom' => 'bg-sky-100 dark:bg-sky-900/30',
             'friend' => 'bg-pink-100 dark:bg-pink-900/30',
-            default => 'bg-gray-100 dark:bg-gray-900/30',
+            default => 'bg-neutral-100 dark:bg-neutral-900/30',
         };
     }
 }

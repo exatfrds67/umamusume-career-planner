@@ -21,6 +21,11 @@ class SupportBonusCalculator
     ];
 
     /**
+     * Per-card flat bonus percentage (+5% per card in deck, max +30% for 6 cards).
+     */
+    private const PER_CARD_BONUS = 5;
+
+    /**
      * Friendship training multiplier (bond >= 80).
      */
     private const FRIENDSHIP_MULTIPLIER = 1.2;
@@ -44,7 +49,8 @@ class SupportBonusCalculator
             return $this->emptyBonusResult();
         }
 
-        $totalBonus = 0;
+        $rarityBonus = 0;
+        $perCardBonus = 0;
         $activeCards = [];
         $friendshipCount = 0;
 
@@ -52,14 +58,20 @@ class SupportBonusCalculator
             $bondLevel = $card->pivot->bond_level ?? 0;
             $rarity = $card->rarity ?? 'R';
 
-            // Calculate base bonus for this card
+            // Calculate rarity-based bonus for this card
             $baseBonus = $this->getBaseBonusForCard($rarity, $trainingType);
 
             // Apply limit break multiplier if available
             $limitBreakMultiplier = $this->getLimitBreakMultiplier($card);
             $cardBonus = $baseBonus * $limitBreakMultiplier;
 
-            $totalBonus += $cardBonus;
+            $rarityBonus += $cardBonus;
+
+            // Per-card +5% bonus when specialization matches training type (or friend card)
+            $cardSpecialization = $card->card_type ?? $card->specialization ?? null;
+            if ($this->cardMatchesTrainingType($cardSpecialization, $trainingType)) {
+                $perCardBonus += self::PER_CARD_BONUS;
+            }
 
             // Track friendship cards
             if ($bondLevel >= self::FRIENDSHIP_THRESHOLD) {
@@ -73,8 +85,11 @@ class SupportBonusCalculator
                 'bonus' => $cardBonus,
                 'bond' => $bondLevel,
                 'is_friendship' => $bondLevel >= self::FRIENDSHIP_THRESHOLD,
+                'per_card_bonus' => $this->cardMatchesTrainingType($cardSpecialization, $trainingType) ? self::PER_CARD_BONUS : 0,
             ];
         }
+
+        $totalBonus = $rarityBonus + $perCardBonus;
 
         // Apply friendship training multiplier if threshold met
         $isFriendship = $friendshipCount >= 3; // Need at least 3 cards at 80+ bond
@@ -83,6 +98,8 @@ class SupportBonusCalculator
 
         return [
             'base_bonus' => round($totalBonus, 2),
+            'rarity_bonus' => round($rarityBonus, 2),
+            'per_card_bonus' => $perCardBonus,
             'friendship_multiplier' => $friendshipMultiplier,
             'final_bonus' => round($finalBonus, 2),
             'is_friendship' => $isFriendship,
@@ -98,6 +115,25 @@ class SupportBonusCalculator
     private function getBaseBonusForCard(string $rarity, string $trainingType): float
     {
         return (float) (self::RARITY_BONUSES[$rarity] ?? self::RARITY_BONUSES['R']);
+    }
+
+    /**
+     * Check if a card's specialization matches the training type.
+     * Friend/pal cards match all training types.
+     */
+    private function cardMatchesTrainingType(?string $cardSpecialization, string $trainingType): bool
+    {
+        if ($cardSpecialization === null) {
+            return false;
+        }
+
+        $normalized = strtolower($cardSpecialization);
+
+        if ($normalized === 'friend' || $normalized === 'pal') {
+            return true;
+        }
+
+        return $normalized === strtolower($trainingType);
     }
 
     /**
@@ -122,6 +158,8 @@ class SupportBonusCalculator
     {
         return [
             'base_bonus' => 0,
+            'rarity_bonus' => 0,
+            'per_card_bonus' => 0,
             'friendship_multiplier' => 1.0,
             'final_bonus' => 0,
             'is_friendship' => false,

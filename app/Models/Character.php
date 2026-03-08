@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Services\CharacterGameDataResolver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,7 +18,15 @@ use Illuminate\Support\Str;
  * @property int $user_id
  * @property string $uuid
  * @property string $name
+ * @property string|null $title
  * @property string|null $avatar_url
+ * @property float $image_x
+ * @property float $image_y
+ * @property float $image_zoom
+ * @property int $image_rotation
+ * @property bool $image_flip_h
+ * @property string|null $avatar_processed
+ * @property string|null $avatar_circular
  * @property string $scenario_type
  * @property string $career_stage
  * @property int $current_turn
@@ -57,7 +66,15 @@ class Character extends Model
         'user_id',
         'uuid',
         'name',
+        'title',
         'avatar_url',
+        'image_x',
+        'image_y',
+        'image_zoom',
+        'image_rotation',
+        'image_flip_h',
+        'avatar_processed',
+        'avatar_circular',
         'scenario_type',
         'career_stage',
         'current_turn',
@@ -82,6 +99,7 @@ class Character extends Model
         'is_seeded',
         'completion_data',
         'available_sp',
+        'game_character_id',
     ];
 
     /**
@@ -92,6 +110,11 @@ class Character extends Model
         return [
             'user_id' => 'integer',
             'current_turn' => 'integer',
+            'image_x' => 'float',
+            'image_y' => 'float',
+            'image_zoom' => 'float',
+            'image_rotation' => 'integer',
+            'image_flip_h' => 'boolean',
             'current_stats' => 'array',
             'stat_priorities' => 'array',
             'stat_breakpoints' => 'array',
@@ -132,6 +155,14 @@ class Character extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo<GameCharacter, $this>
+     */
+    public function gameCharacter(): BelongsTo
+    {
+        return $this->belongsTo(GameCharacter::class);
     }
 
     /**
@@ -307,6 +338,12 @@ class Character extends Model
         $this->attributes['current_stats'] = json_encode($normalized);
     }
 
+    protected function getAvatarUrlAttribute(mixed $value): ?string
+    {
+        return app(CharacterGameDataResolver::class)
+            ->resolveAvatarUrlForCharacter($this, $value);
+    }
+
     // Helper methods for stat access
     /**
      * Get a specific stat value as an integer.
@@ -342,28 +379,68 @@ class Character extends Model
         };
     }
 
+    /**
+     * Get the maximum turns for this character's scenario.
+     * Unity Cup runs to 78 turns; all other scenarios (including URA Finale) use 72.
+     */
+    public function getMaxTurns(): int
+    {
+        return $this->scenario_type === 'unity_cup' ? 78 : 72;
+    }
+
     public function getProgressPercentage(): float
     {
-        if (! is_array($this->goals) || ! isset($this->goals['target_stats']) || ! is_array($this->goals['target_stats'])) {
-            return 0.0;
+        $statProgress = 0.0;
+        $turnProgress = 0.0;
+        $raceProgress = 0.0;
+
+        // Stat-based progress (60% weight)
+        if (is_array($this->goals) && isset($this->goals['target_stats']) && is_array($this->goals['target_stats'])) {
+            $stats = ['speed', 'stamina', 'power', 'guts', 'wit'];
+            $totalStatProgress = 0.0;
+            $statCount = 0;
+
+            foreach ($stats as $stat) {
+                $targetValue = $this->goals['target_stats'][$stat] ?? null;
+                if (is_numeric($targetValue) && (float) $targetValue > 0) {
+                    $current = $this->getStat($stat);
+                    $target = is_int($targetValue) ? $targetValue : (int) $targetValue;
+                    $progress = min(100.0, ($current / $target) * 100);
+                    $totalStatProgress += $progress;
+                    $statCount += 1;
+                }
+            }
+
+            $statProgress = $statCount > 0 ? $totalStatProgress / $statCount : 0.0;
         }
 
-        $stats = ['speed', 'stamina', 'power', 'guts', 'wit'];
-        $totalProgress = 0.0;
-        $statCount = 0;
+        // Turn-based progress (25% weight)
+        $maxTurns = $this->getMaxTurns();
+        $turnProgress = min(100.0, ((int) $this->current_turn / $maxTurns) * 100);
 
-        foreach ($stats as $stat) {
-            $targetValue = $this->goals['target_stats'][$stat] ?? null;
-            if (is_numeric($targetValue) && (float) $targetValue > 0) {
-                $current = $this->getStat($stat);
-                $target = is_int($targetValue) ? $targetValue : (int) $targetValue;
-                $progress = min(100.0, ($current / $target) * 100);
-                $totalProgress += $progress;
-                $statCount += 1;
+        // Race-based progress (15% weight) — goal races completed
+        if ($this->game_character_id) {
+            $gameCharacter = $this->gameCharacter;
+            if ($gameCharacter) {
+                $goalRaces = $gameCharacter->goalRaces;
+                $totalGoalRaces = count($goalRaces);
+                if ($totalGoalRaces > 0) {
+                    $career = $this->currentCareer;
+                    $completedGoalRaces = 0;
+                    if ($career) {
+                        $completedGoalRaces = $career->races()
+                            ->where('won_race', true)
+                            ->count('*');
+                    }
+                    $raceProgress = min(100.0, ($completedGoalRaces / $totalGoalRaces) * 100);
+                }
             }
         }
 
-        return $statCount > 0 ? round($totalProgress / $statCount, 1) : 0.0;
+        // Weighted average: 60% stats + 25% turns + 15% races
+        $weighted = ($statProgress * 0.60) + ($turnProgress * 0.25) + ($raceProgress * 0.15);
+
+        return round($weighted, 1);
     }
 
     /**

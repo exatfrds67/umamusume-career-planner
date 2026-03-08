@@ -54,6 +54,40 @@ class TrainingCalculationService
         'rest' => -50, // Rest recovers energy
     ];
 
+    /**
+     * Minimum number of rainbow (bond >= 80) cards required for Friendship Training activation
+     */
+    protected const FRIENDSHIP_CARD_THRESHOLD = 3;
+
+    /**
+     * Flat Friendship Training multiplier applied when the threshold is met
+     */
+    protected const FRIENDSHIP_TRAINING_MULTIPLIER = 1.2;
+
+    /**
+     * Rarity-based training stat bonus percentages (applied per matching-facility card)
+     *
+     * @var array<string, float>
+     */
+    protected array $rarityBonuses = [
+        'SSR' => 0.10,
+        'SR' => 0.07,
+        'R' => 0.05,
+    ];
+
+    /**
+     * Limit break multipliers applied to each card\'s base training contribution
+     *
+     * @var array<int, float>
+     */
+    protected array $limitBreakMultipliers = [
+        0 => 1.0,
+        1 => 1.1,
+        2 => 1.2,
+        3 => 1.3,
+        4 => 1.4,
+    ];
+
     public function __construct(MCPClientService $mcpClient, TrainingOptimizationAgent $trainingAgent)
     {
         $this->mcpClient = $mcpClient;
@@ -313,8 +347,10 @@ class TrainingCalculationService
     }
 
     /**
-     * Calculate training effect from support card traits
-     * VERIFIED: "Training Effect Up" trait sum
+     * Calculate training effect from support card traits, incorporating rarity bonuses
+     * and limit break multipliers per the docs:
+     * - SSR: +10%, SR: +7%, R: +5% per matching-facility card
+     * - Limit break multipliers: LB0 = 1.0x, LB1 = 1.1x, LB2 = 1.2x, LB3 = 1.3x, LB4 = 1.4x
      *
      * @param  array<int, mixed>  $supportCards
      */
@@ -342,21 +378,25 @@ class TrainingCalculationService
                 : (is_object($card) && isset($card->card_type) ? $card->card_type : null);
 
             if ($cardType && strtolower($cardType) === strtolower($trainingType)) {
-                // Training Effect Up trait: typically 5-10% per card
-                $trainingEffect += 0.05; // 5% base training effect per matching card
+                // Determine rarity bonus for matching card
+                $rarity = is_array($card) && isset($card['rarity'])
+                    ? $card['rarity']
+                    : (is_object($card) && isset($card->rarity) ? $card->rarity : null);
 
-                // Additional effect based on limit break level
+                $rarityBonus = $this->rarityBonuses[strtoupper((string) ($rarity ?? ''))] ?? 0.05;
+
+                // Determine limit break multiplier
+                $rawLb = null;
                 if (is_object($characterCard) && isset($characterCard->limit_break_level)) {
-                    $limitBreakLevel = $characterCard->limit_break_level;
-                    if (is_numeric($limitBreakLevel)) {
-                        $trainingEffect += (float) $limitBreakLevel * 0.01; // +1% per limit break
-                    }
+                    $rawLb = $characterCard->limit_break_level;
                 } elseif (is_array($characterCard) && isset($characterCard['limit_break_level'])) {
-                    $limitBreakLevel = $characterCard['limit_break_level'];
-                    if (is_numeric($limitBreakLevel)) {
-                        $trainingEffect += (float) $limitBreakLevel * 0.01;
-                    }
+                    $rawLb = $characterCard['limit_break_level'];
                 }
+
+                $limitBreakLevel = is_numeric($rawLb) ? min(4, max(0, (int) $rawLb)) : 0;
+                $lbMultiplier = $this->limitBreakMultipliers[$limitBreakLevel] ?? 1.0;
+
+                $trainingEffect += $rarityBonus * $lbMultiplier;
             }
         }
 
@@ -364,8 +404,9 @@ class TrainingCalculationService
     }
 
     /**
-     * Calculate friendship multiplier as product (not additive)
-     * VERIFIED: Product of (1 + FriendshipBonus) for each rainbow card
+     * Calculate friendship multiplier using a flat 1.2x when 3+ cards have bond >= 80.
+     * Per docs: Friendship Training activates when 3 or more support cards reach bond level 80,
+     * granting a flat 20% bonus (1.2x) to all training stat gains.
      *
      * @param  array<int, mixed>  $supportCards
      */
@@ -374,44 +415,35 @@ class TrainingCalculationService
         int $participants,
         array $supportCards = []
     ): float {
-        $multiplier = 1.0;
-
         // If no support cards provided, get from character
         if (empty($supportCards)) {
             $supportCards = $character->supportCards()->with('supportCard')->get();
         }
 
-        // Count rainbow (max bond) cards participating in training
         $rainbowCardCount = 0;
         foreach ($supportCards as $characterCard) {
-            // Check if card is at rainbow bond level (80%+ or max bond)
             $bondLevel = 0;
-            if (is_object($characterCard) && isset($characterCard->bond_level)) {
+            if (is_object($characterCard) && isset($characterCard->friendship_level)) {
+                $bondLevel = is_numeric($characterCard->friendship_level) ? (int) $characterCard->friendship_level : 0;
+            } elseif (is_object($characterCard) && isset($characterCard->bond_level)) {
                 $bondLevel = is_numeric($characterCard->bond_level) ? (int) $characterCard->bond_level : 0;
+            } elseif (is_array($characterCard) && isset($characterCard['friendship_level'])) {
+                $bondLevel = is_numeric($characterCard['friendship_level']) ? (int) $characterCard['friendship_level'] : 0;
             } elseif (is_array($characterCard) && isset($characterCard['bond_level'])) {
                 $bondLevel = is_numeric($characterCard['bond_level']) ? (int) $characterCard['bond_level'] : 0;
             }
 
-            // Rainbow bond is typically 80+ or level 5
-            if ($bondLevel >= 80 || $bondLevel >= 5) {
+            if ($bondLevel >= 80) {
                 $rainbowCardCount++;
             }
         }
 
-        // Each rainbow card provides friendship bonus (10-35% depending on limit break)
-        // Formula: multiply (1 + FriendshipBonus) for each rainbow card
-        for ($i = 0; $i < $rainbowCardCount; $i++) {
-            $friendshipBonus = 0.15; // 15% base friendship bonus per rainbow card
-            $multiplier *= (1.0 + $friendshipBonus);
+        // Friendship Training requires 3+ cards simultaneously at bond >= 80 (flat 1.2x multiplier)
+        if ($rainbowCardCount >= self::FRIENDSHIP_CARD_THRESHOLD) {
+            return self::FRIENDSHIP_TRAINING_MULTIPLIER;
         }
 
-        // Additional bonus if friendship training is active (2-3 participants)
-        if ($participants >= 2) {
-            $friendshipTrainingBonus = $participants === 2 ? 0.10 : 0.15; // 10% for 2, 15% for 3
-            $multiplier *= (1.0 + $friendshipTrainingBonus);
-        }
-
-        return $multiplier;
+        return 1.0;
     }
 
     /**

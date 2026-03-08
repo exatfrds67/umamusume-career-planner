@@ -32,8 +32,8 @@ class TopBarComposer
         }
 
         // Get user's active characters for the Run Selector
-        $activeCharacters = Character::where('user_id', $user->id)
-            ->whereIn('status', ['active', 'completed'])
+        $activeCharacters = Character::where('user_id', '=', $user->id, 'and')
+            ->whereIn('status', ['active', 'completed'], 'and', false)
             ->orderByDesc('is_pinned')
             ->orderByDesc('updated_at')
             ->get(['id', 'name', 'scenario_type', 'current_turn', 'status', 'career_stage', 'energy_level', 'mood_status', 'available_sp', 'is_pinned']);
@@ -50,12 +50,14 @@ class TopBarComposer
             $currentCharacter = $activeCharacters->firstWhere('status', 'active') ?? $activeCharacters->first();
         }
 
+        /** @var Character|null $currentCharacter */
+
         // Provide default topStatus from the current character.
         // Controllers that pass their own $topStatus will override this.
-        if ($currentCharacter) {
+        if ($currentCharacter instanceof Character) {
             ViewFacade::share('topStatus', [
                 'currentTurn' => $currentCharacter->current_turn,
-                'maxTurns' => 78,
+                'maxTurns' => $currentCharacter->getMaxTurns(),
                 'spAvailable' => $currentCharacter->available_sp ?? 0,
                 'storageMode' => 'account',
                 'energy' => $currentCharacter->energy_level,
@@ -66,7 +68,7 @@ class TopBarComposer
 
         // Count active critical alerts for the badge
         $criticalAlertCount = 0;
-        if ($currentCharacter) {
+        if ($currentCharacter instanceof Character) {
             $criticalAlertCount = CriticalAlert::whereHas('career', function ($query) use ($currentCharacter) {
                 $query->where('character_id', $currentCharacter->id);
             })->active()->count();

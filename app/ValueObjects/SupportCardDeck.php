@@ -34,6 +34,11 @@ final readonly class SupportCardDeck
     public const MAX_BOND = 100;
 
     /**
+     * Minimum number of cards at bond ≥80 required for Friendship Training activation
+     */
+    public const MIN_FRIENDSHIP_CARDS = 3;
+
+    /**
      * Create a new Support Card Deck
      *
      * @param  array<SupportCard>  $cards  Array of support cards (max 6)
@@ -71,17 +76,11 @@ final readonly class SupportCardDeck
     /**
      * Check if Friendship Training is available
      *
-     * Returns true if at least one card has bond ≥80
+     * Returns true only when 3 or more cards simultaneously have bond ≥80
      */
     public function hasFriendshipTrainingReady(): bool
     {
-        foreach ($this->cards as $card) {
-            if ($card->bond >= self::FRIENDSHIP_THRESHOLD) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->getFriendshipReadyCount() >= self::MIN_FRIENDSHIP_CARDS;
     }
 
     /**

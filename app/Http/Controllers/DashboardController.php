@@ -18,7 +18,7 @@ class DashboardController extends Controller
     {
         // Get all characters (for now without auth, later filter by user_id)
         $characters = Character::query()
-            ->with(['aptitudes', 'skillAcquisitions.skill', 'supportCards', 'currentCareer.runSnapshots'])
+            ->with(['aptitudes', 'skillAcquisitions.skill', 'supportCards', 'currentCareer.runSnapshots', 'gameCharacter.goalRaces'])
             ->orderBy('updated_at', 'desc')
             ->get();
 
@@ -84,7 +84,7 @@ class DashboardController extends Controller
         return [
             'metrics' => [
                 'currentTurn' => 0,
-                'maxTurns' => 70,
+                'maxTurns' => 72,
                 'overallGrade' => '-',
                 'targetGrade' => '-',
                 'skillsAcquired' => 0,
@@ -186,7 +186,7 @@ class DashboardController extends Controller
 
         // Determine track status
         $progress = $character->getProgressPercentage();
-        $expectedProgress = ($character->current_turn / 70) * 100;
+        $expectedProgress = ($character->current_turn / $character->getMaxTurns()) * 100;
         $trackStatus = match (true) {
             $progress >= $expectedProgress + 10 => 'Ahead',
             $progress >= $expectedProgress - 10 => 'On Track',
@@ -195,7 +195,7 @@ class DashboardController extends Controller
 
         return [
             'currentTurn' => $character->current_turn ?? 1,
-            'maxTurns' => 70,
+            'maxTurns' => $character->getMaxTurns(),
             'overallGrade' => $overallGrade,
             'targetGrade' => $targetGrade,
             'skillsAcquired' => $skillsAcquired,
@@ -275,7 +275,7 @@ class DashboardController extends Controller
             }
 
             // Default: base on turn progress
-            return min(100, ($character->current_turn / 70) * 100);
+            return min(100, ($character->current_turn / $character->getMaxTurns()) * 100);
         }
 
         return $character->getProgressPercentage();
@@ -297,30 +297,53 @@ class DashboardController extends Controller
 
         $upcomingRaces = [];
 
-        // Fallback: derive upcoming race from career_metadata when no schedule is set
+        // If no schedule is set, pre-fill from goal races
         if (empty($raceSchedule)) {
-            $career = $character->currentCareer;
-            $meta = $this->normalizeCareerMetadata($career?->career_metadata);
-            $raceNameValue = $meta['race_name'] ?? null;
-            $raceName = is_string($raceNameValue) ? $raceNameValue : null;
+            // Try to get goal races from gameCharacter relationship
+            $gameCharacter = $character->gameCharacter;
+            if ($gameCharacter) {
+                $goalRaces = $gameCharacter->goalRaces()
+                    ->limit(5)
+                    ->get();
 
-            if ($raceName && $career && ($career->status ?? '') !== 'completed') {
-                $isRaceDay = ($meta['race_day'] ?? false) === true;
-                $rawTurns = $meta['turn_before_race'] ?? null;
-                $turnsBefore = is_numeric($rawTurns) ? (int) $rawTurns : null;
-                $turnsAway = $isRaceDay ? 0 : $turnsBefore;
-
-                return [[
-                    'name' => $raceName,
-                    'grade' => $this->inferRaceGrade($raceName),
-                    'date' => now()->addDays($turnsAway ?? 14)->format('Y-m-d'),
-                    'turn' => $currentTurn + ($turnsAway ?? 14),
-                    'turnsAway' => $turnsAway,
-                    'readiness' => $this->calculateRaceReadiness($stats, []),
-                ]];
+                foreach ($goalRaces as $gameRace) {
+                    $upcomingRaces[] = [
+                        'name' => $gameRace->name_en,
+                        'grade' => $gameRace->grade,
+                        'date' => now()->addDays(14)->format('Y-m-d'),
+                        'turn' => $currentTurn + 14,
+                        'turnsAway' => 14,
+                        'readiness' => $this->calculateRaceReadiness($stats, []),
+                        'isGoalRace' => true,
+                    ];
+                }
             }
 
-            return [];
+            // Fallback: derive upcoming race from career_metadata when no goal races
+            if (empty($upcomingRaces)) {
+                $career = $character->currentCareer;
+                $meta = $this->normalizeCareerMetadata($career?->career_metadata);
+                $raceNameValue = $meta['race_name'] ?? null;
+                $raceName = is_string($raceNameValue) ? $raceNameValue : null;
+
+                if ($raceName && $career && ($career->status ?? '') !== 'completed') {
+                    $isRaceDay = ($meta['race_day'] ?? false) === true;
+                    $rawTurns = $meta['turn_before_race'] ?? null;
+                    $turnsBefore = is_numeric($rawTurns) ? (int) $rawTurns : null;
+                    $turnsAway = $isRaceDay ? 0 : $turnsBefore;
+
+                    return [[
+                        'name' => $raceName,
+                        'grade' => $this->inferRaceGrade($raceName),
+                        'date' => now()->addDays($turnsAway ?? 14)->format('Y-m-d'),
+                        'turn' => $currentTurn + ($turnsAway ?? 14),
+                        'turnsAway' => $turnsAway,
+                        'readiness' => $this->calculateRaceReadiness($stats, []),
+                    ]];
+                }
+            }
+
+            return array_slice($upcomingRaces, 0, 3);
         }
 
         foreach ($raceSchedule as $race) {
@@ -333,8 +356,18 @@ class DashboardController extends Controller
                 // Calculate readiness based on stats vs race requirements
                 $readiness = $this->calculateRaceReadiness($stats, $race);
 
+                // Check if this race is a goal race
+                $isGoalRace = false;
+                $raceName = isset($race['name']) && is_string($race['name']) ? $race['name'] : null;
+                if ($raceName && $character->gameCharacter) {
+                    $isGoalRace = $character->gameCharacter->goalRaces()
+                        ->where('game_races.name', $raceName)
+                        ->wherePivot('race_type', 'goal')
+                        ->exists();
+                }
+
                 $upcomingRaces[] = [
-                    'name' => isset($race['name']) && is_string($race['name']) ? $race['name'] : 'Unknown Race',
+                    'name' => $raceName ?? 'Unknown Race',
                     'grade' => isset($race['grade']) && is_string($race['grade']) ? $race['grade'] : 'G3',
                     'date' => isset($race['date']) && is_string($race['date'])
                         ? $race['date']
@@ -342,6 +375,7 @@ class DashboardController extends Controller
                     'turn' => $raceTurn,
                     'turnsAway' => $raceTurn - $currentTurn,
                     'readiness' => $readiness,
+                    'isGoalRace' => $isGoalRace,
                 ];
             }
         }
@@ -564,10 +598,10 @@ class DashboardController extends Controller
         }
 
         $recentTraining = TrainingSession::query()
-            ->where('character_id', $character->id)
+            ->where('character_id', '=', $character->id, 'and')
             ->orderBy('created_at', 'desc')
             ->limit(3)
-            ->get();
+            ->get(['*']);
 
         foreach ($recentTraining as $session) {
             $totalGain = ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
@@ -583,10 +617,10 @@ class DashboardController extends Controller
         }
 
         $recentRaces = Race::query()
-            ->where('character_id', $character->id)
+            ->where('character_id', '=', $character->id, 'and')
             ->orderBy('created_at', 'desc')
             ->limit(3)
-            ->get();
+            ->get(['*']);
 
         foreach ($recentRaces as $race) {
             $position = $race->finish_position;

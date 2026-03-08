@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int $sp_reward
  * @property string|null $notes
  * @property bool $is_ura_finale
+ * @property-read GoalRacePivot $pivot
  *
  * @use HasFactory<\Database\Factories\GameRaceFactory>
  */
@@ -113,11 +114,7 @@ class GameRace extends Model
         };
     }
 
-    /**
-     * Characters that specifically target this race in their career path.
-     *
-     * @return BelongsToMany<GameCharacter, $this>
-     */
+    /** @return BelongsToMany<GameCharacter, $this, GoalRacePivot, 'pivot'> */
     public function gameCharacters(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -125,6 +122,7 @@ class GameRace extends Model
             'ucp_game_character_target_races',
             'game_race_id',
             'game_character_id'
-        )->withPivot('race_type', 'priority', 'notes');
+        )->using(GoalRacePivot::class)
+            ->withPivot('race_type', 'priority', 'notes');
     }
 }

@@ -26,6 +26,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class GameCharacter extends Model
 {
+    private const DEFAULT_GOAL_RACE_POLICY = [
+        'starts_with' => 'debut-race',
+        'ends_with' => 'arima-kinen',
+        'mode_extensions' => [
+            'ura_finale' => ['ura-preliminary', 'ura-semifinal', 'ura-finals'],
+        ],
+    ];
+
     /** @use HasFactory<\Database\Factories\GameCharacterFactory> */
     use HasFactory;
 
@@ -55,7 +63,7 @@ class GameCharacter extends Model
     /**
      * Races this character targets during their career run.
      *
-     * @return BelongsToMany<GameRace, $this>
+     * @return BelongsToMany<GameRace, $this, GoalRacePivot, 'pivot'>
      */
     public function targetRaces(): BelongsToMany
     {
@@ -64,19 +72,63 @@ class GameCharacter extends Model
             'ucp_game_character_target_races',
             'game_character_id',
             'game_race_id'
-        )->withPivot('race_type', 'priority', 'notes')
+        )->using(GoalRacePivot::class)
+            ->withPivot('race_type', 'priority', 'notes')
             ->orderByPivot('priority');
     }
 
-    /** @return BelongsToMany<GameRace, $this> */
+    /** @return BelongsToMany<GameRace, $this, GoalRacePivot, 'pivot'> */
     public function goalRaces(): BelongsToMany
     {
         return $this->targetRaces()->wherePivot('race_type', 'goal');
     }
 
-    /** @return BelongsToMany<GameRace, $this> */
+    /** @return BelongsToMany<GameRace, $this, GoalRacePivot, 'pivot'> */
     public function requiredRaces(): BelongsToMany
     {
         return $this->targetRaces()->wherePivotIn('race_type', ['required', 'goal']);
+    }
+
+    /** @return array<string, mixed> */
+    public function goalRacePolicy(): array
+    {
+        $notes = is_array($this->notes) ? $this->notes : [];
+        $policy = $notes['goal_race_policy'] ?? [];
+
+        return is_array($policy)
+            ? array_replace_recursive(self::DEFAULT_GOAL_RACE_POLICY, $policy)
+            : self::DEFAULT_GOAL_RACE_POLICY;
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    public function goalRaceSources(): array
+    {
+        $notes = is_array($this->notes) ? $this->notes : [];
+        $sources = $notes['goal_race_sources'] ?? [];
+
+        if (! is_array($sources)) {
+            return [];
+        }
+
+        /** @var array<int, array<string, mixed>> $result */
+        $result = array_values(array_filter($sources, 'is_array'));
+
+        return $result;
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    public function goalRacePolicySources(): array
+    {
+        $notes = is_array($this->notes) ? $this->notes : [];
+        $sources = $notes['goal_race_policy_sources'] ?? [];
+
+        if (! is_array($sources)) {
+            return [];
+        }
+
+        /** @var array<int, array<string, mixed>> $result */
+        $result = array_values(array_filter($sources, 'is_array'));
+
+        return $result;
     }
 }

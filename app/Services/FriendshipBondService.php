@@ -29,13 +29,26 @@ class FriendshipBondService
 
     /**
      * Friendship points gained per training session
-     *
-     * @phpstan-ignore classConstant.unused (Reserved for future training calculation features)
      */
-    private const FRIENDSHIP_POINTS_PER_TRAINING = 5;
+    public const FRIENDSHIP_POINTS_PER_TRAINING = 5;
 
     /**
-     * Friendship bonus multiplier per participant (2 participants = +2, 3 participants = +3)
+     * Additional friendship points per training session when Charm status is active
+     */
+    public const CHARM_BOND_BONUS = 2;
+
+    /**
+     * Minimum number of cards at bond >=80 required for Friendship Training activation (deck-level)
+     */
+    public const MIN_CARDS_FOR_FRIENDSHIP_TRAINING = 3;
+
+    /**
+     * Friendship Training multiplier applied when activation threshold is met (flat 1.2x)
+     */
+    public const FRIENDSHIP_TRAINING_MULTIPLIER = 1.2;
+
+    /**
+     * Friendship bonus multiplier per participant (used for individual rainbow bonus display)
      */
     private const FRIENDSHIP_BONUS_PER_PARTICIPANT = 1;
 
@@ -108,10 +121,10 @@ class FriendshipBondService
      */
     public function getRainbowTrainingCards(int $characterId): array
     {
-        $cards = CharacterSupportCard::where('character_id', $characterId)
-            ->where('friendship_level', '>=', self::RAINBOW_TRAINING_THRESHOLD)
+        $cards = CharacterSupportCard::where('character_id', '=', $characterId, 'and')
+            ->where('friendship_level', '>=', self::RAINBOW_TRAINING_THRESHOLD, 'and')
             ->with('supportCard')
-            ->get();
+            ->get(['*']);
 
         /** @var array<int, array{id: int, support_card_id: int, card_name: string, card_type: string, friendship_level: int, position_slot: int}> $result */
         $result = $cards->map(function ($card) {
@@ -143,10 +156,37 @@ class FriendshipBondService
     }
 
     /**
+     * Calculate the bond points gained in a training session.
+     *
+     * Base gain is +5 pts, or +7 when Charm status is active.
+     */
+    public function calculateBondPointsGained(bool $charmActive = false): int
+    {
+        return self::FRIENDSHIP_POINTS_PER_TRAINING + ($charmActive ? self::CHARM_BOND_BONUS : 0);
+    }
+
+    /**
+     * Check if Friendship Training is active for a character's entire deck.
+     *
+     * Requires 3 or more cards simultaneously at bond >= 80 (orange gauge).
+     */
+    public function isDeckFriendshipTrainingActive(int $characterId): bool
+    {
+        $count = CharacterSupportCard::where('character_id', '=', $characterId, 'and')
+            ->where('friendship_level', '>=', self::RAINBOW_TRAINING_THRESHOLD, 'and')
+            ->count('*');
+
+        return $count >= self::MIN_CARDS_FOR_FRIENDSHIP_TRAINING;
+    }
+
+    /**
      * Calculate total training bonus with friendship multipliers
      *
+     * Friendship Training activates when 3 or more rainbow cards (bond >= 80) are in the deck,
+     * applying a flat 1.2x multiplier to training stat gains.
+     *
      * @param  array<int, int>  $participants  Array of character_support_card_ids
-     * @return array{base_bonus: int, friendship_bonus: int, total_bonus: int, rainbow_participants: array<int, array{id: int, card_name: string, friendship_level: int}>, rainbow_count: int, is_rainbow_training: bool}
+     * @return array{base_bonus: int, friendship_bonus: int, total_bonus: int, rainbow_participants: array<int, array{id: int, card_name: string, friendship_level: int}>, rainbow_count: int, is_rainbow_training: bool, friendship_multiplier: float}
      */
     public function calculateTrainingBonusWithFriendship(array $participants, int $baseBonus): array
     {
@@ -155,7 +195,7 @@ class FriendshipBondService
 
         foreach ($participants as $participantId) {
             /** @var CharacterSupportCard|null $characterSupportCard */
-            $characterSupportCard = CharacterSupportCard::query()->find($participantId);
+            $characterSupportCard = CharacterSupportCard::query()->find($participantId, ['*']);
 
             if ($characterSupportCard instanceof CharacterSupportCard && $characterSupportCard->friendship_level >= self::RAINBOW_TRAINING_THRESHOLD) {
                 $supportCard = $characterSupportCard->supportCard;
@@ -168,9 +208,11 @@ class FriendshipBondService
         }
 
         $rainbowCount = count($rainbowParticipants);
+        $isFriendshipTraining = $rainbowCount >= self::MIN_CARDS_FOR_FRIENDSHIP_TRAINING;
 
-        if ($rainbowCount >= 2) {
-            $totalFriendshipBonus = $this->calculateFriendshipBonus($rainbowCount);
+        if ($isFriendshipTraining) {
+            // Flat friendship training bonus: additional 20% on top of base
+            $totalFriendshipBonus = (int) round($baseBonus * (self::FRIENDSHIP_TRAINING_MULTIPLIER - 1.0));
         }
 
         return [
@@ -179,7 +221,8 @@ class FriendshipBondService
             'total_bonus' => $baseBonus + $totalFriendshipBonus,
             'rainbow_participants' => $rainbowParticipants,
             'rainbow_count' => $rainbowCount,
-            'is_rainbow_training' => $rainbowCount >= 2,
+            'is_rainbow_training' => $isFriendshipTraining,
+            'friendship_multiplier' => $isFriendshipTraining ? self::FRIENDSHIP_TRAINING_MULTIPLIER : 1.0,
         ];
     }
 
@@ -250,10 +293,10 @@ class FriendshipBondService
      */
     public function getDeckFriendshipOverview(int $characterId): array
     {
-        $cards = CharacterSupportCard::where('character_id', $characterId)
+        $cards = CharacterSupportCard::where('character_id', '=', $characterId, 'and')
             ->with('supportCard')
-            ->orderBy('position_slot')
-            ->get();
+            ->orderBy('position_slot', 'asc')
+            ->get(['*']);
 
         $overview = [
             'character_id' => $characterId,

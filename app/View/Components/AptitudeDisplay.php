@@ -48,9 +48,9 @@ class AptitudeDisplay extends Component
             'A' => 'text-orange-500 dark:text-orange-400',
             'B' => 'text-blue-500 dark:text-blue-400',
             'C' => 'text-green-500 dark:text-green-400',
-            'D' => 'text-gray-500 dark:text-gray-400',
+            'D' => 'text-neutral-500 dark:text-neutral-400',
             'E', 'F', 'G' => 'text-red-500 dark:text-red-400',
-            default => 'text-gray-500 dark:text-gray-400',
+            default => 'text-neutral-500 dark:text-neutral-400',
         };
     }
 

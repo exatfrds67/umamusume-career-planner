@@ -47,7 +47,7 @@ class GoalProgress extends Component
             'G2' => 'text-blue-600 dark:text-blue-400',
             'G3' => 'text-purple-600 dark:text-purple-400',
             'OP' => 'text-green-600 dark:text-green-400',
-            default => 'text-gray-600 dark:text-gray-400',
+            default => 'text-neutral-600 dark:text-neutral-400',
         };
     }
 
@@ -61,7 +61,7 @@ class GoalProgress extends Component
             'G2' => 'bg-blue-100 dark:bg-blue-900/30',
             'G3' => 'bg-purple-100 dark:bg-purple-900/30',
             'OP' => 'bg-green-100 dark:bg-green-900/30',
-            default => 'bg-gray-100 dark:bg-gray-900/30',
+            default => 'bg-neutral-100 dark:bg-neutral-900/30',
         };
     }
 

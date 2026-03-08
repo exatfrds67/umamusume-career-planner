@@ -84,13 +84,13 @@ class SupportDeck extends Model
     }
 
     /**
-     * Check if this deck has friendship training available.
+     * Check if friendship training is active (3 or more cards simultaneously at bond >= 80).
      */
     public function hasFriendshipTraining(): bool
     {
         return $this->supportCards()
             ->wherePivot('bond_level', '>=', 80)
-            ->exists();
+            ->count() >= 3;
     }
 
     /**

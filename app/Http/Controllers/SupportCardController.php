@@ -62,28 +62,45 @@ class SupportCardController extends Controller
             }
         }
 
-        // Sorting
-        $sortField = $request->input('sort', 'meta_tier');
+        // Sorting — default: tier (S+ → S → A → B → C)
+        $sortField = $request->input('sort', 'tier');
         $sortDirection = $request->input('direction', 'asc');
 
-        $allowedSorts = ['name', 'rarity', 'meta_tier', 'usage_rate', 'card_type'];
+        // Allow 'tier', 'type', 'recent' as view-friendly aliases
+        $allowedSorts = ['name', 'rarity', 'meta_tier', 'tier', 'usage_rate', 'card_type', 'type', 'recent'];
         if (is_string($sortField) && in_array($sortField, $allowedSorts) && is_string($sortDirection)) {
-            // Custom sort for meta tier to maintain S+, S, A, B, C order
-            if ($sortField === 'meta_tier') {
-                $query->orderByRaw("CASE meta_tier WHEN 'S+' THEN 1 WHEN 'S' THEN 2 WHEN 'A' THEN 3 WHEN 'B' THEN 4 WHEN 'C' THEN 5 ELSE 6 END");
+            if ($sortField === 'meta_tier' || $sortField === 'tier') {
+                // Sort tiers S+ → S → A → B → C, then secondary rarity (SSR → SR → R), then name
+                $query->orderByRaw("CASE meta_tier WHEN 'S+' THEN 1 WHEN 'S' THEN 2 WHEN 'A' THEN 3 WHEN 'B' THEN 4 WHEN 'C' THEN 5 ELSE 6 END")
+                    ->orderByRaw("CASE rarity WHEN 'SSR' THEN 1 WHEN 'SR' THEN 2 WHEN 'R' THEN 3 ELSE 4 END")
+                    ->orderBy('name', 'asc');
+            } elseif ($sortField === 'rarity') {
+                // CASE maps SSR=1, SR=2, R=3; ASC = SSR first (desc direction), DESC = R first (asc direction)
+                $query->orderByRaw("CASE rarity WHEN 'SSR' THEN 1 WHEN 'SR' THEN 2 WHEN 'R' THEN 3 ELSE 4 END ".($sortDirection === 'asc' ? 'DESC' : 'ASC'))
+                    ->orderBy('name', 'asc');
+            } elseif ($sortField === 'recent') {
+                $query->orderBy('release_date', 'desc')->orderBy('name', 'asc');
             } else {
-                $query->orderBy($sortField, $sortDirection);
+                $field = $sortField === 'type' ? 'card_type' : $sortField;
+                $query->orderBy($field, $sortDirection)->orderBy('name', 'asc');
             }
         }
 
         $cards = $query->paginate(24)->withQueryString();
+
+        // Total rarity counts across all active cards (not just current page)
+        $totalRarityCounts = SupportCardDefinition::query()
+            ->where('is_active', true)
+            ->selectRaw('rarity, COUNT(*) as cnt')
+            ->groupBy('rarity')
+            ->pluck('cnt', 'rarity');
 
         // Get filter options
         $cardTypes = ['speed', 'stamina', 'power', 'guts', 'wit', 'friend'];
         $rarities = ['SSR', 'SR', 'R'];
         $tiers = ['S+', 'S', 'A', 'B', 'C'];
 
-        return view('support-cards.index', compact('cards', 'cardTypes', 'rarities', 'tiers'));
+        return view('support-cards.index', compact('cards', 'cardTypes', 'rarities', 'tiers', 'totalRarityCounts'));
     }
 
     /**
