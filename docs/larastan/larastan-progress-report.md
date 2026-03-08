@@ -231,7 +231,7 @@ vendor/bin/phpstan analyse --level=9 --memory-limit=2G app/Models
 ```bash
 vendor/bin/pint --dirty
 vendor/bin/pint app/Services
-```
+```text
 
 ### Testing
 

@@ -254,7 +254,7 @@ $message = "Name: $mixedVar";
 $message = "Name: " . (string)$mixedVar;
 // or
 $message = "Name: " . ($mixedVar['name'] ?? 'unknown');
-```
+```text
 
 ### Pattern 3: Unnecessary Null Coalescing
 
@@ -301,7 +301,7 @@ $result = $mixedValue / 100;
 $result = (float)$mixedValue / 100;
 // or
 $result = is_numeric($mixedValue) ? $mixedValue / 100 : 0;
-```
+```text
 
 ## Testing Strategy
 
@@ -391,7 +391,7 @@ $warnings[] = "Character '{$charName}' already exists, skipped";
 // Should be:
 $charName = is_string($charData['name'] ?? null) ? $charData['name'] : 'Unknown';
 $warnings[] = "Character '" . $charName . "' already exists, skipped";
-```
+```text
 
 ## Progress Tracking
 

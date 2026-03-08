@@ -12,7 +12,7 @@ Example errors:
 Access to an undefined property PHPUnit\Framework\TestCase::$user.
 Access to an undefined property PHPUnit\Framework\TestCase::$character.
 Access to an undefined property PHPUnit\Framework\TestCase::$parser.
-```
+```text
 
 ## Root Cause
 
@@ -88,7 +88,7 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 }
-```
+```text
 
 ## Results
 

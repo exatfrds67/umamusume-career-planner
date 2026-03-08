@@ -132,7 +132,7 @@ January 20, 2026
 │  │  └─ DB 2: Sessions                                  │   │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
-```
+```text
 
 ## Cache Tag Structure
 
@@ -205,7 +205,7 @@ php artisan cache:warm
 
 # Run automated tests
 php artisan test --filter=RedisIntegrationTest
-```
+```text
 
 ## 6. Monitor Redis
 

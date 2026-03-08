@@ -52,7 +52,7 @@ INFO                                  # Get server information
 INFO memory                           # Get memory information
 INFO stats                            # Get statistics
 SLOWLOG GET 10                        # Get slow queries
-```
+```text
 
 ## PHP/Laravel Cache Operations
 
@@ -162,7 +162,7 @@ $service->invalidateTags(['training', 'character']);
 
 // Direct cache flush
 Cache::tags(['training'])->flush();
-```
+```text
 
 ### Monitor Performance
 
@@ -216,7 +216,7 @@ redis-cli monitor
 
 # Check fragmentation
 redis-cli info memory | grep fragmentation
-```
+```text
 
 ## phpredis Not Working
 

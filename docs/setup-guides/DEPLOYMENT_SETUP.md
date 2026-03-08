@@ -99,7 +99,7 @@ ssh-copy-id -i ~/.ssh/deploy_key.pub user@staging.example.com
 
 # Or manually:
 cat ~/.ssh/deploy_key.pub | ssh user@staging.example.com "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
-```
+```text
 
 ## Production Server
 
@@ -142,7 +142,7 @@ cat ~/.ssh/deploy_key
 └── backups/          # Backup storage
     ├── staging/
     └── production/
-```
+```text
 
 ### Create Deployment Directories
 
@@ -246,7 +246,7 @@ EOF
 
 # Generate application key
 php artisan key:generate
-```
+```text
 
 ---
 
@@ -363,7 +363,7 @@ php artisan storage:link
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
-```
+```text
 
 ## Production
 
@@ -482,7 +482,7 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 php artisan up
-```
+```text
 
 ---
 

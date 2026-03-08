@@ -52,7 +52,7 @@ Local MCP servers run as command-line processes on the same machine:
         ],
     ],
 ],
-```
+```text
 
 #### Remote Servers
 
@@ -132,7 +132,7 @@ protected function mcpServers(): array
         ],
     ];
 }
-```
+```text
 
 This configuration includes all tools from the filesystem server except the dangerous delete and write operations.
 
@@ -207,7 +207,7 @@ $info = McpToolIntegration::getServerInfo('memory');
 //     'description' => 'Knowledge graph and persistent memory',
 //     'tools' => ['exclude' => [], 'only' => []],
 // ]
-```
+```text
 
 ### Get Tools from Specific Servers
 
@@ -337,7 +337,7 @@ class TrainingAdvisorAgent extends BaseAgent
 {
     // ...
 }
-```
+```text
 
 ### 3. Handle Connection Errors
 

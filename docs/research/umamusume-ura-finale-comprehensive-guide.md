@@ -354,7 +354,7 @@
 
 **Complete Training Calculation**:
 
-```
+```text
 Final Stat Gain = Base × Training Level × Growth Rate × Mood × Support Cards × Multi-Training × Friendship
 ```
 

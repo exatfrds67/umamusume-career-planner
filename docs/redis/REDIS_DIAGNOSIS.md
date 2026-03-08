@@ -44,7 +44,7 @@ REDIS_PORT=6379
 REDIS_DB=0
 REDIS_CACHE_DB=1
 REDIS_SESSION_DB=2
-```
+```text
 
 **Laravel config** (`config/database.php`):
 
@@ -105,7 +105,7 @@ beforeEach(function () {
     }
     Cache::flush();
 });
-```
+```text
 
 The test correctly tries to connect but fails because it's using `127.0.0.1` instead of the WSL IP.
 
@@ -203,7 +203,7 @@ REDIS_PORT=6379
 REDIS_DB=15
 REDIS_CACHE_DB=15
 REDIS_SESSION_DB=15
-```
+```text
 
 **Remove** Redis configuration from `phpunit.xml`:
 
@@ -264,7 +264,7 @@ REDIS_SESSION_DB=15
 <env name="REDIS_DB" value="15"/>
 <env name="REDIS_CACHE_DB" value="15"/>
 <env name="REDIS_SESSION_DB" value="15"/>
-```
+```text
 
 1. **Clear configuration cache**:
 
@@ -295,7 +295,7 @@ If you just want to run tests immediately without creating `.env.testing`:
 ```bash
 php artisan config:clear
 php artisan test --filter=FallbackRecoveryTest
-```
+```text
 
 ---
 
@@ -363,7 +363,7 @@ PASS  Tests\Feature\FallbackRecoveryTest
 ✓ tracks failure count for APIs
 ✓ opens circuit breaker after threshold failures
 ...
-```
+```text
 
 ---
 

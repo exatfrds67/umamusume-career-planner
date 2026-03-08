@@ -304,7 +304,7 @@ If you want to test error handling:
 
 ```text
 [Record any issues, console errors, or observations]
-```
+```text
 
 ### Task 4.1.2: Error Scenarios
 
@@ -328,7 +328,7 @@ If you want to test error handling:
 
 ```text
 [Record retry behavior]
-```
+```text
 
 ### Task 4.1.4: Existing Features
 
@@ -352,7 +352,7 @@ If you want to test error handling:
 
 ```text
 [Copy/paste any console errors here]
-```
+```text
 
 ### Network Errors
 

@@ -165,7 +165,7 @@ public function show(Character $character)
         // Other data...
     ]);
 }
-```
+```text
 
 Then in the view:
 

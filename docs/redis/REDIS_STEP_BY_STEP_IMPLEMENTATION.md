@@ -21,7 +21,7 @@ This guide provides a complete step-by-step process to implement Redis in your U
 ```bash
 sudo apt update
 sudo apt upgrade -y
-```
+```text
 
 **Expected Output**: Package lists updated successfully
 
@@ -37,7 +37,7 @@ sudo apt install redis-server -y
 
 ```bash
 redis-server --version
-```
+```text
 
 **Expected Output**: `Redis server v=7.0.x` or higher
 
@@ -63,7 +63,7 @@ protected-mode no
 # Add these lines if not present:
 maxmemory 256mb
 maxmemory-policy allkeys-lru
-```
+```text
 
 Save and exit: `Ctrl+X`, then `Y`, then `Enter`
 
@@ -79,7 +79,7 @@ sudo service redis-server start
 
 ```bash
 redis-cli ping
-```
+```text
 
 **Expected Output**: `PONG`
 
@@ -128,7 +128,7 @@ extension=redis
 ```php
 <?php
 phpinfo();
-```
+```text
 
 1. Visit: `http://localhost/phpinfo.php`
 2. Search for "redis" on the page (Ctrl+F)
@@ -182,7 +182,7 @@ Open Command Prompt in your project directory:
 cd C:\xampp\htdocs\umamusume-career-planner
 php artisan config:clear
 php artisan cache:clear
-```
+```text
 
 **Expected Output**: `Configuration cache cleared!` and `Application cache cleared!`
 
@@ -200,7 +200,7 @@ php artisan redis:health
 
 **Expected Output**:
 
-```
+```text
 ✅ Redis connection successful!
 
 📊 Cache Statistics:
@@ -218,7 +218,7 @@ If you see an error, go to [Troubleshooting](#troubleshooting) section.
 
 ```bash
 php artisan tinker
-```
+```text
 
 In Tinker, run these commands:
 
@@ -241,7 +241,7 @@ exit
 
 ```bash
 php artisan cache:warm
-```
+```text
 
 **Expected Output**: `Cache warming completed successfully!`
 
@@ -265,7 +265,7 @@ Route::get('/test-redis', function () {
 ```bash
 # In WSL
 redis-cli -n 2 keys "*"
-```
+```text
 
 **Expected Output**: You should see session keys
 
@@ -289,7 +289,7 @@ In WSL, run:
 
 ```bash
 redis-cli monitor
-```
+```text
 
 Then in another terminal, run:
 
@@ -305,7 +305,7 @@ Press `Ctrl+C` to stop monitoring.
 
 ```bash
 php artisan tinker
-```
+```text
 
 ```php
 $service = app('redis.cache.optimizer');
@@ -328,7 +328,7 @@ Every time you restart your computer, run:
 
 ```bash
 wsl sudo service redis-server start
-```
+```text
 
 ### Option B: Windows Task Scheduler (Automatic)
 
@@ -413,7 +413,7 @@ redis-cli info memory | grep used_memory_human
 
 # If too high, clear cache:
 redis-cli -n 1 FLUSHDB
-```
+```text
 
 ---
 

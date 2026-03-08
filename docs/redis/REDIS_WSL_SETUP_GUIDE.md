@@ -28,7 +28,7 @@ UmamusumeCareerPlanner application. Redis is used for caching, session managemen
 │  │  - Database 2: Sessions                              │   │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
-```
+```text
 
 ## Prerequisites
 
@@ -66,7 +66,7 @@ Expected output: `Redis server v=7.0.x` or higher
 
 ```bash
 sudo nano /etc/redis/redis.conf
-```
+```text
 
 ### 2.2 Update Configuration Settings
 
@@ -120,7 +120,7 @@ Expected output: `redis-server is running`
 
 ```bash
 redis-cli ping
-```
+```text
 
 Expected output: `PONG`
 
@@ -172,7 +172,7 @@ Edit `C:\xampp\php\php.ini`:
 
 ```ini
 extension=redis
-```
+```text
 
 ### 5.3 Restart Apache
 
@@ -233,7 +233,7 @@ php artisan cache:clear
 
 ```bash
 php artisan tinker
-```
+```text
 
 ```php
 Cache::put('test', 'Hello Redis!', 60);
@@ -257,7 +257,7 @@ php artisan tinker
 dispatch(function () {
     logger('Test job executed!');
 });
-```
+```text
 
 ## 7.3 Test Session
 
@@ -299,7 +299,7 @@ redis-cli -n 2 keys "*"
 
 # Check queue database (DB 0)
 redis-cli -n 0 keys "*"
-```
+```text
 
 ## Database Allocation
 
@@ -357,7 +357,7 @@ sudo netstat -tulpn | grep 6379
 # Check firewall (if enabled)
 sudo ufw status
 sudo ufw allow 6379/tcp
-```
+```text
 
 ## phpredis Not Working
 
@@ -433,7 +433,7 @@ sudo service redis-server status
 
 # Monitor memory usage
 redis-cli info memory | grep used_memory_human
-```
+```text
 
 ## Weekly Tasks
 
@@ -503,7 +503,7 @@ TTL key_name
 
 # Set key with expiration
 SETEX key_name 3600 "value"
-```
+```text
 
 ## Laravel Artisan Commands
 

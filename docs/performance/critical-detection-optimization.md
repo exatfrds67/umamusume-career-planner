@@ -127,7 +127,7 @@ The test suite includes:
 
 ```bash
 php artisan test tests/Performance/CriticalDetectionPerformanceTest.php --compact
-```
+```text
 
 ### Expected Output
 
@@ -142,7 +142,7 @@ Performance Profile:
 ============================================================
 
 Tests:    6 passed (11 assertions)
-```
+```text
 
 ## Conclusion
 

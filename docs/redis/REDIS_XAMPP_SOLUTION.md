@@ -13,7 +13,7 @@
 ```text
 C:\XAMPP\php\php.exe -v
 PHP 8.2.12 (cli) (built: Oct 24 2023 21:15:15)
-```
+```text
 
 **Your CLI uses PHP 8.4.11:**
 
@@ -45,7 +45,7 @@ php artisan serve
 
 ### Step 3: Access Application
 
-```
+```text
 
 <http://127.0.0.1:8000>
 
@@ -132,7 +132,7 @@ php artisan serve
 
 ```powershell
 php artisan serve
-```
+```text
 
 ### Start on Different Port
 
@@ -150,7 +150,7 @@ php artisan serve --host=0.0.0.0 --port=8000
 
 ```text
 http://127.0.0.1:8000
-```
+```text
 
 ---
 

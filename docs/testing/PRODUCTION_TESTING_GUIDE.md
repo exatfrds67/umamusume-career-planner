@@ -36,7 +36,7 @@ php artisan test --testsuite=Smoke --compact
 # Or manually verify endpoints
 curl -s https://staging.example.com/api/health | jq .
 curl -s https://staging.example.com/api/v1/characters | jq .
-```
+```text
 
 ## Expected Results
 
@@ -185,7 +185,7 @@ watch -n 1 'free -m && echo "---" && top -bn1 | head -20'
 
 # Check PHP-FPM status
 curl http://localhost/status?full
-```
+```text
 
 ---
 
@@ -251,7 +251,7 @@ npm run test:accessibility
 
 # Or use axe-core CLI
 npx axe https://staging.example.com/
-```
+```text
 
 ## Manual Testing Checklist
 
@@ -363,7 +363,7 @@ php artisan test --compact
 
 # With coverage
 php artisan test --coverage --min=80
-```
+```text
 
 ## Specific Regression Areas
 

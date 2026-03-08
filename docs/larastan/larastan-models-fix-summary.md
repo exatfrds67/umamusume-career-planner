@@ -59,7 +59,7 @@
 
 ```text
 Class uses generic trait HasFactory but does not specify its types: TFactory
-```
+```text
 
 **Solution**: Can be ignored or fixed with PHPDoc `@use HasFactory<FactoryClass>`
 **Status**: Already added to most models, some remain
@@ -87,7 +87,7 @@ public function scopeActive(Builder $query): Builder
 
 #### 3. Array Type Specifications (Medium Priority - ~40 occurrences)
 
-```
+```text
 
 PHPDoc tag @property for property $metadata with no value type specified in iterable type array.
 

@@ -814,13 +814,13 @@ Unity Training costs **more energy** than normal training:
 
 **Team Stat Average**:
 
-```
+```text
 team_stat_avg = SUM(member_stat) / COUNT(members)
 ```
 
 **Facility Level**:
 
-```
+```text
 IF team_stat_avg < 200: level = 1
 ELSE IF team_stat_avg < 340: level = 2
 ELSE IF team_stat_avg < 510: level = 3
@@ -830,13 +830,13 @@ ELSE: level = 5
 
 **Unity Training Energy Cost**:
 
-```
+```text
 total_cost = base_cost + (explosions × 6) + (flames - 1)
 ```
 
 **Spirit Burst Stat Gain** (trainee):
 
-```
+```text
 base_gain = LOOKUP(facility_type, stat_table)
 IF scenario_linked_present:
     final_gain = base_gain + scenario_linked_bonus
@@ -845,7 +845,7 @@ final_gain = MIN(final_gain, 50)  // Cap at 50
 
 **Team Race Impact**:
 
-```
+```text
 IF win:
     stat_bonus = 50
     team_rank_change = +1

@@ -46,7 +46,7 @@ Open a **new** PowerShell window (important - to reload PATH):
 
 ```powershell
 tesseract --version
-```
+```text
 
 **Expected Output:**
 
@@ -59,7 +59,7 @@ tesseract 5.x.x
  Found FMA
  Found SSE4.1
  Found OpenMP 201511
-```
+```text
 
 ### Step 4: Verify Language Data
 
@@ -69,7 +69,7 @@ tesseract --list-langs
 
 **Expected Output:**
 
-```
+```text
 List of available languages (3):
 eng
 jpn
@@ -91,7 +91,7 @@ TESSERACT_PATH=tesseract
 TESSERACT_LANGUAGE=jpn+eng
 TESSERACT_PSM=6
 TESSERACT_OEM=3
-```
+```text
 
 If Tesseract is not in PATH, update to full path:
 
@@ -103,7 +103,7 @@ TESSERACT_PATH=C:\Program Files\Tesseract-OCR\tesseract.exe
 
 ```powershell
 php artisan tinker
-```
+```text
 
 Then run:
 
@@ -119,7 +119,7 @@ exit
 
 ```powershell
 php artisan test --filter=Tesseract --compact
-```
+```text
 
 **Expected:** All 11 tests should pass (no skips)
 
@@ -177,7 +177,7 @@ php -r "echo shell_exec('tesseract --version');"
 
 # Test Laravel service
 php artisan tinker --execute="echo app(\App\Services\TesseractService::class)->isAvailable() ? 'Yes' : 'No';"
-```
+```text
 
 ### Issue 4: Permission errors
 
@@ -216,7 +216,7 @@ If you have Scoop installed:
 
 ```powershell
 scoop install tesseract
-```
+```text
 
 ### Method 3: Manual Installation
 
@@ -273,7 +273,7 @@ $file = new \Illuminate\Http\UploadedFile(
 
 $result = $service->processScreenshot($file, 1);
 print_r($result);
-```
+```text
 
 ---
 
@@ -285,7 +285,7 @@ print_r($result);
 Tests:  11 passed (33 assertions)
 - 3 tests skip when Tesseract not available
 - 8 tests run (don't require Tesseract)
-```
+```text
 
 ### After Tesseract Installation
 
@@ -294,7 +294,7 @@ Tests:  11 passed (44 assertions)
 - All 11 tests run
 - No skips
 - Full OCR functionality tested
-```
+```text
 
 ---
 
@@ -434,4 +434,4 @@ After installation, run:
 ```powershell
 tesseract --version
 php artisan test --filter=Tesseract --compact
-```
+```text

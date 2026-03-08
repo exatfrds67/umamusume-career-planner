@@ -4,7 +4,7 @@ Complete API documentation for the Umamusume Career Planner.
 
 ## Base URL
 
-```
+```text
 https://api.example.com/api/v1
 ```
 
@@ -14,7 +14,7 @@ All API endpoints require authentication using Laravel Sanctum tokens.
 
 ### Headers
 
-```
+```text
 Authorization: Bearer {token}
 Content-Type: application/json
 Accept: application/json
@@ -24,7 +24,7 @@ Accept: application/json
 
 ```http
 POST /api/login
-```
+```text
 
 **Request Body:**
 
@@ -46,7 +46,7 @@ POST /api/login
         "email": "user@example.com"
     }
 }
-```
+```text
 
 ---
 
@@ -93,7 +93,7 @@ GET /api/v1/characters
         "total": 75
     }
 }
-```
+```text
 
 ### Get Character
 
@@ -122,7 +122,7 @@ GET /api/v1/characters/{id}
         "created_at": "2026-01-20T12:00:00Z"
     }
 }
-```
+```text
 
 ### Create Character
 
@@ -142,7 +142,7 @@ POST /api/v1/characters
     "guts_stat": 100,
     "wit_stat": 100
 }
-```
+```text
 
 **Response:** `201 Created`
 
@@ -159,7 +159,7 @@ PUT /api/v1/characters/{id}
     "name": "Updated Name",
     "speed_stat": 600
 }
-```
+```text
 
 **Response:** `200 OK`
 
@@ -179,7 +179,7 @@ DELETE /api/v1/characters/{id}
 
 ```http
 GET /api/v1/careers
-```
+```text
 
 **Query Parameters:**
 
@@ -198,7 +198,7 @@ GET /api/v1/careers/{id}
 
 ```http
 POST /api/v1/careers
-```
+```text
 
 **Request Body:**
 
@@ -213,7 +213,7 @@ POST /api/v1/careers
 
 ```http
 PUT /api/v1/careers/{id}
-```
+```text
 
 **Request Body:**
 
@@ -227,7 +227,7 @@ PUT /api/v1/careers/{id}
 
 ```http
 DELETE /api/v1/careers/{id}
-```
+```text
 
 ### Career Statistics
 
@@ -252,7 +252,7 @@ GET /api/v1/careers/{id}/statistics
         "race_win_rate": 75.0
     }
 }
-```
+```text
 
 ### Career Report
 
@@ -264,7 +264,7 @@ GET /api/v1/careers/{id}/report
 
 ```http
 POST /api/v1/careers/compare
-```
+```text
 
 **Request Body:**
 
@@ -282,7 +282,7 @@ POST /api/v1/careers/compare
 
 ```http
 GET /api/v1/careers/{careerId}/training-sessions
-```
+```text
 
 ### Create Training Session
 
@@ -297,7 +297,7 @@ POST /api/v1/careers/{careerId}/training-sessions
     "training_type": "speed",
     "turn_number": 1
 }
-```
+```text
 
 ### Training Predictions
 
@@ -323,7 +323,7 @@ GET /api/v1/careers/{careerId}/training-predictions
         ]
     }
 }
-```
+```text
 
 ---
 
@@ -339,7 +339,7 @@ GET /api/v1/careers/{careerId}/races
 
 ```http
 GET /api/v1/careers/{careerId}/available-races
-```
+```text
 
 ### Create Race Entry
 
@@ -355,7 +355,7 @@ POST /api/v1/careers/{careerId}/races
     "race_grade": "G1",
     "turn_number": 50
 }
-```
+```text
 
 ### Update Race Result
 
@@ -371,7 +371,7 @@ PUT /api/v1/careers/{careerId}/races/{raceId}
     "won_race": true,
     "sp_reward": 50
 }
-```
+```text
 
 ---
 
@@ -396,7 +396,7 @@ GET /api/v1/skills
 
 ```http
 GET /api/v1/skills/{id}
-```
+```text
 
 ### Skill Hints
 
@@ -408,7 +408,7 @@ GET /api/v1/skills/{id}/hints
 
 ```http
 GET /api/v1/characters/{characterId}/skills
-```
+```text
 
 ### Acquire Skill
 
@@ -422,7 +422,7 @@ POST /api/v1/characters/{characterId}/skills
 {
     "skill_id": 1
 }
-```
+```text
 
 ### Remove Skill
 
@@ -434,7 +434,7 @@ DELETE /api/v1/characters/{characterId}/skills/{skillId}
 
 ```http
 GET /api/v1/skills/analysis/recommendations
-```
+```text
 
 **Query Parameters:**
 
@@ -481,7 +481,7 @@ POST /api/characters/{characterId}/skill-recommendations
         "additional_context": "Need skills for rainy weather conditions"
     }
 }
-```
+```text
 
 **Request Body Parameters:**
 
@@ -578,7 +578,7 @@ POST /api/characters/{characterId}/skill-recommendations
     "success": false,
     "message": "Authentication required."
 }
-```
+```text
 
 **403 Forbidden:**
 
@@ -596,7 +596,7 @@ POST /api/characters/{characterId}/skill-recommendations
     "success": false,
     "message": "Character not found."
 }
-```
+```text
 
 **422 Unprocessable Entity:**
 
@@ -619,7 +619,7 @@ POST /api/characters/{characterId}/skill-recommendations
     "message": "Unable to generate skill recommendations. Please try again.",
     "error": "AI service temporarily unavailable"
 }
-```
+```text
 
 **Rate Limiting:**
 
@@ -672,7 +672,7 @@ curl -X POST "https://api.example.com/api/characters/123/skill-recommendations" 
       }
     }
   }'
-```
+```text
 
 **Notes:**
 
@@ -705,7 +705,7 @@ GET /api/v1/support-cards
 
 ```http
 GET /api/v1/support-cards/{id}
-```
+```text
 
 ### Meta Ranking
 
@@ -717,7 +717,7 @@ GET /api/v1/support-cards/meta-ranking
 
 ```http
 GET /api/v1/support-cards/{id}/synergies
-```
+```text
 
 ---
 
@@ -733,7 +733,7 @@ GET /api/v1/characters/{characterId}/deck
 
 ```http
 POST /api/v1/characters/{characterId}/deck
-```
+```text
 
 **Request Body:**
 
@@ -748,7 +748,7 @@ POST /api/v1/characters/{characterId}/deck
 
 ```http
 DELETE /api/v1/characters/{characterId}/deck/{slot}
-```
+```text
 
 ### Deck Analysis
 
@@ -760,7 +760,7 @@ GET /api/v1/characters/{characterId}/deck/analysis
 
 ```http
 GET /api/v1/characters/{characterId}/deck/optimization
-```
+```text
 
 ---
 
@@ -776,7 +776,7 @@ POST /api/v1/ai/conversations
 
 ```http
 POST /api/v1/ai/conversations/{conversationId}/messages
-```
+```text
 
 **Request Body:**
 
@@ -790,7 +790,7 @@ POST /api/v1/ai/conversations/{conversationId}/messages
 
 ```http
 GET /api/v1/ai/conversations/{conversationId}
-```
+```text
 
 ---
 
@@ -818,7 +818,7 @@ POST /api/v1/ocr/upload
         "status": "processing"
     }
 }
-```
+```text
 
 ### Get Extraction Result
 
@@ -834,7 +834,7 @@ GET /api/v1/ocr/extractions/{extractionId}
 
 ```http
 GET /api/v1/export
-```
+```text
 
 **Query Parameters:**
 
@@ -879,7 +879,7 @@ POST /api/v1/import
         "field_name": ["Validation error message"]
     }
 }
-```
+```text
 
 ---
 
@@ -900,7 +900,7 @@ Rate limit headers:
 X-RateLimit-Limit: 120
 X-RateLimit-Remaining: 115
 X-RateLimit-Reset: 1706000000
-```
+```text
 
 ---
 

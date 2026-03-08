@@ -49,7 +49,7 @@ if (config('cache.default') !== 'redis') {
 if (! extension_loaded('redis') || config('cache.default') !== 'redis') {
     $this->markTestSkipped('Redis required for this test');
 }
-```
+```text
 
 1. Tests that need this update:
    - "record api response time stores metrics"
@@ -110,7 +110,7 @@ beforeEach(function () {
 ```php
 // Remove: })->skip('Requires Redis which is not available in test environment');
 // Replace with: });
-```
+```text
 
 **Line 299:** Remove skip
 
@@ -142,7 +142,7 @@ if (! extension_loaded('redis') || config('cache.default') !== 'redis') {
 if (! extension_loaded('redis') || config('cache.default') !== 'redis') {
     $this->markTestSkipped('Redis required for API response time tracking');
 }
-```
+```text
 
 **Line 222-224:** Update condition
 

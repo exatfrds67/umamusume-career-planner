@@ -1,18 +1,22 @@
 # Enhanced Game Alignment Analysis - Deep Screenshot Review
 
-**Document Version**: 1.0.0  
-**Date**: January 29, 2026 (After Detailed Review)  
+**Document Version**: 1.1.0  
+**Date**: March 3, 2026 (Updated with career pre-training screenshot validation)  
 **Status**: Supplementary Analysis  
 **Purpose**: Identify additional patterns from thorough screenshot examination  
-**Key Insight**: 38 sequential January 28, 2026 screenshots provide highest-detail reference
+**Key Insight**: January 2026 remains the best full-run reference; March 2026 adds a validated career pre-training setup sequence
 
 ---
 
 ## Executive Summary
 
-A comprehensive examination of 132 game screenshots (July 2025 - January 2026) identified **additional UI patterns, edge cases, and component behaviors** not initially captured. This document supplements the GAME_ALIGNMENT_STRATEGIC_PLAN.md with deeper insights.
+A comprehensive examination of historical and recent game screenshots identified **additional UI patterns, edge cases, and component behaviors** not initially captured. This document supplements the GAME_ALIGNMENT_STRATEGIC_PLAN.md with deeper insights.
 
-**Most Valuable Dataset**: 38 sequential screenshots from 2026-01-28 (07:07-07:20 playtime window) - Complete career phase progression
+**Most Valuable Datasets**:
+
+- 38 sequential screenshots from 2026-01-28 (07:07-07:20 playtime window) - Complete career phase progression
+- 26 sequential screenshots from 2026-03-03 (18:32-19:04) - Career pre-training run setup and confirmation flow
+- 10 sequential screenshots from 2026-03-03 (18:22-18:27) - Archived pre-career setup reference (`pre-career` subfolder)
 
 ---
 
@@ -120,7 +124,7 @@ A comprehensive examination of 132 game screenshots (July 2025 - January 2026) i
 
 **Patterns Found**:
 
-```
+```text
 Speed Red in Different Contexts:
 ├─ Stat bar fill: #EF4444 (bright, RGB 239, 68, 68)
 ├─ Card header: #DC2626 (slightly darker, RGB 220, 38, 38)
@@ -144,7 +148,7 @@ Same pattern for other stats (stamina blue, power yellow, etc.)
 
 **Patterns Found**:
 
-```
+```text
 Icon Usage Patterns:
 ├─ Stat icon: Stat color (Red for Speed, etc.)
 ├─ Condition icon: Condition color (Green for GREAT, etc.)
@@ -166,7 +170,7 @@ Icon Usage Patterns:
 
 **Patterns Found**:
 
-```
+```text
 Possible Dark Mode Colors:
 ├─ Background: #0F1419 or #111827 (near-black)
 ├─ Stat colors: Slightly brightened (boost saturation)
@@ -193,7 +197,7 @@ Possible Dark Mode Colors:
 
 **Patterns Found**:
 
-```
+```text
 Card States Observed:
 ├─ Unselected: Normal appearance, subtle shadow
 ├─ Hover: Slight scale increase (1.02x), shadow enhanced
@@ -222,7 +226,7 @@ Card States Observed:
 
 **Patterns Found**:
 
-```
+```text
 Stat Bar Progression (from 7 screenshots):
 Turn 1:  [████░░░░░░] 750/2000  → turns gray when at soft cap
 Turn 15: [█████░░░░░] 900/2000
@@ -250,7 +254,7 @@ Soft Cap Marker at 1200:
 
 **Patterns Found**:
 
-```
+```text
 Skill Card Variations Observed:
 
 Rarity Borders (colored outlines):
@@ -291,7 +295,7 @@ Cost Display:
 
 **Recommendations for App**:
 
-```
+```text
 Empty State Designs Needed:
 ├─ No characters available: "No characters match filters"
 │  └─ Show filter reset button
@@ -316,7 +320,7 @@ Empty State Designs Needed:
 
 **Recommendations for App**:
 
-```
+```text
 Error States to Design:
 ├─ Invalid stat value: Border red, error text below field
 ├─ Duplicate plan name: Warning modal
@@ -338,7 +342,7 @@ Toast/Notification Style:
 
 **Recommendations for App**:
 
-```
+```text
 Loading Indicators:
 ├─ Page load: Skeleton screens (pulsing gray)
 ├─ Data fetch: Spinner overlay (20% opacity)
@@ -363,7 +367,7 @@ Spinner Design:
 
 **Patterns Found**:
 
-```
+```text
 Mobile Grid Layout (sm breakpoint, <640px):
 ├─ Cards per row: 2 (side by side with 8px gap)
 ├─ Card width: calc(50% - 4px) each
@@ -398,7 +402,7 @@ Desktop Grid Layout (lg breakpoint, 1024px):
 
 **Patterns Found**:
 
-```
+```text
 Stat Bar Layout Changes:
 
 Mobile (<640px):
@@ -434,7 +438,7 @@ Tablet/Desktop (>640px):
 
 **Patterns Found**:
 
-```
+```text
 Focus Indicator Specifications:
 ├─ Width: 2px
 ├─ Offset: 2px from element edge
@@ -458,7 +462,7 @@ Focus Indicator Specifications:
 
 **Patterns Found**:
 
-```
+```text
 Touch Target Sizes Observed:
 ├─ Primary buttons: 48px height minimum (observed)
 ├─ Card tappable areas: Full card (120+px)
@@ -479,7 +483,7 @@ Touch Target Sizes Observed:
 
 **Patterns Found** (tested against images):
 
-```
+```text
 Observed Contrast Ratios:
 ├─ Red (#EF4444) on white: ~6.5:1 ✅ Pass AAA
 ├─ Blue (#3B82F6) on white: ~5.2:1 ✅ Pass AAA
@@ -535,6 +539,18 @@ Observed Contrast Ratios:
 - Animation and transition details
 
 **Value**: Highest fidelity reference for implementation
+
+### 7.4 March 2026 Career Pre-Training Sequence (26 screenshots)
+
+**Critical Insight**: 26 sequential screenshots from 2026-03-03 validate the career pre-training run flow:
+
+- **Trainee Select** entry and trainee details states
+- Goals and Hall of Fame scenario record screens
+- Support effects and skill list review states
+- Final confirmation state before run/training progression
+- Continued use of aptitude groupings: **Track / Distance / Style**
+
+**Value**: High-confidence reference for plan-creation and career pre-training setup UX
 
 ---
 
@@ -596,7 +612,7 @@ animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 /* Card hover scale (observed 1.02x) */
 transform: scale(1.02);
 transition: transform 200ms ease-out, box-shadow 200ms ease-out;
-```
+```text
 
 ### 8.3 Responsive Grid Formulas
 
@@ -684,6 +700,27 @@ Add to Strategic Plan § 3.3:
 
 ---
 
+## Part 10: Career Pre-Training Flow Validation (March 2026)
+
+### 10.1 Confirmed Setup Flow
+
+Observed sequence from `images/game_screenshots_030326` (with previous pre-career captures archived in `images/game_screenshots_030326/pre-career`):
+
+1. Trainee selection entry and details states
+2. Goals/Hall of Fame scenario records states
+3. Card and support effects review states
+4. Skill list and support effects continuation states
+5. Final confirmation state for run setup
+
+### 10.2 UI/UX Implications for This Project
+
+- Keep plan creation entry visually separate from execution screens
+- Place filtering controls close to trainee/character selection
+- Use aptitude filter grouping as first-class controls: Track, Distance, Style
+- Maintain short setup sequence before entering full career planning
+
+---
+
 ## Recommended Updates to Existing Documents
 
 ### Update GAME_ALIGNMENT_STRATEGIC_PLAN.md
@@ -736,7 +773,9 @@ Add to Strategic Plan § 3.3:
 
 For designers/developers implementing these patterns:
 
-- [ ] Review January 28, 2026 (38 screenshots) for detailed reference
+- [ ] Review January 28, 2026 (38 screenshots) for complete run reference
+- [ ] Review March 3, 2026 (26 screenshots) for career pre-training setup reference
+- [ ] Review March 3, 2026 pre-career archive (10 screenshots in `pre-career`)
 - [ ] Verify all component variations against this document
 - [ ] Test animations match observed timings (300-400ms)
 - [ ] Validate responsive breakpoints with formula
@@ -748,7 +787,7 @@ For designers/developers implementing these patterns:
 
 ## Conclusion
 
-The 132 game screenshots provide comprehensive coverage of game UI patterns. **Key finding**: The 38 sequential screenshots from January 28, 2026 offer the highest-detail reference for implementation.
+The screenshot corpus provides comprehensive coverage of game UI patterns. **Key finding**: Use the January 2026 sequence for full-run behavior and the March 2026 main sequence for career pre-training setup behavior, with the `pre-career` archive as earlier setup reference.
 
 This detailed review identified:
 
@@ -762,7 +801,7 @@ This detailed review identified:
 
 ---
 
-**Review Completed**: January 29, 2026  
+**Review Completed**: March 3, 2026  
 **Thoroughness Level**: HIGH (detailed analysis of 132 images)  
 **Confidence in Patterns**: VERY HIGH (validated across multiple capture dates)  
 **Readiness for Development**: READY with enhanced specifications

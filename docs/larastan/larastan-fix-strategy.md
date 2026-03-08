@@ -32,7 +32,7 @@ return Cache::remember('key', 60, fn() => [...]);
 // ✅ Good
 $result = Cache::remember('key', 60, fn() => [...]);
 return is_array($result) ? $result : ['default' => 'value'];
-```
+```text
 
 ### 3. Array Offset Access on Mixed
 

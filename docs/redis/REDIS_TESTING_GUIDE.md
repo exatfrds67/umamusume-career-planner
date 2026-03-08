@@ -23,7 +23,7 @@ php artisan redis:health
 
 Expected output:
 
-```
+```text
 
 ✅ Redis connection successful!
 
@@ -54,7 +54,7 @@ Expected output:
 Starting cache warming process...
 Redis connection successful.
 Cache warming completed successfully!
-```
+```text
 
 ### 3. Test Cache Operations
 
@@ -597,7 +597,7 @@ Run the test suite:
 
 ```bash
 php artisan test --filter=RedisIntegrationTest
-```
+```text
 
 ## Troubleshooting Common Issues
 
@@ -754,7 +754,7 @@ redis-cli --bigkeys
 
 # Sample keys
 redis-cli --scan --pattern "*training*"
-```
+```text
 
 ## Conclusion
 

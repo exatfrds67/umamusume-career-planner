@@ -67,7 +67,7 @@ Tool::make('calculate', 'Perform calculation')
             'divide' => $b != 0 ? $a / $b : 'Cannot divide by zero',
         };
     });
-```
+```text
 
 ### Available Property Types
 
@@ -175,7 +175,7 @@ Tool::make('fetch_github_user', 'Fetch GitHub user information')
         $response = Http::get("https://api.github.com/users/{$username}");
         return $response->json();
     })
-```
+```text
 
 ## Best Practices
 

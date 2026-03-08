@@ -30,7 +30,7 @@ wsl bash -c "redis-cli -h 127.0.0.1 -p 6379 ping"
 
 # Connect to Redis CLI
 wsl bash -c "redis-cli"
-```
+```text
 
 ## Laravel Artisan Commands
 
@@ -103,7 +103,7 @@ redis-cli ttl 'umamusume-career-planner:key_name'
 
 # Set key with expiration
 redis-cli setex 'test_key' 60 'test_value'
-```
+```text
 
 ## Database Operations
 
@@ -187,7 +187,7 @@ php artisan tinker --execute="Cache::forget('test'); echo 'deleted';"
 
 # Get all keys (pattern)
 php artisan tinker --execute="print_r(Redis::keys('umamusume-career-planner:*'));"
-```
+```text
 
 ## Advanced Operations
 
@@ -260,7 +260,7 @@ wsl bash -c "redis-cli slowlog get 10"
 
 # 4. Check database size
 wsl bash -c "redis-cli dbsize"
-```
+```text
 
 ## Clear Everything (Nuclear Option)
 
@@ -325,7 +325,7 @@ php artisan test --filter=TestName
 CACHE_STORE=database
 QUEUE_CONNECTION=database
 SESSION_DRIVER=database
-```
+```text
 
 ## Production (with Redis)
 
@@ -388,7 +388,7 @@ wsl bash -c "redis-cli client list"
 
 # Check hit rate
 wsl bash -c "redis-cli info stats | grep keyspace"
-```
+```text
 
 ## Safety Notes
 

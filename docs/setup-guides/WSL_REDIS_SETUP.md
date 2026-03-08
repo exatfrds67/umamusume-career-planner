@@ -33,7 +33,7 @@ If you prefer to set up manually:
 ```powershell
 wsl hostname -I
 # Example output: 172.18.205.249
-```
+```text
 
 1. **Add port forwarding** (as Administrator):
 
@@ -61,7 +61,7 @@ Your `.env` and `.env.testing` files are already configured correctly:
 ```env
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
-```
+```text
 
 ## Testing
 
@@ -113,7 +113,7 @@ wsl hostname -I
 
 ```powershell
 netsh interface portproxy show all
-```
+```text
 
 1. **Test port connectivity**:
 
@@ -168,7 +168,7 @@ $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-Executio
 $trigger = New-ScheduledTaskTrigger -AtStartup
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 Register-ScheduledTask -TaskName "WSL Redis Port Forward" -Action $action -Trigger $trigger -Principal $principal
-```
+```text
 
 1. Or add to Windows startup folder (requires UAC prompt):
    - Create shortcut to `setup-redis-portforward.ps1`
@@ -233,7 +233,7 @@ redis-server
 
 ```powershell
 .\scripts\setup-redis-portforward.ps1
-```
+```text
 
 1. **Test the connection**:
 

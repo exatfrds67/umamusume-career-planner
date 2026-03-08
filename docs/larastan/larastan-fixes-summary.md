@@ -233,7 +233,7 @@ $value = (int) $mixed;
 
 // After
 $value = is_numeric($mixed) ? (int) $mixed : 0;
-```
+```text
 
 ### 2. Array Access Safety
 
@@ -253,7 +253,7 @@ $userId = $user->id;
 
 // After
 $userId = $user?->id ?? throw new \Exception('User required');
-```
+```text
 
 ### 4. Config with Defaults
 
@@ -273,7 +273,7 @@ public function scopeActive($query)
 
 // After
 public function scopeActive(Builder $query): Builder
-```
+```text
 
 ### 6. Binary Operations
 

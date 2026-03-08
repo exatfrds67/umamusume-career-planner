@@ -109,7 +109,7 @@ vendor/bin/phpstan analyse --level=9 app/View/Components/
 
 ```bash
 vendor/bin/pint --dirty
-```
+```text
 
 **Result**: ✅ All files formatted correctly
 

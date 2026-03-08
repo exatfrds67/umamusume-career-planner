@@ -231,7 +231,7 @@ Before configuring MCP servers, ensure you have:
     }
   }
 }
-```
+```text
 
 **Note**: All Power servers are disabled. Enable them individually from the MCP Servers view when needed for AWS/cloud development tasks.
 
@@ -401,7 +401,7 @@ Before configuring MCP servers, ensure you have:
 
 ```bash
 # No installation needed - runs on demand
-```
+```text
 
 ### For uvx-based servers
 
@@ -417,7 +417,7 @@ brew install uv
 ```bash
 # Install GitKraken Desktop
 # https://www.gitkraken.com/download
-```
+```text
 
 ---
 

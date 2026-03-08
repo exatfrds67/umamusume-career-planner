@@ -51,7 +51,7 @@ class YouTubeAgent extends Agent
         );
     }
 }
-```
+```text
 
 You can also use other providers like OpenAI, Gemini, or Ollama if you want to run the model locally. Check out the [AI
 Providers](ai-providers.md) documentation.
@@ -134,7 +134,7 @@ $agent = Agent::make()
     ->withInstructions("You are a helpful assistant");
 
 $response = $agent->chat(new UserMessage("Hello!"));
-```
+```text
 
 ## Monitoring
 

@@ -240,7 +240,7 @@ it('rare skills have higher SP costs than normal skills on average', function ()
     // Rare skills should cost more on average
     expect($avgRare)->toBeGreaterThan($avgNormal);
 });
-```
+```text
 
 **Reason**: The curated skills data contains some skills with costs outside the strict 120-180 range (e.g., 110 SP for
 some normal skills, 170 SP for some rare skills). The updated tests validate that:

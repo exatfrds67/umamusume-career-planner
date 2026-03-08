@@ -49,7 +49,7 @@ if ($character->user_id !== Auth::id()) {
 ```php
 // ✅ Policy-based authorization (respects admin bypass)
 $this->authorize('update', $character);
-```
+```text
 
 ---
 

@@ -237,7 +237,7 @@
 
 **SPEC Documents** (8 files)
 
-```
+```text
 docs/specs/000_SPECS_INDEX.md
 docs/specs/SPEC-001_Character_Management_Technical.md
 docs/specs/SPEC-002_Training_Optimization_Technical.md
@@ -250,7 +250,7 @@ docs/specs/SPEC-007_External_Integration_Technical.md
 
 **TECH-FLOW Documents** (8 files)
 
-```
+```text
 docs/tech-flow/000_TECH_FLOW_INDEX.md
 docs/tech-flow/TECH-FLOW-001_Character_Management_Flow.md
 docs/tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md
@@ -263,32 +263,32 @@ docs/tech-flow/TECH-FLOW-007_External_Integration_Flow.md
 
 **Wireframe Documents** (1 file)
 
-```
+```text
 docs/wireframes/000_WIREFRAMES_INDEX.md
 ```
 
 **Sequence Diagram Documents** (1 file)
 
-```
+```text
 docs/sequences/000_SEQUENCE_DIAGRAMS_INDEX.md
 ```
 
 **User Flow Documents** (1 file)
 
-```
+```text
 docs/user-flows/000_USER_FLOW_DIAGRAMS_INDEX.md
 ```
 
 **Verification & Summary Documents** (2 files)
 
-```
+```text
 docs/000_IMPLEMENTATION_VERIFICATION_MATRIX.md
 docs/DOCUMENTATION_COMPLETION_SUMMARY.md
 ```
 
 **Project Completion Documents** (2 files)
 
-```
+```text
 docs/DOCUMENTATION_ARTIFACTS_DIRECTORY_STRUCTURE.md
 EXECUTIVE_SUMMARY_DOCUMENTATION_COMPLETE.md
 ```

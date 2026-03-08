@@ -44,7 +44,7 @@ protected function provider(): AIProviderInterface
         httpOptions: new HttpClientOptions(timeout: 30),
     );
 }
-```
+```text
 
 ### OpenAI (Legacy Completions API)
 
@@ -115,7 +115,7 @@ protected function provider(): AIProviderInterface
         httpOptions: new HttpClientOptions(timeout: 30),
     );
 }
-```
+```text
 
 ### Google Gemini
 
@@ -172,7 +172,7 @@ protected function provider(): AIProviderInterface
         httpOptions: new HttpClientOptions(timeout: 30),
     );
 }
-```
+```text
 
 ### HuggingFace
 
@@ -234,7 +234,7 @@ Requires the AWS SDK:
 
 ```bash
 composer require aws/aws-sdk-php
-```
+```text
 
 ```php
 use Aws\BedrockRuntime\BedrockRuntimeClient;
@@ -393,7 +393,7 @@ class MyAIProvider implements AIProviderInterface
         return new AssistantMessage($result['content']);
     }
 }
-```
+```text
 
 ### Contributing
 

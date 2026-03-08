@@ -21,7 +21,7 @@ The `ExternalAPIService` is a base class for integrating with multiple external 
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                   ExternalAPIService                        │
 │                     (Base Class)                            │
@@ -87,7 +87,7 @@ class MyAPIService extends ExternalAPIService
         return $this->fetchWithFallback("/data/{$id}");
     }
 }
-```
+```text
 
 ### 2. Register as Service Provider
 
@@ -113,7 +113,7 @@ if ($result['success']) {
 } else {
     $error = $result['error'];
 }
-```
+```text
 
 ## API Source Configuration
 
@@ -157,7 +157,7 @@ When a request fails, the service automatically tries the next priority source:
 ```php
 // Tries primary first, then secondary, then tertiary
 $result = $this->fetchWithFallback('/endpoint');
-```
+```text
 
 ### Rate Limiting
 
@@ -181,7 +181,7 @@ Each source can have a different timeout:
 ```php
 // Timeout after 5 seconds
 'timeout' => 5,
-```
+```text
 
 ### Circuit Breaker
 
@@ -236,7 +236,7 @@ All requests and responses are logged:
     "error": "Request timeout",
     "timestamp": "2024-01-15T10:30:05Z"
 }
-```
+```text
 
 ## Protected Methods
 
@@ -273,7 +273,7 @@ protected function fetchWithFallback(
         'fetched_at' => '2024-01-15T10:30:00Z',
     ],
 ]
-```
+```text
 
 ### `fetchFromSource()`
 
@@ -296,7 +296,7 @@ Get all configured API sources.
 
 ```php
 $sources = $service->getApiSources();
-```
+```text
 
 ### `enableSource()` / `disableSource()`
 
@@ -314,7 +314,7 @@ Get circuit breaker status for all sources.
 ```php
 $status = $service->getCircuitBreakerStatus();
 // Returns: ['primary' => ['failures' => 0, 'is_open' => false]]
-```
+```text
 
 ### `getHealthStatus()`
 
@@ -349,7 +349,7 @@ All fetch methods return a standardized response:
         'fetched_at' => '2024-01-15T10:30:00Z',
     ],
 ]
-```
+```text
 
 ### Error Response
 
@@ -383,7 +383,7 @@ All fetch methods return a standardized response:
         ],
     ],
 ]
-```
+```text
 
 ## Testing
 
@@ -415,7 +415,7 @@ $this->apiSources = [
     'primary' => [...],
     'secondary' => [...],
 ];
-```
+```text
 
 ### 2. Set Appropriate Timeouts
 
@@ -434,7 +434,7 @@ $status = $service->getCircuitBreakerStatus();
 if ($status['primary']['is_open']) {
     // Alert: Primary API source is down
 }
-```
+```text
 
 ### 4. Use Preferred Sources
 
@@ -459,7 +459,7 @@ if (!$result['success']) {
     
     // Use cached data or show error to user
 }
-```
+```text
 
 ## Configuration
 
@@ -481,7 +481,7 @@ Add to `.env`:
 ```env
 UMAPYOI_API_URL=https://api.umapyoi.net
 UMAMUSUMEDB_API_URL=https://umamusumedb.com/api
-```
+```text
 
 ## Troubleshooting
 

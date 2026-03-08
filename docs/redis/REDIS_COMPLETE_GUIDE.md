@@ -83,7 +83,7 @@ php scripts/test-redis.php
 # Attempting to connect to 127.0.0.1:6379...
 # Connected successfully!
 # Ping response: PONG
-```
+```text
 
 ## Step 3: Run Tests
 
@@ -127,7 +127,7 @@ does not have the required features. Falling back to NAT networking.
 
 ## Architecture
 
-```
+```text
 
 ┌─────────────────────────────────────────────────────────────┐
 │                    Windows 10 (XAMPP)                       │
@@ -244,7 +244,7 @@ php artisan redis:health
 
 # Detailed information
 php artisan redis:health --detailed
-```
+```text
 
 ## cache:warm
 
@@ -329,7 +329,7 @@ php artisan redis:health --detailed
 ```powershell
 # Re-run port forwarding setup (as Administrator)
 .\scripts\setup-redis-portforward.ps1
-```
+```text
 
 ## Troubleshooting
 
@@ -386,7 +386,7 @@ wsl redis-cli info stats | grep fragmentation
 
 # If fragmentation > 1.5, consider restart
 wsl sudo service redis-server restart
-```
+```text
 
 ## Cache Hit Rate
 
@@ -438,7 +438,7 @@ requirepass your-strong-password
 ```bash
 # In redis.conf
 bind 127.0.0.1 ::1
-```
+```text
 
 1. **Enable SSL/TLS**:
 
@@ -523,7 +523,7 @@ wsl --shutdown
 ```powershell
 netsh interface portproxy delete v4tov4 listenport=6379 listenaddress=127.0.0.1
 Remove-NetFirewallRule -DisplayName "WSL Redis"
-```
+```text
 
 1. **Test Connection**:
 

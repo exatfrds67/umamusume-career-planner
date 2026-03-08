@@ -153,7 +153,7 @@ Created three comprehensive Form Request classes with validation rules and custo
         'timestamp' => string (ISO 8601),
     ],
 ]
-```
+```text
 
 **Features**:
 
@@ -323,7 +323,7 @@ protected static function booted()
 
 ```bash
 php artisan test --filter=TrainingPrediction
-```
+```text
 
 ## Testing Checklist
 

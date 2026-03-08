@@ -31,7 +31,7 @@ Enhanced focus indicators for keyboard navigation mode:
 .keyboard-navigation .btn:focus-visible {
     outline-width: 3px;
 }
-```
+```text
 
 ### 2. Skip Links
 
@@ -110,7 +110,7 @@ eventBus.emit('focus:trap', '#modal-container');
 
 // Release focus
 eventBus.emit('focus:release');
-```
+```text
 
 ### 5. Focus Management for Forms
 
@@ -152,7 +152,7 @@ const isFocusable = accessibilitySystem.isFocusable(element);
 
 // Ensure focus is visible
 accessibilitySystem.ensureFocusVisible(element);
-```
+```text
 
 ### Registering Custom Keyboard Shortcuts
 
@@ -324,7 +324,7 @@ test('focus trap works in modals', () => {
     fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
     expect(document.activeElement).toBe(lastElement);
 });
-```
+```text
 
 ## Best Practices
 

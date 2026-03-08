@@ -177,7 +177,7 @@ actual data input to ensure all form fields work correctly and data is properly 
 ```text
 Illuminate\Database\Eloquent\RelationNotFoundException
 Call to undefined relationship [skills] on model [App\Models\Character].
-```
+```text
 
 **Location**: `app/Http/Controllers/CharacterController.php:140`
 
@@ -261,7 +261,7 @@ Table 'umamusume-career-planner.careers' doesn't exist
     "created_at": "2026-01-18T00:59:11.000000Z",
     "updated_at": "2026-01-18T00:59:11.000000Z"
 }
-```
+```text
 
 ### Aptitude Records (10 records)
 

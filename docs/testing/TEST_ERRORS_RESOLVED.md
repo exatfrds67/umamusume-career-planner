@@ -11,7 +11,7 @@
 
 **Error:**
 
-```
+```text
 PHP Warning: The use statement with non-compound name 'Mockery' has no effect
 in tests/Feature/Services/AI/BedrockIntegrationTest.php on line 6
 ```
@@ -33,7 +33,7 @@ in tests/Feature/Services/AI/BedrockIntegrationTest.php on line 6
 
 ```powershell
 php artisan test --filter=BedrockIntegration --compact
-```
+```text
 
 Result: ✅ 21 tests passed, no warnings
 
@@ -46,7 +46,7 @@ Result: ✅ 21 tests passed, no warnings
 ```
 'tesseract' is not recognized as an internal or external command,
 operable program or batch file.
-```
+```text
 
 **Cause:**
 
@@ -78,7 +78,7 @@ if (! $this->service->isAvailable()) {
 
 ```powershell
 php artisan test --filter=Tesseract --compact
-```
+```text
 
 Result: ✅ 11 tests passed (tests that don't need Tesseract run, others skip gracefully)
 
@@ -90,7 +90,7 @@ Result: ✅ 11 tests passed (tests that don't need Tesseract run, others skip gr
 
 ```
 WARN  No code coverage driver available
-```
+```text
 
 **Status:** This is informational, not an error
 
@@ -118,7 +118,7 @@ WARN  No code coverage driver available
 ❌ Mockery warning on every test run
 ❌ Tesseract errors causing noise
 ⚠️  Tests attempting to run without checking dependencies
-```
+```text
 
 ### After Fixes
 
@@ -127,7 +127,7 @@ WARN  No code coverage driver available
 ✅ Tesseract tests skip gracefully when not installed
 ✅ Clean test output
 ✅ All tests passing or skipping appropriately
-```
+```text
 
 ---
 
@@ -153,7 +153,7 @@ php artisan test --filter=Redis --compact
 
 # Cache tests
 php artisan test --filter=CacheManagement --compact
-```
+```text
 
 ---
 
@@ -188,7 +188,7 @@ php artisan test --filter=CacheManagement --compact
 +     }
       // ... rest of test
   });
-```
+```text
 
 ---
 
@@ -227,7 +227,7 @@ if (! $this->service->isAvailable()) {
 ```php
 // Only import what you use
 // Remove unused imports to avoid warnings
-```
+```text
 
 ### 3. Environment-Aware Tests
 

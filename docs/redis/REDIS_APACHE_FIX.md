@@ -10,7 +10,7 @@
 
 The application works fine in CLI (tests pass), but throws an error when accessed via web browser:
 
-```
+```text
 Class "Redis" not found
 ```
 
@@ -28,7 +28,7 @@ Class "Redis" not found
 
 ```powershell
 Test-Path "C:\xampp\php\ext\php_redis.dll"
-```
+```text
 
 **Status:** ✅ File exists
 
@@ -57,7 +57,7 @@ net stop Apache2.4
 
 # Start Apache
 net start Apache2.4
-```
+```text
 
 #### Option C: Using Services
 
@@ -81,7 +81,7 @@ phpinfo();
 
 ### Access in browser
 
-```
+```text
 http://127.0.0.1:8000/phpinfo-test.php
 ```
 
@@ -94,7 +94,7 @@ http://127.0.0.1:8000/phpinfo-test.php
 
 ```powershell
 Remove-Item public/phpinfo-test.php
-```
+```text
 
 ---
 
@@ -112,7 +112,7 @@ php artisan serve
 
 **Access application at:**
 
-```
+```text
 http://127.0.0.1:8000
 ```
 
@@ -132,7 +132,7 @@ http://127.0.0.1:8000
 
 ```powershell
 Get-Process httpd -ErrorAction SilentlyContinue
-```
+```text
 
 **Force stop Apache:**
 
@@ -144,7 +144,7 @@ Stop-Process -Name httpd -Force
 
 ```powershell
 net start Apache2.4
-```
+```text
 
 ### Issue 2: Redis still not found after restart
 
@@ -173,7 +173,7 @@ Access: `http://127.0.0.1:8000/test.php`
 ```php
 <?php
 echo php_ini_loaded_file();
-```
+```text
 
 **If different from C:\xampp\php\php.ini:**
 
@@ -211,7 +211,7 @@ net stop Apache2.4
 
 # Start PHP server
 php artisan serve
-```
+```text
 
 **Why?**
 

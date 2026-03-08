@@ -131,7 +131,7 @@ Browser to be installed."
 composer require pestphp/pest-plugin-browser:^4.0 --dev --ignore-platform-reqs
 npm install playwright@latest
 npx playwright install
-```
+```text
 
 **Note**: The `--ignore-platform-reqs` flag is required on Windows because Laravel Horizon requires Unix-only extensions
 (`ext-pcntl`, `ext-posix`).

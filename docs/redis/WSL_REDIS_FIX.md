@@ -36,7 +36,7 @@ New-NetFirewallRule -DisplayName "WSL Redis" -Direction Inbound -LocalPort $port
 
 Write-Host "Port forwarding configured: 127.0.0.1:$port -> $wslIP:$port"
 Write-Host "Verify with: netsh interface portproxy show all"
-```
+```text
 
 #### Step 2: Run the script as Administrator
 
@@ -50,7 +50,7 @@ Update `.env`:
 
 ```env
 REDIS_HOST=127.0.0.1
-```
+```text
 
 Update `.env.testing`:
 
@@ -63,7 +63,7 @@ REDIS_HOST=127.0.0.1
 ```bash
 php test-redis.php
 php artisan test --filter=FallbackRecoveryTest
-```
+```text
 
 #### Pros (Option 1)
 
@@ -106,7 +106,7 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
-```
+```text
 
 #### Step 3: Enable service (Option 2)
 
@@ -120,7 +120,7 @@ wsl sudo systemctl start redis-forward
 ```env
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6380
-```
+```text
 
 #### Pros (Option 2)
 
@@ -157,7 +157,7 @@ redis-server
 ```env
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
-```
+```text
 
 #### Pros (Option 3)
 
@@ -190,7 +190,7 @@ networkingMode=mirrored
 ```powershell
 wsl --shutdown
 wsl
-```
+```text
 
 #### Step 3: Update configuration (Option 4)
 
@@ -227,7 +227,7 @@ This is the cleanest solution and will work for all WSL services.
 [wsl2]
 networkingMode=mirrored
 "@ | Out-File -FilePath "$env:USERPROFILE\.wslconfig" -Encoding ASCII
-```
+```text
 
 1. **Restart WSL**:
 
@@ -244,7 +244,7 @@ wsl echo "WSL restarted"
 wsl sudo service redis-server status
 # If not running:
 wsl sudo service redis-server start
-```
+```text
 
 1. **Update configuration files**:
 
@@ -261,7 +261,7 @@ REDIS_PORT=6379
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
 REDIS_DB=15
-```
+```text
 
 1. **Test connection**:
 
@@ -274,7 +274,7 @@ php test-redis.php
 ```bash
 php artisan config:clear
 php artisan test --filter=FallbackRecoveryTest --compact
-```
+```text
 
 ---
 
@@ -307,7 +307,7 @@ php artisan test --filter="API Health Monitoring" --compact
 
 ```powershell
 wsl --version
-```
+```text
 
 Should show WSL version 2.0.0 or higher.
 
@@ -321,7 +321,7 @@ Get-Content "$env:USERPROFILE\.wslconfig"
 
 ```bash
 wsl ip addr show eth0
-```
+```text
 
 ### If port forwarding doesn't work
 
@@ -335,7 +335,7 @@ netsh interface portproxy show all
 
 ```powershell
 Get-NetFirewallRule -DisplayName "WSL Redis"
-```
+```text
 
 1. **Test port availability**:
 

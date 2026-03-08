@@ -145,7 +145,7 @@ To run only performance tests:
 
 ```bash
 php artisan test --group=performance --compact
-```
+```text
 
 ## Related Documentation
 

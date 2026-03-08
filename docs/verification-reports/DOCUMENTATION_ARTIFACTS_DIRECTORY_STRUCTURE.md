@@ -8,7 +8,7 @@
 
 ## Directory Tree
 
-```
+```text
 docs/
 ├── 000_DOCUMENT_INDEX.md                           ← Master navigation guide
 ├── 000_MASTER_GLOSSARY.md                          ← Standardized terminology
@@ -143,7 +143,7 @@ docs/
 
 **Character Management System**:
 
-```
+```text
 SRS Requirements (REQ-001 to REQ-008)
     ↓
 PRD-001_Character_Management.md
@@ -163,7 +163,7 @@ TECH-FLOW-001_Character_Management_Flow.md
 
 **Training Optimization**:
 
-```
+```text
 PRD-002 Training Optimization (Feature)
     ↓
 SPEC-002 Technical Spec (5 facilities, prediction engine, recommendations)
@@ -192,7 +192,7 @@ Test Suite: TrainingTest.php (38 tests, 90% coverage)
 
 **Career Progression Flow**:
 
-```
+```text
 UF-002: Career Progression & Training Loop
     ↓
 Includes 50+ decision points across:
@@ -305,7 +305,7 @@ Performance validated in:
 
 ### Document Distribution by Type
 
-```
+```text
 Strategic Planning        : 3 documents  (001_SDP, 002_BRS, 003_SRS)
 Technical Architecture    : 4 documents  (004_SDS, 009_DBD, 010_SCD + others)
 Product Requirements      : 7 documents  (PRD-001 through 007)
@@ -321,7 +321,7 @@ TOTAL                    : 35 documents (34 active, 1 archive tracking)
 
 ### Content Volume Distribution
 
-```
+```text
 Category               Lines      Pages*   Percentage
 ─────────────────────────────────────────────────────
 SPEC Documents        8,980      18.0%    

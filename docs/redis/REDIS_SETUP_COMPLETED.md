@@ -24,7 +24,7 @@ CACHE_PREFIX=umamusume-career-planner-cache-
 
 ```powershell
 Select-String -Path .env -Pattern "^CACHE_STORE=|^QUEUE_CONNECTION=|^SESSION_DRIVER="
-```
+```text
 
 **Result:**
 
@@ -151,7 +151,7 @@ php artisan test --filter=CacheManagement --compact
 
 # Run full test suite
 php artisan test --compact
-```
+```text
 
 **Expected:** All tests should pass
 
@@ -223,7 +223,7 @@ php artisan tinker --execute="echo config('cache.default');"
 
 # Test cache operations
 php artisan tinker --execute="Cache::put('test', 'ok', 60); echo Cache::get('test');"
-```
+```text
 
 ---
 

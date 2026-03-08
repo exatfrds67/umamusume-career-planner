@@ -56,7 +56,7 @@ NEURON_MCP_ENABLED=true
     'connection' => [...],
     'global_tools' => [...],
 ]
-```
+```text
 
 ## Local MCP Servers
 
@@ -170,7 +170,7 @@ NEURON_MCP_UMAPYOI_URL=https://api.umapyoi.net/mcp
 
 # Set the authentication token
 NEURON_MCP_UMAPYOI_TOKEN=your-api-token-here
-```
+```text
 
 ## Transport Options
 
@@ -252,7 +252,7 @@ protected function mcpConnectors(): array
         McpConnectorFactory::make('umapyoi'),
     ];
 }
-```
+```text
 
 ## Tool Filtering
 
@@ -284,7 +284,7 @@ $connector = McpConnector::remote()
     ->token(env('UMAPYOI_API_TOKEN'))
     ->only(['get_character_data', 'get_skill_data'])
     ->connect();
-```
+```text
 
 ### Global Tool Filtering
 
@@ -309,7 +309,7 @@ Configure connection behavior for MCP servers:
     'retry_attempts' => env('NEURON_MCP_RETRY_ATTEMPTS', 3),
     'retry_delay' => env('NEURON_MCP_RETRY_DELAY', 1000), // milliseconds
 ],
-```
+```text
 
 ### Environment Variables
 
@@ -530,7 +530,7 @@ class TrainingAdvisorAgent extends Agent
         ],
     ],
 ],
-```
+```text
 
 ## Additional Resources
 

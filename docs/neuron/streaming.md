@@ -61,7 +61,7 @@ $stream = MyAgent::make()->stream(
 foreach ($stream as $chunk) {
     echo $chunk;
 }
-```
+```text
 
 ## Monitoring Streaming
 

@@ -46,7 +46,7 @@ $recommendation = $parser->parse($aiResponse);
 echo $recommendation->action; // "Train at Speed facility"
 echo $recommendation->priority->value; // "high"
 echo $recommendation->reasoning; // "Three support cards present..."
-```
+```text
 
 ### Parsing Multiple Recommendations
 
@@ -87,7 +87,7 @@ if ($recommendation === null) {
     // All parsing strategies failed
     Log::error('Unable to parse AI recommendation');
 }
-```
+```text
 
 ## Expected JSON Schema
 
@@ -128,7 +128,7 @@ The parser expects AI responses to follow this schema:
   "action": "Train Speed",
   "reasoning": "Best option available"
 }
-```
+```text
 
 ### 2. Markdown Code Block
 
@@ -145,7 +145,7 @@ Here's my recommendation:
 
 This should help.
 
-```
+```text
 
 ### 3. Mixed Text with JSON
 
@@ -153,7 +153,7 @@ This should help.
 
 Based on the analysis, I recommend: {"priority": "high", "action": "Train Speed", "reasoning": "Best option"}
 
-```
+```text
 
 ### 4. Natural Language (Fallback)
 
@@ -161,7 +161,7 @@ Based on the analysis, I recommend: {"priority": "high", "action": "Train Speed"
 
 I strongly recommend training at the Speed facility immediately. This is critical because your character needs to improve speed stats urgently.
 
-```
+```text
 
 ## Natural Language Parsing
 
@@ -245,7 +245,7 @@ class TrainingAdvisoryService
         }
     }
 }
-```
+```text
 
 ## Testing
 

@@ -170,7 +170,7 @@ AWS Bedrock API (us-east-1)
 Model Response
     ↓
 Response Processing & Return
-```
+```text
 
 ### Usage Example
 
@@ -224,7 +224,7 @@ AWS_DEFAULT_REGION=us-east-1
 AWS_BEDROCK_VERSION=latest
 AWS_BEDROCK_ENABLED=true
 BEDROCK_MODEL_PREFERENCES=claude-4.5-sonnet,nova-2-lite
-```
+```text
 
 ### Model Pricing Configuration
 

@@ -192,7 +192,7 @@ ucp_skills (1) ──→ (N) ucp_skill_hints
     └──→ (1) ucp_skills [evolution_target_id]
 
 ucp_support_cards (N) ──→ (N) ucp_skill_hints [provision mapping]
-```
+```text
 
 ### Relationship Verification Status
 

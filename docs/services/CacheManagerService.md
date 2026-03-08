@@ -31,7 +31,7 @@ class MyController extends Controller
         private CacheManagerService $cacheManager
     ) {}
 }
-```
+```text
 
 ## Configuration
 
@@ -82,7 +82,7 @@ if ($cached) {
     echo "Age: " . $cached['_cache']['age_seconds'] . " seconds";
     echo "Is stale: " . ($cached['_cache']['is_stale'] ? 'Yes' : 'No');
 }
-```
+```text
 
 #### Deleting Data
 
@@ -96,7 +96,7 @@ $cacheManager->delete('character_data:Silence Suzuka');
 if ($cacheManager->has('character_data:Silence Suzuka')) {
     // Key exists in cache
 }
-```
+```text
 
 ### Cache Metadata
 
@@ -124,7 +124,7 @@ Override the default TTL for specific cache entries:
 ```php
 $customTtl = 7200; // 2 hours
 $cacheManager->put($key, $data, $customTtl);
-```
+```text
 
 ### Cache Statistics
 
@@ -145,7 +145,7 @@ Reset statistics:
 
 ```php
 $cacheManager->resetStatistics();
-```
+```text
 
 ### Cache Information
 
@@ -176,7 +176,7 @@ $size = $cacheManager->getCacheSize();
 //     'total_keys' => 150,
 //     'estimated_size_bytes' => 524288
 // ]
-```
+```text
 
 ### Cache Warming
 
@@ -202,7 +202,7 @@ Flush all external API cache:
 
 ```php
 $cacheManager->flush();
-```
+```text
 
 ## Integration with External API Service
 
@@ -261,7 +261,7 @@ if ($cached) {
     // Use cached data
     return $cached;
 }
-```
+```text
 
 ## Monitoring and Debugging
 
@@ -282,7 +282,7 @@ $metadata = $cacheManager->getCacheMetadata('character_data:test');
 //     'data_type' => 'character_data',
 //     'key' => 'character_data:test'
 // ]
-```
+```text
 
 ## Best Practices
 

@@ -27,7 +27,7 @@ networking.
 ✅ Redis running in WSL: wsl redis-cli ping → PONG
 ❌ Windows to WSL: Test-NetConnection 172.18.205.249:6379 → Timeout
 ❌ PHP to WSL: new Redis()->connect('172.18.205.249', 6379) → Timeout
-```
+```text
 
 **Root Cause**: WSL2 uses Hyper-V virtualization with a separate network namespace. The WSL IP is only accessible from
 within WSL, not from Windows.
@@ -122,7 +122,7 @@ php artisan test --filter="API Health Monitoring" --compact
 
 # Run all fallback tests
 php artisan test --filter=FallbackRecoveryTest --compact
-```
+```text
 
 ## Why This Happened
 

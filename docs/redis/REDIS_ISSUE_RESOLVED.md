@@ -15,7 +15,7 @@ Class "Redis" not found
 PHP 8.4.11
 Laravel 12.46.0
 127.0.0.1:8000
-```
+```text
 
 **Root Cause:**
 
@@ -49,7 +49,7 @@ Press Ctrl+C to stop the server
 
 ### Network Request Status ✅
 
-```
+```text
 
 GET <http://127.0.0.1:8000/> [success - 200]
 
@@ -205,7 +205,7 @@ URL: <http://127.0.0.1:8000>
 
 ### PHP Configuration
 
-```
+```text
 
 PHP Version: 8.4.11
 Redis Extension: Enabled
@@ -233,7 +233,7 @@ Version: 7.0.15
 
 ```powershell
 php artisan serve
-```
+```text
 
 ### Verify Status
 

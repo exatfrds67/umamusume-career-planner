@@ -480,7 +480,7 @@ Available sections:
 <!-- After -->
 <input type="text" name="search" id="search-users" placeholder="Search users...">
 <label for="search-users" class="sr-only">Search users</label>
-```
+```text
 
 ---
 

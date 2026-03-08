@@ -33,7 +33,7 @@ Neuron AI provides:
 
 ### Architecture Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     Laravel Application                      │
 ├─────────────────────────────────────────────────────────────┤
@@ -78,7 +78,7 @@ Install the core Neuron AI package and Laravel integration:
 
 ```bash
 composer require neuron-core/neuron-ai neuron-core/neuron-laravel
-```
+```text
 
 ### Step 2: Publish Configuration
 
@@ -96,7 +96,7 @@ Publish the chat history migration:
 
 ```bash
 php artisan vendor:publish --tag=neuron-migrations
-```
+```text
 
 Run the migrations:
 
@@ -128,7 +128,7 @@ OLLAMA_MODEL=llama2
 
 # Optional: Inspector Monitoring
 INSPECTOR_INGESTION_KEY=your-inspector-key
-```
+```text
 
 ### Step 5: Verify Installation
 
@@ -165,7 +165,7 @@ return [
         // ... other providers
     ],
 ];
-```
+```text
 
 ### Provider Selection
 
@@ -204,7 +204,7 @@ Create a new agent using the Artisan command:
 
 ```bash
 php artisan neuron:agent TrainingAdvisorAgent
-```
+```text
 
 This creates `app/Neuron/Agents/TrainingAdvisorAgent.php` with a basic structure.
 
@@ -298,7 +298,7 @@ new SystemPrompt(
         "Tone and style guidelines",
     ]
 )
-```
+```text
 
 ### Base Agent Pattern
 
@@ -369,7 +369,7 @@ class TrainingAdvisorAgent extends BaseAgent
         );
     }
 }
-```
+```text
 
 ## Creating Tools
 
@@ -441,7 +441,7 @@ class CharacterStatsTool
         });
     }
 }
-```
+```text
 
 ### Tool Property Types
 
@@ -503,7 +503,7 @@ protected function tools(): array
         RaceDataTool::make(),
     ];
 }
-```
+```text
 
 ## Using Agents
 
@@ -547,7 +547,7 @@ $response = $agent->structured(
 echo $response->recommendedTraining; // string
 echo $response->reasoning; // string
 print_r($response->expectedGains); // array
-```
+```text
 
 ### Defining Response Classes
 
@@ -634,7 +634,7 @@ class TrainingAdvisorService
         );
     }
 }
-```
+```text
 
 ### Controller Integration
 
@@ -702,7 +702,7 @@ foreach ($agent->stream(new UserMessage('Give me training advice')) as $chunk) {
     echo $chunk->content;
     flush();
 }
-```
+```text
 
 ### Server-Sent Events (SSE)
 
@@ -794,7 +794,7 @@ eventSource.onerror = (error) => {
     console.error('SSE error:', error);
     eventSource.close();
 };
-```
+```text
 
 ## Chat History
 
@@ -848,7 +848,7 @@ $raceAgent = new RaceStrategyAgent(
     userId: auth()->id(),
     sessionId: $raceSessionId
 );
-```
+```text
 
 ### Clearing History
 
@@ -877,7 +877,7 @@ $messages = DB::table('neuron_chat_histories')
     ->where('agent_type', 'training_advisor')
     ->orderBy('created_at', 'desc')
     ->paginate(50);
-```
+```text
 
 ## Error Handling
 
@@ -930,7 +930,7 @@ try {
         expectedGains: [],
     );
 }
-```
+```text
 
 ### Rate Limiting
 
@@ -976,7 +976,7 @@ Tool::make('get_character_stats', 'Retrieve character statistics')
             return "Error: Character with ID {$character_id} not found.";
         }
     });
-```
+```text
 
 ## Testing
 
@@ -1035,7 +1035,7 @@ it('retrieves character stats correctly', function () {
         ->and($result['stats']['speed'])->toBe(800)
         ->and($result['stats']['stamina'])->toBe(700);
 });
-```
+```text
 
 ### Testing Service Classes
 
@@ -1096,7 +1096,7 @@ it('persists and retrieves chat history', function () {
     // History should be loaded automatically
     // (Verify through agent behavior or database queries)
 });
-```
+```text
 
 ## Troubleshooting
 
@@ -1133,7 +1133,7 @@ php artisan migrate
 
 # Check table exists
 php artisan db:show
-```
+```text
 
 #### 3. "Tool not found" or "Tool execution failed"
 
@@ -1191,7 +1191,7 @@ class TrainingAdviceResponse
 }
 
 // Check your system prompt is clear about output format
-```
+```text
 
 #### 5. "Rate limit exceeded"
 
@@ -1238,7 +1238,7 @@ return response()->stream($callback, 200, [
 // Check nginx configuration
 // Add to nginx.conf:
 // proxy_buffering off;
-```
+```text
 
 ### Debugging Tips
 
@@ -1284,7 +1284,7 @@ Route::get('/test-neuron', function () {
         ], 500);
     }
 });
-```
+```text
 
 #### Inspect Chat History
 
@@ -1320,7 +1320,7 @@ Tool::make('get_character_stats', 'description')
         
         return $result;
     });
-```
+```text
 
 ## Advanced Topics
 
@@ -1390,7 +1390,7 @@ protected function provider(): AIProviderInterface
 {
     return AIProvider::driver('custom_anthropic');
 }
-```
+```text
 
 ### Dynamic Tool Registration
 
@@ -1463,7 +1463,7 @@ class TrainingAdvisorAgent extends BaseAgent
         return $connectors;
     }
 }
-```
+```text
 
 #### MCP Configuration
 
@@ -1520,7 +1520,7 @@ class AdaptiveAgent extends BaseAgent
         );
     }
 }
-```
+```text
 
 ### Response Caching
 
@@ -1650,7 +1650,7 @@ The dashboard provides:
 
 ```env
 INSPECTOR_INGESTION_KEY=
-```
+```text
 
 **Production** (Inspector enabled):
 
@@ -1662,7 +1662,7 @@ INSPECTOR_INGESTION_KEY=your-actual-key
 
 ```env
 INSPECTOR_INGESTION_KEY=your-staging-key
-```
+```text
 
 #### Troubleshooting Inspector
 
@@ -1822,7 +1822,7 @@ php artisan vendor:publish --tag=neuron-config
 
 # Publish migrations
 php artisan vendor:publish --tag=neuron-migrations
-```
+```text
 
 ### Common Patterns
 
@@ -1840,7 +1840,7 @@ $response = $agent->structured(
     ResponseClass::class,
     new UserMessage('Your question')
 );
-```
+```text
 
 #### Streaming Response
 
@@ -1864,7 +1864,7 @@ Tool::make('tool_name', 'Description')
         // Tool logic
         return $result;
     });
-```
+```text
 
 ### Environment Variables
 

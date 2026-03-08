@@ -32,7 +32,7 @@ REDIS_HOST=127.0.0.1
 # AI Configuration
 OLLAMA_HOST=http://localhost:11434
 UMAPYOI_API_URL=https://api.umapyoi.net
-```
+```text
 
 ## 3. Installation Steps
 
@@ -49,7 +49,7 @@ npm install
 
 ```bash
 npm run build
-```
+```text
 
 ### 3.3 Setup Database
 
@@ -64,7 +64,7 @@ php artisan config:cache
 php artisan event:cache
 php artisan route:cache
 php artisan view:cache
-```
+```text
 
 ## 4. OCR Setup (Ubuntu/Debian)
 
@@ -89,7 +89,7 @@ user=www-data
 numprocs=2
 redirect_stderr=true
 stdout_logfile=/path/to/project/storage/logs/worker.log
-```
+```text
 
 ## 6. Maintenance
 

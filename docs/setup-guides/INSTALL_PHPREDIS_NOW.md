@@ -64,7 +64,7 @@ Run this command:
 
 ```powershell
 php -m | Select-String -Pattern "redis"
-```
+```text
 
 **Expected output:** `redis`
 
@@ -153,7 +153,7 @@ php artisan cache:warm
 
 ```powershell
 wsl bash -c "redis-cli ping"
-```
+```text
 
 Should return: `PONG`
 

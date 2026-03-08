@@ -87,7 +87,7 @@ Custom exception handling is configured in `bootstrap/app.php`:
         }
     });
 })
-```
+```text
 
 ### Error Notification Channels
 
@@ -189,7 +189,7 @@ $report = $metrics->getPerformanceReport('last_24_hours');
 
 ### Health Check Endpoint
 
-```
+```text
 
 GET /api/health
 
@@ -249,7 +249,7 @@ if ($user->hasConsented('analytics')) {
         'user_id_hash' => hash('sha256', $user->id),
     ]);
 }
-```
+```text
 
 ---
 
@@ -306,7 +306,7 @@ Log::channel('performance')->info('API request completed', [
     'status' => 200,
     'user_id' => auth()->id(),
 ]);
-```
+```text
 
 ### Log Rotation
 
@@ -481,7 +481,7 @@ class SystemAlert extends Notification
             });
     }
 }
-```
+```text
 
 ### On-Call Rotation
 
@@ -558,4 +558,4 @@ grep -c "ERROR" storage/logs/laravel-$(date +%Y-%m-%d).log
 
 # Find slow queries
 grep "Slow query" storage/logs/performance.log
-```
+```text

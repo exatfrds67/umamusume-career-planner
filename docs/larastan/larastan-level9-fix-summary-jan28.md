@@ -131,7 +131,7 @@ $message = "Value: {$mixedVar}";
 // After
 $value = is_scalar($mixedVar) ? (string) $mixedVar : 'N/A';
 $message = "Value: {$value}";
-```
+```text
 
 ### Pattern 3: PHPDoc Array Type Annotations
 
@@ -175,7 +175,7 @@ vendor/bin/phpstan analyse --level=9
 
 ```bash
 vendor/bin/pint --dirty
-```
+```text
 
 **Result**: ✅ 22 files formatted, 3 style issues fixed
 

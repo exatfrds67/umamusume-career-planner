@@ -60,7 +60,7 @@ Generate turn-by-turn training facility recommendations based on character state
     {"id": 15, "distance": "medium", "turn": 18}
   ]
 }
-```
+```text
 
 **Response** (200 OK):
 
@@ -121,7 +121,7 @@ Get intelligent skill purchase recommendations based on SP budget and character 
     }
   ]
 }
-```
+```text
 
 **Response** (200 OK):
 
@@ -175,7 +175,7 @@ Generate pre-race strategy recommendations based on character stats and race req
     "style_escape": "A"
   }
 }
-```
+```text
 
 **Response** (200 OK):
 
@@ -222,7 +222,7 @@ Detect critical situations requiring immediate attention.
     "support_bonds": [65, 70, 58, 75, 68, 72]
   }
 }
-```
+```text
 
 **Response** (200 OK):
 
@@ -269,7 +269,7 @@ Record actual training outcome for prediction accuracy tracking.
     "failure_occurred": false
   }
 }
-```
+```text
 
 **Response** (200 OK):
 
@@ -305,7 +305,7 @@ Record actual race outcome for prediction accuracy tracking.
     "margin": -0.3
   }
 }
-```
+```text
 
 **Response** (200 OK):
 

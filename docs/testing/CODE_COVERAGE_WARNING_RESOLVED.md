@@ -12,7 +12,7 @@ When running tests, PHPUnit displayed this warning:
 
 ```text
 WARN  No code coverage driver available
-```
+```text
 
 **Root Cause:**
 
@@ -86,7 +86,7 @@ php artisan test --filter=Tesseract --compact
 
 **Result:**
 
-```
+```text
 
    PASS  Tests\Unit\Services\TesseractServiceTest
   ✓ 11 tests passed (33 assertions)
@@ -113,7 +113,7 @@ php artisan test tests/Unit/Services/TesseractServiceTest.php tests/Feature/Serv
 
   Tests:    32 passed (124 assertions)
   Duration: 25.60s
-```
+```text
 
 **No warnings!** ✅
 
@@ -290,7 +290,7 @@ php artisan test --filter=Tesseract --compact
 
 ```powershell
 php artisan test --coverage
-```
+```text
 
 ---
 

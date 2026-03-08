@@ -18,7 +18,7 @@ local image files:
 
 ```php
 ->filter(fn ($file) => preg_match('/^__([a-z_]+)_umamusume/', $file->getFilename()))
-```
+```text
 
 Standard filenames follow the pattern `__character_name_umamusume_..._hash.jpg`.
 Silence Suzuka's local image file is `bb962aabeafaee5cbf7831e4d178ca64.jpg` — a hash-only filename
@@ -41,7 +41,7 @@ In `slugToName()`, after the `'grass_wonder'` entry:
 
 ```php
 'silence_suzuka' => 'Silence Suzuka',
-```
+```text
 
 #### 2. Added manual override block in `buildLocalImageMap()`
 
@@ -71,7 +71,7 @@ if (
 ) {
     $character->update(['avatar_url' => $this->localImageMap->get($characterName)]);
 }
-```
+```text
 
 #### 4. Direct DB fix
 

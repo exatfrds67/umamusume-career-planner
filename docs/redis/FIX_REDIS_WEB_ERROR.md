@@ -46,7 +46,7 @@ Apache needs to be restarted to load the redis extension.
 # Right-click PowerShell → Run as Administrator
 net stop Apache2.4
 net start Apache2.4
-```
+```text
 
 ## Method C: Windows Services
 
@@ -123,7 +123,7 @@ php artisan serve
 
 ### Access Application
 
-```
+```text
 
 <http://127.0.0.1:8000>
 

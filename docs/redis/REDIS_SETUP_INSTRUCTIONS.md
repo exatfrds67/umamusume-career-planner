@@ -60,7 +60,7 @@ Run the health check command:
 
 ```powershell
 php artisan redis:health
-```
+```text
 
 If successful, you should see Redis connection details.
 

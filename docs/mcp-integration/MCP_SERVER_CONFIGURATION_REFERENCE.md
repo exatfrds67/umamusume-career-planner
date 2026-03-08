@@ -76,7 +76,7 @@ This document provides the authoritative reference for all Model Context Protoco
 │  │ Design System   │                                           │
 │  └─────────────────┘                                           │
 └─────────────────────────────────────────────────────────────────┘
-```
+```text
 
 ### 2.2 MCP Server Categories
 
@@ -131,7 +131,7 @@ server_name: agentcore-mcp-server
 command: uvx
 args: ['agentcore-mcp-server@latest']
 enabled: true
-```
+```text
 
 **Capabilities**:
 
@@ -187,7 +187,7 @@ server_name: awsknowledge
 command: uvx
 args: ['awsknowledge@latest']
 enabled: true
-```
+```text
 
 **Capabilities**:
 
@@ -241,7 +241,7 @@ server_name: awslabs.aws-iac-mcp-server
 command: uvx
 args: ['awslabs.aws-iac-mcp-server@latest']
 enabled: true
-```
+```text
 
 **Capabilities**:
 
@@ -297,7 +297,7 @@ server_name: fetch
 command: uvx
 args: ['fetch@latest']
 enabled: true
-```
+```text
 
 **Capabilities**:
 
@@ -354,7 +354,7 @@ server_name: figma
 command: uvx
 args: ['figma@latest']
 enabled: false  # Optional
-```
+```text
 
 **Capabilities**:
 
@@ -419,7 +419,7 @@ MCP_CONTEXT7_ENABLED=true
 MCP_FETCH_ENABLED=true
 MCP_MEMORY_ENABLED=true
 MCP_FIGMA_ENABLED=false
-```
+```text
 
 ### 4.3 Service Integration Pattern
 
@@ -476,7 +476,7 @@ The MCP server integration enables sophisticated subagent coordination through m
 
 ```text
 User Request → Context Agent → Strategy Agent → Training Agent → Race Agent → Response
-```
+```text
 
 **Parallel Coordination**:
 
@@ -495,7 +495,7 @@ Strategy Agent (Coordinator)
     ├── Training Agent (Specialist)
     ├── Race Agent (Specialist)
     └── Skill Agent (Specialist)
-```
+```text
 
 ### 5.2 Subagent Communication Protocols
 
@@ -553,7 +553,7 @@ class AgentMemoryCoordinator
         $this->memoryServer->storeKnowledge($consolidatedKnowledge);
     }
 }
-```
+```text
 
 ### 5.3 Workflow Templates
 
@@ -582,7 +582,7 @@ agents:
 coordination: sequential
 timeout: 60_seconds
 fallback: simplified_planning
-```
+```text
 
 ---
 
@@ -671,7 +671,7 @@ class MCPHealthCheckCommand extends Command
         return Command::SUCCESS;
     }
 }
-```
+```text
 
 ### 6.2 Performance Monitoring
 
@@ -763,7 +763,7 @@ class MCPCircuitBreaker
         }
     }
 }
-```
+```text
 
 ---
 

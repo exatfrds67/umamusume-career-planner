@@ -391,7 +391,7 @@ Ensure both operands are typed before operations:
 
 ```php
 $validated = (float)$value1 / (float)$value2;
-```
+```text
 
 ---
 
@@ -435,7 +435,7 @@ $items = is_array($data) ? $data : [];
 foreach ($items as $item) {
     // Safe iteration
 }
-```
+```text
 
 ---
 
@@ -500,7 +500,7 @@ Change PHPDoc to `@var list<string>` or suppress with stubs.
 4. Argument Type Mismatches (CATEGORY 4)
    ↓ Enables
 5. Return Type Mismatches (CATEGORY 5)
-```
+```text
 
 **Independent (Can be fixed in parallel)**:
 

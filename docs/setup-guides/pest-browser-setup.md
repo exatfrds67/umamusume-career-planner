@@ -19,7 +19,7 @@ composer require pestphp/pest-plugin-browser:^4.0 --dev --ignore-platform-reqs
 
 ```bash
 npm install playwright@latest
-```
+```text
 
 ### 3. Install Playwright Browsers
 
@@ -91,7 +91,7 @@ Tests run in headless mode by default. To see the browser:
 
 ```bash
 PEST_BROWSER_HEADLESS=false php artisan test
-```
+```text
 
 ## Troubleshooting
 
@@ -180,7 +180,7 @@ PEST_BROWSER=firefox php artisan test
 
 ```bash
 PEST_BROWSER_HEADLESS=false php artisan test
-```
+```text
 
 ## Performance Considerations
 

@@ -64,7 +64,7 @@ WIT:        #A855F7 or similar bright purple
             └─ Always purple regardless of context
             └─ Used in: Skill display, stat bars
             └─ Icon: Lightbulb or brain
-```
+```text
 
 **Why This Matters**: Users learn stat colors once and recognize them everywhere. No cognitive load for color remapping.
 
@@ -131,7 +131,7 @@ BAD (↓):
 ├─ Icon: Downward arrow or warning
 ├─ Meaning: Stat will improve less than usual
 ├─ Context: Fatigue or low morale
-```
+```text
 
 **Why This Matters**: Traffic light system is universally understood. Users instantly recognize good/bad states without
 reading text.
@@ -193,7 +193,7 @@ Remaining 50% of Screen: DETAILED CONTENT
 │ │                                         │ │
 │ └─────────────────────────────────────────┘ │
 └─────────────────────────────────────────────┘
-```
+```text
 
 **Why This Matters**: Users don't need to scroll to see critical info. Primary actions are visible. Detailed content can
 scroll.
@@ -235,7 +235,7 @@ Stamina:  930/2000   ███░░░░░░░
 Power:    850/2000   ██░░░░░░░░
 Guts:     1110/2000  ███░░░░░░░
 Wit:      990/2000   ███░░░░░░░
-```
+```text
 
 #### Card Component Pattern (from character grid)
 
@@ -304,7 +304,7 @@ Disabled State (all buttons):
 ├─ No hover effects
 ├─ Gray text
 └─ No shadow
-```
+```text
 
 ### 1.4 Layout Grid System
 
@@ -346,7 +346,7 @@ Scrollable area:
 ├─ Starts below header (56px from top)
 ├─ Ends before bottom nav (calc(100vh - 56px - 56px))
 └─ Has 12px padding on all sides
-```
+```text
 
 #### Tablet Layout (md breakpoint, 768px)
 
@@ -391,7 +391,7 @@ Interaction:
 ├─ Smooth transition or instant (both observed)
 ├─ Maintains scroll position within tab
 └─ Mobile: May have scroll-snap or horizontal scroll if many tabs
-```
+```text
 
 #### Pattern B: Grid/List Navigation
 
@@ -448,7 +448,7 @@ Characteristics:
 ├─ Title always visible
 ├─ Buttons sticky to bottom or within scrollable area
 └─ Zindex: 40-50 (above main content)
-```
+```text
 
 ### 2.2 Gesture & Touch Patterns
 
@@ -481,7 +481,7 @@ Interaction:
 ├─ Shows: Tooltip, context menu, or detail preview
 ├─ Release: Action executes or menu appears
 └─ Move finger: Can still cancel (drag away)
-```
+```text
 
 #### Pull-to-Refresh (Mobile)
 
@@ -533,7 +533,7 @@ Mobile-specific:
 ├─ Font size: 16px (prevents zoom on focus)
 ├─ Padding: 12px (generous spacing)
 └─ Width: Full width parent container
-```
+```text
 
 #### Slider Input
 
@@ -596,7 +596,7 @@ Option styling:
 ├─ Selected: Checkmark icon + bold text
 ├─ Grouped: Optional category headers (gray, not selectable)
 └─ Height: 40px per option (touch target)
-```
+```text
 
 ---
 
@@ -645,7 +645,7 @@ Linear (for continuous processes):
 ├─ Progress bar increments
 ├─ Scrolling animations (if any)
 └─ Used for machine-like consistency
-```
+```text
 
 ### 3.3 Accessibility with Animations
 
@@ -696,7 +696,7 @@ Text links: 44×44px padding around
 
 ### 4.2 Spacing Guidelines
 
-```
+```text
 
 Component padding:
 ├─ Cards: 16px internal padding
@@ -737,7 +737,7 @@ Gray (#6B7280) on white: ~5.3:1 ✅ Pass
 
 ### 5.2 Text Readability
 
-```
+```text
 
 Font choices (observed):
 ├─ Headings: Bold sans-serif (appears to be system font)
@@ -819,7 +819,7 @@ Use CSS custom properties:
     --text-primary: #F3F4F6;
   }
 }
-```
+```text
 
 ---
 

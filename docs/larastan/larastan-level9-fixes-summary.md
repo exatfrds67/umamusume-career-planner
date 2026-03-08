@@ -33,7 +33,7 @@ protected function calculateSupportCardBonus(
     string $trainingType,
     array $supportCards = []
 ): float {
-```
+```text
 
 ### 2. Mixed Type Casting Issues
 
@@ -67,7 +67,7 @@ return array_key_first($distanceAptitudes) ?? 'mile';
 
 ```php
 return (string) (array_key_first($distanceAptitudes) ?? 'mile');
-```
+```text
 
 ### 4. Context Array Access with Type Guards
 
@@ -109,7 +109,7 @@ if (isset($response['content'][0]['text'])) {
         return $text;
     }
 }
-```
+```text
 
 ### 6. Pricing Array Access with Type Validation
 
@@ -149,7 +149,7 @@ return [
     'content' => isset($result['response']) && is_string($result['response']) ? $result['response'] : '',
     'model' => isset($result['model']) && is_string($result['model']) ? $result['model'] : 'claude-3-5-sonnet',
 ];
-```
+```text
 
 ### 8. Return Type Annotations
 

@@ -25,7 +25,7 @@ Content here with proper line length (max 80 characters per line).
 
 ```language
 Code blocks must specify language
-```
+```text
 
 ### Another Subsection
 

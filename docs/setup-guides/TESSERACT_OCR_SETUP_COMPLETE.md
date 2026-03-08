@@ -43,7 +43,7 @@ tesseract --version
 ```powershell
 tesseract --list-langs
 # Output: eng, jpn, msa, osd
-```
+```text
 
 ## 3. Laravel Service Verification ✅
 
@@ -95,7 +95,7 @@ TESSERACT_OEM=3
     'psm' => '6',
     'oem' => '3',
 ]
-```
+```text
 
 ---
 

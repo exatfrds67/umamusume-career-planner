@@ -45,7 +45,7 @@ $person = MyAgent::make()->structured(
 
 echo $person->name; // "John Doe"
 echo $person->age;  // 30
-```
+```text
 
 ### Encapsulating in Agent
 
@@ -137,7 +137,7 @@ class Person
         public Address $address,
     ) {}
 }
-```
+```text
 
 ### Arrays of Strings
 
@@ -233,7 +233,7 @@ $person = MyAgent::make()->structured(
     new UserMessage("Extract person data"),
     maxRetry: 0
 );
-```
+```text
 
 **Tip:** For less capable LLMs, balance retry count with token consumption.
 
@@ -273,7 +273,7 @@ Validate array size:
 ```php
 #[ArraySize(min: 1, max: 10)]
 public array $tags;
-```
+```text
 
 ### Comparison Rules
 
@@ -314,7 +314,7 @@ Validate number is within range:
 ```php
 #[InRange(min: 0, max: 100)]
 public int $percentage;
-```
+```text
 
 ### Boolean Rules
 
@@ -347,7 +347,7 @@ public string $metadata;
 ```php
 #[IsUrl]
 public string $website;
-```
+```text
 
 **Email:**
 
@@ -382,7 +382,7 @@ flow in real-time, including validation attempts and retries.
 
 ```env
 INSPECTOR_INGESTION_KEY=your_key_here
-```
+```text
 
 Each segment brings its own debug information to follow the agent execution in real time.
 

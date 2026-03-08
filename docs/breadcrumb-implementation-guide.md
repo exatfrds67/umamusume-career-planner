@@ -119,7 +119,7 @@ Usage:
 <x-breadcrumb :items="[
     ['label' => 'Page Name']
 ]" />
-```
+```text
 
 ### Pattern 2: Two-Level Navigation
 
@@ -164,7 +164,7 @@ public function show(Character $character)
         ]
     ]);
 }
-```
+```text
 
 ## Testing Checklist
 

@@ -61,7 +61,7 @@ $alertValueObjects = $dbAlerts->map(function ($model) {
     ]);
 })->all();
 $this->alerts = new CriticalAlertCollection($alertValueObjects);
-```
+```text
 
 ### 3. Undefined Properties on ValueObjects (Lines 394, 408)
 
@@ -172,7 +172,7 @@ vendor/bin/phpstan analyse app/Livewire/AdvisoryPanel.php --level=9
 
 # Code formatting
 vendor/bin/pint app/Livewire/AdvisoryPanel.php
-```
+```text
 
 ## Impact Assessment
 

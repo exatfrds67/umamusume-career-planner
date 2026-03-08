@@ -81,7 +81,7 @@ Run this command:
 
 ```powershell
 php -m | Select-String -Pattern "redis"
-```
+```text
 
 **Expected output:** `redis`
 
@@ -103,7 +103,7 @@ Once you've completed the manual installation above, run these commands:
 
 ```powershell
 php artisan config:clear
-```
+```text
 
 ### Test Redis Connection
 
@@ -120,7 +120,7 @@ php artisan test --filter=CacheManagement --compact
 
 # Run full test suite
 php artisan test --compact
-```
+```text
 
 ### Warm Cache
 

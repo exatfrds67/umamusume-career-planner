@@ -120,7 +120,7 @@ $value = (string) $mixed;
 
 // After (safe)
 $value = is_string($raw) ? $raw : 'default';
-```
+```text
 
 ### 3. Safe Array Operations
 

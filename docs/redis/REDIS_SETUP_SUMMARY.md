@@ -150,7 +150,7 @@ REDIS_CACHE_CONNECTION=cache
 
 ```powershell
 wsl bash -c "redis-cli ping"
-```
+```text
 
 ### After phpredis Installation (Quick Commands)
 

@@ -37,7 +37,7 @@ After thorough analysis using Chrome DevTools, all remaining console messages ha
 ```text
 SQLSTATE[42S02]: Base table or view not found: 1146 
 Table 'umamusume-career-planner.characters' doesn't exist
-```
+```text
 
 **Location**: `app/Http/Requests/Api/BatchTrainingPredictionRequest.php` line 48
 
@@ -140,7 +140,7 @@ public function authorize(): bool
     // Regular users can only view their own characters
     return $this->user()->characters()->where('id', $characterId)->exists();
 }
-```
+```text
 
 **Result**: Admins can now view any character's training predictions.
 
@@ -206,7 +206,7 @@ These are **intentional informational logs** from the application's `Performance
 if (rating === "poor" && process.env.NODE_ENV === "development") {
     console.warn(`[PerformanceMonitor] ${name} is poor: ${value.toFixed(2)}`, report);
 }
-```
+```text
 
 **Metrics Observed**:
 
@@ -258,7 +258,7 @@ Error: Table 'characters' doesn't exist
 ```text
 POST /api/training-predictions/batch → 422 Unprocessable Content  
 Error: Character does not belong to you
-```
+```text
 
 ### After Validation Fix (Final State)
 
@@ -357,7 +357,7 @@ public function rules(): array
 
 ### Network Request Verification
 
-```
+```text
 
 Request:
   POST <http://127.0.0.1:8000/api/training-predictions/batch>

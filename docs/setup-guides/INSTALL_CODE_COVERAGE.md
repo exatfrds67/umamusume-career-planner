@@ -9,7 +9,7 @@
 
 ```text
 WARN  No code coverage driver available
-```
+```text
 
 This warning appears because PHPUnit is configured to generate code coverage reports, but PHP doesn't have a coverage
 driver installed.
@@ -134,7 +134,7 @@ pcov
 
 ```powershell
 php artisan test --coverage
-```
+```text
 
 **Expected:** Coverage report generated without warnings
 
@@ -195,7 +195,7 @@ php -v
 PHP 8.4.11 (cli) (built: Jul 29 2025 18:02:29) (NTS Visual C++ 2022 x64)
 ...
     with Xdebug v3.x.x, Copyright (c) 2002-2024, by Derick Rethans
-```
+```text
 
 ### Step 5: Test Code Coverage
 
@@ -276,7 +276,7 @@ Update `phpunit.xml` to disable code coverage:
     <!-- ... logging ... -->
     <!-- ... php ... -->
 </phpunit>
-```
+```text
 
 ---
 

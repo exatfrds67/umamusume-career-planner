@@ -157,7 +157,7 @@ This diagram reflects the actual implemented database structure with all 18 tabl
 └─────────────────┘
          │
          └──────────────────────────────────────────────────────────┘
-```
+```text
 
 ## Relationship Details
 

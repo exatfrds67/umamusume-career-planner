@@ -44,7 +44,7 @@ Route::post('/skill-recommendations',
     [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getRecommendations'])
     ->middleware('auth:sanctum')
     ->name('skill-recommendations');
-```
+```text
 
 **Verification**:
 
@@ -81,7 +81,7 @@ Alpine Expression Error: skills is not defined
 Alpine Expression Error: loading is not defined
 Alpine Expression Error: error is not defined
 Alpine Expression Error: successMessage is not defined
-```
+```text
 
 #### Error Pattern
 
@@ -93,7 +93,7 @@ Uncaught ReferenceError: [property] is not defined
     at tryCatch (alpine.js:1:1)
     at saferEval (alpine.js:1:1)
     at evaluate (alpine.js:1:1)
-```
+```text
 
 ### Affected Components
 
@@ -193,7 +193,7 @@ Alpine.data('skillManagement', () => ({
 ```javascript
 // Check if this exists in app.js:
 import './pages/skills/index.js';
-```
+```text
 
 ---
 
@@ -305,19 +305,19 @@ import './pages/skills/index.js';
 
 ```
 /resources/js/pages/skills/index.js
-```
+```text
 
 **Main App File**:
 
 ```
 /resources/js/app.js
-```
+```text
 
 **Blade Template**:
 
 ```
 /resources/views/skills/index.blade.php
-```
+```text
 
 ### Expected Component Structure
 
@@ -343,7 +343,7 @@ import './pages/skills/index.js';
 
 // Start Alpine
 Alpine.start();
-```
+```text
 
 ### Blade Template Usage
 
@@ -442,7 +442,7 @@ However, during verification testing, a **NEW ISSUE** was discovered: Alpine.js 
 
 ### Console Error Output (First 20 Errors)
 
-```
+```text
 1. Alpine Expression Error: skillManagement is not defined
 2. Alpine Expression Error: isAdmin is not defined
 3. Alpine Expression Error: selectedCharacterId is not defined
@@ -468,7 +468,7 @@ However, during verification testing, a **NEW ISSUE** was discovered: Alpine.js 
 
 ### Network Tab (No Errors)
 
-```
+```text
 ✅ GET http://127.0.0.1:8000/skills - 200 OK
 ✅ GET http://127.0.0.1:8000/build/assets/app-[hash].js - 200 OK
 ✅ GET http://127.0.0.1:8000/build/assets/app-[hash].css - 200 OK

@@ -1,7 +1,7 @@
 # Umamusume Pretty Derby Gameplay Research
 
-**Research Collection Version**: 1.0.0  
-**Last Updated**: January 31, 2026  
+**Research Collection Version**: 1.1.0  
+**Last Updated**: March 3, 2026  
 **Status**: Comprehensive Game Mechanics Documentation
 
 ---
@@ -9,6 +9,8 @@
 ## Overview
 
 This directory contains comprehensive research documentation on Umamusume Pretty Derby gameplay mechanics, formulas, and systems. All research is based on official game wikis, community resources, and verified player data to ensure game-accurate implementation in the Career Planner application.
+
+Latest update includes screenshot-validated March 3, 2026 flow references: career pre-training run UI in `images/game_screenshots_030326` and archived earlier pre-career setup UI in `images/game_screenshots_030326/pre-career`.
 
 ---
 
@@ -59,13 +61,13 @@ This directory contains comprehensive research documentation on Umamusume Pretty
 - Training Mechanics (complete formulas, support card bonuses, friendship training)
 - Support Card System (limit breaks, bond progression, deck building)
 - Race System (running styles, aptitudes, weather effects)
-- Inheritance & Factor System (blue/red/white/green factors)
+- Inheritance & Factor System (blue/pink/green/white sparks, affinity, and inspiration timing)
 
 **Key Findings**:
 
 - Usage-based facility progression (every 4 uses = +1 level)
 - Hint system: Lv1=10%, Lv2=20%, Lv3=30%, Lv4=35%, Lv5=40% max discount
-- Friendship training activates at Bond ≥80 with +10% to +35% bonus
+- Support cards become rainbow-ready at Bond ≥80; this app models active friendship training when 3+ cards simultaneously reach Bond ≥80 for a 1.2x multiplier
 - Stamina requirements: Sprint 290-400, Mile 390-500, Medium 540-700, Long 790-1000
 - Training formula: Base × Level × Growth × Mood × Cards × Multi × Friendship
 
@@ -96,7 +98,7 @@ This directory contains comprehensive research documentation on Umamusume Pretty
 
 - SP is extremely scarce - avoid "SP trap" skills
 - Stamina is often the limiting factor for long races
-- Inheritance in February (Classic Year) is critical
+- Inheritance is delivered at three Inspiration Events: career start, Year 2 late March, and Year 3 late March
 - Red exclamation marks should NEVER be skipped
 - Manual team setup before each Team Race is mandatory (Unity Cup)
 

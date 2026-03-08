@@ -34,7 +34,7 @@ UPDATE ucp_users SET is_admin = 1 WHERE email = 'user@example.com';
 
 ```bash
 php artisan tinker
-```
+```text
 
 ```php
 $user = User::where('email', 'user@example.com')->first();

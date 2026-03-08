@@ -38,7 +38,7 @@ Controllers/Livewire
                     ├── BedrockService (cloud, paid)
                     ├── MCPClientService → StrandsAgentWrapper
                     └── MCPClientService → AgentCoreWrapper
-```
+```text
 
 ### Test Results (Run Date: 2026-02-28)
 

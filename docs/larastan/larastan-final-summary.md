@@ -196,7 +196,7 @@ vendor/bin/pint --dirty
 
 # Run tests
 php artisan test --compact
-```
+```text
 
 ## Files Modified Summary
 

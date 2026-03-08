@@ -91,7 +91,7 @@ echo $response->getContent();
 
 ```bash
 composer require neuron-core/neuron-ai
-```
+```text
 
 ## Resources
 

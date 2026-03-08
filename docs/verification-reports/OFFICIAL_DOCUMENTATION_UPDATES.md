@@ -266,7 +266,7 @@ This document consolidates official documentation findings for all major technol
 
 #### Production (via .env override)
 
-```
+```text
 DB_CONNECTION=mysql
 DB_HOST=localhost
 DB_PORT=3306

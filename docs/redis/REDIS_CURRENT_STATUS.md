@@ -165,7 +165,7 @@
 
 ❌ php -r "new Redis();"
    Result: Class 'Redis' not found (expected)
-```
+```text
 
 ### Laravel Configuration Tests
 

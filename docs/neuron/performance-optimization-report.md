@@ -130,7 +130,7 @@ WHERE career_id = ?
 ORDER BY created_at DESC;
 
 -- Uses index: idx_career_type_time (career_id, recommendation_type, created_at)
-```
+```text
 
 ### 4. Lazy Loading with Cache::remember()
 
@@ -179,7 +179,7 @@ Log::info('[TrainingAdvisory] Performance metrics', [
     'ai_provider' => $provider,
     'fallback_used' => $fallbackUsed,
 ]);
-```
+```text
 
 ### 2. Cache Performance Monitoring
 

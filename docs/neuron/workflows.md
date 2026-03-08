@@ -114,7 +114,7 @@ Node::make('analyze_document')
             'analysis' => $analysis->getContent()
         ]);
     })
-```
+```text
 
 ## Events
 
@@ -195,7 +195,7 @@ Node::make('process')
         
         return new Event('complete', ['results' => [$result1, $result2]]);
     })
-```
+```text
 
 ## Using Agents in Workflows
 
@@ -282,7 +282,7 @@ Enable Inspector monitoring to visualize workflow execution:
 
 ```env
 INSPECTOR_INGESTION_KEY=your_key_here
-```
+```text
 
 Inspector shows:
 

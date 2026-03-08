@@ -69,7 +69,7 @@ private function createImage($data): resource|false
 
 // After
 private function createImage($data): \GdImage|false
-```
+```text
 
 ### 3. ExternalDataService.php
 
@@ -181,7 +181,7 @@ $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 if (!\is_array($batchData)) {
     return ['error' => 'Batch not found'];
 }
-```
+```text
 
 ### Missing Iterable Value Types
 
@@ -235,7 +235,7 @@ private function createImage($data): \GdImage|false
     }
     return $image;
 }
-```
+```text
 
 ### 3. Cache Retrieval
 
@@ -337,7 +337,7 @@ vendor/bin/phpstan analyse app/Services/TesseractService.php app/Services/ImageP
 
 # Format code
 vendor/bin/pint app/Services/TesseractService.php app/Services/ImageProcessingService.php app/Services/ExternalDataService.php app/Services/CacheManagementService.php app/Services/BackupService.php app/Services/DataMigrationService.php
-```
+```text
 
 ## Summary
 

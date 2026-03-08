@@ -58,7 +58,7 @@ $cached = Cache::get($cacheKey);
 if ($cached !== null) {
     return $cached; // Returns proper type
 }
-```
+```text
 
 ### 3. Collection Generic Type Specifications
 

@@ -81,7 +81,7 @@ Successfully implemented a complete, production-ready support card management sy
 
 ### Browse Support Cards
 
-```
+```text
 http://127.0.0.1:8000/support-cards
 ```
 
@@ -96,7 +96,7 @@ http://127.0.0.1:8000/support-cards
 
 ### Build a Deck
 
-```
+```text
 http://127.0.0.1:8000/characters/{id}/deck-builder
 ```
 
@@ -154,7 +154,7 @@ PATCH /deck/{card}
 
 // Clear deck
 DELETE /deck
-```
+```text
 
 ---
 
@@ -174,7 +174,7 @@ resources/views/
     ├── support-card-tier-badge.blade.php
     ├── support-card-type-badge.blade.php
     └── support-card-rarity-badge.blade.php
-```
+```text
 
 ### Controllers (2 files)
 
@@ -183,7 +183,7 @@ app/Http/Controllers/
 ├── SupportCardController.php     # Web routes
 └── Api/
     └── SupportDeckController.php # API routes
-```
+```text
 
 ### Services (2 files)
 
@@ -191,7 +191,7 @@ app/Http/Controllers/
 app/Services/
 ├── SupportDeckService.php        # Deck management logic
 └── SynergyScorer.php             # Synergy calculations
-```
+```text
 
 ### Other Backend (2 files)
 
@@ -201,21 +201,21 @@ app/Http/
 │   └── SupportCardResource.php   # API resource
 └── Requests/
     └── StoreSupportDeckRequest.php # Validation
-```
+```text
 
 ### Tests (1 file)
 
 ```
 tests/Feature/
 └── SupportDeckTest.php           # 10 tests, all passing
-```
+```text
 
 ### Database (1 file)
 
 ```
 database/seeders/
 └── SupportCardSeeder.php         # 15 verified cards
-```
+```text
 
 ### Documentation (5 files)
 
@@ -226,7 +226,7 @@ database/seeders/
 └── public/images/support_cards/
     ├── README.md
     └── PLACEHOLDER_CREATION_GUIDE.md
-```
+```text
 
 ---
 
@@ -308,7 +308,7 @@ php artisan test --filter=SupportDeck
 
 ### Copyright Notice
 
-```
+```text
 Umamusume: Pretty Derby © Cygames, Inc.
 All rights reserved.
 

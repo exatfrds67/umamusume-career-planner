@@ -67,7 +67,7 @@ if ($career->character?->user_id !== Auth::id()) {
 ```php
 // Use policy authorization (allows admins and owners)
 $this->authorize('view', $career);
-```
+```text
 
 #### 4. `app/Http/Controllers/Api/SkillManagementController.php` ✅ FIXED
 
@@ -122,7 +122,7 @@ if (! $isAdmin && $character->user_id !== Auth::id()) {
 ```php
 // Use policy authorization (allows admins and owners)
 $this->authorize('view', $character);
-```
+```text
 
 #### 6. `app/Http/Controllers/Api/V1/CareerController.php` ✅ FIXED
 
@@ -198,7 +198,7 @@ Gate::define('viewTelescope', function ($user) {
         //
     ]);
 });
-```
+```text
 
 #### 8. `app/Providers/HorizonServiceProvider.php` ✅ FIXED
 
@@ -277,7 +277,7 @@ php artisan test --filter=Policy --compact
 
 ```bash
 vendor/bin/pint --dirty
-```
+```text
 
 **Results**: ✅ ALL FILES FORMATTED
 

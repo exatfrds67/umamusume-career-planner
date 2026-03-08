@@ -85,7 +85,7 @@ $response = DocumentRAG::make()->chat(
 );
 
 echo $response->getContent();
-```
+```text
 
 The RAG agent will:
 

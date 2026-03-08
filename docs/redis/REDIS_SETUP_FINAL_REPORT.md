@@ -54,7 +54,7 @@ Connections:
 - default (DB 0): Connected ✅
 - cache (DB 1): Connected ✅
 - session (DB 2): Connected ✅
-```
+```text
 
 ### Extension Verification
 
@@ -220,7 +220,7 @@ $value = Cache::get('key');
 $value = Cache::remember('key', 3600, function() {
     return 'computed value';
 });
-```
+```text
 
 ### Queue Operations
 
@@ -254,7 +254,7 @@ php artisan redis:health --detailed
 
 ```powershell
 wsl bash -c "redis-cli keys 'umamusume-career-planner:*'"
-```
+```text
 
 ### Monitor Activity
 
@@ -309,7 +309,7 @@ wsl bash -c "redis-cli info memory"
 ```powershell
 wsl bash -c "sudo service redis-server restart"
 php artisan config:clear
-```
+```text
 
 **If cache seems stale:**
 

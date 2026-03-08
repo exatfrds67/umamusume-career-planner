@@ -79,7 +79,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])
         Route::post('characters/{character}/training-prediction',
             [TrainingController::class, 'predict']);
     });
-```
+```text
 
 ### Eloquent Relationships and Model Structure
 
@@ -274,7 +274,7 @@ class UmapyoiClient
         return $this->fetchWithCache('support-cards', 1800);
     }
 }
-```
+```text
 
 **Error Handling Standards**:
 
@@ -323,7 +323,7 @@ protected function casts(): array
         'created_at' => 'datetime',
     ];
 }
-```
+```text
 
 **Attribute Accessors (Laravel 12)**:
 
@@ -376,7 +376,7 @@ class TrainingOptimizationService
         ], $character);
     }
 }
-```
+```text
 
 ### MCP Health Monitoring
 
@@ -498,7 +498,7 @@ it('handles MCP server failures gracefully', function () {
             'prediction_source' => 'local'
         ]);
 });
-```
+```text
 
 ### Test Coverage Requirements
 
@@ -615,7 +615,7 @@ it('handles MCP server failures gracefully', function () {
     'cookie_consent',
     'throttle:api',
 ],
-```
+```text
 
 **Authorization Policies**:
 

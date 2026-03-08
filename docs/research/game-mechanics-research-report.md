@@ -91,7 +91,7 @@ Stat Gain = (Base + StatBonus)
           × (1 + TrainingEffect)
           × (1 + 0.05 × NumSupportCards)
           × FriendshipMultiplier
-```
+```text
 
 **Key Components**:
 
@@ -318,7 +318,7 @@ HP Consumption = 20.0 × (CurrentSpeed - BaseSpeed + 12.0) / 144.0
                  × StatusModifier
                  × GroundModifier
                  × StrategyCoeff
-```
+```text
 
 - **Rushing (Kakari)**: Increases consumption by **1.6x**.
 - **GroundModifier**: Heavy/Soft track adds +2% HP drain/sec.
@@ -712,6 +712,15 @@ Hierarchy of ranks based on total fan count. Reaching these thresholds unlocks h
 - **URA Finale**: Final career scenario race
 - **Make Debut**: First race in career
 
+### 12.3 Career Pre-Training UI Terms (Screenshot-Validated, 2026-03-03)
+
+Observed from the career pre-training capture set (`images/game_screenshots_030326`) and aligned with the archived pre-career set (`images/game_screenshots_030326/pre-career`):
+
+- **Trainee Select**: Career pre-training entry screen in run setup
+- **Display Settings**: Sorting/filter configuration panel in selection flow
+- **Potential Lvl**: Potential level field shown in character filtering/sorting context
+- **Track / Distance / Style**: Aptitude filter groups used during pre-run selection
+
 ---
 
 ## 13. Recommendations for Application
@@ -719,9 +728,9 @@ Hierarchy of ranks based on total fan count. Reaching these thresholds unlocks h
 ### 13.1 High Priority Updates
 
 1. **Skill Hint System**
-    - Update to 10% per hint, max 4 hints
+    - Update to 10% per hint (levels 1-3), +5% (levels 4-5), max 5 levels
     - Adjust SP cost calculations accordingly
-    - Update UI to show hint count (0-4)
+    - Update UI to show hint count (0-5)
 
 2. **Stat Range Display**
     - Support stats above 1200
@@ -835,7 +844,7 @@ Hierarchy of ranks based on total fan count. Reaching these thresholds unlocks h
 This research compiled authoritative information from 8+ primary sources to verify game mechanics for the Umamusume Career Planner application. Key findings include:
 
 1. **Training system** uses complex multiplicative formula with 5 components
-2. **Skill hints** provide 10% discount per hint (max 4), not 20-40% per hint (max 2)
+2. **Skill hints** provide 10% discount per hint (levels 1-3) and 5% per hint (levels 4-5), for 40% max at level 5
 3. **Aptitude system** uses precise percentage modifiers varying by category
 4. **Stats** can exceed 1200 with diminishing returns
 5. **Career structure** spans ~70 turns across 3 years

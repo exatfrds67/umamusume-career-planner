@@ -8,7 +8,7 @@ This directory contains all project documentation organized by category for easy
 
 ## Directory Structure
 
-```
+```text
 docs/
 ├── README.md                    # This file - documentation index
 ├── 00-core-docs/               # Core SDLC specification documents

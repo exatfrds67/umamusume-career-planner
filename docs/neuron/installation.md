@@ -22,7 +22,7 @@ You can easily create your first agent with the command below:
 
 ```bash
 php vendor/bin/neuron make:agent App\\Neuron\\MyAgent
-```
+```text
 
 **Windows:**
 
@@ -89,7 +89,7 @@ environment file to start monitoring:
 
 ```env
 INSPECTOR_INGESTION_KEY=nwse877auxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
+```text
 
 ## Video Tutorial On A Laravel Application
 

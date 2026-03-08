@@ -48,7 +48,7 @@ Redis is installed in WSL and ready. You need to install the phpredis extension 
 
 ```powershell
 php artisan redis:health --detailed
-```
+```text
 
 Should show: Connection successful
 
@@ -91,7 +91,7 @@ All tests should pass.
 
 ```powershell
 php artisan cache:warm
-```
+```text
 
 ---
 

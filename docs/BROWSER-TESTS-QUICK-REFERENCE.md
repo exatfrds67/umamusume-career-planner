@@ -12,7 +12,7 @@ php artisan test:traversal --open-report
 php artisan test:traversal --scope=public
 php artisan test:traversal --scope=auth
 php artisan test:traversal --scope=admin
-```
+```text
 
 **Runtime:** 5-10 minutes | **Output:** HTML report in `storage/app/test-reports/`
 
@@ -41,7 +41,7 @@ php artisan test tests/Browser/UserJourneyTest.php
 php artisan test --filter="registration flow"
 php artisan test --filter="character creation"
 php artisan test --filter="E2E journey"
-```
+```text
 
 **Runtime:** 3-5 minutes | **Tests:** 8 complete user workflows
 
@@ -73,7 +73,7 @@ php artisan test --group=screenshots
 
 # Cross-browser testing
 php artisan test --group=cross-browser
-```
+```text
 
 **Runtime:** 5 minutes | **Output:** Screenshots in `storage/app/screenshots/`
 
@@ -105,7 +105,7 @@ php artisan test --group=wcag
 
 # 3. Quick traversal
 php artisan test:traversal --scope=public
-```
+```text
 
 **Total Time:** ~5-8 minutes
 
@@ -129,7 +129,7 @@ php artisan test --group=tabs
 
 # 3. Accessibility audit
 php artisan test --group=accessibility
-```
+```text
 
 **Total Time:** ~10-15 minutes
 
@@ -161,7 +161,7 @@ php artisan test --filter="character creation"
 
 ```bash
 php artisan test tests/Browser/TabNavigationTest.php
-```
+```text
 
 ### By Multiple Groups
 
@@ -176,7 +176,7 @@ php artisan test --group=accessibility --group=keyboard
 
 ```bash
 php artisan test --group=smoke --compact
-```
+```text
 
 ### With Coverage
 
@@ -188,7 +188,7 @@ php artisan test --group=smoke --coverage
 
 ```bash
 php artisan test --group=browser --parallel
-```
+```text
 
 ## Troubleshooting
 
@@ -204,7 +204,7 @@ npx playwright install
 ```bash
 # Increase timeout in phpunit.xml or use:
 php artisan test --group=smoke --stop-on-failure
-```
+```text
 
 ### View Browser (Debug)
 
@@ -216,7 +216,7 @@ php artisan test:traversal --headless=false
 
 ```bash
 php artisan migrate:fresh --env=testing
-```
+```text
 
 ## Report Locations
 

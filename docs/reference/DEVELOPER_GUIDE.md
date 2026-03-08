@@ -33,7 +33,7 @@ This guide provides comprehensive documentation for developers working on the Um
 
 ### System Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                        Client Layer                          │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
@@ -109,7 +109,7 @@ npm run build
 
 # Start development server
 composer run dev
-```
+```text
 
 ### Environment Configuration
 
@@ -141,7 +141,7 @@ AWS_DEFAULT_REGION=us-east-1
 
 ## Project Structure
 
-```
+```text
 ├── app/
 │   ├── Console/Commands/     # Artisan commands
 │   ├── Http/
@@ -211,7 +211,7 @@ vendor/bin/pint
 
 # Format only changed files
 vendor/bin/pint --dirty
-```
+```text
 
 ### Static Analysis
 
@@ -256,7 +256,7 @@ php artisan test --parallel
 php artisan test --testsuite=Unit
 php artisan test --testsuite=Feature
 php artisan test --testsuite=Architecture
-```
+```text
 
 ### Writing Tests
 
@@ -303,7 +303,7 @@ All API routes are versioned under `/api/v1/`.
 
 ```bash
 php artisan make:controller Api/V1/NewController --api
-```
+```text
 
 1. Create a Form Request:
 
@@ -315,7 +315,7 @@ php artisan make:request Api/V1/NewRequest
 
 ```bash
 php artisan make:resource Api/V1/NewResource
-```
+```text
 
 1. Add routes to `routes/api.php`
 
@@ -344,7 +344,7 @@ php artisan make:resource Api/V1/NewResource
         "name": ["The name field is required."]
     }
 }
-```
+```text
 
 ### Authentication
 
@@ -375,7 +375,7 @@ php artisan migrate:rollback
 
 # Fresh migration with seeding
 php artisan migrate:fresh --seed
-```
+```text
 
 ### Models
 
@@ -393,7 +393,7 @@ public function careers(): HasMany
 {
     return $this->hasMany(Career::class);
 }
-```
+```text
 
 ### Query Optimization
 
@@ -422,7 +422,7 @@ Create reusable components:
 
 ```bash
 php artisan make:component Button
-```
+```text
 
 ### Alpine.js
 
@@ -445,7 +445,7 @@ Configure in `resources/css/app.css`:
 @theme {
     --color-primary: oklch(0.72 0.11 178);
 }
-```
+```text
 
 ### Asset Building
 
@@ -470,7 +470,7 @@ Configure in `config/neuron.php` for local AI inference:
     'host' => env('OLLAMA_HOST', 'http://localhost:11434'),
     'model' => env('OLLAMA_MODEL', 'llama3'),
 ],
-```
+```text
 
 ### AWS Bedrock (Cloud AI)
 
@@ -490,7 +490,7 @@ use App\Services\Neuron\NeuronAIService;
 
 $aiService = app(NeuronAIService::class);
 $response = $aiService->generateResponse($prompt, $context);
-```
+```text
 
 ### MCP Integration
 
@@ -531,7 +531,7 @@ php artisan migrate --force
 
 # Build assets
 npm run build
-```
+```text
 
 ### Environment Variables
 

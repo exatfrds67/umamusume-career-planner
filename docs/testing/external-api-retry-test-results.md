@@ -86,7 +86,7 @@ async retryEndpoint(endpointName) {
 async retryAll() {
     await this.loadData();
 }
-```
+```text
 
 **Validation**:
 
