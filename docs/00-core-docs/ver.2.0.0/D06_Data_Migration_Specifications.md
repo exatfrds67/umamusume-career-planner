@@ -2,8 +2,8 @@
 
 ## Uma Musume Career Planner
 
-**Document Version:** 2.0  
-**Date:** 2026-01-03  
+**Document Version:** 2.0
+**Date:** 2026-01-03
 **Status:** Draft
 
 ---
@@ -22,7 +22,8 @@
 
 ## 1. Introduction
 
-This document provides technical specifications for data migration, including export scripts, import adapters, transformation rules, and validation procedures.
+This document provides technical specifications for data migration, including export scripts, import
+adapters, transformation rules, and validation procedures.
 
 ### 1.1 Scope
 
@@ -68,21 +69,21 @@ flowchart LR
         DB[(Database)]
         LS[(localStorage)]
     end
-    
+
     subgraph Formats["Export Formats"]
         JSON["JSON<br/>(Full Data)"]
         CSV["CSV<br/>(Summary)"]
     end
-    
+
     subgraph Output["Output"]
         File["Download File"]
         Clipboard["Clipboard"]
     end
-    
+
     DB --> JSON
     DB --> CSV
     LS --> JSON
-    
+
     JSON --> File
     CSV --> File
     JSON --> Clipboard
@@ -156,13 +157,13 @@ erDiagram
     PLAN ||--o{ TURN : tracks
     PLAN ||--o{ GOAL : defines
     PLAN ||--o{ RACE_PREDICTION : includes
-    
+
     EXPORT_FILE {
         string schema_version
         datetime exported_at
         string source_system
     }
-    
+
     PLAN {
         uuid uuid
         string title
@@ -174,7 +175,7 @@ erDiagram
         json growth_rates
         json aptitudes
     }
-    
+
     SKILL {
         string name
         string name_jp
@@ -182,18 +183,18 @@ erDiagram
         string tier
         string status
     }
-    
+
     TURN {
         int turn_number
         string career_year
         json stats
     }
-    
+
     GOAL {
         string description
         boolean completed
     }
-    
+
     RACE_PREDICTION {
         string race_name
         string venue
@@ -204,8 +205,11 @@ erDiagram
 ### 2.4 CSV Export Format
 
 ```csv
-title,character_name,status,career_stage,current_turn,speed,stamina,power,guts,wit,mood,energy,total_sp_available,notes,created_at
-"Speed Build Attempt","Special Week","in_progress","senior",65,1150,800,750,600,700,"good",75,450,"Focusing on speed","2025-12-15T08:00:00Z"
+title,character_name,status,career_stage,current_turn,speed,stamina,power,guts,wit,mood,energy,total
+_sp_available,notes,created_at
+"Speed Build Attempt","Special
+Week","in_progress","senior",65,1150,800,750,600,700,"good",75,450,"Focusing on
+speed","2025-12-15T08:00:00Z"
 ```text
 
 | Column | Type | Required | Description |
@@ -244,7 +248,7 @@ flowchart TD
     Confirm["User Confirms"]
     Import["Import to Storage"]
     Done["Complete"]
-    
+
     Start --> Detect
     Detect --> Parse
     Parse --> Validate
@@ -257,7 +261,7 @@ flowchart TD
     Confirm -->|"Yes"| Import
     Confirm -->|"No"| Cancel["Cancel"]
     Import --> Done
-    
+
     style Done fill:#c8e6c9
     style Error fill:#ffcdd2
 ```
@@ -290,21 +294,21 @@ classDiagram
         +validate(data) ValidationResult
         +transform(data) Plan[]
     }
-    
+
     class JsonImportAdapter {
         +detect(content) bool
         +parse(content) array
         +validate(data) ValidationResult
         +transform(data) Plan[]
     }
-    
+
     class CsvImportAdapter {
         +detect(content) bool
         +parse(content) array
         +validate(data) ValidationResult
         +transform(data) Plan[]
     }
-    
+
     class LegacyImportAdapter {
         +detect(content) bool
         +parse(content) array
@@ -312,7 +316,7 @@ classDiagram
         +transform(data) Plan[]
         -mapLegacyFields(data) array
     }
-    
+
     ImportAdapter <|.. JsonImportAdapter
     ImportAdapter <|.. CsvImportAdapter
     ImportAdapter <|.. LegacyImportAdapter
@@ -327,7 +331,7 @@ sequenceDiagram
     participant Adapter as Import Adapter
     participant Validator
     participant Storage
-    
+
     User->>UI: Upload file
     UI->>Adapter: detect(content)
     Adapter-->>UI: Format detected
@@ -335,7 +339,7 @@ sequenceDiagram
     Adapter-->>UI: Parsed data
     UI->>Validator: validate(data)
     Validator-->>UI: Validation result
-    
+
     alt Valid
         UI->>UI: Show preview
         User->>UI: Confirm import
@@ -364,7 +368,7 @@ flowchart LR
         L4["gut"]
         L5["int"]
     end
-    
+
     subgraph Canonical["Canonical Fields"]
         C1["speed"]
         C2["stamina"]
@@ -372,7 +376,7 @@ flowchart LR
         C4["guts"]
         C5["wit"]
     end
-    
+
     L1 --> C1
     L2 --> C2
     L3 --> C3
@@ -405,21 +409,21 @@ flowchart TD
         A["Array"]
         O["Object"]
     end
-    
+
     subgraph Rules["Conversion Rules"]
         R1["Parse integers"]
         R2["Normalize enums"]
         R3["Convert dates"]
         R4["Flatten nested"]
     end
-    
+
     subgraph Output["Output Types"]
         INT["Integer"]
         ENUM["Enum Value"]
         DATE["ISO DateTime"]
         JSON["JSON Column"]
     end
-    
+
     S --> R1 --> INT
     S --> R2 --> ENUM
     S --> R3 --> DATE
@@ -443,7 +447,7 @@ flowchart TD
 ```mermaid
 flowchart LR
     Raw["Raw Data"]
-    
+
     subgraph Pipeline["Transformation Pipeline"]
         T1["1. Field Mapping"]
         T2["2. Type Conversion"]
@@ -451,9 +455,9 @@ flowchart LR
         T4["4. Default Values"]
         T5["5. Relationship Linking"]
     end
-    
+
     Transformed["Transformed Data"]
-    
+
     Raw --> T1 --> T2 --> T3 --> T4 --> T5 --> Transformed
 ```
 
@@ -466,30 +470,30 @@ flowchart LR
 ```mermaid
 flowchart TD
     Data["Input Data"]
-    
+
     subgraph L1["Layer 1: Schema Validation"]
         S1["Required fields present"]
         S2["Data types correct"]
         S3["Format compliance"]
     end
-    
+
     subgraph L2["Layer 2: Business Rules"]
         B1["Value ranges valid"]
         B2["Enum values valid"]
         B3["Relationships valid"]
     end
-    
+
     subgraph L3["Layer 3: Integrity Checks"]
         I1["No duplicates"]
         I2["References exist"]
         I3["Consistency checks"]
     end
-    
+
     Data --> L1
     L1 -->|"Pass"| L2
     L2 -->|"Pass"| L3
     L3 -->|"Pass"| Valid["✅ Valid"]
-    
+
     L1 -->|"Fail"| Invalid["❌ Invalid"]
     L2 -->|"Fail"| Invalid
     L3 -->|"Fail"| Invalid
@@ -517,7 +521,7 @@ flowchart TD
         R4["Turn history is sequential"]
         R5["Goals have descriptions"]
     end
-    
+
     R1 --> Check1{"Junior: 1-24<br/>Classic: 25-48<br/>Senior: 49-78"}
     R2 --> Check2{"0 ≤ stat ≤ 2000"}
     R3 --> Check3{"sp_cost > 0"}
@@ -580,20 +584,20 @@ pie title Error Distribution by Category
 ```mermaid
 flowchart TD
     Error["Error Detected"]
-    
+
     Error --> Type{"Error Type?"}
-    
+
     Type -->|"Recoverable"| Recover["Attempt Recovery"]
     Type -->|"Non-recoverable"| Reject["Reject Record"]
-    
+
     Recover --> Success{"Success?"}
     Success -->|"Yes"| Continue["Continue Import"]
     Success -->|"No"| Reject
-    
+
     Reject --> Log["Log Error"]
     Log --> Report["Add to Report"]
     Report --> Next["Process Next Record"]
-    
+
     Continue --> Next
 ```text
 
@@ -616,17 +620,17 @@ sequenceDiagram
     participant Logger as Error Logger
     participant Report as Report Generator
     participant User
-    
+
     Import->>Logger: Log error details
     Logger->>Logger: Store in error collection
-    
+
     loop For each error
         Logger->>Report: Add error to report
     end
-    
+
     Report->>Report: Generate summary
     Report->>User: Display error report
-    
+
     User->>User: Review errors
     User->>Import: Decide: Retry/Skip/Abort
 ```
@@ -652,10 +656,10 @@ class ExportService
             'source_system' => 'uma-musume-career-tracker',
             'plans' => $plans->map(fn($plan) => $this->transformPlan($plan))->toArray(),
         ];
-        
+
         return json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
-    
+
     private function transformPlan(CareerRun $plan): array
     {
         return [
@@ -680,17 +684,17 @@ class ImportService
     public function importFromJson(string $content): ImportResult
     {
         $data = json_decode($content, true);
-        
+
         // Validate schema
         $validation = $this->validator->validate($data);
         if (!$validation->valid) {
             return ImportResult::failed($validation->errors);
         }
-        
+
         // Transform and import
         $imported = [];
         $errors = [];
-        
+
         foreach ($data['plans'] as $planData) {
             try {
                 $plan = $this->transformer->transform($planData);
@@ -700,7 +704,7 @@ class ImportService
                 $errors[] = new ImportError($planData, $e->getMessage());
             }
         }
-        
+
         return new ImportResult($imported, $errors);
     }
 }
@@ -716,7 +720,7 @@ flowchart TD
         E3["Generate File"]
         E4["Download"]
     end
-    
+
     subgraph Import["Import Phase"]
         I1["Upload File"]
         I2["Parse & Validate"]
@@ -725,7 +729,7 @@ flowchart TD
         I5["Confirm Import"]
         I6["Save to Storage"]
     end
-    
+
     E1 --> E2 --> E3 --> E4
     E4 -.->|"File Transfer"| I1
     I1 --> I2 --> I3 --> I4 --> I5 --> I6
@@ -784,7 +788,7 @@ sequenceDiagram
     participant LS as localStorage
     participant API as Laravel API
     participant DB as Database
-    
+
     User->>UI: Click "Convert to Account"
     UI->>LS: Read local run
     LS-->>UI: Local run data

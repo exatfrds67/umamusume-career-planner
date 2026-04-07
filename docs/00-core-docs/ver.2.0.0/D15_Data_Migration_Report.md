@@ -2,8 +2,8 @@
 
 ## Uma Musume Career Planner
 
-**Document Version:** 2.0  
-**Date:** 2026-01-03  
+**Document Version:** 2.0
+**Date:** 2026-01-03
 **Status:** Template
 
 ---
@@ -39,18 +39,18 @@ flowchart LR
         S2["Legacy App 2"]
         S3["JSON Exports"]
     end
-    
+
     subgraph Process["Migration Process"]
         Extract["Extract"]
         Transform["Transform"]
         Validate["Validate"]
         Load["Load"]
     end
-    
+
     subgraph Target["Target System"]
         DB[(Uma Musume<br/>Career Planner)]
     end
-    
+
     S1 --> Extract
     S2 --> Extract
     S3 --> Extract
@@ -133,13 +133,13 @@ pie title Records by Entity Type
 ```mermaid
 flowchart TD
     Issue["Issue Detected"]
-    
+
     Issue --> Type{"Issue Type?"}
-    
+
     Type -->|"Critical"| Critical["🔴 Critical<br/>Record Not Migrated"]
     Type -->|"Warning"| Warning["🟡 Warning<br/>Data Modified"]
     Type -->|"Info"| Info["🔵 Info<br/>Logged Only"]
-    
+
     Critical --> ManualFix["Manual Remediation Required"]
     Warning --> AutoFix["Auto-corrected"]
     Info --> NoAction["No Action Needed"]
@@ -169,14 +169,14 @@ flowchart LR
         O3["Turn: 0"]
         O4["SP: null"]
     end
-    
+
     subgraph Transformed["Transformed Values"]
         T1["'in_progress'"]
         T2["'completed'"]
         T3["Turn: 1"]
         T4["SP: 0"]
     end
-    
+
     O1 -->|"Enum Map"| T1
     O2 -->|"Enum Map"| T2
     O3 -->|"Min Value"| T3
@@ -192,14 +192,14 @@ flowchart LR
 ```mermaid
 flowchart TD
     Start["Start Validation"]
-    
+
     Start --> Count["Record Count Check"]
     Count --> Integrity["Data Integrity Check"]
     Integrity --> Relations["Relationship Check"]
     Relations --> Timestamps["Timestamp Check"]
     Timestamps --> Users["User Association Check"]
     Users --> Complete["Validation Complete"]
-    
+
     Count -->|"Fail"| CountFail["❌ Count Mismatch"]
     Integrity -->|"Fail"| IntegrityFail["❌ Data Corruption"]
     Relations -->|"Fail"| RelationsFail["❌ Broken Links"]
@@ -238,7 +238,7 @@ flowchart LR
     Engineer["Migration Engineer"]
     QA["QA Lead"]
     Manager["Project Manager"]
-    
+
     Engineer -->|"Execute & Document"| QA
     QA -->|"Verify & Approve"| Manager
     Manager -->|"Final Sign-off"| Complete["Migration Complete"]

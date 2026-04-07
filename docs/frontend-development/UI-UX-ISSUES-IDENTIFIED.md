@@ -109,12 +109,12 @@
 
 ## Implementation Plan
 
-**Phase 1**: Update HTML structure with proper semantics (labels, ARIA, roles)  
-**Phase 2**: Update CSS to use `.card` instead of `.glass-card`  
-**Phase 3**: Implement sidebar + progress bar per WF-002  
-**Phase 4**: Add validation feedback and error messages  
-**Phase 5**: Test accessibility with NVDA/JAWS simulators  
-**Phase 6**: Browser verification with keyboard-only navigation  
+**Phase 1**: Update HTML structure with proper semantics (labels, ARIA, roles)
+**Phase 2**: Update CSS to use `.card` instead of `.glass-card`
+**Phase 3**: Implement sidebar + progress bar per WF-002
+**Phase 4**: Add validation feedback and error messages
+**Phase 5**: Test accessibility with NVDA/JAWS simulators
+**Phase 6**: Browser verification with keyboard-only navigation
 
 ---
 

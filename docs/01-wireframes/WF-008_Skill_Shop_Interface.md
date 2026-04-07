@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.3.0
+**Date**: February 22, 2026
 **Related Documents**: [PRD-004], [SPEC-004], [FLOW-004], [SEQ-003]
 
 **Source Specs**:
@@ -13,12 +13,12 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-004](../prds/PRD-004_Skill_Management.md)
-- SPEC: [SPEC-004](../specs/SPEC-004_Skill_Management_Technical.md)
-- Flow: [FLOW-004](../flows/FLOW-004_Skill_Management_System.md)
-- Tech Flow: [TECH-FLOW-004](../tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
-- Sequences: [SEQ-003](../sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
-- User Flows: [UF-005](../user-flows/UF-005_Skill_Management_Flow.md)
+- PRD: [PRD-004](../02-prds/PRD-004_Skill_Management.md)
+- SPEC: [SPEC-004](../02-specs/SPEC-004_Skill_Management_Technical.md)
+- Flow: [FLOW-004](../01-flows/FLOW-004_Skill_Management_System.md)
+- Tech Flow: [TECH-FLOW-004](../01-tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
+- Sequences: [SEQ-003](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- User Flows: [UF-005](../01-user-flows/UF-005_Skill_Management_Flow.md)
 - Related WF: [WF-009](WF-009_Skill_Loadout_Manager.md), [WF-001](WF-001_Dashboard_Overview.md)
 
 ---
@@ -27,7 +27,9 @@
 
 ### 1.1 Purpose
 
-The Skill Shop Interface provides a comprehensive catalog of available skills, enabling players to browse, search, and acquire skills with SP (Skill Points) cost optimization through hint tracking and discount calculation.
+The Skill Shop Interface provides a comprehensive catalog of available skills, enabling players to
+browse, search, and acquire skills with SP (Skill Points) cost optimization through hint tracking
+and discount calculation.
 
 ### 1.2 Key Objectives
 
@@ -456,7 +458,7 @@ class SkillHintService
     {
         $hintLevel = $this->getHintLevel($skill, $character);
         $baseDiscount = $this->getHintDiscount($hintLevel);
-        
+
         // Apply additional discounts (Fast Learner, etc.)
         $additionalDiscount = $this->getAdditionalDiscounts($character);
         $totalDiscount = min(0.50, $baseDiscount + $additionalDiscount); // Cap at 50%
@@ -476,16 +478,16 @@ class SkillHintService
     {
         return self::HINT_DISCOUNTS[min(5, $hintLevel)] ?? 0.0;
     }
-    
+
     private function getAdditionalDiscounts(Character $character): float
     {
         $discount = 0.0;
-        
+
         // Fast Learner condition
         if ($character->hasCondition('fast_learner')) {
             $discount += 0.10;
         }
-        
+
         return $discount;
     }
 }
@@ -614,7 +616,7 @@ class AIRecommendations extends Component
                     </div>
                 @endif
             </div>
-            
+
             <div class="hint-level-guide">
                 <h4>Hint Level Discounts:</h4>
                 <ul class="hint-levels">
@@ -1046,7 +1048,7 @@ test('applies progressive hint discounts correctly', function () {
                 'is_used' => false,
             ]);
         }
-        
+
         $finalCost = $service->calculateFinalCost($skill, $character);
         expect($finalCost)->toBe($expectedCost);
     }
@@ -1279,24 +1281,24 @@ test.describe("WF-008: Accessibility", () => {
 
 ### 9.1 Product Requirements
 
-- [PRD-004: Skill Management](../prds/PRD-004_Skill_Management.md)
+- [PRD-004: Skill Management](../02-prds/PRD-004_Skill_Management.md)
 
 ### 9.2 Technical Specifications
 
-- [SPEC-004: Skill Management Technical](../specs/SPEC-004_Skill_Management_Technical.md)
+- [SPEC-004: Skill Management Technical](../02-specs/SPEC-004_Skill_Management_Technical.md)
 
 ### 9.3 Flow Documentation
 
-- [FLOW-004: Skill Management System](../flows/FLOW-004_Skill_Management_System.md)
-- [TECH-FLOW-004: Skill Management Flow](../tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
+- [FLOW-004: Skill Management System](../01-flows/FLOW-004_Skill_Management_System.md)
+- [TECH-FLOW-004: Skill Management Flow](../01-tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
 
 ### 9.4 Sequence Diagrams
 
-- [SEQ-003: Skill Acquisition and Upgrade](../sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- [SEQ-003: Skill Acquisition and Upgrade](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
 
 ### 9.5 User Flows
 
-- [UF-005: Skill Management Flow](../user-flows/UF-005_Skill_Management_Flow.md)
+- [UF-005: Skill Management Flow](../01-user-flows/UF-005_Skill_Management_Flow.md)
 
 ### 9.6 Related Wireframes
 
@@ -1318,7 +1320,8 @@ test.describe("WF-008: Accessibility", () => {
 
 ## 11. Notes
 
-**Implementation Status**: ✅ Complete
+**Implementation Status**: Alignment-reviewed concept; specific component classes and route paths in
+this document are illustrative and should be verified against the current implementation.
 
 **Known Issues**: None
 
@@ -1333,4 +1336,5 @@ test.describe("WF-008: Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the Skill Shop Interface and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe describes the intended experience for the Skill Shop Interface. Details should be
+verified against current implementation documentation before treating as authoritative._

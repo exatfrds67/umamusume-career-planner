@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.4.0
+**Date**: March 8, 2026
 **Related Documents**: [PRD-002], [SPEC-002], [FLOW-002], [SEQ-002]
 
 **Source Specs**:
@@ -13,13 +13,18 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-002](../prds/PRD-002_Training_Optimization.md)
-- SPEC: [SPEC-002](../specs/SPEC-002_Training_Optimization_Technical.md)
-- Flow: [FLOW-002](../flows/FLOW-002_Training_Optimization_System.md)
-- Tech Flow: [TECH-FLOW-002](../tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
-- Sequences: [SEQ-002](../sequences/SEQ-002_Training_Block_Resolution.md), [SEQ-003](../sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
-- User Flows: [UF-003](../user-flows/UF-003_Training_Day_Flow.md)
+- PRD: [PRD-002](../02-prds/PRD-002_Training_Optimization.md)
+- SPEC: [SPEC-002](../02-specs/SPEC-002_Training_Optimization_Technical.md)
+- Flow: [FLOW-002](../01-flows/FLOW-002_Training_Optimization_System.md)
+- Tech Flow: [TECH-FLOW-002](../01-tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
+- Sequences: [SEQ-002](../01-sequences/SEQ-002_Training_Block_Resolution.md),
+[SEQ-003](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- User Flows: [UF-003](../01-user-flows/UF-003_Training_Day_Flow.md)
 - Related WF: [WF-005](WF-005_Training_Result_Screen.md), [WF-001](WF-001_Dashboard_Overview.md)
+
+**Alignment Note**: This wireframe defines the intended training-selection experience. Exact
+Livewire classes, request paths, and persistence behavior should be verified against the aligned
+training user-flow and tech-flow docs before being treated as implementation-exact.
 
 ---
 
@@ -27,7 +32,9 @@
 
 ### 1.1 Purpose
 
-The Training Selection Interface provides users with AI-powered training predictions, risk assessments, and intelligent recommendations to optimize character stat progression. This interface is the primary decision point for each training turn in a career run.
+The Training Selection Interface provides users with AI-powered training predictions, risk
+assessments, and intelligent recommendations to optimize character stat progression. This interface
+is the primary decision point for each training turn in a career run.
 
 ### 1.2 Key Objectives
 
@@ -37,7 +44,7 @@ The Training Selection Interface provides users with AI-powered training predict
 | **Risk Assessment** | Visual risk indicators with color-coded badges |
 | **AI Recommendations** | Highlight optimal training choice based on goals |
 | **Support Integration** | Display active support cards and friendship bonuses |
-| **Quick Actions** | One-click training execution with confirmation for high-risk |
+| **Quick Actions** | One-click training execution when the current storage mode supports mutation, with confirmation for high-risk |
 
 ### 1.3 User Stories
 
@@ -48,6 +55,31 @@ The Training Selection Interface provides users with AI-powered training predict
 | US-003 | As a player, I want clear risk indicators to avoid training failures | P0 |
 | US-004 | As a player, I want to see which support cards are active in each training | P0 |
 | US-005 | As a player, I want quick access to my current stats and upcoming races | P1 |
+
+### 1.4 Storage Mode Support
+
+- `StorageMode::ACCOUNT`: supports authenticated training execution, persisted follow-up state, and
+account-backed history.
+- `StorageMode::LOCAL`: supports browser-local planning and local state handling where available;
+account-backed history and reporting should not be implied.
+
+### 1.5 Navigation Surface
+
+This wireframe uses conceptual labels such as Training Selection, AI Recommendation, and Result
+Transition. Where implementation-backed navigation matters, the current route and API surface is
+documented in the aligned training flow docs and includes `/characters/{character}/training`,
+`/api/training/characters/{character}/predictions`, `/api/training/characters/{character}/execute`,
+and `/api/advisory/training/recommendations`.
+
+### 1.6 Screen Variants and Degraded States
+
+The training selection surface should explicitly support these screen states:
+
+- active run with advisory available
+- active run with deterministic predictions only
+- no active run in the current storage context
+- account-mode network or authorization failure during refresh or execution
+- local-only planning state where execution history is not account-backed
 
 ---
 
@@ -92,6 +124,7 @@ The Training Selection Interface provides users with AI-powered training predict
 │ │ │ │ │ Bad Status │ Guts: 760 [B] │ │
 │ │ │ [Friend] │ │ Cure Chance │ Wisdom: 890 [A] │ │
 │ │ │ Riko │ │ │ Soft Cap: 1200 │ │
+│ │ │ Riko │ │ │ Soft-cap guidance shown contextually │ │
 │ │ │ │ │ │ [Upcoming Race: 8 Days] │ │
 │ │ │ [SELECT] │ │ [SELECT] │ Kanto Okami Cup (G1) │ │
 │ │ └─────────────┘ └─────────────┘ │ │
@@ -222,9 +255,31 @@ The Training Selection Interface provides users with AI-powered training predict
 
 ````text
 
+### 2.4 Responsive Behavior Requirements
+
+- Desktop keeps current stats and secondary context visible while the training cards remain the primary action area.
+- Tablet may collapse secondary stats or advisory detail into drawers, tabs, or stacked panels, but
+no information should be hover-only.
+- Mobile should keep the primary action bar sticky when train, rest, or confirm actions are visible
+and provide visible affordances for horizontally scrollable training cards.
+- Any expanded prediction detail available on desktop hover must have a tap or focus equivalent on tablet and mobile.
+
+### 2.5 Empty, Offline, and Degraded Variants
+
+- No active run: replace the prediction grid with recovery guidance and a route back to setup or run selection.
+- Advisory unavailable: retain prediction cards and show a reduced-detail recommendation banner
+instead of removing the decision surface.
+- Account-mode failure: preserve the current selection, show retry guidance, and avoid implying that
+execution succeeded.
+- Local-only state: allow planning and local progression where supported, but do not imply account-
+backed result history.
+
 ---
 
 ## 3. Component Specifications
+
+The component names and snippets in this section are illustrative UI contracts. They should not be
+read as a verified inventory of current file names or final class boundaries.
 
 ### 3.1 Training Prediction Card
 
@@ -480,6 +535,10 @@ $efficiency = (
 
 ## 4. State Management
 
+Livewire 4 remains request and hydration based. Alpine-backed interactions in this screen should be
+limited to transient UI state such as expansion, confirmation modals, and client-side affordances
+rather than treated as an alternate persistence layer.
+
 ### 4.1 Livewire Component State
 
 **Main Component**: `app/Livewire/Training/TrainingSelector.php`
@@ -547,20 +606,21 @@ class TrainingSelector extends Component
 | Support card bonuses | `support_bonuses:{deck_id}` | 1 hour | On deck modification |
 | AI recommendations | `ai_training:{run_id}` | 10 minutes | On stat/goal change |
 
-### 4.3 Real-time Updates
+### 4.3 Refresh Behavior
 
-**WebSocket Integration**:
+**Status Refresh Integration**:
 
 ```javascript
-// Listen for character stat updates
-Echo.private(`character.${characterId}`)
-    .listen("StatsUpdated", (e) => {
-        Livewire.dispatch("refresh-predictions");
-    })
-    .listen("TrainingCompleted", (e) => {
-        // Redirect to result screen
-        window.location.href = e.resultUrl;
-    });
+// Refresh predictions after training-related updates
+window.addEventListener('stats-updated', () => {
+    Livewire.dispatch('refresh-predictions');
+});
+
+window.addEventListener('training-completed', (event) => {
+    if (event.detail?.resultUrl) {
+        window.location.href = event.detail.resultUrl;
+    }
+});
 ```
 
 ---
@@ -644,6 +704,7 @@ flowchart TD
 | **2.4.7 Focus Visible** | Clear focus indicators on cards | Visual inspection |
 | **3.3.1 Error Identification** | Risk warnings clearly identified | Screen reader + visual |
 | **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
+| **1.4.1 Use of Color** | Risk and recommendation states include text or icon support | Visual + screen reader |
 
 ### 6.2 Keyboard Navigation
 
@@ -654,6 +715,18 @@ flowchart TD
 | Select training | `Enter` | When [TRAIN] button focused |
 | Collapse all | `Esc` | Expanded predictions |
 | Refresh predictions | `F5` or `Ctrl+R` | Training page |
+
+### 6.4 Accessibility Interaction Requirements
+
+- On initial screen load, focus moves to the primary page heading or first actionable control in the training view.
+- After validation failure or execution failure, focus moves to an error summary and then to the
+first invalid or blocked control.
+- After dismissing a high-risk confirmation modal, focus returns to the triggering train button.
+- Interactive prediction cards must support `Tab` entry, visible focus on the active card, and
+arrow-key traversal where implemented.
+- Collapsible sections and expandable cards must expose expanded state and support activation with `Enter` and `Space`.
+- Mobile primary actions and icon-only controls must meet a minimum `44x44` CSS pixel touch target.
+- Success, warning, advisory, and risk states must not rely on color alone.
 
 ### 6.3 Screen Reader Announcements
 
@@ -1015,25 +1088,26 @@ test.describe("WF-004: Accessibility", () => {
 
 ### 9.1 Product Requirements
 
-- [PRD-002: Training Optimization](../prds/PRD-002_Training_Optimization.md)
+- [PRD-002: Training Optimization](../02-prds/PRD-002_Training_Optimization.md)
 
 ### 9.2 Technical Specifications
 
-- [SPEC-002: Training Optimization Technical](../specs/SPEC-002_Training_Optimization_Technical.md)
+- [SPEC-002: Training Optimization Technical](../02-specs/SPEC-002_Training_Optimization_Technical.md)
 
 ### 9.3 Flow Documentation
 
-- [FLOW-002: Training Optimization System](../flows/FLOW-002_Training_Optimization_System.md)
-- [TECH-FLOW-002: Training Optimization Flow](../tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
+- [FLOW-002: Training Optimization System](../01-flows/FLOW-002_Training_Optimization_System.md)
+- [TECH-FLOW-002: Training Optimization Flow](../01-tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
 
 ### 9.4 Sequence Diagrams
 
-- [SEQ-002: Training Block Resolution](../sequences/SEQ-002_Training_Block_Resolution.md)
-- [SEQ-003: Skill Acquisition and Upgrade](../sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- [SEQ-002: Training Block Resolution](../01-sequences/SEQ-002_Training_Block_Resolution.md)
+- [SEQ-003: Skill Acquisition and Upgrade](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
 
 ### 9.5 User Flows
 
-- [UF-003: Training Day Flow](../user-flows/UF-003_Training_Day_Flow.md)
+- [UF-003: Training Day Flow](../01-user-flows/UF-003_Training_Day_Flow.md)
+- [UF-009: Storage Mode Transition Flow](../01-user-flows/UF-009_Storage_Mode_Transition_Flow.md)
 
 ### 9.6 Related Wireframes
 
@@ -1046,6 +1120,7 @@ test.describe("WF-004: Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.0 | 2026-03-08 | Development Team | Added storage-aware behavior, degraded and empty-state variants, responsive and accessibility interaction requirements, and clarified that component examples are conceptual unless verified against aligned implementation docs |
 | 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: added complete training formula, facility level multipliers (1.0×-2.0×), support card presence bonus (+5% per card), stat soft cap at 1200, mood effects (+20%/-20% range) |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added AI recommendations, red exclamation indicators, friendship training, risk confirmations, accessibility specifications, and testing requirements |
@@ -1055,7 +1130,8 @@ test.describe("WF-004: Accessibility", () => {
 
 ## 11. Notes
 
-**Implementation Status**: ✅ Complete
+**Implementation Status**: Alignment-reviewed concept; exact route and component contracts must be
+verified against current training docs
 
 **Known Issues**: None
 
@@ -1070,4 +1146,5 @@ test.describe("WF-004: Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the Training Selection Interface and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe specification reflects the intended training-selection experience and should be read
+with the aligned training flow documents before being treated as implementation-exact._

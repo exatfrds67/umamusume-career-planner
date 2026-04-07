@@ -2,7 +2,8 @@
 
 ## Overview
 
-The `CacheManagerService` provides intelligent caching capabilities for external API data with staleness indicators, configurable TTL by data type, and comprehensive cache statistics tracking.
+The `CacheManagerService` provides intelligent caching capabilities for external API data with
+staleness indicators, configurable TTL by data type, and comprehensive cache statistics tracking.
 
 ## Features
 
@@ -16,7 +17,8 @@ The `CacheManagerService` provides intelligent caching capabilities for external
 
 ## Requirements
 
-This service implements **Requirement 14.2: Intelligent Caching and Offline Functionality** from the External API Integration specification.
+This service implements **Requirement 14.2: Intelligent Caching and Offline Functionality** from the
+External API Integration specification.
 
 ## Installation
 
@@ -52,7 +54,8 @@ The service uses predefined TTL values for different data types:
 
 ### Staleness Threshold
 
-Data is considered "stale" when its age exceeds 80% of its TTL. This threshold is configurable via the `STALENESS_THRESHOLD` constant.
+Data is considered "stale" when its age exceeds 80% of its TTL. This threshold is configurable via
+the `STALENESS_THRESHOLD` constant.
 
 ## Usage
 
@@ -224,7 +227,7 @@ class UmapyoiApiClient extends ExternalAPIService
     public function fetchCharacterData(string $characterName): array
     {
         $cacheKey = "character_data:{$characterName}";
-        
+
         // Try cache first
         if ($cached = $this->cacheManager->get($cacheKey)) {
             return $cached;
@@ -232,7 +235,7 @@ class UmapyoiApiClient extends ExternalAPIService
 
         // Fetch from API
         $result = $this->fetchWithFallback("/characters/{$characterName}");
-        
+
         if ($result['success']) {
             // Cache the result
             $this->cacheManager->put($cacheKey, $result['data']);
@@ -257,7 +260,7 @@ if ($cached) {
         echo "Warning: This data is " . $cached['_cache']['age_seconds'] . " seconds old";
         echo "Staleness: " . $cached['_cache']['staleness_percentage'] . "%";
     }
-    
+
     // Use cached data
     return $cached;
 }

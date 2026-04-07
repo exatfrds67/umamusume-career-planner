@@ -52,10 +52,10 @@ undefined.
 <div x-data="deckBuilder(...)">
     <div class="grid...">
         <aside>Card Library</aside>
-        
+
         <!-- Edit Modal HERE - INSIDE Alpine scope! -->
         <div x-show="showEditModal">...</div>
-        
+
     </div> <!-- Grid closes -->
 </div> <!-- Alpine closes -->
 ```text
@@ -67,14 +67,14 @@ undefined.
 **Before**:
 
 ```html
-<div x-data="deckBuilder(@js($deckData), {{ $character->id }})" 
+<div x-data="deckBuilder(@js($deckData), {{ $character->id }})"
      x-init="availableCards = window.preloadedCards || []; init()">
 ```text
 
 **After**:
 
 ```html
-<div x-data="deckBuilder(@js($deckData), {{ $character->id }})" 
+<div x-data="deckBuilder(@js($deckData), {{ $character->id }})"
      x-init="if (window.preloadedCards) { availableCards = window.preloadedCards; }">
 ```
 
@@ -262,4 +262,3 @@ If issues persist:
 3. Verify `npm run build` completed successfully
 4. Check that `resources/js/deck-builder.js` is loaded
 5. Verify Alpine.js is initialized (`window.Alpine` exists)
-

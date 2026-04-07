@@ -1,8 +1,8 @@
 # External API Retry Functionality - Manual Test Checklist
 
-**Task**: 4.1.3 Test retry functionality  
-**Date**: January 29, 2026  
-**Tester**: _________________  
+**Task**: 4.1.3 Test retry functionality
+**Date**: January 29, 2026
+**Tester**: _________________
 **Status**: ☐ Not Started | ☐ In Progress | ☐ Completed
 
 ## Test Environment Setup
@@ -500,8 +500,8 @@
 
 ### Sign-off
 
-**Tester Name**: _________________  
-**Date**: _________________  
+**Tester Name**: _________________
+**Date**: _________________
 **Signature**: _________________
 
 ---

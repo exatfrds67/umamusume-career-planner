@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [SEQ-005]
 
 **Source Specs**:
@@ -13,12 +13,12 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-005](../prds/PRD-005_Support_Card_Management.md)
-- SPEC: [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md)
-- Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
-- Tech Flow: [TECH-FLOW-005](../tech-flow/TECH-FLOW-005_Support_Card_Management_Flow.md)
-- Sequences: [SEQ-005](../sequences/SEQ-005_Support_Card_Upgrade.md)
-- User Flows: [UF-006](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+- PRD: [PRD-005](../02-prds/PRD-005_Support_Card_Management.md)
+- SPEC: [SPEC-005](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](../01-flows/FLOW-005_Support_Card_Management_System.md)
+- Tech Flow: [TECH-FLOW-005](../01-tech-flow/TECH-FLOW-005_Support_Card_Management_Flow.md)
+- Sequences: [SEQ-005](../01-sequences/SEQ-005_Support_Card_Upgrade.md)
+- User Flows: [UF-006](../01-user-flows/UF-006_Support_Deck_Building_Flow.md)
 - Related WF: [WF-011](WF-011_Support_Deck_Builder.md), [WF-001](WF-001_Dashboard_Overview.md)
 
 ---
@@ -27,7 +27,9 @@
 
 ### 1.1 Purpose
 
-The Support Card Collection interface provides a comprehensive catalog of all available support cards, enabling players to browse, search, filter, and manage their card inventory with meta tier rankings and detailed card information.
+The Support Card Collection interface provides a comprehensive catalog of all available support
+cards, enabling players to browse, search, filter, and manage their card inventory with meta tier
+rankings and detailed card information.
 
 ### 1.2 Key Objectives
 
@@ -365,7 +367,7 @@ class CardSearch extends Component
         'wit' => '🧠',
         'friend' => '💖',
     ];
-    
+
     $friendshipThreshold = 80;
     $isFriendshipReady = $card->bond_percentage >= $friendshipThreshold;
     $isMLB = $card->limit_break_count >= 4;
@@ -441,7 +443,8 @@ class CardSearch extends Component
                     🤝 Ready
                 </span>
             @else
-                <span class="status-progress" title="{{ $friendshipThreshold - $card->bond_percentage }}% to Friendship Training">
+                <span class="status-progress" title="{{ $friendshipThreshold - $card->bond_percentage }}% to
+                Friendship Training">
                     ⏳ {{ round(($card->bond_percentage / $friendshipThreshold) * 100) }}% to 80%
                 </span>
             @endif
@@ -554,12 +557,12 @@ class MetaTierService
         'wit' => '🧠',
         'friend' => '💖',
     ];
-    
+
     $friendshipThreshold = 80;
     $isFriendshipReady = $card->bond_percentage >= $friendshipThreshold;
     $isMLB = $card->limit_break_count >= 4;
     $totalStars = $card->limit_break_count + 1;
-    
+
     // Friendship bonus ranges by rarity
     $friendshipBonusRanges = [
         'R' => '10-15%',
@@ -616,13 +619,13 @@ class MetaTierService
                         @endif
                     </span>
                 </div>
-                
+
                 {{-- Level Display --}}
                 <div class="stat-item">
                     <span class="stat-label">Level:</span>
                     <span class="stat-value">{{ $card->level }}/{{ $card->max_level }}</span>
                 </div>
-                
+
                 {{-- Bond Display with Threshold --}}
                 <div class="stat-item">
                     <span class="stat-label">Bond:</span>
@@ -774,7 +777,7 @@ class BondProgressionService
     public const CHARMING_BOND_GAIN = 9;       // With Charming condition (+2)
     public const EXCLAMATION_BOND_GAIN = 5;    // Event available indicator
     public const FRIENDSHIP_THRESHOLD = 80;    // Enables Friendship Training
-    
+
     // Friendship bonus ranges by rarity
     public const FRIENDSHIP_BONUS_RANGES = [
         'R' => ['min' => 10, 'max' => 15],
@@ -787,7 +790,7 @@ class BondProgressionService
         $newLevel = min(100, $card->bond_percentage + $points);
 
         // Check for friendship threshold milestone
-        $crossedThreshold = $card->bond_percentage < self::FRIENDSHIP_THRESHOLD 
+        $crossedThreshold = $card->bond_percentage < self::FRIENDSHIP_THRESHOLD
             && $newLevel >= self::FRIENDSHIP_THRESHOLD;
 
         DB::transaction(function () use ($card, $newLevel, $crossedThreshold, $source) {
@@ -812,15 +815,15 @@ class BondProgressionService
     public function calculateBondGain(bool $hasCharming = false, bool $hasExclamation = false): int
     {
         $gain = self::BASE_BOND_GAIN;
-        
+
         if ($hasCharming) {
             $gain = self::CHARMING_BOND_GAIN; // Replaces base, not additive
         }
-        
+
         if ($hasExclamation) {
             $gain += self::EXCLAMATION_BOND_GAIN;
         }
-        
+
         return $gain;
     }
 
@@ -829,7 +832,7 @@ class BondProgressionService
         if ($card->bond_percentage < self::FRIENDSHIP_THRESHOLD) {
             return null;
         }
-        
+
         return $card->friendship_bonus ?? self::FRIENDSHIP_BONUS_RANGES[$card->rarity]['max'];
     }
 
@@ -1127,7 +1130,7 @@ flowchart TD
 
 <!-- Friendship status announcement -->
 <div aria-live="polite" aria-atomic="true" class="sr-only">
-    Card: Kitasan Black. SSR Speed type. 5 stars, Max Limit Break. 
+    Card: Kitasan Black. SSR Speed type. 5 stars, Max Limit Break.
     Bond: 100%. Friendship Training active. Friendship bonus: 35%.
 </div>
 ```
@@ -1178,34 +1181,34 @@ flowchart TD
 ```php
 test('calculates base bond gain correctly', function () {
     $service = new BondProgressionService();
-    
+
     expect($service->calculateBondGain())->toBe(7);
 });
 
 test('calculates charming bond gain correctly', function () {
     $service = new BondProgressionService();
-    
+
     expect($service->calculateBondGain(hasCharming: true))->toBe(9);
 });
 
 test('calculates exclamation event bond gain correctly', function () {
     $service = new BondProgressionService();
-    
+
     expect($service->calculateBondGain(hasExclamation: true))->toBe(12); // 7 + 5
 });
 
 test('calculates charming plus exclamation bond gain correctly', function () {
     $service = new BondProgressionService();
-    
+
     expect($service->calculateBondGain(hasCharming: true, hasExclamation: true))->toBe(14); // 9 + 5
 });
 
 test('unlocks friendship training at 80% bond', function () {
     $card = SupportCard::factory()->create(['bond_percentage' => 75, 'rarity' => 'SSR']);
     $service = new BondProgressionService();
-    
+
     $service->addBondPoints($card, 10);
-    
+
     expect($card->fresh()->bond_percentage)->toBe(85)
         ->and(BondMilestone::where('support_card_id', $card->id)
             ->where('milestone', 80)
@@ -1216,9 +1219,9 @@ test('returns correct friendship bonus range by rarity', function () {
     $ssrCard = SupportCard::factory()->create(['rarity' => 'SSR', 'bond_percentage' => 85]);
     $srCard = SupportCard::factory()->create(['rarity' => 'SR', 'bond_percentage' => 85]);
     $rCard = SupportCard::factory()->create(['rarity' => 'R', 'bond_percentage' => 85]);
-    
+
     $service = new BondProgressionService();
-    
+
     // SSR: 25-35%, SR: 15-25%, R: 10-15%
     expect($service->getFriendshipBonus($ssrCard))->toBeGreaterThanOrEqual(25)
         ->and($service->getFriendshipBonus($srCard))->toBeGreaterThanOrEqual(15)
@@ -1228,7 +1231,7 @@ test('returns correct friendship bonus range by rarity', function () {
 test('returns null friendship bonus when below threshold', function () {
     $card = SupportCard::factory()->create(['bond_percentage' => 75]);
     $service = new BondProgressionService();
-    
+
     expect($service->getFriendshipBonus($card))->toBeNull();
 });
 ```text
@@ -1474,7 +1477,7 @@ test.describe("WF-010: Support Card Collection", () => {
         // All visible cards should have friendship indicator
         const cards = page.locator('.support-card');
         const count = await cards.count();
-        
+
         for (let i = 0; i < count; i++) {
             await expect(cards.nth(i).locator('.friendship-status')).toContainText("🤝");
         }
@@ -1603,24 +1606,24 @@ test.describe("WF-010: Accessibility", () => {
 
 ### 9.1 Product Requirements
 
-- [PRD-005: Support Card Management](../prds/PRD-005_Support_Card_Management.md)
+- [PRD-005: Support Card Management](../02-prds/PRD-005_Support_Card_Management.md)
 
 ### 9.2 Technical Specifications
 
-- [SPEC-005: Support Card Management Technical](../specs/SPEC-005_Support_Card_Management_Technical.md)
+- [SPEC-005: Support Card Management Technical](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
 
 ### 9.3 Flow Documentation
 
-- [FLOW-005: Support Card Management System](../flows/FLOW-005_Support_Card_Management_System.md)
-- [TECH-FLOW-005: Support Card Management Flow](../tech-flow/TECH-FLOW-005_Support_Card_Management_Flow.md)
+- [FLOW-005: Support Card Management System](../01-flows/FLOW-005_Support_Card_Management_System.md)
+- [TECH-FLOW-005: Support Card Management Flow](../01-tech-flow/TECH-FLOW-005_Support_Card_Management_Flow.md)
 
 ### 9.4 Sequence Diagrams
 
-- [SEQ-005: Support Card Upgrade](../sequences/SEQ-005_Support_Card_Upgrade.md)
+- [SEQ-005: Support Card Upgrade](../01-sequences/SEQ-005_Support_Card_Upgrade.md)
 
 ### 9.5 User Flows
 
-- [UF-006: Support Deck Building Flow](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+- [UF-006: Support Deck Building Flow](../01-user-flows/UF-006_Support_Deck_Building_Flow.md)
 
 ### 9.6 Related Wireframes
 
@@ -1683,7 +1686,8 @@ test.describe("WF-010: Accessibility", () => {
 
 ## 12. Notes
 
-**Implementation Status**: ✅ Complete
+**Implementation Status**: Alignment-reviewed concept; specific component classes and route paths in
+this document are illustrative and should be verified against the current implementation.
 
 **Known Issues**: None
 
@@ -1700,4 +1704,5 @@ test.describe("WF-010: Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the Support Card Collection with game-accurate mechanics from Umamusume Pretty Derby (Global English Server, verified January 2026) and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe describes the intended experience for the Support Card Collection. Details should be
+verified against current implementation documentation before treating as authoritative._

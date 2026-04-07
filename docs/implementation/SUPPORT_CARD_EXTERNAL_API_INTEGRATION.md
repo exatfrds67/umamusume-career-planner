@@ -1,7 +1,7 @@
 # Support Card External API Integration
 
-**Status**: ✅ Implemented  
-**Date**: 2026-01-25  
+**Status**: ✅ Implemented
+**Date**: 2026-01-25
 **Feature**: External API Integration for Support Card Management
 
 ## Overview

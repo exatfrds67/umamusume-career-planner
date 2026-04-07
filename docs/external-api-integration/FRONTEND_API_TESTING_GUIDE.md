@@ -1,6 +1,6 @@
 # Frontend API Testing Guide
 
-**Date:** 2026-01-25  
+**Date:** 2026-01-25
 **Purpose:** Test umapyoi.net and UmamusumeDB.com APIs directly in the browser using Chrome DevTools
 
 ---
@@ -438,6 +438,6 @@ async function testRateLimit() {
 
 ---
 
-**Last Updated:** 2026-01-25  
-**Status:** Active  
+**Last Updated:** 2026-01-25
+**Status:** Active
 **Maintainer:** Development Team

@@ -1,9 +1,9 @@
 # SPEC-003: Race Strategy System - Technical Specification
 
-**Document Version**: 2.4.0  
-**Date**: 2026-03-04  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Current - Calendar/Targets view data contracts updated  
+**Document Version**: 2.4.1
+**Date**: 2026-03-11
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Current - Calendar/Targets view data contracts updated
 **Classification**: Internal - Development Team
 
 ---
@@ -13,29 +13,30 @@
 | Attribute | Value |
 | --- | --- |
 | **Document ID** | SPEC-003 |
-| **Related PRD** | [PRD-003: Race Strategy](../prds/PRD-003_Race_Strategy.md) |
-| **Architecture Version** | v2.3.0 |
+| **Related PRD** | [PRD-003: Race Strategy](../02-prds/PRD-003_Race_Strategy.md) |
+| **Architecture Version** | v2.4.1 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-02-22 |
+| **Last Reviewed** | 2026-03-11 |
 
 ### Related Documents
 
 **Requirements & Design**:
 
-- [SRS Section 3.3: Race Management](../003_SRS_Software_Requirement_Specifications.md#33-race-management)
-- [SDS Section 4.3: Race Strategy Architecture](../004_SDS_Software_Design_Specifications.md#43-race-strategy-module)
+- [SRS Section 3.3: Race Management](../00-core-docs/003_SRS_Software_Requirement_Specifications.md#33-race-management)
+- [SDS Section 4.3: Race Strategy Architecture](../00-core-
+docs/004_SDS_Software_Design_Specifications.md#43-race-strategy-module)
 
 **Data & Integration**:
 
-- [DBD Section 5.3: Race Tables](../009_DBD_Database_Documentation.md#53-race-tables)
-- [API Section 4.3: Race Endpoints](../010_API_API_Documentation.md#43-race-endpoints)
+- [DBD Section 5.3: Race Tables](../00-core-docs/009_DBD_Database_Documentation.md#53-race-tables)
+- [API Section 4.3: Race Endpoints](../00-core-docs/010_API_API_Documentation.md#43-race-endpoints)
 
 **Visual Documentation**:
 
-- [FLOW-003: Race Strategy System](../flows/FLOW-003_Race_Strategy_System.md)
-- [SEQ-004: Race Registration and Outcome](../sequences/SEQ-004_Race_Registration_and_Outcome.md)
-- [WF-006: Race Calendar View](../wireframes/WF-006_Race_Calendar_View.md)
-- [WF-007: Race Preparation Screen](../wireframes/WF-007_Race_Preparation_Screen.md)
+- [FLOW-003: Race Strategy System](../01-flows/FLOW-003_Race_Strategy_System.md)
+- [SEQ-004: Race Registration and Outcome](../01-sequences/SEQ-004_Race_Registration_and_Outcome.md)
+- [WF-006: Race Calendar View](../01-wireframes/WF-006_Race_Calendar_View.md)
+- [WF-007: Race Preparation Screen](../01-wireframes/WF-007_Race_Preparation_Screen.md)
 
 ---
 
@@ -159,22 +160,22 @@ graph TB
     API --> FormRequest
     FormRequest --> RaceSvc
     Livewire --> RaceSvc
-    
+
     RaceSvc --> StrategySvc
     RaceSvc --> AnalysisSvc
-    
+
     StrategySvc --> NeuronAI
     AnalysisSvc --> Analyzers
-    
+
     RaceSvc --> RaceDef
     RaceSvc --> RaceResult
     RaceSvc --> DB
-    
+
     RaceSvc --> External
     RaceSvc --> Cache
-    
+
     Analyzers --> ReqAnalyzer[RequirementAnalyzer]
-    Analyzers --> WinCalc[WinProbabilityCalculator]
+    Analyzers --> WinCalc[RaceConditionService]
     Analyzers --> StyleOpt[StyleOptimizer]
 ```text
 
@@ -234,7 +235,7 @@ use App\DTOs\RaceAnalysis;
 
 /**
  * Race Requirement Analyzer
- * 
+ *
  * Evaluates character readiness for specific races based on stat requirements.
  */
 class RaceRequirementAnalyzer
@@ -262,7 +263,7 @@ class RaceRequirementAnalyzer
 
     /**
      * Analyze character readiness for a race
-     * 
+     *
      * @param Character $character
      * @param RaceDefinition $race
      * @return RaceAnalysis
@@ -271,7 +272,7 @@ class RaceRequirementAnalyzer
     {
         $requirements = $this->calculateRequirements($race);
         $currentStats = $character->current_stats;
-        
+
         $statAnalysis = [];
         $totalGap = 0;
 
@@ -307,7 +308,7 @@ class RaceRequirementAnalyzer
 
     /**
      * Calculate stat requirements for a race
-     * 
+     *
      * @param RaceDefinition $race
      * @return array<string, int>
      */
@@ -336,7 +337,7 @@ class RaceRequirementAnalyzer
 
     /**
      * Get base requirement multipliers for distance type
-     * 
+     *
      * @param string $distanceType
      * @return array<string, float>
      */
@@ -347,7 +348,7 @@ class RaceRequirementAnalyzer
 
     /**
      * Evaluate stat status
-     * 
+     *
      * @param int $current
      * @param int $target
      * @return string
@@ -367,7 +368,7 @@ class RaceRequirementAnalyzer
 
     /**
      * Calculate overall readiness score
-     * 
+     *
      * @param array $statAnalysis
      * @return int
      */
@@ -385,7 +386,7 @@ class RaceRequirementAnalyzer
 
     /**
      * Get recommendation based on readiness score
-     * 
+     *
      * @param int $readinessScore
      * @return string
      */
@@ -416,11 +417,11 @@ use App\Enums\{AptitudeGrade, MoodStatus};
 
 /**
  * Win Probability Calculator
- * 
+ *
  * Calculates predicted win probability using weighted stat/aptitude scoring.
  * Uses game-accurate aptitude modifiers (G-S grades, S is maximum).
  */
-class WinProbabilityCalculator
+class RaceConditionService
 {
     /**
      * Component weights in probability calculation
@@ -435,7 +436,7 @@ class WinProbabilityCalculator
     /**
      * Game-accurate aptitude grade multipliers
      * S is maximum grade. A is baseline (1.0).
-     * 
+     *
      * Note: Actual modifiers vary by category (Surface/Distance/Style)
      * These are simplified averages for win probability calculation.
      */
@@ -452,7 +453,7 @@ class WinProbabilityCalculator
 
     /**
      * Calculate win probability
-     * 
+     *
      * @param Character $character
      * @param RaceDefinition $race
      * @return array{probability: float, breakdown: array}
@@ -489,7 +490,7 @@ class WinProbabilityCalculator
 
     /**
      * Calculate stat component score
-     * 
+     *
      * @param Character $character
      * @param RaceDefinition $race
      * @return float
@@ -505,7 +506,7 @@ class WinProbabilityCalculator
 
     /**
      * Calculate aptitude component score
-     * 
+     *
      * @param Character $character
      * @param RaceDefinition $race
      * @return float
@@ -524,7 +525,7 @@ class WinProbabilityCalculator
             ->first();
 
         // Calculate average multiplier
-        $distanceMultiplier = $distanceApt 
+        $distanceMultiplier = $distanceApt
             ? self::APTITUDE_MULTIPLIERS[$distanceApt->grade->value] ?? 1.0
             : 1.0;
 
@@ -540,7 +541,7 @@ class WinProbabilityCalculator
 
     /**
      * Calculate skill component score
-     * 
+     *
      * @param Character $character
      * @param RaceDefinition $race
      * @return float
@@ -556,7 +557,7 @@ class WinProbabilityCalculator
         $relevantSkills = $skills->filter(function ($skill) use ($race) {
             // Check if skill conditions match race
             $conditions = $skill->conditions_json ?? [];
-            
+
             if (empty($conditions)) {
                 return true; // Universal skill
             }
@@ -597,7 +598,7 @@ class WinProbabilityCalculator
 
     /**
      * Calculate mood component score
-     * 
+     *
      * @param Character $character
      * @return float
      */
@@ -614,9 +615,9 @@ class WinProbabilityCalculator
 
     /**
      * Convert total score to win probability
-     * 
+     *
      * Uses sigmoid function for realistic probability curve
-     * 
+     *
      * @param float $score
      * @return float
      */
@@ -648,7 +649,7 @@ use App\Enums\RunningStyle;
 
 /**
  * Running Style Optimizer
- * 
+ *
  * Determines optimal running style for a character in a specific race.
  */
 class RunningStyleOptimizer
@@ -665,7 +666,7 @@ class RunningStyleOptimizer
 
     /**
      * Optimize running style selection
-     * 
+     *
      * @param Character $character
      * @param RaceDefinition $race
      * @return array{recommended_style: string, confidence: float, alternatives: array}
@@ -676,7 +677,7 @@ class RunningStyleOptimizer
 
         foreach (RunningStyle::cases() as $style) {
             $score = $this->calculateStyleScore($character, $race, $style);
-            
+
             $styleScores[$style->value] = [
                 'score' => $score,
                 'style' => $style->value,
@@ -699,7 +700,7 @@ class RunningStyleOptimizer
 
     /**
      * Calculate score for a specific running style
-     * 
+     *
      * @param Character $character
      * @param RaceDefinition $race
      * @param RunningStyle $style
@@ -729,7 +730,7 @@ class RunningStyleOptimizer
 
     /**
      * Get aptitude score for running style
-     * 
+     *
      * @param Character $character
      * @param RunningStyle $style
      * @return float
@@ -761,7 +762,7 @@ class RunningStyleOptimizer
 
     /**
      * Get stat alignment score for running style
-     * 
+     *
      * @param Character $character
      * @param RunningStyle $style
      * @return float
@@ -776,10 +777,10 @@ class RunningStyleOptimizer
 
         foreach ($weights as $stat => $weight) {
             $statValue = $stats[$stat] ?? 0;
-            
+
             // Normalize to 0-100 (assuming 1200 max)
             $normalized = min(100, ($statValue / 1200) * 100);
-            
+
             $totalScore += $normalized * $weight;
             $totalWeight += $weight;
         }
@@ -789,7 +790,7 @@ class RunningStyleOptimizer
 
     /**
      * Get distance suitability score
-     * 
+     *
      * @param RaceDefinition $race
      * @param RunningStyle $style
      * @return float
@@ -835,7 +836,7 @@ class RunningStyleOptimizer
 
     /**
      * Calculate confidence in recommendation
-     * 
+     *
      * @param float $topScore
      * @param array $alternatives
      * @return float
@@ -870,10 +871,11 @@ use App\Enums\{TrackCondition, WeatherType};
 
 /**
  * Weather Impact Calculator
- * 
+ *
  * Calculates performance modifiers based on track conditions and weather.
- * Uses game-accurate track condition penalties from Global EN server.
- * 
+ * Uses planner-readable track condition approximations derived from verified
+ * Global EN mechanics.
+ *
  * Track Condition Penalties:
  * - Firm: No penalties
  * - Good: Power -50
@@ -883,9 +885,12 @@ use App\Enums\{TrackCondition, WeatherType};
 class WeatherImpactCalculator
 {
     /**
-     * Game-accurate track condition modifiers
-     * 
-     * Penalties are applied as flat stat reductions:
+        * Planner-readable track condition modifiers
+     *
+        * Penalties are applied as flat reductions for readability inside the planner.
+        * The live game resolves these effects through more complex race-performance
+        * calculations rather than literal permanent stat subtraction.
+        *
      * - Power penalties vary by surface (Turf: -50, Dirt: -100)
      * - Speed penalties apply to Heavy conditions
      * - Stamina drain increases on Soft/Heavy
@@ -917,27 +922,27 @@ class WeatherImpactCalculator
 
     /**
      * Calculate weather impact with game-accurate penalties
-     * 
+     *
      * @param Character $character
      * @param TrackCondition $condition
      * @param string $surface 'turf' or 'dirt'
      * @return array{penalties: array, effective_stats: array, skill_recommendations: array}
      */
     public function calculate(
-        Character $character, 
+        Character $character,
         TrackCondition $condition,
         string $surface = 'turf'
     ): array {
         $penalties = self::CONDITION_PENALTIES[$condition->value] ?? self::CONDITION_PENALTIES['firm'];
-        
+
         // Calculate power penalty based on surface
-        $powerPenalty = $surface === 'dirt' 
+        $powerPenalty = $surface === 'dirt'
             ? ($penalties['power_penalty_dirt'] ?? $penalties['power_penalty'] ?? 0)
             : ($penalties['power_penalty_turf'] ?? $penalties['power_penalty'] ?? 0);
-        
+
         $speedPenalty = $penalties['speed_penalty'] ?? 0;
         $staminaDrainMod = $penalties['stamina_drain_modifier'] ?? 1.0;
-        
+
         // Calculate effective stats after penalties
         $currentStats = $character->current_stats;
         $effectiveStats = [
@@ -964,7 +969,7 @@ class WeatherImpactCalculator
 
     /**
      * Get recommended skills for track condition
-     * 
+     *
      * @param TrackCondition $condition
      * @return array
      */
@@ -992,7 +997,7 @@ class WeatherImpactCalculator
 
     /**
      * Get human-readable impact description
-     * 
+     *
      * @param TrackCondition $condition
      * @return string
      */
@@ -1012,7 +1017,7 @@ class WeatherImpactCalculator
 
 ## 4. Service Layer
 
-### 4.1 RaceService
+### 4.1 RaceConditionService
 
 Main orchestration service for race operations.
 
@@ -1028,7 +1033,7 @@ use Illuminate\Support\Facades\{DB, Cache};
 
 /**
  * Race Management Service
- * 
+ *
  * Handles race-related business operations.
  */
 class RaceConditionService
@@ -1041,7 +1046,7 @@ class RaceConditionService
 
     /**
      * Get race calendar for a specific month
-     * 
+     *
      * @param int $month
      * @param array $filters
      * @return \Illuminate\Support\Collection
@@ -1057,7 +1062,7 @@ class RaceConditionService
 
     /**
      * Get race analysis for character
-     * 
+     *
      * @param int $raceId
      * @param int $characterId
      * @return array
@@ -1072,7 +1077,7 @@ class RaceConditionService
 
     /**
      * Record race result
-     * 
+     *
      * @param CareerRun $career
      * @param int $raceDefinitionId
      * @param array $resultData
@@ -1113,7 +1118,7 @@ class RaceConditionService
 
     /**
      * Sync race definitions from external API
-     * 
+     *
      * @return int Number of races updated
      */
     public function syncRaceDefinitions(): int
@@ -1148,7 +1153,7 @@ class RaceConditionService
 
     /**
      * Apply race rewards to character
-     * 
+     *
      * @param CareerRun $career
      * @param array $rewards
      * @return void
@@ -1172,7 +1177,7 @@ class RaceConditionService
 
     /**
      * Determine distance type from meters
-     * 
+     *
      * @param int $distance
      * @return string
      */
@@ -1200,7 +1205,7 @@ namespace App\Services\Race;
 use App\Models\{Character, RaceDefinition};
 use App\Services\Race\Analyzers\{
     RaceRequirementAnalyzer,
-    WinProbabilityCalculator,
+    RaceConditionService,
     RunningStyleOptimizer,
     WeatherImpactCalculator
 };
@@ -1208,21 +1213,21 @@ use App\Enums\TrackCondition;
 
 /**
  * Race Analysis Aggregation Service
- * 
+ *
  * Combines multiple analysis engines into comprehensive race analysis.
  */
 class RaceConditionService
 {
     public function __construct(
         private RaceRequirementAnalyzer $requirementAnalyzer,
-        private WinProbabilityCalculator $winCalc,
+        private RaceConditionService $winCalc,
         private RunningStyleOptimizer $styleOptimizer,
         private WeatherImpactCalculator $weatherCalc
     ) {}
 
     /**
      * Perform comprehensive race analysis
-     * 
+     *
      * @param Character $character
      * @param RaceDefinition $race
      * @param TrackCondition|null $trackCondition
@@ -1279,7 +1284,7 @@ class RaceConditionService
 
     /**
      * Analyze aptitude matching for race
-     * 
+     *
      * @param Character $character
      * @param RaceDefinition $race
      * @return array
@@ -1305,7 +1310,7 @@ class RaceConditionService
 
     /**
      * Calculate overall aptitude match grade
-     * 
+     *
      * @param \App\Models\Aptitude|null $distanceApt
      * @param \App\Models\Aptitude|null $surfaceApt
      * @return string
@@ -1352,7 +1357,7 @@ use App\Neuron\Agents\RaceStrategyAgent;
 
 /**
  * Race Strategy Recommendation Service
- * 
+ *
  * Provides AI-powered strategic recommendations for races.
  */
 class RaceStrategyService
@@ -1365,7 +1370,7 @@ class RaceStrategyService
 
     /**
      * Get AI strategy recommendation
-     * 
+     *
      * @param int $characterId
      * @param int $raceId
      * @return array
@@ -1396,7 +1401,7 @@ class RaceStrategyService
 
     /**
      * Build AI context for strategy generation
-     * 
+     *
      * @param Character $character
      * @param RaceDefinition $race
      * @param array $analysis
@@ -1409,26 +1414,28 @@ class RaceStrategyService
     ): string {
         return <<<CONTEXT
         Race: {$race->name} ({$race->grade}, {$race->distance}m, {$race->surface})
-        
+
         Character: {$character->name}
-        Stats: Speed {$character->current_stats['speed']}, Stamina {$character->current_stats['stamina']}, Power {$character->current_stats['power']}, Guts {$character->current_stats['guts']}, Wit {$character->current_stats['wit']}
-        
+        Stats: Speed {$character->current_stats['speed']}, Stamina {$character->current_stats['stamina']},
+        Power {$character->current_stats['power']}, Guts {$character->current_stats['guts']}, Wit
+        {$character->current_stats['wit']}
+
         Aptitudes:
         - Distance ({$race->distance_type}): {$analysis['aptitude_match']['distance']}
         - Surface ({$race->surface}): {$analysis['aptitude_match']['surface']}
-        
+
         Analysis:
         - Readiness Score: {$analysis['readiness']['score']}%
         - Win Probability: {$analysis['win_probability']}
         - Recommended Style: {$analysis['running_style']['recommended']}
-        
+
         Skills: {$this->formatSkills($character->skills)}
         CONTEXT;
     }
 
     /**
      * Format skills for context
-     * 
+     *
      * @param \Illuminate\Support\Collection $skills
      * @return string
      */
@@ -1564,14 +1571,16 @@ Accept: application/json
         "ai_recommendation": {
             "recommended_style": "Late Surger",
             "confidence": 0.88,
-            "reasoning": "Character has high Power stats (950) which favor late acceleration on Medium distance races. Stamina is slightly below optimal, but adequate for this strategy.",
+            "reasoning": "Character has high Power stats (950) which favor late acceleration on Medium distance
+            races. Stamina is slightly below optimal, but adequate for this strategy.",
             "skill_priority": [
                 "Arc Maestro",
                 "Stamina Recovery",
                 "Corner Acceleration"
             ],
             "weather_note": "If track becomes Heavy, consider 'Muddy Track' skill.",
-            "preparation_advice": "Focus on 1-2 more Stamina training sessions before the race to reach the 900 threshold for optimal performance."
+            "preparation_advice": "Focus on 1-2 more Stamina training sessions before the race to reach the 900
+            threshold for optimal performance."
         }
     }
 }
@@ -1645,7 +1654,7 @@ CREATE TABLE ucp_race_definitions (
     metadata JSON NULL COMMENT 'Additional race data',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     UNIQUE KEY unique_external (external_id),
     INDEX idx_grade (grade),
     INDEX idx_surface (surface),
@@ -1672,7 +1681,7 @@ CREATE TABLE ucp_race_results (
     track_condition VARCHAR(20) NULL COMMENT 'Weather at race time',
     prediction_accuracy DECIMAL(5,2) NULL COMMENT 'Comparison to predicted outcome',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (career_id) REFERENCES ucp_careers(id) ON DELETE CASCADE,
     FOREIGN KEY (race_definition_id) REFERENCES ucp_race_definitions(id),
     INDEX idx_career_turn (career_id, turn_number),
@@ -1808,10 +1817,10 @@ Bonuses:
 
 ### 9.1 External API Integration
 
-**Primary Source**: `umapyoi.net/api/races`  
+**Primary Source**: `umapyoi.net/api/races`
 **Fallback**: `gametora.com/api/races`
 
-**Sync Schedule**: Daily at 00:00 UTC  
+**Sync Schedule**: Daily at 00:00 UTC
 **Data Cached**: 24 hours
 
 ```php
@@ -1826,7 +1835,7 @@ Schedule::call(function () {
 Extract race results from screenshots:
 
 ```php
-$ocrResult = app(OCRService::class)->extractRaceResult($imagePath);
+$ocrResult = app(TesseractService::class)->extractRaceResult($imagePath);
 
 // Expected output
 [
@@ -1925,10 +1934,10 @@ public function analyze(User $user, RaceDefinition $race, Character $character):
 test('requirement analyzer calculates correct thresholds', function () {
     $race = RaceDefinition::factory()->make(['grade' => 'G1', 'distance_type' => 'medium']);
     $character = Character::factory()->make(['current_stats' => ['speed' => 900]]);
-    
+
     $analyzer = app(RaceRequirementAnalyzer::class);
     $analysis = $analyzer->analyze($character, $race);
-    
+
     expect($analysis->readinessScore)->toBeGreaterThan(70);
 });
 
@@ -1936,19 +1945,19 @@ test('win probability increases with better stats', function () {
     $race = RaceDefinition::factory()->make();
     $weakChar = Character::factory()->make(['current_stats' => ['speed' => 500]]);
     $strongChar = Character::factory()->make(['current_stats' => ['speed' => 1000]]);
-    
-    $calc = app(WinProbabilityCalculator::class);
-    
+
+    $calc = app(RaceConditionService::class);
+
     $weakProb = $calc->calculate($weakChar, $race);
     $strongProb = $calc->calculate($strongChar, $race);
-    
+
     expect($strongProb['probability'])->toBeGreaterThan($weakProb['probability']);
 });
 
 test('running style optimizer recommends correct style for sprint', function () {
     $race = RaceDefinition::factory()->make(['distance_type' => 'sprint']);
     $character = Character::factory()->create();
-    
+
     // Create high Speed aptitude
     $character->aptitudes()->create([
         'category' => 'style',
@@ -1956,10 +1965,10 @@ test('running style optimizer recommends correct style for sprint', function () 
         'grade' => 'S',
         'bonus_value' => 15,
     ]);
-    
+
     $optimizer = app(RunningStyleOptimizer::class);
     $result = $optimizer->optimize($character, $race);
-    
+
     expect($result['recommended_style'])->toBe('front_runner')
         ->and($result['confidence'])->toBeGreaterThan(0.5);
 });
@@ -1967,9 +1976,9 @@ test('running style optimizer recommends correct style for sprint', function () 
 test('weather impact calculator applies correct modifiers', function () {
     $character = Character::factory()->make();
     $calculator = app(WeatherImpactCalculator::class);
-    
+
     $result = $calculator->calculate($character, TrackCondition::Heavy);
-    
+
     expect($result['modifiers']['speed'])->toBe(0.85)
         ->and($result['modifiers']['stamina'])->toBe(1.15)
         ->and($result['skill_recommendations'])->toContain('Muddy Track');
@@ -1977,7 +1986,7 @@ test('weather impact calculator applies correct modifiers', function () {
 
 test('distance type determination is accurate', function () {
     $service = app(RaceConditionService::class);
-    
+
     expect($service->determineDistanceType(1200))->toBe('sprint')
         ->and($service->determineDistanceType(1600))->toBe('mile')
         ->and($service->determineDistanceType(2000))->toBe('medium')
@@ -1996,10 +2005,10 @@ test('user can get race analysis for their character', function () {
         'current_stats' => ['speed' => 900, 'stamina' => 850, 'power' => 800],
     ]);
     $race = RaceDefinition::factory()->create();
-    
+
     $response = $this->actingAs($user)
         ->getJson("/api/v1/races/{$race->id}/analysis?character_id={$character->id}");
-    
+
     $response->assertStatus(200)
         ->assertJsonStructure([
             'data' => [
@@ -2017,10 +2026,10 @@ test('user cannot analyze race with another users character', function () {
     $user2 = User::factory()->create();
     $character = Character::factory()->for($user2)->create();
     $race = RaceDefinition::factory()->create();
-    
+
     $response = $this->actingAs($user1)
         ->getJson("/api/v1/races/{$race->id}/analysis?character_id={$character->id}");
-    
+
     $response->assertStatus(403);
 });
 
@@ -2028,7 +2037,7 @@ test('race result is recorded correctly', function () {
     $user = User::factory()->create();
     $career = CareerRun::factory()->for($user)->create();
     $race = RaceDefinition::factory()->create();
-    
+
     $response = $this->actingAs($user)
         ->postJson("/api/v1/careers/{$career->id}/race-result", [
             'race_definition_id' => $race->id,
@@ -2036,16 +2045,16 @@ test('race result is recorded correctly', function () {
             'fans_gained' => 15000,
             'strategy_used' => 'late_surger',
         ]);
-    
+
     $response->assertStatus(201);
-    
+
     $this->assertDatabaseHas('ucp_race_results', [
         'career_id' => $career->id,
         'race_definition_id' => $race->id,
         'placement' => 1,
         'fans_gained' => 15000,
     ]);
-    
+
     $career->refresh();
     expect($career->total_fans)->toBe(15000);
 });
@@ -2054,12 +2063,12 @@ test('race calendar returns races for specified month', function () {
     RaceDefinition::factory()->create(['month' => 3, 'half' => 1]);
     RaceDefinition::factory()->create(['month' => 3, 'half' => 2]);
     RaceDefinition::factory()->create(['month' => 5, 'half' => 1]);
-    
+
     $user = User::factory()->create();
-    
+
     $response = $this->actingAs($user)
         ->getJson('/api/v1/races?month=3');
-    
+
     $response->assertStatus(200)
         ->assertJsonCount(2, 'data');
 });
@@ -2068,12 +2077,12 @@ test('race calendar filters by grade', function () {
     RaceDefinition::factory()->create(['grade' => 'G1', 'month' => 6]);
     RaceDefinition::factory()->create(['grade' => 'G2', 'month' => 6]);
     RaceDefinition::factory()->create(['grade' => 'G3', 'month' => 6]);
-    
+
     $user = User::factory()->create();
-    
+
     $response = $this->actingAs($user)
         ->getJson('/api/v1/races?month=6&grade=G1');
-    
+
     $response->assertStatus(200)
         ->assertJsonCount(1, 'data');
 });
@@ -2089,10 +2098,10 @@ test('AI strategy agent provides valid recommendations', function () {
         'current_stats' => ['speed' => 900, 'stamina' => 750, 'power' => 950],
     ]);
     $race = RaceDefinition::factory()->create(['distance_type' => 'medium']);
-    
+
     $service = app(RaceStrategyService::class);
     $strategy = $service->getStrategy($character->id, $race->id);
-    
+
     expect($strategy)->toHaveKeys(['analysis', 'ai_recommendation'])
         ->and($strategy['ai_recommendation'])->toHaveKeys([
             'recommended_style',
@@ -2119,12 +2128,12 @@ test('external race sync creates or updates definitions', function () {
             ]
         ], 200),
     ]);
-    
+
     $service = app(RaceConditionService::class);
     $syncedCount = $service->syncRaceDefinitions();
-    
+
     expect($syncedCount)->toBe(1);
-    
+
     $this->assertDatabaseHas('ucp_race_definitions', [
         'external_id' => 'ext_001',
         'name' => 'Tokyo Yushun (Japanese Derby)',
@@ -2139,15 +2148,15 @@ test('race analysis aggregates all components correctly', function () {
         ['category' => 'surface', 'type' => 'turf', 'grade' => 'S'],
         ['category' => 'style', 'type' => 'late_surger', 'grade' => 'A'],
     ]);
-    
+
     $race = RaceDefinition::factory()->create([
         'distance_type' => 'medium',
         'surface' => 'Turf',
     ]);
-    
+
     $service = app(RaceConditionService::class);
     $analysis = $service->analyze($character, $race);
-    
+
     expect($analysis)->toHaveKeys([
         'race',
         'readiness',
@@ -2169,29 +2178,29 @@ test('race analysis aggregates all components correctly', function () {
 test('race analysis completes within performance target', function () {
     $character = Character::factory()->create();
     $race = RaceDefinition::factory()->create();
-    
+
     $service = app(RaceConditionService::class);
-    
+
     $startTime = microtime(true);
     $service->analyze($character, $race);
     $endTime = microtime(true);
-    
+
     $executionTime = ($endTime - $startTime) * 1000; // Convert to ms
-    
+
     expect($executionTime)->toBeLessThan(200); // 200ms target
 });
 
 test('race calendar query is performant with 100 races', function () {
     RaceDefinition::factory()->count(100)->create(['month' => 6]);
-    
+
     $service = app(RaceConditionService::class);
-    
+
     $startTime = microtime(true);
     $service->getCalendar(6);
     $endTime = microtime(true);
-    
+
     $executionTime = ($endTime - $startTime) * 1000;
-    
+
     expect($executionTime)->toBeLessThan(50); // 50ms target
 });
 ```
@@ -2215,10 +2224,10 @@ class RaceDefinitionFactory extends Factory
             'medium' => [2000, 2200, 2400],
             'long' => [2500, 3000, 3200],
         ];
-        
+
         $distanceType = $this->faker->randomElement(['sprint', 'mile', 'medium', 'long']);
         $distance = $this->faker->randomElement($distances[$distanceType]);
-        
+
         return [
             'external_id' => 'test_' . $this->faker->unique()->numerify('####'),
             'name' => $this->faker->words(3, true) . ' Stakes',
@@ -2233,14 +2242,14 @@ class RaceDefinitionFactory extends Factory
             'half' => $this->faker->numberBetween(1, 2),
         ];
     }
-    
+
     public function g1(): self
     {
         return $this->state(fn (array $attributes) => [
             'grade' => 'G1',
         ]);
     }
-    
+
     public function sprint(): self
     {
         return $this->state(fn (array $attributes) => [
@@ -2248,7 +2257,7 @@ class RaceDefinitionFactory extends Factory
             'distance' => 1200,
         ]);
     }
-    
+
     public function turf(): self
     {
         return $this->state(fn (array $attributes) => [
@@ -2271,7 +2280,7 @@ class RaceResultFactory extends Factory
     public function definition(): array
     {
         $placement = $this->faker->numberBetween(1, 18);
-        
+
         // Calculate fans based on placement
         $fansGained = match (true) {
             $placement === 1 => $this->faker->numberBetween(10000, 25000),
@@ -2279,7 +2288,7 @@ class RaceResultFactory extends Factory
             $placement === 3 => $this->faker->numberBetween(2000, 6000),
             default => $this->faker->numberBetween(500, 2000),
         };
-        
+
         return [
             'career_id' => CareerRun::factory(),
             'race_definition_id' => RaceDefinition::factory(),
@@ -2300,7 +2309,7 @@ class RaceResultFactory extends Factory
             'track_condition' => $this->faker->randomElement(['good', 'yielding', 'soft', 'heavy']),
         ];
     }
-    
+
     public function winner(): self
     {
         return $this->state(fn (array $attributes) => [
@@ -2316,11 +2325,13 @@ class RaceResultFactory extends Factory
 
 ## 14. Frontend View Data Contracts
 
-This section defines the exact JSON shape passed by `RaceController` to the Alpine.js components for the Calendar and Targets views.
+This section defines the exact JSON shape passed by `RaceController` to the Alpine.js components for
+the Calendar and Targets views.
 
 ### 14.1 Race Calendar View (`/races/calendar`)
 
-Data is embedded via `<script id="race-calendar-data" type="application/json">` and consumed by the `raceCarouselView()` Alpine component.
+Data is embedded via `<script id="race-calendar-data" type="application/json">` and consumed by the
+`raceCarouselView()` Alpine component.
 
 **Controller method**: `RaceController::calendar()`
 
@@ -2494,6 +2505,7 @@ The `raceTargets()` component maintains the following filter state:
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.1 | 2026-03-11 | Development Team | Clarified that `WeatherImpactCalculator` uses planner-side track-condition approximations for readability rather than literal internal game stat subtraction. |
 | 2.4.0 | 2026-03-04 | Development Team | Added Section 14 (Frontend View Data Contracts) defining exact JSON shapes for calendar and targets views. Documented split surface/distance filters, phase filter, corrected grade values, fansReward vs fanCount distinction. |
 | 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0: RaceConditionService, Neuron\RaceStrategyService, ExternalDataService, AdviceService, GameTora fallback, Neuron AI v2.11, status complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate track conditions (Firm/Good/Soft/Heavy with flat stat penalties), corrected aptitude modifiers (S max, A baseline), surface-specific power penalties |
@@ -2513,11 +2525,11 @@ The `raceTargets()` component maintains the following filter state:
 
 ---
 
-### Document Control  
+### Document Control
 
-**Maintained By**: Backend Development Team  
-**Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-03-07  
+**Maintained By**: Backend Development Team
+**Review Frequency**: Bi-weekly during active development
+**Next Review Date**: 2026-03-07
 **Distribution**: Development Team, QA Team, Product Management, Data Science Team
 
 ---

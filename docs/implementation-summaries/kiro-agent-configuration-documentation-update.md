@@ -1,15 +1,17 @@
 # Kiro Agent Configuration Documentation Update
 
-**Date**: 2026-01-29  
-**Type**: Documentation Enhancement + Skill Resources Creation  
-**Status**: Completed  
+**Date**: 2026-01-29
+**Type**: Documentation Enhancement + Skill Resources Creation
+**Status**: Completed
 **Related Files**: SKILLS.md, AGENTS.md, .kiro/skills/
 
 ---
 
 ## Overview
 
-Comprehensive update to project documentation including Kiro AI agent configuration guidelines and creation of skill resources for progressive knowledge loading. This enables contributors to create specialized AI assistants with domain-specific knowledge.
+Comprehensive update to project documentation including Kiro AI agent configuration guidelines and
+creation of skill resources for progressive knowledge loading. This enables contributors to create
+specialized AI assistants with domain-specific knowledge.
 
 ## Changes Made
 
@@ -324,6 +326,6 @@ description: Specific description of when to use this skill. Include key use cas
 
 ---
 
-**Document Owner**: Development Team  
-**Last Updated**: 2026-01-29  
+**Document Owner**: Development Team
+**Last Updated**: 2026-01-29
 **Status**: Completed

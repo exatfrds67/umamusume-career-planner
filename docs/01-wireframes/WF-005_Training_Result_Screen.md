@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0
+**Date**: March 8, 2026
 **Related Documents**: [PRD-002], [SPEC-002], [FLOW-002], [SEQ-002]
 
 **Source Specs**:
@@ -13,13 +13,17 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-002](../prds/PRD-002_Training_Optimization.md)
-- SPEC: [SPEC-002](../specs/SPEC-002_Training_Optimization_Technical.md)
-- Flow: [FLOW-002](../flows/FLOW-002_Training_Optimization_System.md)
-- Tech Flow: [TECH-FLOW-002](../tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
-- Sequences: [SEQ-002](../sequences/SEQ-002_Training_Block_Resolution.md)
-- User Flows: [UF-003](../user-flows/UF-003_Training_Day_Flow.md)
+- PRD: [PRD-002](../02-prds/PRD-002_Training_Optimization.md)
+- SPEC: [SPEC-002](../02-specs/SPEC-002_Training_Optimization_Technical.md)
+- Flow: [FLOW-002](../01-flows/FLOW-002_Training_Optimization_System.md)
+- Tech Flow: [TECH-FLOW-002](../01-tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
+- Sequences: [SEQ-002](../01-sequences/SEQ-002_Training_Block_Resolution.md)
+- User Flows: [UF-003](../01-user-flows/UF-003_Training_Day_Flow.md)
 - Related WF: [WF-004](WF-004_Training_Selection_Interface.md), [WF-001](WF-001_Dashboard_Overview.md)
+
+**Alignment Note**: This wireframe defines the intended post-training feedback experience. Exact
+route names, result models, and component classes should be verified against the aligned training
+flow docs before being treated as implementation-exact.
 
 ---
 
@@ -27,7 +31,10 @@
 
 ### 1.1 Purpose
 
-The Training Result Screen displays the outcome of a training session, showing actual stat gains, bond changes, skill hints obtained, energy/mood changes, and any triggered events. This screen provides immediate feedback and allows players to review the effectiveness of their training choices.
+The Training Result Screen displays the outcome of a training session, showing actual stat gains,
+bond changes, skill hints obtained, energy/mood changes, and any triggered events. This screen
+provides immediate feedback and allows players to review the effectiveness of their training
+choices.
 
 ### 1.2 Key Objectives
 
@@ -48,6 +55,29 @@ The Training Result Screen displays the outcome of a training session, showing a
 | US-003 | As a player, I want to see bond changes with support cards | P0 |
 | US-004 | As a player, I want to understand mood and energy changes | P0 |
 | US-005 | As a player, I want to quickly proceed to the next turn | P0 |
+
+### 1.4 Storage Mode Support
+
+- `StorageMode::ACCOUNT`: can reflect authenticated training execution, persisted follow-up state,
+and account-backed history where the current implementation supports it.
+- `StorageMode::LOCAL`: should be treated as browser-local result feedback or local state
+progression where supported; it should not imply account-backed history or reporting parity.
+
+### 1.5 Navigation Surface
+
+This document uses conceptual labels such as Result Screen, Event Panel, and Next Training. The
+aligned training flow docs should be treated as the source of truth for actual route or API
+boundaries.
+
+### 1.6 Screen Variants
+
+The result screen should explicitly support:
+
+- account-backed executed training result
+- local-only result feedback or local progression state
+- result with triggered event choices
+- result without follow-up event
+- degraded or unavailable follow-up actions when network or authorization fails
 
 ---
 
@@ -98,7 +128,7 @@ The Training Result Screen displays the outcome of a training session, showing a
 │ └──────────────────────────────────────────────────────────────────┘ │
 │ │
 │ ┌──────────────────────────────────────────────────────────────────┐ │
-│ │ [NEXT TRAINING] [CHARACTER DETAILS] [TEAM RACE] │ │
+│ │ [NEXT TRAINING] [CAREER DETAILS] [RACE PLANNING] │ │
 │ └──────────────────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────────────────┘
 
@@ -137,7 +167,7 @@ The Training Result Screen displays the outcome of a training session, showing a
 │ │ [ 2. Decline ] │ │
 │ └────────────────────────────────────────────────┘ │
 │ │
-│ [NEXT TRAINING] [CHARACTER] [TEAM RACE] │
+│ [NEXT TRAINING] [CAREER] [RACE PLAN] │
 └────────────────────────────────────────────────────┘
 
 ### 2.3 Mobile Layout (<640px)
@@ -173,7 +203,7 @@ The Training Result Screen displays the outcome of a training session, showing a
 │ │ [ 2. Decline] │ │
 │ └──────────────────────────┘ │
 │ │
-│ [NEXT] [CHAR] [RACE] │
+│ [NEXT] [CAREER] [RACE PLAN] │
 └──────────────────────────────┘
 │ Bottom Navigation Bar │
 │ [🏠]\[👤]\[⚡]\[🏆]\[🤖]\[⚙️] │
@@ -182,6 +212,10 @@ The Training Result Screen displays the outcome of a training session, showing a
 ---
 
 ## 3. Component Specifications
+
+The component names and snippets in this section are illustrative UI contracts. Where they use older
+result or run naming, treat them as conceptual unless the aligned implementation docs verify the
+exact class, route, or model path.
 
 ### 3.1 Result Banner Component
 
@@ -582,7 +616,8 @@ class EventsPanel extends Component
             <span class="stat-label">{{ ucfirst($stat) }}:</span>
             <span class="stat-value">{{ $value }}</span>
             @if($gradeChanges[$stat] ?? false)
-                <span class="grade-change">({{ $gradeChanges[$stat]['old'] }} → {{ $gradeChanges[$stat]['new'] }})</span>
+                <span class="grade-change">({{ $gradeChanges[$stat]['old'] }} → {{ $gradeChanges[$stat]['new']
+                }})</span>
             @endif
         </div>
     @endforeach
@@ -603,6 +638,10 @@ class EventsPanel extends Component
 ---
 
 ## 4. State Management
+
+Result rendering should distinguish between persisted account-backed follow-up state and browser-
+local post-action feedback. The screen should not imply that every result view corresponds to a DB-
+backed history record.
 
 ### 4.1 Livewire Component State
 
@@ -662,19 +701,19 @@ class ResultScreen extends Component
 sequenceDiagram
     participant User
     participant ResultScreen
-    participant CareerRun
+    participant RunContext
     participant Database
-    participant WebSocket
+    participant StatusRefresh
 
     User->>ResultScreen: View training result
-    ResultScreen->>CareerRun: Load updated run
-    CareerRun->>Database: Fetch result data
-    Database-->>CareerRun: Result + changes
-    CareerRun-->>ResultScreen: Display data
+    ResultScreen->>RunContext: Load updated local or account-backed state
+    RunContext->>Database: Fetch persisted result data when available
+    Database-->>RunContext: Result + changes
+    RunContext-->>ResultScreen: Display data
     ResultScreen->>User: Show result screen
 
-    ResultScreen->>WebSocket: Broadcast stats-updated
-    WebSocket->>User: Real-time notification
+    ResultScreen->>StatusRefresh: Refresh local or account-backed state
+    StatusRefresh->>User: Refreshed result state
 
     User->>ResultScreen: Click [NEXT TRAINING]
     ResultScreen->>User: Redirect to training select
@@ -738,9 +777,9 @@ flowchart LR
     ResultScreen[Training Result Screen]
 
     ResultScreen -->|Next Training| TrainingSelect[Training Selection]
-    ResultScreen -->|View Character| CharacterDetail[Character Detail]
+    ResultScreen -->|View Career| CharacterDetail[Career Detail]
     ResultScreen -->|Ask AI| AIAdvisor[AI Advisor]
-    ResultScreen -->|Dashboard| Dashboard[Dashboard]
+    ResultScreen -->|Race Planning| Dashboard[Race Planning]
 ```text
 
 ---
@@ -757,6 +796,7 @@ flowchart LR
 | **2.4.3 Focus Order** | Logical tab order through result components | Tab key traversal |
 | **2.4.7 Focus Visible** | Clear focus indicators | Visual inspection |
 | **3.3.1 Error Identification** | Training failures clearly identified | Screen reader + visual |
+| **1.4.1 Use of Color** | Success, failure, and warning states include text or icon redundancy | Visual + screen reader |
 | **4.1.2 Name, Role, Value** | Proper ARIA attributes | axe-core scan |
 
 ### 6.2 Keyboard Navigation
@@ -768,6 +808,15 @@ flowchart LR
 | Ask AI | `A` | Result screen |
 | Expand/Collapse Section | `Space` | When section focused |
 | Navigate Sections | `Tab` / `Shift+Tab` | Result screen |
+
+### 6.4 Accessibility Interaction Requirements
+
+- On initial screen load, focus moves to the result heading or success or failure banner.
+- After an event-choice submission, focus moves to the event outcome summary or next actionable control.
+- After closing a result dialog or banner, focus returns to the control that launched the transition.
+- After blocked follow-up navigation, focus moves to an error summary or inline alert and then to the relevant control.
+- Primary mobile and tablet actions must provide a minimum interactive target size of `44x44` CSS pixels.
+- Stat, bond, mood, and result states must not rely on color alone.
 
 ### 6.3 Screen Reader Announcements
 
@@ -1066,24 +1115,25 @@ test.describe("WF-005: Accessibility", () => {
 
 ### 9.1 Product Requirements
 
-- [PRD-002: Training Optimization](../prds/PRD-002_Training_Optimization.md)
+- [PRD-002: Training Optimization](../02-prds/PRD-002_Training_Optimization.md)
 
 ### 9.2 Technical Specifications
 
-- [SPEC-002: Training Optimization Technical](../specs/SPEC-002_Training_Optimization_Technical.md)
+- [SPEC-002: Training Optimization Technical](../02-specs/SPEC-002_Training_Optimization_Technical.md)
 
 ### 9.3 Flow Documentation
 
-- [FLOW-002: Training Optimization System](../flows/FLOW-002_Training_Optimization_System.md)
-- [TECH-FLOW-002: Training Optimization Flow](../tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
+- [FLOW-002: Training Optimization System](../01-flows/FLOW-002_Training_Optimization_System.md)
+- [TECH-FLOW-002: Training Optimization Flow](../01-tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
 
 ### 9.4 Sequence Diagrams
 
-- [SEQ-002: Training Block Resolution](../sequences/SEQ-002_Training_Block_Resolution.md)
+- [SEQ-002: Training Block Resolution](../01-sequences/SEQ-002_Training_Block_Resolution.md)
 
 ### 9.5 User Flows
 
-- [UF-003: Training Day Flow](../user-flows/UF-003_Training_Day_Flow.md)
+- [UF-003: Training Day Flow](../01-user-flows/UF-003_Training_Day_Flow.md)
+- [UF-009: Storage Mode Transition Flow](../01-user-flows/UF-009_Storage_Mode_Transition_Flow.md)
 
 ### 9.6 Related Wireframes
 
@@ -1096,6 +1146,7 @@ test.describe("WF-005: Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-08 | Development Team | Added storage-aware result semantics, clarified conceptual navigation and component boundaries, updated follow-up CTA wording, and expanded accessibility focus and touch-target requirements |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: per-training cap (+100, reduced to +50 if stat > 1200), support card bonuses (+5% per card), predicted vs actual comparison display |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added friendship bonuses, guaranteed hint indicators, event handling, accessibility specifications, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
@@ -1104,7 +1155,8 @@ test.describe("WF-005: Accessibility", () => {
 
 ## 11. Notes
 
-**Implementation Status**: ✅ Complete
+**Implementation Status**: Alignment-reviewed concept; exact result routes, models, and history
+behavior should be verified against the current training docs
 
 **Known Issues**: None
 
@@ -1119,4 +1171,5 @@ test.describe("WF-005: Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the Training Result Screen and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe specification reflects the intended post-training feedback experience and should be
+read with the aligned training flow docs before being treated as implementation-exact._

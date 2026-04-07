@@ -1,7 +1,7 @@
 # Admin User Authorization Fix
 
-**Date**: January 26, 2026  
-**Issue**: Admin user getting 403 errors when editing characters  
+**Date**: January 26, 2026
+**Issue**: Admin user getting 403 errors when editing characters
 **Status**: ✅ **FIXED**
 
 ## Problem Description
@@ -92,8 +92,8 @@ This means:
 
 ## Admin User Credentials
 
-**Email**: `admin@umamusume.local`  
-**Password**: `admin123`  
+**Email**: `admin@umamusume.local`
+**Password**: `admin123`
 **Created by**: `AdminUserSeeder`
 
 ## Testing
@@ -248,7 +248,7 @@ public function isAdmin(): bool
         'admin@umamusume.local',
         'superadmin@umamusume.local',
     ];
-    
+
     return in_array($this->email, $adminEmails);
 }
 ```text
@@ -269,7 +269,7 @@ restricted to their own characters.
 
 ---
 
-**Document Version**: 1.0  
-**Fix Date**: January 26, 2026  
-**Status**: ✅ COMPLETE  
+**Document Version**: 1.0
+**Fix Date**: January 26, 2026
+**Status**: ✅ COMPLETE
 **Tests**: 18 passed (20 assertions)

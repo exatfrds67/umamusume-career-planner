@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: March 10, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Updated with verified game mechanics from Global English Server
@@ -12,36 +12,47 @@
 
 ## 1. Training Prediction Pipeline Flow
 
-This flow illustrates how `TrainingPredictionService` generates forecasts for all training facilities, utilizing Redis caching to optimize performance.
+This flow illustrates how `TrainingPredictionService` generates forecasts for all training
+facilities, utilizing Redis caching to optimize performance.
+
+Prediction calculation is shared across both storage modes, but training context loading and
+execution persistence differ between Local mode and Account mode.
 
 ```mermaid
 flowchart TD
     Start([User Opens Training]) --> CheckCache{Cache Hit?}
-    
+
     CheckCache -->|Yes| ReturnCache[Return Cached Predictions]
     CheckCache -->|No| LoadContext[Load Context]
-    
-    LoadContext --> FetchState[Fetch Character Stats/Mood/Energy]
+
+    LoadContext --> StorageMode{Storage Mode?}
+    StorageMode -->|Local| LoadLocal[Load Run State from localStorage by UUID]
+    StorageMode -->|Account| LoadAccount[Load Run State from Database with Owner Scope]
+
+    LoadLocal --> FetchState[Fetch Character Stats/Mood/Energy]
+    LoadAccount --> FetchState
     FetchState --> FetchDeck[Fetch Support Deck]
     FetchDeck --> FetchScenario[Fetch Scenario Config]
-    
+
     FetchScenario --> IterateFacilities[Iterate Facilities]
-    
+
     IterateFacilities --> CalcBase[Calculate Base Gains]
     CalcBase --> ApplySupport[Apply Deck Bonuses]
     ApplySupport --> CalcRisk[Calculate Failure Risk]
     CalcRisk --> CalcHints[Determine Hint Probabilities]
-    
+
     CalcHints --> BuildObject[Build TrainingPrediction Object]
     BuildObject --> NextFacility{More Facilities?}
-    
+
     NextFacility -->|Yes| IterateFacilities
     NextFacility -->|No| CacheResults[Cache Results (Redis: 5m)]
-    
+
     CacheResults --> ReturnNew[Return Predictions]
-    ReturnCache --> AIAnalysis[Optional: Neuron Agent Analysis]
+    ReturnCache --> AIAnalysis{Optional: Neuron Agent Analysis?}
     ReturnNew --> AIAnalysis
-```text
+    AIAnalysis -->|Yes| ReturnAdvice[Return Predictions with AI Guidance]
+    AIAnalysis -->|No| ReturnOnly[Return Predictions Only]
+```
 
 ---
 
@@ -52,19 +63,19 @@ This flow details how the **Training Advisor Agent** analyzes raw predictions to
 ```mermaid
 flowchart TD
     Start([Analyze Predictions]) --> InputData[Input: Predictions + Goals]
-    
+
     InputData --> Agent[Trigger TrainingAdvisorAgent]
-    
+
     Agent --> EvalGoals[Evaluate Goal Progress]
     Agent --> EvalEconomy[Analyze Turn Economy]
     Agent --> EvalRisk[Assess Risk vs Reward]
-    
+
     EvalGoals --> ScoreOptions[Score Training Options]
     EvalEconomy --> ScoreOptions
     EvalRisk --> ScoreOptions
-    
+
     ScoreOptions --> Rank[Rank Recommendations]
-    
+
     Rank --> GenReasoning[Generate Natural Language Reasoning]
     GenReasoning --> Output[Return Advice Payload]
 ```
@@ -73,35 +84,52 @@ flowchart TD
 
 ## 3. Training Execution Flow
 
-The transactional process of executing a training turn via `TrainingService`.
+The process of executing a training turn via `TrainingService`. Account mode uses a database
+transaction; Local mode applies the updated run state to browser storage and refreshes dependent
+client-side state.
 
 ```mermaid
 flowchart TD
     Start([User Confirms Action]) --> Validate[Validate Constraints]
-    
+
     Validate -->|Energy Low| Fail[Reject Action]
-    Validate -->|Valid| Execute{Execute Transaction}
-    
-    Execute --> RollOutcome{Roll RNG}
-    
+    Validate -->|Valid| Execute[Apply Training Update]
+
+    Execute --> StorageMode{Storage Mode?}
+    StorageMode -->|Account| AccountAuth{Authorized and valid?}
+    StorageMode -->|Local| LocalWrite[Apply localStorage State Write]
+
+    AccountAuth -->|No| RejectAccount[Reject Action and Return Error]
+    AccountAuth -->|Yes| DbTxn[Apply DB Transaction]
+
+    DbTxn --> RollOutcome{Roll RNG}
+    LocalWrite --> RollOutcome
+
     RollOutcome -->|Success| ApplyFull[Apply Full Gains + Bond]
     RollOutcome -->|Failure| ApplyPartial[Apply Partial/Zero Gains]
-    
+
     ApplyFull --> CheckHints[Check Skill Hints]
     CheckHints --> AssignHints[Assign Hints]
-    
+
     ApplyPartial --> CheckConditions[Check Bad Conditions]
     CheckConditions --> ApplyCondition[Apply Condition (e.g. Lazy)]
-    
+
     AssignHints --> UpdateTurn[Increment Turn]
     ApplyCondition --> UpdateTurn
-    
+
     UpdateTurn --> ProcessEvents[Process Support/Scenario Events]
-    
-    ProcessEvents --> Save[Commit Transaction]
+
+    ProcessEvents --> Persist{Persist Updated State}
+    Persist -->|Account| SaveCheck{Commit Transaction Succeeds?}
+    Persist -->|Local| SaveLocal[Write Updated Run Payload]
+
+    SaveCheck -->|No| PersistError[Return Persistence Error]
+    SaveCheck -->|Yes| Save[Commit Transaction]
+
     Save --> Invalidate[Invalidate Predictions Cache]
+    SaveLocal --> Invalidate
     Invalidate --> Return[Return TrainingResult]
-```text
+```
 
 ---
 
@@ -112,20 +140,20 @@ Logic handled by `SupportBonusCalculator` to determine effective stat multiplier
 ```mermaid
 flowchart TD
     Start([Calculate Bonuses]) --> LoadDeck[Load Active Deck]
-    
+
     LoadDeck --> Identify[Identify Participants]
     Identify --> Filter[Filter by Facility Type]
-    
+
     Filter --> SumBase[Sum Base Bonuses]
     SumBase -->|Speed/Stamina/etc| StatBonuses
-    
+
     Filter --> CheckFriendship{Bond >= 80%?}
     CheckFriendship -->|Yes| ApplyMotivation[Apply Motivation Multiplier]
     CheckFriendship -->|No| BaseOnly[Base Multiplier Only]
-    
+
     ApplyMotivation --> UniqueBonus[Check Unique Card Bonuses]
     BaseOnly --> UniqueBonus
-    
+
     UniqueBonus --> Finalize[Return Multipliers]
 ```
 
@@ -138,22 +166,22 @@ Logic handled by `RiskCalculator` to determine the probability of training failu
 ```mermaid
 flowchart TD
     Start([Calc Risk]) --> GetRate[Get Facility Fail Rate]
-    
+
     GetRate --> EnergyCheck[Check Energy %]
     EnergyCheck -->|Energy > 50%| Base0[Risk = 0%]
     EnergyCheck -->|Energy < 50%| CalcCurve[Calculate Risk Curve]
-    
+
     CalcCurve --> MoodMod[Apply Mood Modifier]
     MoodMod --> ConditionMod[Apply Condition Modifiers]
-    
+
     ConditionMod -->|Overweight| Pen1[Risk +10%]
     ConditionMod -->|Lazy| Pen2[Risk +5%]
-    
+
     Pen1 --> Clamp[Clamp 0-99%]
     Pen2 --> Clamp
-    
+
     Clamp --> Return[Return Failure Probability]
-```text
+```
 
 ---
 
@@ -164,17 +192,17 @@ Logic handled by `SkillService` during training execution.
 ```mermaid
 flowchart TD
     Start([Check Hints]) --> GetParticipants[Get Support Cards present]
-    
+
     GetParticipants --> FilterHints[Filter Cards with 'Hint Lv Up']
-    
+
     FilterHints --> Roll{Roll Probability}
     Roll -->|Pass| SelectSkill[Select Random Skill from Card]
     Roll -->|Fail| NoHint
-    
+
     SelectSkill --> CheckOwned{Already Max Hint (Lv 5)?}
     CheckOwned -->|Yes| NoHint
     CheckOwned -->|No| GrantHint[Grant Hint Level +1]
-    
+
     GrantHint --> ReduceCost[Update SP Cost Discount]
     ReduceCost --> ReturnResult
 ```
@@ -199,18 +227,18 @@ Logic for facility level progression and special training periods.
 ```mermaid
 flowchart TD
     Start([Check Facility]) --> GetLevel[Get Current Facility Level (1-5)]
-    
+
     GetLevel --> CheckCamp{Summer Training Camp?}
-    
+
     CheckCamp -->|Yes| SetMax[All Facilities = Level 5]
     CheckCamp -->|No| UseNormal[Use Current Levels]
-    
+
     SetMax --> CalcBonus[Calculate Training Bonus]
     UseNormal --> CalcBonus
-    
+
     CalcBonus --> ApplyMultiplier[Apply Level Multiplier]
     ApplyMultiplier --> ReturnGains[Return Stat Gains]
-```text
+```
 
 ### 7.1 Summer Training Camp Details
 
@@ -227,8 +255,9 @@ The precise formula used by `TrainingCalculationService` to determine stat gains
 ### 8.1 Training Formula
 
 ```
-Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
-```text
+Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodModifier) × (1 + TrainingEffect) × (1 +
+0.05 × NumSupportCards) × FriendshipMultiplier
+```
 
 ### 8.2 Formula Components
 
@@ -237,9 +266,8 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 
 | **Base** | Facility base stat gain | 10-25 depending on facility level |
 | **StatBonus** | Support card stat bonuses | Sum of participating card bonuses |
 | **GrowthRate** | Character's innate growth rate | 0-20% per stat |
-| **MoodMultiplier** | Mood effect multiplier | Very Good: +20%, Good: +10%, Normal: 0%, Bad: -10%, Very Bad: -20% |
-| **MoodEffect** | Additional mood modifiers | From conditions/events |
-| **TrainingEffect** | Scenario-specific bonuses | Varies by scenario |
+| **MoodModifier** | Flat mood multiplier (game-accurate) | Great: +4%, Good: +2%, Normal: 0%, Bad: −2%, Awful: −4% |
+| **TrainingEffect** | Scenario-specific bonuses | URA Finals: approx. ×1.11 at peak; Unity Cup: varies by team score |
 | **NumSupportCards** | Cards present at facility | 0-6 cards (+5% per card) |
 | **FriendshipMultiplier** | Friendship training bonus | 1.0 (no bonus) to 1.35 (max) |
 
@@ -248,19 +276,19 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 
 ```mermaid
 flowchart TD
     Start([Calculate Gain]) --> CheckCurrent{Current Stat > 1200?}
-    
+
     CheckCurrent -->|No| ApplyNormal[Apply Normal Gain]
     CheckCurrent -->|Yes| ApplyDiminished[Apply Diminished Gain]
-    
+
     ApplyNormal --> CheckGain{Gain > 100?}
     CheckGain -->|Yes| CapAt100[Cap at +100]
     CheckGain -->|No| UseGain[Use Calculated Gain]
-    
+
     ApplyDiminished --> HalfGain[Gain = Gain / 2]
     HalfGain --> CheckHalfGain{Halved Gain > 50?}
     CheckHalfGain -->|Yes| CapAt50[Cap at +50]
     CheckHalfGain -->|No| UseHalfGain[Use Halved Gain]
-    
+
     CapAt100 --> FinalStat[Add to Current Stat]
     UseGain --> FinalStat
     CapAt50 --> FinalStat
@@ -279,6 +307,8 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-10 | Development Team | Corrected MoodModifier values to game-accurate ±4%/±2% range and renamed from MoodMultiplier; simplified formula by removing redundant MoodEffect term; clarified TrainingEffect with scenario examples. |
+| 2.2.1 | 2026-03-08 | Development Team | Added StorageMode-aware context loading and training execution branches so Local UUID runs and Account-mode DB writes are modeled separately. |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Added complete training formula, stat cap rules (1200 base, +100/+50 per-training caps, half value above 1200), hint levels max at 5, added hint discount table, added Summer Training Camp flow (4 turns, all facilities Level 5) |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to include caching, Neuron AI agents, and Service layer architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
@@ -287,6 +317,6 @@ flowchart TD
 
 ## Related Documents
 
-- [PRD-002: Training Optimization](../prds/PRD-002_Training_Optimization.md)
-- [SPEC-002: Training Optimization Technical](../specs/SPEC-002_Training_Optimization_Technical.md)
-- [010_SCD: Source Code Documentation](../010_SCD_Source_Code_Documentation.md)
+- [PRD-002: Training Optimization](../02-prds/PRD-002_Training_Optimization.md)
+- [SPEC-002: Training Optimization Technical](../02-specs/SPEC-002_Training_Optimization_Technical.md)
+- [010_SCD: Source Code Documentation](../00-core-docs/010_SCD_Source_Code_Documentation.md)

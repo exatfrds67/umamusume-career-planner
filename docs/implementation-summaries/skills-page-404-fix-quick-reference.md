@@ -9,7 +9,7 @@ Fixed 404 error: `POST /api/characters/{characterId}/skill-recommendations`
 ### Route Added (routes/api.php)
 
 ```php
-Route::post('/characters/{characterId}/skill-recommendations', 
+Route::post('/characters/{characterId}/skill-recommendations',
     [SkillRecommendationController::class, 'getRecommendations'])
     ->middleware('auth:sanctum')
     ->name('api.characters.skill-recommendations');

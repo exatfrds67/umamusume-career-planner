@@ -254,7 +254,7 @@ document.querySelector('img').loading
 **Fix**: Add explicit dimensions
 
 ```blade
-<img src="{{ $url }}" 
+<img src="{{ $url }}"
     width="400" height="600"
     loading="lazy"
     alt="Card">
@@ -279,16 +279,15 @@ document.querySelector('img').loading
 
 ## Success Criteria
 
-✅ **Initial page load is faster**  
-✅ **Only visible images load first**  
-✅ **Images load smoothly when scrolling**  
-✅ **No layout shifts or jumps**  
-✅ **Works on mobile and slow connections**  
-✅ **Performance score improved in Lighthouse**  
+✅ **Initial page load is faster**
+✅ **Only visible images load first**
+✅ **Images load smoothly when scrolling**
+✅ **No layout shifts or jumps**
+✅ **Works on mobile and slow connections**
+✅ **Performance score improved in Lighthouse**
 
 ---
 
 **Happy Testing!** 🚀
 
 Your images are now loading efficiently with native browser lazy loading.
-

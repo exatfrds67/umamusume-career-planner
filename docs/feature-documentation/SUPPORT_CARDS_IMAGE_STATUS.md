@@ -1,9 +1,9 @@
 # Support Card Image Status
 
-**Last Updated**: February 27, 2026  
-**Status**: ✅ **522/522 CARDS HAVE ARTWORK URLs (100%)**  
-**Total Cards**: 522  
-**Cards with Images**: 522 (100%)  
+**Last Updated**: February 27, 2026
+**Status**: ✅ **522/522 CARDS HAVE ARTWORK URLs (100%)**
+**Total Cards**: 522
+**Cards with Images**: 522 (100%)
 **Cards with Placeholders**: 0 (0%)
 
 ---
@@ -127,13 +127,15 @@ public/images/support_cards/
 #### Option A: Using Tinker
 
 ```bash
-php artisan tinker --execute="DB::table('ucp_support_cards')->where('internal_id', 'GLOBAL_SC_BIKOPEGASUS_CARROT')->update(['artwork_url' => '/images/support_cards/Biko_Pegasus_Double_Carrot_Punch.png']);"
+php artisan tinker --execute="DB::table('ucp_support_cards')->where('internal_id',
+'GLOBAL_SC_BIKOPEGASUS_CARROT')->update(['artwork_url' =>
+'/images/support_cards/Biko_Pegasus_Double_Carrot_Punch.png']);"
 ```text
 
 #### Option B: Using SQL
 
 ```sql
-UPDATE ucp_support_cards 
+UPDATE ucp_support_cards
 SET artwork_url = '/images/support_cards/Biko_Pegasus_Double_Carrot_Punch.png'
 WHERE internal_id = 'GLOBAL_SC_BIKOPEGASUS_CARROT';
 ```

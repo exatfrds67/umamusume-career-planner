@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.0
-**Date**: February 22, 2026
+**Document Version**: 2.4.1
+**Date**: March 10, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 and Global English server gameplay scope
 
 ---
 
@@ -29,11 +29,17 @@
 
 ### 1.1 Purpose
 
-This document defines the business objectives and current scope for the Umamusume Pretty Derby Career Planner application. It establishes the business context, stakeholder needs, and high-level requirements that guide the technical implementation.
+This document defines the business objectives and current scope for the Umamusume Pretty Derby
+Career Planner application. It establishes the business context, stakeholder needs, and high-level
+requirements that guide the technical implementation.
 
 ### 1.2 Scope
 
-The Umamusume Career Planner is a comprehensive web application built with **Laravel 12** (released February 24, 2025), **Livewire 4**, **Alpine.js 3**, **Tailwind CSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude 4.5** models and **Ollama** for AI capabilities via **Neuron AI v2.11**. The system enables players of Uma Musume: Pretty Derby to track, manage, and optimize their career progression through intelligent recommendations and analytics.
+The Umamusume Career Planner is a comprehensive web application built with **Laravel 12** (released
+February 24, 2025), **Livewire 4**, **Alpine.js 3**, **Tailwind CSS v4** (released January 22,
+2025), and integrates with **AWS Bedrock Claude 4.5** models and **Ollama** for AI capabilities via
+**Neuron AI v2.11**. The system enables players of Uma Musume: Pretty Derby to track, manage, and
+optimize their career progression through intelligent recommendations and analytics.
 
 ### 1.3 Definitions and Acronyms
 
@@ -44,6 +50,8 @@ The Umamusume Career Planner is a comprehensive web application built with **Lar
 - **Term**: URA Finale; **Definition**: The final race series at the end of Senior Year
 - **Term**: OCR; **Definition**: Optical Character Recognition for screenshot data extraction
 - **Term**: MCP; **Definition**: Model Context Protocol for AI integration
+
+> **Scope Note:** Core business-facing documentation tracks scenarios available on the **Global English server**. New scenario names should only be added here after they are released globally.
 
 ---
 
@@ -65,8 +73,9 @@ Players of Uma Musume: Pretty Derby currently lack a comprehensive, unified tool
 By providing a modern, AI-enhanced planning platform, we can:
 
 - Deliver superior user experience with modern web technologies (Laravel 12, Livewire 4, Tailwind CSS v4)
-- Enable offline-first usage for players without reliable connectivity
-- Support cross-device access for authenticated users
+- Enable strong browser-local usage for players without reliable connectivity, while keeping
+authenticated account-backed persistence and cross-device access as a separate storage mode
+- Support cross-device access for authenticated account-mode users
 - Improve accessibility for users with disabilities (WCAG AA compliance)
 - Provide AI-powered training optimization and race strategy recommendations
 - Integrate external game data sources for accurate planning
@@ -115,7 +124,7 @@ mindmap
 
 #### 3.1.1 Players (End Users)
 
-### Needs
+##### Needs
 
 - Quick and easy plan creation with AI recommendations
 - Offline access to data via PWA
@@ -124,7 +133,7 @@ mindmap
 - Accessible interface (WCAG AA compliant)
 - Intelligent training and race strategy guidance
 
-### Pain Points
+##### Pain Points
 
 - Current tools are fragmented
 - No AI-powered optimization
@@ -133,7 +142,7 @@ mindmap
 
 #### 3.1.2 Developers/Maintainers
 
-### Needs - Developers
+##### Needs
 
 - Single codebase to maintain
 - Modern, well-documented architecture
@@ -166,25 +175,31 @@ quadrantChart
 
 **Business Need:** Players need to manage their Uma Musume character roster with complete information.
 
-- **ID**: BR-1.1; **Requirement**: Create, view, update, and delete character records; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-1.1; **Requirement**: Create, view, update, and delete character records; **Priority**:
+P0; **Status**: Implemented
 - **ID**: BR-1.2; **Requirement**: Store character images with visual preview; **Priority**: P1; **Status**: Implemented
-- **ID**: BR-1.3; **Requirement**: Track aptitude grades for terrain, distance, and style; **Priority**: P0; **Status**: Implemented
-- **ID**: BR-1.4; **Requirement**: Track growth rate bonuses for all five stats; **Priority**: P0; **Status**: Implemented
-- **ID**: BR-1.5; **Requirement**: Factor inheritance system with stat/aptitude bonuses; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-1.3; **Requirement**: Track aptitude grades for terrain, distance, and style;
+**Priority**: P0; **Status**: Implemented
+- **ID**: BR-1.4; **Requirement**: Track growth rate bonuses for all five stats; **Priority**: P0;
+**Status**: Implemented
+- **ID**: BR-1.5; **Requirement**: Factor inheritance system with stat/aptitude bonuses;
+**Priority**: P0; **Status**: Implemented
 - **ID**: BR-1.6; **Requirement**: Goal management and progress tracking; **Priority**: P1; **Status**: Implemented
 
 ### Related Artifacts
 
-- PRD: [PRD-001](prds/PRD-001_Character_Management.md)
-- SPEC: [SPEC-001](specs/SPEC-001_Character_Management_Technical.md)
-- Flow: [FLOW-001](flows/FLOW-001_Character_Management_System.md)
-- Wireframes: [WF-002](wireframes/WF-002_Character_Creation_Wizard.md), [WF-003](wireframes/WF-003_Character_Detail_Management.md)
+- PRD: [PRD-001](../02-prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md)
+- Wireframes: [WF-002](../01-wireframes/WF-002_Character_Creation_Wizard.md),
+[WF-003](../01-wireframes/WF-003_Character_Detail_Management.md)
 
 ### 4.2 Training Optimization [BR-2]
 
 **Business Need:** Players need intelligent training recommendations and predictions.
 
-- **ID**: BR-2.1; **Requirement**: Training prediction engine with stat gain calculations; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-2.1; **Requirement**: Training prediction engine with stat gain calculations;
+**Priority**: P0; **Status**: Implemented
 - **ID**: BR-2.2; **Requirement**: Support card bonus integration; **Priority**: P0; **Status**: Implemented
 - **ID**: BR-2.3; **Requirement**: Skill hint tracking and SP cost reduction; **Priority**: P0; **Status**: Implemented
 - **ID**: BR-2.4; **Requirement**: AI-powered training recommendations; **Priority**: P0; **Status**: Implemented
@@ -192,16 +207,18 @@ quadrantChart
 
 ### Related Artifacts - Training Optimization
 
-- PRD: [PRD-002](prds/PRD-002_Training_Optimization.md)
-- SPEC: [SPEC-002](specs/SPEC-002_Training_Optimization_Technical.md)
-- Flow: [FLOW-002](flows/FLOW-002_Training_Optimization_System.md)
-- Wireframes: [WF-004](wireframes/WF-004_Training_Selection_Interface.md), [WF-005](wireframes/WF-005_Training_Result_Screen.md)
+- PRD: [PRD-002](../02-prds/PRD-002_Training_Optimization.md)
+- SPEC: [SPEC-002](../02-specs/SPEC-002_Training_Optimization_Technical.md)
+- Flow: [FLOW-002](../01-flows/FLOW-002_Training_Optimization_System.md)
+- Wireframes: [WF-004](../01-wireframes/WF-004_Training_Selection_Interface.md),
+[WF-005](../01-wireframes/WF-005_Training_Result_Screen.md)
 
 ### 4.3 Race Strategy [BR-3]
 
 **Business Need:** Players need race preparation guidance and strategy optimization.
 
-- **ID**: BR-3.1; **Requirement**: Race calendar with requirements and readiness scoring; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-3.1; **Requirement**: Race calendar with requirements and readiness scoring;
+**Priority**: P0; **Status**: Implemented
 - **ID**: BR-3.2; **Requirement**: Running style optimization (4 styles); **Priority**: P0; **Status**: Implemented
 - **ID**: BR-3.3; **Requirement**: Win probability calculation; **Priority**: P1; **Status**: Implemented
 - **ID**: BR-3.4; **Requirement**: AI-powered race strategy recommendations; **Priority**: P0; **Status**: Implemented
@@ -209,77 +226,89 @@ quadrantChart
 
 ### Related Artifacts - Race Strategy
 
-- PRD: [PRD-003](prds/PRD-003_Race_Strategy.md)
-- SPEC: [SPEC-003](specs/SPEC-003_Race_Strategy_Technical.md)
-- Flow: [FLOW-003](flows/FLOW-003_Race_Strategy_System.md)
-- Wireframes: [WF-006](wireframes/WF-006_Race_Calendar_View.md), [WF-007](wireframes/WF-007_Race_Preparation_Screen.md)
+- PRD: [PRD-003](../02-prds/PRD-003_Race_Strategy.md)
+- SPEC: [SPEC-003](../02-specs/SPEC-003_Race_Strategy_Technical.md)
+- Flow: [FLOW-003](../01-flows/FLOW-003_Race_Strategy_System.md)
+- Wireframes: [WF-006](../01-wireframes/WF-006_Race_Calendar_View.md),
+[WF-007](../01-wireframes/WF-007_Race_Preparation_Screen.md)
 
 ### 4.4 Skill Management [BR-4]
 
 **Business Need:** Players need to plan and track skill acquisitions efficiently.
 
-- **ID**: BR-4.1; **Requirement**: Skill catalog with search (English and Japanese); **Priority**: P0; **Status**: Implemented
-- **ID**: BR-4.2; **Requirement**: Hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-4.1; **Requirement**: Skill catalog with search (English and Japanese); **Priority**:
+P0; **Status**: Implemented
+- **ID**: BR-4.2; **Requirement**: Hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max);
+**Priority**: P0; **Status**: Implemented
 - **ID**: BR-4.3; **Requirement**: Skill evolution system (Normal → Rare); **Priority**: P0; **Status**: Implemented
 - **ID**: BR-4.4; **Requirement**: SP budget optimization; **Priority**: P1; **Status**: Implemented
 - **ID**: BR-4.5; **Requirement**: AI skill build recommendations; **Priority**: P1; **Status**: Implemented
 
 ### Related Artifacts - Skill Management
 
-- PRD: [PRD-004](prds/PRD-004_Skill_Management.md)
-- SPEC: [SPEC-004](specs/SPEC-004_Skill_Management_Technical.md)
-- Flow: [FLOW-004](flows/FLOW-004_Skill_Management_System.md)
-- Wireframes: [WF-008](wireframes/WF-008_Skill_Shop_Interface.md), [WF-009](wireframes/WF-009_Skill_Loadout_Manager.md)
+- PRD: [PRD-004](../02-prds/PRD-004_Skill_Management.md)
+- SPEC: [SPEC-004](../02-specs/SPEC-004_Skill_Management_Technical.md)
+- Flow: [FLOW-004](../01-flows/FLOW-004_Skill_Management_System.md)
+- Wireframes: [WF-008](../01-wireframes/WF-008_Skill_Shop_Interface.md),
+[WF-009](../01-wireframes/WF-009_Skill_Loadout_Manager.md)
 
 ### 4.5 Support Card Management [BR-5]
 
 **Business Need:** Players need to optimize support card decks for training.
 
-- **ID**: BR-5.1; **Requirement**: Support card database (200+ cards with meta tiers); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-5.1; **Requirement**: Support card database (200+ cards with meta tiers); **Priority**:
+P0; **Status**: Implemented
 - **ID**: BR-5.2; **Requirement**: Deck composition validator (6-card deck); **Priority**: P0; **Status**: Implemented
 - **ID**: BR-5.3; **Requirement**: Bond level and limit break tracking; **Priority**: P0; **Status**: Implemented
 - **ID**: BR-5.4; **Requirement**: Deck synergy scoring and recommendations; **Priority**: P1; **Status**: Implemented
-- **ID**: BR-5.5; **Requirement**: Meta tier synchronization from external sources; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-5.5; **Requirement**: Meta tier synchronization from external sources; **Priority**:
+P1; **Status**: Implemented
 
 ### Related Artifacts - Support Card Management
 
-- PRD: [PRD-005](prds/PRD-005_Support_Card_Management.md)
-- SPEC: [SPEC-005](specs/SPEC-005_Support_Card_Management_Technical.md)
-- Flow: [FLOW-005](flows/FLOW-005_Support_Card_Management_System.md)
-- Wireframes: [WF-010](wireframes/WF-010_Support_Card_Collection.md), [WF-011](wireframes/WF-011_Support_Deck_Builder.md)
+- PRD: [PRD-005](../02-prds/PRD-005_Support_Card_Management.md)
+- SPEC: [SPEC-005](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](../01-flows/FLOW-005_Support_Card_Management_System.md)
+- Wireframes: [WF-010](../01-wireframes/WF-010_Support_Card_Collection.md),
+[WF-011](../01-wireframes/WF-011_Support_Deck_Builder.md)
 
 ### 4.6 AI Advisory System [BR-6]
 
 **Business Need:** Players need intelligent recommendations across all planning aspects.
 
-- **ID**: BR-6.1; **Requirement**: Hybrid AI architecture (Ollama local + AWS Bedrock fallback); **Priority**: P0; **Status**: Implemented
-- **ID**: BR-6.2; **Requirement**: Training, race, and skill advisory capabilities; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-6.1; **Requirement**: Hybrid AI architecture (Ollama local + AWS Bedrock fallback);
+**Priority**: P0; **Status**: Implemented
+- **ID**: BR-6.2; **Requirement**: Training, race, and skill advisory capabilities; **Priority**:
+P0; **Status**: Implemented
 - **ID**: BR-6.3; **Requirement**: Conversation history management; **Priority**: P1; **Status**: Implemented
-- **ID**: BR-6.4; **Requirement**: Cost tracking and budget management for cloud AI; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-6.4; **Requirement**: Cost tracking and budget management for cloud AI; **Priority**:
+P1; **Status**: Implemented
 - **ID**: BR-6.5; **Requirement**: Confidence scoring for recommendations; **Priority**: P1; **Status**: Implemented
 
 ### Related Artifacts - AI Advisory
 
-- PRD: [PRD-006](prds/PRD-006_AI_Advisory.md)
-- SPEC: [SPEC-006](specs/SPEC-006_AI_Advisory_Technical.md)
-- Flow: [FLOW-006](flows/FLOW-006_AI_Advisory_System.md)
-- Wireframes: [WF-012](wireframes/WF-012_AI_Advisor_Interface.md)
+- PRD: [PRD-006](../02-prds/PRD-006_AI_Advisory.md)
+- SPEC: [SPEC-006](../02-specs/SPEC-006_AI_Advisory_Technical.md)
+- Flow: [FLOW-006](../01-flows/FLOW-006_AI_Advisory_System.md)
+- Wireframes: [WF-012](../01-wireframes/WF-012_AI_Advisor_Interface.md)
 
 ### 4.7 External Integration [BR-7]
 
 **Business Need:** Players need accurate, up-to-date game data from external sources.
 
-- **ID**: BR-7.1; **Requirement**: External API integration (umapyoi.net, UmamusumeDB); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-7.1; **Requirement**: External API integration (umapyoi.net, UmamusumeDB);
+**Priority**: P0; **Status**: Implemented
 - **ID**: BR-7.2; **Requirement**: Circuit breaker pattern for resilience; **Priority**: P0; **Status**: Implemented
 - **ID**: BR-7.3; **Requirement**: OCR screenshot processing; **Priority**: P1; **Status**: Implemented
-- **ID**: BR-7.4; **Requirement**: WebSocket real-time updates (Laravel Reverb); **Priority**: P1; **Status**: Implemented
+- **ID**: BR-7.4; **Requirement**: Background status updates for sync and advisory workflows;
+**Priority**: P1; **Status**: Implemented
 - **ID**: BR-7.5; **Requirement**: Community data sharing; **Priority**: P2; **Status**: Implemented
 
 ### Related Artifacts - External Integration
 
-- PRD: [PRD-007](prds/PRD-007_External_Integration.md)
-- SPEC: [SPEC-007](specs/SPEC-007_External_Integration_Technical.md)
-- Flow: [FLOW-007](flows/FLOW-007_External_Integration_System.md)
+- PRD: [PRD-007](../02-prds/PRD-007_External_Integration.md)
+- SPEC: [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md)
+- Flow: [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md)
 
 ### 4.8 Data Management [BR-8]
 
@@ -316,7 +345,8 @@ quadrantChart
 **Business Need:** Application must be accessible and provide excellent UX.
 
 - **ID**: BR-11.1; **Requirement**: PWA offline route coverage; **Priority**: P1; **Status**: In Progress
-- **ID**: BR-11.2; **Requirement**: Accessibility pages and keyboard shortcuts; **Priority**: P1; **Status**: In Progress
+- **ID**: BR-11.2; **Requirement**: Accessibility pages and keyboard shortcuts; **Priority**: P1;
+**Status**: In Progress
 - **ID**: BR-11.3; **Requirement**: Dark/Light mode toggle with persistence; **Priority**: P0; **Status**: Implemented
 - **ID**: BR-11.4; **Requirement**: Responsive design (320px to 2560px); **Priority**: P0; **Status**: Implemented
 - **ID**: BR-11.5; **Requirement**: WCAG AA accessibility compliance; **Priority**: P0; **Status**: Implemented
@@ -356,7 +386,8 @@ pie title Requirements by Priority
 ### 5.1 Data Validation Rules
 
 - **Rule ID**: BV-1; **Rule Description**: Plan title is required and cannot be empty
-- **Rule ID**: BV-2; **Rule Description**: Stat values have soft cap at 1200 (50% effectiveness above), practical max ~1600
+- **Rule ID**: BV-2; **Rule Description**: Stat values have soft cap at 1200 (50% effectiveness
+above), practical max ~1600
 - **Rule ID**: BV-3; **Rule Description**: Turn numbers must be between 1 and 78
 - **Rule ID**: BV-4; **Rule Description**: Skill status "Acquired" requires turn_acquired value
 - **Rule ID**: BV-5; **Rule Description**: Energy level must be between 0 and 100
@@ -368,8 +399,10 @@ pie title Requirements by Priority
 - **Rule ID**: BC-1; **Rule Description**: Stat soft cap at 1200 (values above count for 50%, practical max ~1600)
 - **Rule ID**: BC-2; **Rule Description**: Acquired SP = sum of sp_cost where status = acquired
 - **Rule ID**: BC-3; **Rule Description**: Mood modifiers: Great +4%, Good +2%, Normal 0%, Bad -2%, Awful -4%
-- **Rule ID**: BC-4; **Rule Description**: Aptitude effectiveness: S=+5% (max), A=0% (baseline), B=-10%, C=-20%, D=-30%/-40%, E=-50%/-60%, F=-70%/-80%, G=-90%
-- **Rule ID**: BC-5; **Rule Description**: Skill hint discount: Level 1=10%, Level 2=20%, Level 3=30%, Level 4=35%, Level 5=40% (max)
+- **Rule ID**: BC-4; **Rule Description**: Aptitude effectiveness: S=+5% (max), A=0% (baseline),
+B=-10%, C=-20%, D=-30%/-40%, E=-50%/-60%, F=-70%/-80%, G=-90%
+- **Rule ID**: BC-5; **Rule Description**: Skill hint discount: Level 1=10%, Level 2=20%, Level
+3=30%, Level 4=35%, Level 5=40% (max)
 - **Rule ID**: BC-6; **Rule Description**: Factor inheritance: ★☆☆=+5, ★★☆=+12, ★★★=+21 bonus
 
 ### 5.3 Storage Rules
@@ -455,7 +488,7 @@ flowchart TD
     TryFallback --> FallbackSuccess{Success?}
     FallbackSuccess -->|Yes| UpdateCache
     FallbackSuccess -->|No| UseCached
-    UpdateCache --> NotifyUpdate[Notify Subscribers via WebSocket]
+    UpdateCache --> NotifyUpdate[Persist status for polling refresh]
     UseCached --> Complete([Sync Complete])
     NotifyUpdate --> Complete
 ```
@@ -586,10 +619,18 @@ flowchart BT
 
 ### 10.2 Revision History
 
-- **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Added MCP Integration (BR-12) and Admin Panel (BR-13) business requirements; updated priority matrix counts
-- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated tech stack references (Livewire 4, Neuron AI v2.11); replaced TypeScript with Livewire 4 + Alpine.js 3; aligned with v2.3.0 architecture
+- **Version**: 2.4.1; **Date**: 2026-03-10; **Author**: Development Team; **Changes**: Clarified
+Global English server scenario-documentation scope; added future-scenario note for business-facing
+docs
+- **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Added MCP
+Integration (BR-12) and Admin Panel (BR-13) business requirements; updated priority matrix counts
+- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated tech
+stack references (Livewire 4, Neuron AI v2.11); replaced TypeScript with Livewire 4 + Alpine.js 3;
+aligned with v2.3.0 architecture
 - **Version**: 2.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Aligned with codebase v2.2.0
-- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated scope and requirements to match implementation; added AI integration requirements; added external API integration; aligned with v2.0 architecture
+- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated scope
+and requirements to match implementation; added AI integration requirements; added external API
+integration; aligned with v2.0 architecture
 - **Version**: 1.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Initial draft
 
 ---

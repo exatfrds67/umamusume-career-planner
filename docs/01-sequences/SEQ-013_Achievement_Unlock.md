@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001]
 
 ---
@@ -26,7 +26,9 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the achievement unlock workflow in the Umamusume Career Planner application, covering trigger evaluation, atomic unlock operations, reward granting, and user notification. Updated with verified game mechanics from the Global English Server (January 2026).
+This sequence diagram documents the achievement unlock workflow in the Umamusume Career Planner
+application, covering trigger evaluation, atomic unlock operations, reward granting, and user
+notification. Updated with verified game mechanics from the Global English Server (January 2026).
 
 ### 1.2 Scope
 
@@ -41,9 +43,9 @@ This sequence diagram documents the achievement unlock workflow in the Umamusume
 
 **Related Artifacts:**
 
-- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
-- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
-- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
+- PRD: [PRD-001](../02-prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md)
 
 ### 1.3 Business Context
 
@@ -120,6 +122,9 @@ Based on verified game mechanics from Global English Server (January 2026):
 | **Total Stats Diamond** | 6000+ | Combined stats milestone |
 
 **Note**: Stats above 1200 count for half value in race calculations (diminishing returns).
+
+> **Terminology**: “Exceptional Stat” is a planner-internal category for tracking stats in the deep
+> diminishing-returns zone. It is not an official in-game label or achievement name.
 
 ### 3.2 Race Achievements
 
@@ -202,7 +207,7 @@ sequenceDiagram
     Event->>Engine: Dispatch event
     Engine->>Engine: Identify affected users
     Engine->>Cache: Check cached achievement state
-    
+
     alt Cache Hit
         Cache-->>Engine: Cached achievement data
     else Cache Miss
@@ -210,38 +215,38 @@ sequenceDiagram
         DB-->>Engine: Achievement data
         Engine->>Cache: Store achievement state
     end
-    
+
     Engine->>Engine: Evaluate triggers against event
-    
+
     alt No Achievements Unlocked
         Engine-->>Event: No unlocks
     else Achievements Unlocked
         Engine->>DB: BEGIN TRANSACTION
-        
+
         loop For each unlocked achievement
             Engine->>Repo: Create unlock record
             Repo->>DB: INSERT achievement_unlocks
             DB-->>Repo: Unlock ID
-            
+
             Engine->>RewardSvc: Calculate rewards
             RewardSvc->>RewardSvc: Determine reward type and amount
             RewardSvc->>DB: Grant rewards (SP, items, currency)
             DB-->>RewardSvc: Reward granted
-            
+
             Engine->>Audit: Log achievement unlock
             Audit->>DB: INSERT audit_log
         end
-        
+
         Engine->>DB: COMMIT TRANSACTION
-        
+
         Engine->>NotifSvc: Queue notifications
         NotifSvc->>NotifSvc: Build notification payload
         NotifSvc-->>User: Display in-app notification
         NotifSvc-->>User: Optional email notification
-        
+
         Engine->>Cache: Invalidate achievement cache
         Cache-->>Engine: Cache cleared
-        
+
         Engine-->>Event: Unlock complete
     end
 ```text
@@ -256,25 +261,25 @@ sequenceDiagram
 
     Note over Training,DB: STAT MILESTONE CHECK
     Training->>Engine: StatUpdated event (stat, value, career_id)
-    
+
     Engine->>Engine: Check stat thresholds
-    
+
     alt Stat >= 901 (A-Grade)
         Engine->>Engine: Queue "A-Grade Stat" achievement
     end
-    
+
     alt Stat >= 1200 (Soft Cap)
         Engine->>Engine: Queue "Soft Cap Reached" achievement
         Note over Engine: Diminishing returns zone begins
     end
-    
+
     alt Stat >= 1600 (Exceptional)
         Engine->>Engine: Queue "Exceptional Stat" achievement
     end
-    
+
     Engine->>Engine: Calculate total stats
     Engine->>Engine: Check total stat milestones (3000/4000/5000/5500/6000)
-    
+
     Engine->>DB: Process queued achievements
 ```
 
@@ -288,39 +293,39 @@ sequenceDiagram
 
     Note over Race,DB: FAN COUNT UPDATE
     Race->>Engine: RaceCompleted event (fans_gained, total_fans)
-    
+
     Engine->>Engine: Check class rank thresholds
-    
+
     alt Total Fans >= 5,000
         Engine->>Engine: Queue "Bronze Class" if not unlocked
     end
-    
+
     alt Total Fans >= 20,000
         Engine->>Engine: Queue "Silver Class" if not unlocked
     end
-    
+
     alt Total Fans >= 50,000
         Engine->>Engine: Queue "Gold Class" if not unlocked
     end
-    
+
     alt Total Fans >= 100,000
         Engine->>Engine: Queue "Platinum Class" if not unlocked
         Note over Engine: KEEP! Benchmark reached
     end
-    
+
     alt Total Fans >= 160,000
         Engine->>Engine: Queue "Star Class" if not unlocked
     end
-    
+
     alt Total Fans >= 240,000
         Engine->>Engine: Queue "Top Star Class" if not unlocked
     end
-    
+
     alt Total Fans >= 320,000
         Engine->>Engine: Queue "Legend Class" if not unlocked
         Note over Engine: Maximum rank achieved
     end
-    
+
     Engine->>DB: Process queued achievements
 ```text
 
@@ -361,7 +366,7 @@ class AchievementEngine
     private const STAT_THRESHOLD_A_GRADE = 901;
     private const STAT_THRESHOLD_SOFT_CAP = 1200;
     private const STAT_THRESHOLD_EXCEPTIONAL = 1600;
-    
+
     // Game-accurate fan count thresholds for class ranks
     private const CLASS_THRESHOLDS = [
         'bronze' => 5_000,
@@ -372,7 +377,7 @@ class AchievementEngine
         'top_star' => 240_000,
         'legend' => 320_000,
     ];
-    
+
     public function __construct(
         private AchievementRepository $repository,
         private RewardService $rewardService,
@@ -380,44 +385,44 @@ class AchievementEngine
         private AuditLogger $auditLogger,
         private CacheManager $cache,
     ) {}
-    
+
     public function evaluate(SystemEvent $event): void
     {
         $users = $this->identifyAffectedUsers($event);
-        
+
         foreach ($users as $user) {
             $this->evaluateForUser($user, $event);
         }
     }
-    
+
     private function evaluateForUser(User $user, SystemEvent $event): void
     {
         // 1. Load user's current achievement state
         $state = $this->loadAchievementState($user);
-        
+
         // 2. Identify potential unlocks
         $triggers = $this->getTriggersForEvent($event);
         $newUnlocks = [];
-        
+
         foreach ($triggers as $trigger) {
             if ($this->isMet($trigger, $event, $state)) {
                 $newUnlocks[] = $trigger->achievement_id;
             }
         }
-        
+
         // 3. Process unlocks atomically
         if (!empty($newUnlocks)) {
             $this->processUnlocks($user, $newUnlocks, $event);
         }
     }
-    
+
     private function isMet(AchievementTrigger $trigger, SystemEvent $event, array $state): bool
     {
         // Already unlocked?
         if (in_array($trigger->achievement_id, $state['unlocked_ids'])) {
             return false;
         }
-        
+
         // Evaluate trigger conditions
         return match ($trigger->type) {
             'stat_milestone' => $this->checkStatMilestone($trigger, $event),
@@ -432,7 +437,7 @@ class AchievementEngine
             default => false,
         };
     }
-    
+
     private function processUnlocks(User $user, array $achievementIds, SystemEvent $event): void
     {
         DB::transaction(function () use ($user, $achievementIds, $event) {
@@ -445,11 +450,11 @@ class AchievementEngine
                     'trigger_event' => get_class($event),
                     'event_data' => $event->toArray(),
                 ]);
-                
+
                 // 2. Grant rewards
                 $achievement = Achievement::find($achievementId);
                 $this->rewardService->grantRewards($user, $achievement->rewards);
-                
+
                 // 3. Audit log
                 $this->auditLogger->log('achievement_unlock', $user->id, [
                     'achievement_id' => $achievementId,
@@ -458,10 +463,10 @@ class AchievementEngine
                     'trigger' => get_class($event),
                 ]);
             }
-            
+
             // 4. Queue notifications
             $this->notificationService->notifyAchievementUnlocks($user, $achievementIds);
-            
+
             // 5. Invalidate cache
             $this->cache->forget("achievements.user.{$user->id}");
         });
@@ -479,15 +484,15 @@ private function checkStatMilestone(AchievementTrigger $trigger, SystemEvent $ev
     if (!$event instanceof StatMilestoneReached) {
         return false;
     }
-    
+
     $criteria = $trigger->criteria;
     $threshold = $criteria['threshold'];
-    
+
     // Game-accurate thresholds:
     // 901 = A-grade threshold
     // 1200 = Soft cap (diminishing returns begin)
     // 1600 = Exceptional (deep diminishing returns)
-    
+
     return $event->stat === $criteria['stat'] &&
            $event->value >= $threshold;
 }
@@ -501,15 +506,15 @@ private function checkClassRank(AchievementTrigger $trigger, SystemEvent $event)
     if (!$event instanceof RaceCompleted) {
         return false;
     }
-    
+
     $criteria = $trigger->criteria;
     $requiredFans = $criteria['fan_threshold'];
-    
+
     // Game-accurate class thresholds:
     // Bronze: 5,000 | Silver: 20,000 | Gold: 50,000
     // Platinum: 100,000 | Star: 160,000 | Top Star: 240,000
     // Legend: 320,000 (maximum)
-    
+
     return $event->totalFans >= $requiredFans;
 }
 ```
@@ -522,24 +527,24 @@ private function checkRaceWin(AchievementTrigger $trigger, SystemEvent $event): 
     if (!$event instanceof RaceWon) {
         return false;
     }
-    
+
     $criteria = $trigger->criteria;
-    
+
     // Check grade requirement (G1, G2, G3, OP, Pre-OP)
     if (isset($criteria['grade']) && $event->race->grade !== $criteria['grade']) {
         return false;
     }
-    
+
     // Check placement requirement
     if (isset($criteria['placement']) && $event->placement > $criteria['placement']) {
         return false;
     }
-    
+
     // Check for Triple Crown (specific race sequence)
     if (isset($criteria['triple_crown']) && $criteria['triple_crown']) {
         return $this->checkTripleCrownProgress($event);
     }
-    
+
     return true;
 }
 ```text
@@ -552,12 +557,12 @@ private function checkSkillCount(AchievementTrigger $trigger, SystemEvent $event
     if (!$event instanceof SkillAcquired) {
         return false;
     }
-    
+
     $criteria = $trigger->criteria;
     $skillCount = SkillAcquisition::where('career_id', $event->career->id)
         ->where('status', 'acquired')
         ->count();
-    
+
     return $skillCount >= $criteria['count'];
 }
 
@@ -566,9 +571,9 @@ private function checkSkillRarity(AchievementTrigger $trigger, SystemEvent $even
     if (!$event instanceof SkillAcquired) {
         return false;
     }
-    
+
     $criteria = $trigger->criteria;
-    
+
     // Check skill rarity: normal (white), rare (gold), unique
     return $event->skill->rarity === $criteria['rarity'];
 }
@@ -582,26 +587,26 @@ private function checkBondLevel(AchievementTrigger $trigger, SystemEvent $event)
     if (!$event instanceof BondLevelReached) {
         return false;
     }
-    
+
     $criteria = $trigger->criteria;
-    
+
     // Game-accurate bond thresholds:
     // 80% = Orange bond (unlocks Friendship Training)
     // 100% = Maximum bond (rainbow)
-    
+
     if (isset($criteria['single_card_threshold'])) {
         return $event->bondPercentage >= $criteria['single_card_threshold'];
     }
-    
+
     // Check all cards threshold
     if (isset($criteria['all_cards_threshold'])) {
         $allCardsAtThreshold = SupportCardBond::where('career_id', $event->career->id)
             ->where('bond_percentage', '>=', $criteria['all_cards_threshold'])
             ->count() >= 6;
-        
+
         return $allCardsAtThreshold;
     }
-    
+
     return false;
 }
 ```text
@@ -614,25 +619,25 @@ private function checkCareerComplete(AchievementTrigger $trigger, SystemEvent $e
     if (!$event instanceof CareerCompleted) {
         return false;
     }
-    
+
     $criteria = $trigger->criteria;
-    
+
     // Check year completion
     if (isset($criteria['year'])) {
         return $event->completedYear === $criteria['year'];
     }
-    
+
     // Check URA Finals
     if (isset($criteria['ura_finals']) && $criteria['ura_finals']) {
         return $event->reachedUraFinals;
     }
-    
+
     // Check final grade
     if (isset($criteria['min_grade'])) {
-        return $this->gradeToValue($event->finalGrade) >= 
+        return $this->gradeToValue($event->finalGrade) >=
                $this->gradeToValue($criteria['min_grade']);
     }
-    
+
     return false;
 }
 
@@ -673,31 +678,31 @@ class RewardService
             };
         }
     }
-    
+
     private function grantSkillPoints(User $user, int $amount): void
     {
         // Grant SP to user's active career
         $activeCareers = Career::where('user_id', $user->id)
             ->where('status', CareerStatus::InProgress)
             ->get();
-        
+
         foreach ($activeCareers as $career) {
             $career->increment('total_sp_available', $amount);
         }
     }
-    
+
     private function grantCurrency(User $user, int $amount): void
     {
         $user->increment('currency', $amount);
     }
-    
+
     private function grantItem(User $user, int $itemId, int $quantity): void
     {
         $inventory = $user->inventory()->firstOrCreate(['user_id' => $user->id]);
-        
+
         $items = $inventory->items ?? [];
         $items[$itemId] = ($items[$itemId] ?? 0) + $quantity;
-        
+
         $inventory->update(['items' => $items]);
     }
 }
@@ -714,7 +719,7 @@ class NotificationService
     public function notifyAchievementUnlocks(User $user, array $achievementIds): void
     {
         $achievements = Achievement::whereIn('id', $achievementIds)->get();
-        
+
         foreach ($achievements as $achievement) {
             // 1. In-app notification
             Notification::create([
@@ -729,10 +734,9 @@ class NotificationService
                     'rewards' => $achievement->rewards,
                 ],
             ]);
-            
-            // 2. WebSocket real-time notification
-            broadcast(new AchievementUnlocked($user, $achievement));
-            
+
+            // 2. Refreshable in-app notification state
+
             // 3. Optional email notification
             if ($user->preferences['email_achievements'] ?? false) {
                 Mail::to($user)->queue(new AchievementUnlockedEmail($achievement));
@@ -750,14 +754,14 @@ class NotificationService
 private function loadAchievementState(User $user): array
 {
     $cacheKey = "achievements.user.{$user->id}";
-    
+
     return $this->cache->remember($cacheKey, 3600, function () use ($user) {
         $unlocked = AchievementUnlock::where('user_id', $user->id)
             ->pluck('achievement_id')
             ->toArray();
-        
+
         $progress = $this->calculateProgress($user);
-        
+
         return [
             'unlocked_ids' => $unlocked,
             'progress' => $progress,
@@ -768,7 +772,7 @@ private function loadAchievementState(User $user): array
 private function calculateProgress(User $user): array
 {
     $careers = Career::where('user_id', $user->id)->get();
-    
+
     return [
         // Stat progress with game-accurate thresholds
         'max_single_stat' => $careers->max(fn($c) => max($c->speed, $c->stamina, $c->power, $c->guts, $c->wit)),
@@ -776,11 +780,11 @@ private function calculateProgress(User $user): array
         'stats_at_a_grade' => $this->countStatsAtThreshold($careers, 901),
         'stats_at_soft_cap' => $this->countStatsAtThreshold($careers, 1200),
         'stats_at_exceptional' => $this->countStatsAtThreshold($careers, 1600),
-        
+
         // Career progress
         'careers_completed' => $careers->where('status', CareerStatus::Completed)->count(),
         'ura_finals_reached' => $careers->where('reached_ura_finals', true)->count(),
-        
+
         // Race progress with fan count
         'total_fans' => $careers->sum('total_fans'),
         'current_class_rank' => $this->calculateClassRank($careers->sum('total_fans')),
@@ -788,7 +792,7 @@ private function calculateProgress(User $user): array
             ->where('grade', 'G1')
             ->where('placement', 1)
             ->count(),
-        
+
         // Skill progress
         'skills_acquired' => SkillAcquisition::whereIn('career_id', $careers->pluck('id'))
             ->where('status', 'acquired')
@@ -797,7 +801,7 @@ private function calculateProgress(User $user): array
             ->where('status', 'acquired')
             ->whereHas('skill', fn($q) => $q->where('rarity', 'rare'))
             ->count(),
-        
+
         // Bond progress
         'max_bond_cards' => SupportCardBond::whereIn('career_id', $careers->pluck('id'))
             ->where('bond_percentage', 100)
@@ -982,10 +986,10 @@ sequenceDiagram
     participant Engine as AchievementEngine
     participant DB as Database
     participant Audit as AuditLogger
-    
+
     Engine->>DB: BEGIN TRANSACTION
     Engine->>DB: Create unlock record
-    
+
     alt Database Error
         DB-->>Engine: Constraint violation
         Engine->>DB: ROLLBACK
@@ -1109,9 +1113,9 @@ Cache::forget('achievements.all');
 
 | Document | Description |
 | --- | --- |
-| [PRD-001](../prds/PRD-001_Character_Management.md) | Product requirements for character management |
-| [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
-| [FLOW-001](../flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
+| [PRD-001](../02-prds/PRD-001_Character_Management.md) | Product requirements for character management |
+| [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
+| [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
 | [Game Mechanics Research](../research/game-mechanics-research-report.md) | Verified game mechanics from Global English Server |
 
 ### 9.2 Related Sequences
@@ -1126,7 +1130,7 @@ Cache::forget('achievements.all');
 
 | Document | Description |
 | --- | --- |
-| [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
+| [DBD-009](../00-core-docs/009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
 
@@ -1136,6 +1140,7 @@ Cache::forget('achievements.all');
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-10 | Development Team | Added note that “Exceptional Stat” is a planner-internal term, not an official in-game category (section 3.1) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected stat thresholds (901/1200/1600), class pyramid with fan requirements (5K/20K/50K/100K/160K/240K/320K), career structure (Junior/Classic/Senior/URA), support card bond mechanics (80%/100%), skill rarity system |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, trigger evaluation, reward granting, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
@@ -1156,14 +1161,17 @@ Cache::forget('achievements.all');
 
 **Game Mechanics Reference:**
 
-The achievement criteria in this document are based on verified game mechanics from the Umamusume Pretty Derby Global English Server (January 2026). Key sources include:
+The achievement criteria in this document are based on verified game mechanics from the Umamusume
+Pretty Derby Global English Server (January 2026). Key sources include:
 
 - **Stat Thresholds**: 901 (A-grade), 1200 (soft cap), 1600 (exceptional)
-- **Class Pyramid**: Bronze (5K) → Silver (20K) → Gold (50K) → Platinum (100K) → Star (160K) → Top Star (240K) → Legend (320K)
+- **Class Pyramid**: Bronze (5K) → Silver (20K) → Gold (50K) → Platinum (100K) → Star (160K) → Top
+Star (240K) → Legend (320K)
 - **Career Structure**: Junior Year → Classic Year → Senior Year → URA Finals
 - **Bond System**: 80% (orange/Friendship Training unlock), 100% (rainbow/max)
 
-For detailed game mechanics documentation, see [Game Mechanics Research Report](../research/game-mechanics-research-report.md).
+For detailed game mechanics documentation, see [Game Mechanics Research Report](../research/game-
+mechanics-research-report.md).
 
 ---
 
@@ -1176,4 +1184,6 @@ For detailed game mechanics documentation, see [Game Mechanics Research Report](
 
 ---
 
-*This sequence diagram reflects the current implementation of the achievement unlock workflow as of v2.2.0. For the most up-to-date information, refer to the source code in `app/Services/AchievementEngine.php`, `app/Services/RewardService.php`, and related files.*
+*This sequence diagram reflects the current implementation of the achievement unlock workflow as of
+v2.2.0. For the most up-to-date information, refer to the source code in
+`app/Services/AchievementEngine.php`, `app/Services/RewardService.php`, and related files.*

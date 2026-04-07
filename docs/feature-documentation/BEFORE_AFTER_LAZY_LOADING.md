@@ -326,8 +326,8 @@ User Journey:
 
 ```blade
 <!-- No optimization -->
-<img src="{{ $card->artwork_url }}" 
-    alt="{{ $card->name }}" 
+<img src="{{ $card->artwork_url }}"
+    alt="{{ $card->name }}"
     class="w-full h-full object-cover">
 ```text
 
@@ -339,7 +339,7 @@ User Journey:
 
 ```blade
 <!-- Optimized with lazy loading -->
-<img src="{{ $card->artwork_url }}" 
+<img src="{{ $card->artwork_url }}"
     alt="{{ $card->name }}"
     loading="lazy"
     decoding="async"
@@ -416,27 +416,27 @@ User Journey:
 
 ### Key Improvements
 
-✅ **60-80% faster** initial page load  
-✅ **60% reduction** in initial bandwidth  
-✅ **Progressive loading** - smooth experience  
-✅ **Better mobile** - especially on slow connections  
-✅ **Data savings** - less bandwidth wasted  
-✅ **Higher scores** - better Core Web Vitals  
+✅ **60-80% faster** initial page load
+✅ **60% reduction** in initial bandwidth
+✅ **Progressive loading** - smooth experience
+✅ **Better mobile** - especially on slow connections
+✅ **Data savings** - less bandwidth wasted
+✅ **Higher scores** - better Core Web Vitals
 
 ### No Downsides
 
-✅ **No breaking changes**  
-✅ **No JavaScript required**  
-✅ **95% browser support**  
-✅ **Graceful fallback** for old browsers  
-✅ **Maintained accessibility**  
-✅ **Same visual result**  
+✅ **No breaking changes**
+✅ **No JavaScript required**
+✅ **95% browser support**
+✅ **Graceful fallback** for old browsers
+✅ **Maintained accessibility**
+✅ **Same visual result**
 
 ---
 
 ## The Bottom Line
 
-**Before**: Load everything, wait, then interact  
+**Before**: Load everything, wait, then interact
 **After**: Load what's needed, interact immediately, load more as you go
 
 **Result**: Faster, smoother, better user experience with zero downsides! 🎉

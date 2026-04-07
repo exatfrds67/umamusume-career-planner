@@ -1,9 +1,9 @@
 # SPEC-008: Performance Monitoring & APM System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active  
+**Document Version**: 2.2.0
+**Date**: 2026-01-28
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Active
 **Classification**: Internal - Development Team
 
 ---
@@ -22,13 +22,17 @@
 
 **Requirements & Design**:
 
-- [SRS Section 3.9: Performance Requirements](../00-core-docs/003_SRS_Software_Requirement_Specifications.md#39-performance-requirements)
-- [SDS Section 5.3: Performance & Monitoring Services](../00-core-docs/004_SDS_Software_Design_Specifications.md#53-performance--monitoring-services)
-- [SCD Section 5.3: Performance & Monitoring Services](../00-core-docs/010_SCD_Source_Code_Documentation.md#53-performance--monitoring-services)
+- [SRS Section 3.9: Performance Requirements](../00-core-
+docs/003_SRS_Software_Requirement_Specifications.md#39-performance-requirements)
+- [SDS Section 5.3: Performance & Monitoring Services](../00-core-
+docs/004_SDS_Software_Design_Specifications.md#53-performance--monitoring-services)
+- [SCD Section 5.3: Performance & Monitoring Services](../00-core-
+docs/010_SCD_Source_Code_Documentation.md#53-performance--monitoring-services)
 
 **Visual Documentation**:
 
-- [System Process Flow Diagrams §11: Performance Monitoring & APM Flow](../01-diagrams/system-process-flow-diagrams.md#11-performance-monitoring--apm-flow)
+- [System Process Flow Diagrams §11: Performance Monitoring & APM Flow](../01-diagrams/system-
+process-flow-diagrams.md#11-performance-monitoring--apm-flow)
 
 ---
 
@@ -55,7 +59,10 @@
 
 ### 1.1 Module Purpose
 
-The Performance Monitoring & APM (Application Performance Monitoring) System provides comprehensive observability across all application layers. This module enables proactive identification of performance bottlenecks, automatic optimization recommendations, and regression detection across deployments.
+The Performance Monitoring & APM (Application Performance Monitoring) System provides comprehensive
+observability across all application layers. This module enables proactive identification of
+performance bottlenecks, automatic optimization recommendations, and regression detection across
+deployments.
 
 **Core Responsibilities**:
 
@@ -105,29 +112,29 @@ flowchart TB
         CacheListener[Cache Listener]
         AIListener[AI Latency Listener]
     end
-    
+
     subgraph Processing[Processing Layer]
         ApmService[ApmService]
         ApiMonitor[ApiPerformanceMonitoringService]
         QueryOpt[QueryOptimizationService]
         CacheOpt[RedisCacheOptimizationService]
     end
-    
+
     subgraph Storage[Storage Layer]
         Redis[(Redis - Hot)]
         MySQL[(MySQL - Cold)]
     end
-    
+
     subgraph Output[Output Layer]
         Alerts[PerformanceAlertingService]
         Dashboard[Dashboard API]
         Reports[Optimization Reports]
     end
-    
+
     Collection --> Processing
     Processing --> Storage
     Processing --> Output
-    
+
     style Collection fill:#e3f2fd
     style Processing fill:#f3e5f5
     style Storage fill:#e8f5e9
@@ -145,18 +152,18 @@ sequenceDiagram
     participant C as RedisCacheOptimizationService
     participant S as Storage (Redis/MySQL)
     participant AL as AlertingService
-    
+
     R->>M: Request Start
     M->>A: startRequest(requestId)
-    
+
     Note over A,Q: During Request Processing
     A->>Q: trackQuery(sql, duration)
     A->>C: trackCacheOperation(key, hit/miss)
-    
+
     R->>M: Request End
     M->>A: endRequest(requestId, statusCode)
     A->>S: storeMetrics(metrics)
-    
+
     A->>AL: checkThresholds(metrics)
     alt Threshold Exceeded
         AL->>AL: generateAlert(alert)
@@ -182,7 +189,7 @@ use Illuminate\Support\Facades\DB;
 class ApmService
 {
     private array $activeRequests = [];
-    
+
     /**
      * Start tracking a new request.
      */
@@ -196,7 +203,7 @@ class ApmService
             'memory_start' => memory_get_usage(true),
         ];
     }
-    
+
     /**
      * End request tracking and store metrics.
      */
@@ -206,7 +213,7 @@ class ApmService
         if (!$request) {
             return [];
         }
-        
+
         $metrics = [
             'request_id' => $requestId,
             'endpoint' => $request['endpoint'],
@@ -219,13 +226,13 @@ class ApmService
             'memory_peak_mb' => memory_get_peak_usage(true) / 1024 / 1024,
             'timestamp' => now()->toISOString(),
         ];
-        
+
         $this->storeMetrics($metrics);
         unset($this->activeRequests[$requestId]);
-        
+
         return $metrics;
     }
-    
+
     /**
      * Track a database query.
      */
@@ -238,7 +245,7 @@ class ApmService
             ];
         }
     }
-    
+
     /**
      * Track a cache operation.
      */
@@ -252,43 +259,43 @@ class ApmService
             ];
         }
     }
-    
+
     /**
      * Store metrics in Redis for real-time access.
      */
     private function storeMetrics(array $metrics): void
     {
         $key = "apm:metrics:{$metrics['endpoint']}:" . now()->format('Y-m-d-H-i');
-        
+
         Redis::rpush($key, json_encode($metrics));
         Redis::expire($key, 3600); // 1 hour retention
     }
-    
+
     /**
      * Get real-time metrics for an endpoint.
-     * 
+     *
      * @return array<string, mixed>
      */
     public function getEndpointMetrics(string $endpoint, int $minutes = 60): array
     {
         $metrics = [];
-        
+
         for ($i = 0; $i < $minutes; $i++) {
             $timestamp = now()->subMinutes($i)->format('Y-m-d-H-i');
             $key = "apm:metrics:{$endpoint}:{$timestamp}";
-            
+
             $data = Redis::lrange($key, 0, -1);
             foreach ($data as $item) {
                 $metrics[] = json_decode($item, true);
             }
         }
-        
+
         return $this->aggregateMetrics($metrics);
     }
-    
+
     /**
      * Aggregate raw metrics into summary statistics.
-     * 
+     *
      * @param array<int, array<string, mixed>> $metrics
      * @return array<string, mixed>
      */
@@ -297,10 +304,10 @@ class ApmService
         if (empty($metrics)) {
             return ['count' => 0];
         }
-        
+
         $durations = array_column($metrics, 'duration_ms');
         sort($durations);
-        
+
         return [
             'count' => count($metrics),
             'avg_duration_ms' => array_sum($durations) / count($durations),
@@ -313,10 +320,10 @@ class ApmService
             'cache_hit_rate' => $this->calculateCacheHitRate($metrics),
         ];
     }
-    
+
     /**
      * Calculate percentile value from sorted array.
-     * 
+     *
      * @param array<int, float> $sorted
      */
     private function percentile(array $sorted, int $percentile): float
@@ -324,17 +331,17 @@ class ApmService
         $index = ($percentile / 100) * (count($sorted) - 1);
         $lower = floor($index);
         $upper = ceil($index);
-        
+
         if ($lower === $upper) {
             return $sorted[(int)$lower];
         }
-        
+
         return $sorted[(int)$lower] * ($upper - $index) + $sorted[(int)$upper] * ($index - $lower);
     }
-    
+
     /**
      * Calculate overall cache hit rate from metrics.
-     * 
+     *
      * @param array<int, array<string, mixed>> $metrics
      */
     private function calculateCacheHitRate(array $metrics): float
@@ -342,7 +349,7 @@ class ApmService
         $totalHits = array_sum(array_column($metrics, 'cache_hits'));
         $totalMisses = array_sum(array_column($metrics, 'cache_misses'));
         $total = $totalHits + $totalMisses;
-        
+
         return $total > 0 ? $totalHits / $total : 0.0;
     }
 }
@@ -364,27 +371,27 @@ class ApiPerformanceMonitoringService
 {
     /**
      * Get performance summary for all API endpoints.
-     * 
+     *
      * @return Collection<string, array<string, mixed>>
      */
     public function getEndpointSummary(int $hours = 24): Collection
     {
         $endpoints = $this->getTrackedEndpoints();
-        
+
         return collect($endpoints)->mapWithKeys(function (string $endpoint) use ($hours) {
             return [$endpoint => $this->getEndpointPerformance($endpoint, $hours)];
         });
     }
-    
+
     /**
      * Get detailed performance metrics for a specific endpoint.
-     * 
+     *
      * @return array<string, mixed>
      */
     public function getEndpointPerformance(string $endpoint, int $hours = 24): array
     {
         $metrics = $this->collectMetrics($endpoint, $hours);
-        
+
         return [
             'endpoint' => $endpoint,
             'period_hours' => $hours,
@@ -410,56 +417,56 @@ class ApiPerformanceMonitoringService
             ],
         ];
     }
-    
+
     /**
      * Identify slow endpoints that need optimization.
-     * 
+     *
      * @return array<int, array<string, mixed>>
      */
     public function identifySlowEndpoints(float $thresholdMs = 500, int $hours = 24): array
     {
         $summary = $this->getEndpointSummary($hours);
-        
+
         return $summary
             ->filter(fn($data) => ($data['latency']['p95_ms'] ?? 0) > $thresholdMs)
             ->sortByDesc(fn($data) => $data['latency']['p95_ms'] ?? 0)
             ->values()
             ->toArray();
     }
-    
+
     /**
      * Get list of tracked endpoints from Redis.
-     * 
+     *
      * @return array<int, string>
      */
     private function getTrackedEndpoints(): array
     {
         return Redis::smembers('apm:endpoints') ?: [];
     }
-    
+
     /**
      * Collect metrics for an endpoint over the specified time period.
-     * 
+     *
      * @return array<int, array<string, mixed>>
      */
     private function collectMetrics(string $endpoint, int $hours): array
     {
         $metrics = [];
         $minutes = $hours * 60;
-        
+
         for ($i = 0; $i < $minutes; $i++) {
             $timestamp = now()->subMinutes($i)->format('Y-m-d-H-i');
             $key = "apm:metrics:{$endpoint}:{$timestamp}";
-            
+
             $data = Redis::lrange($key, 0, -1);
             foreach ($data as $item) {
                 $metrics[] = json_decode($item, true);
             }
         }
-        
+
         return $metrics;
     }
-    
+
     /**
      * @param array<int, array<string, mixed>> $metrics
      */
@@ -468,11 +475,11 @@ class ApiPerformanceMonitoringService
         if (empty($metrics)) {
             return 0.0;
         }
-        
+
         $values = array_column($metrics, $field);
         return array_sum($values) / count($values);
     }
-    
+
     /**
      * @param array<int, array<string, mixed>> $metrics
      */
@@ -480,15 +487,15 @@ class ApiPerformanceMonitoringService
     {
         $values = array_column($metrics, $field);
         sort($values);
-        
+
         if (empty($values)) {
             return 0.0;
         }
-        
+
         $index = ($percentile / 100) * (count($values) - 1);
         return $values[(int)round($index)] ?? 0.0;
     }
-    
+
     /**
      * @param array<int, array<string, mixed>> $metrics
      */
@@ -497,11 +504,11 @@ class ApiPerformanceMonitoringService
         if (empty($metrics)) {
             return 0.0;
         }
-        
+
         $errors = count(array_filter($metrics, fn($m) => ($m['status_code'] ?? 200) >= 400));
         return $errors / count($metrics);
     }
-    
+
     /**
      * @param array<int, array<string, mixed>> $metrics
      * @return array<int, int>
@@ -515,7 +522,7 @@ class ApiPerformanceMonitoringService
         }
         return $grouped;
     }
-    
+
     /**
      * @param array<int, array<string, mixed>> $metrics
      */
@@ -524,7 +531,7 @@ class ApiPerformanceMonitoringService
         $totalHits = array_sum(array_column($metrics, 'cache_hits'));
         $totalMisses = array_sum(array_column($metrics, 'cache_misses'));
         $total = $totalHits + $totalMisses;
-        
+
         return $total > 0 ? $totalHits / $total : 0.0;
     }
 }
@@ -546,10 +553,10 @@ class QueryOptimizationService
 {
     private const SLOW_QUERY_THRESHOLD_MS = 100;
     private const HIGH_ROW_SCAN_THRESHOLD = 1000;
-    
+
     /**
      * Analyze a query and return optimization suggestions.
-     * 
+     *
      * @return array<string, mixed>
      */
     public function analyzeQuery(string $sql): array
@@ -557,7 +564,7 @@ class QueryOptimizationService
         $plan = $this->getQueryPlan($sql);
         $score = $this->calculatePerformanceScore($plan);
         $suggestions = $this->generateSuggestions($sql, $plan);
-        
+
         return [
             'sql' => $sql,
             'plan' => $plan,
@@ -566,47 +573,47 @@ class QueryOptimizationService
             'analyzed_at' => now()->toISOString(),
         ];
     }
-    
+
     /**
      * Get slow queries from the tracking system.
-     * 
+     *
      * @return Collection<int, array<string, mixed>>
      */
     public function getSlowQueries(int $hours = 24, float $thresholdMs = null): Collection
     {
         $threshold = $thresholdMs ?? self::SLOW_QUERY_THRESHOLD_MS;
-        
+
         // In production, this would query from the slow query log or metrics store
         return collect(DB::select("
-            SELECT 
-                query_time, 
-                lock_time, 
-                rows_sent, 
-                rows_examined, 
+            SELECT
+                query_time,
+                lock_time,
+                rows_sent,
+                rows_examined,
                 sql_text
-            FROM mysql.slow_log 
+            FROM mysql.slow_log
             WHERE start_time > DATE_SUB(NOW(), INTERVAL ? HOUR)
             AND query_time > ?
             ORDER BY query_time DESC
             LIMIT 100
         ", [$hours, $threshold / 1000]));
     }
-    
+
     /**
      * Identify queries that would benefit from indexing.
-     * 
+     *
      * @return array<int, array<string, mixed>>
      */
     public function identifyMissingIndexes(): array
     {
         $recommendations = [];
-        
+
         // Analyze recent queries for table scans
         $slowQueries = $this->getSlowQueries(24);
-        
+
         foreach ($slowQueries as $query) {
             $plan = $this->getQueryPlan($query->sql_text);
-            
+
             if ($this->isTableScan($plan)) {
                 $recommendations[] = [
                     'query' => $query->sql_text,
@@ -616,13 +623,13 @@ class QueryOptimizationService
                 ];
             }
         }
-        
+
         return $recommendations;
     }
-    
+
     /**
      * Get EXPLAIN plan for a query.
-     * 
+     *
      * @return array<int, object>
      */
     private function getQueryPlan(string $sql): array
@@ -633,10 +640,10 @@ class QueryOptimizationService
             return [];
         }
     }
-    
+
     /**
      * Calculate a performance score (0-100) based on query plan.
-     * 
+     *
      * @param array<int, object> $plan
      */
     private function calculatePerformanceScore(array $plan): int
@@ -644,79 +651,79 @@ class QueryOptimizationService
         if (empty($plan)) {
             return 0;
         }
-        
+
         $score = 100;
-        
+
         foreach ($plan as $row) {
             // Penalize table scans
             if (($row->type ?? '') === 'ALL') {
                 $score -= 30;
             }
-            
+
             // Penalize high row estimates
             $rows = $row->rows ?? 0;
             if ($rows > self::HIGH_ROW_SCAN_THRESHOLD) {
                 $score -= min(20, $rows / 500);
             }
-            
+
             // Penalize filesort
             if (str_contains($row->Extra ?? '', 'filesort')) {
                 $score -= 15;
             }
-            
+
             // Penalize temporary tables
             if (str_contains($row->Extra ?? '', 'temporary')) {
                 $score -= 15;
             }
-            
+
             // Bonus for using index
             if (($row->type ?? '') === 'ref' || ($row->type ?? '') === 'eq_ref') {
                 $score += 5;
             }
         }
-        
+
         return max(0, min(100, $score));
     }
-    
+
     /**
      * Generate optimization suggestions based on query and plan.
-     * 
+     *
      * @param array<int, object> $plan
      * @return array<int, string>
      */
     private function generateSuggestions(string $sql, array $plan): array
     {
         $suggestions = [];
-        
+
         foreach ($plan as $row) {
             if (($row->type ?? '') === 'ALL') {
                 $suggestions[] = "Consider adding an index on table '{$row->table}' for columns used in WHERE/JOIN";
             }
-            
+
             if (str_contains($row->Extra ?? '', 'filesort')) {
                 $suggestions[] = "Query uses filesort - consider adding index for ORDER BY columns";
             }
-            
+
             if (str_contains($row->Extra ?? '', 'temporary')) {
                 $suggestions[] = "Query creates temporary table - consider optimizing GROUP BY or DISTINCT";
             }
-            
+
             if (($row->rows ?? 0) > 10000) {
                 $suggestions[] = "High row scan ({$row->rows} rows) - consider pagination or query restructuring";
             }
         }
-        
+
         // Check for SELECT *
         if (preg_match('/SELECT\s+\*/i', $sql)) {
             $suggestions[] = "Avoid SELECT * - specify only needed columns";
         }
-        
+
         return array_unique($suggestions);
     }
-    
+
     /**
      * Check if plan indicates a full table scan.
-     * 
+     *
      * @param array<int, object> $plan
      */
     private function isTableScan(array $plan): bool
@@ -728,7 +735,7 @@ class QueryOptimizationService
         }
         return false;
     }
-    
+
     /**
      * Extract the primary table name from a SQL query.
      */
@@ -739,39 +746,40 @@ class QueryOptimizationService
         }
         return 'unknown';
     }
-    
+
     /**
      * Suggest an index based on query structure.
-     * 
+     *
      * @param array<int, object> $plan
      */
     private function suggestIndex(string $sql, array $plan): string
     {
         $columns = [];
-        
+
         // Extract WHERE columns
         if (preg_match_all('/WHERE\s+.*?(\w+)\s*[=<>]/i', $sql, $matches)) {
             $columns = array_merge($columns, $matches[1]);
         }
-        
+
         // Extract ORDER BY columns
         if (preg_match_all('/ORDER BY\s+(\w+)/i', $sql, $matches)) {
             $columns = array_merge($columns, $matches[1]);
         }
-        
+
         $columns = array_unique($columns);
         $table = $this->extractTableName($sql);
-        
+
         if (!empty($columns)) {
-            return "CREATE INDEX idx_{$table}_" . implode('_', $columns) . " ON {$table} (" . implode(', ', $columns) . ")";
+            return "CREATE INDEX idx_{$table}_" . implode('_', $columns) . " ON {$table} (" . implode(', ',
+            $columns) . ")";
         }
-        
+
         return "Analyze query structure manually";
     }
-    
+
     /**
      * Estimate performance improvement from suggested optimization.
-     * 
+     *
      * @param array<int, object> $plan
      */
     private function estimateImprovement(array $plan): string
@@ -780,13 +788,13 @@ class QueryOptimizationService
         foreach ($plan as $row) {
             $currentRows = max($currentRows, $row->rows ?? 0);
         }
-        
+
         if ($currentRows > 10000) {
             return "~90% reduction in rows scanned";
         } elseif ($currentRows > 1000) {
             return "~70% reduction in rows scanned";
         }
-        
+
         return "Moderate improvement expected";
     }
 }
@@ -811,7 +819,7 @@ class PerformanceAlertingService
      * @var array<string, array<string, mixed>>
      */
     private array $thresholds;
-    
+
     public function __construct()
     {
         $this->thresholds = config('apm.alerting.thresholds', [
@@ -821,27 +829,28 @@ class PerformanceAlertingService
             'query_time_p95_ms' => 100,
         ]);
     }
-    
+
     /**
      * Check metrics against thresholds and generate alerts.
-     * 
+     *
      * @param array<string, mixed> $metrics
      * @return array<int, array<string, mixed>>
      */
     public function checkThresholds(array $metrics): array
     {
         $alerts = [];
-        
+
         // Response time check
         if (($metrics['p95_duration_ms'] ?? 0) > $this->thresholds['response_time_p95_ms']) {
             $alerts[] = $this->createAlert(
                 'high_response_time',
                 'critical',
-                "P95 response time ({$metrics['p95_duration_ms']}ms) exceeds threshold ({$this->thresholds['response_time_p95_ms']}ms)",
+                "P95 response time ({$metrics['p95_duration_ms']}ms) exceeds threshold
+                ({$this->thresholds['response_time_p95_ms']}ms)",
                 $metrics
             );
         }
-        
+
         // Error rate check
         $errorRate = ($metrics['error_rate'] ?? 0) * 100;
         if ($errorRate > $this->thresholds['error_rate_percent']) {
@@ -852,27 +861,28 @@ class PerformanceAlertingService
                 $metrics
             );
         }
-        
+
         // Cache hit rate check
         if (($metrics['cache_hit_rate'] ?? 1) < $this->thresholds['cache_hit_rate_min']) {
             $alerts[] = $this->createAlert(
                 'low_cache_hit_rate',
                 'warning',
-                "Cache hit rate ({$metrics['cache_hit_rate']}) below threshold ({$this->thresholds['cache_hit_rate_min']})",
+                "Cache hit rate ({$metrics['cache_hit_rate']}) below threshold
+                ({$this->thresholds['cache_hit_rate_min']})",
                 $metrics
             );
         }
-        
+
         foreach ($alerts as $alert) {
             $this->processAlert($alert);
         }
-        
+
         return $alerts;
     }
-    
+
     /**
      * Create an alert structure.
-     * 
+     *
      * @param array<string, mixed> $context
      * @return array<string, mixed>
      */
@@ -888,10 +898,10 @@ class PerformanceAlertingService
             'acknowledged' => false,
         ];
     }
-    
+
     /**
      * Process and store an alert.
-     * 
+     *
      * @param array<string, mixed> $alert
      */
     private function processAlert(array $alert): void
@@ -899,26 +909,26 @@ class PerformanceAlertingService
         // Store in Redis for quick access
         Redis::lpush('apm:alerts', json_encode($alert));
         Redis::ltrim('apm:alerts', 0, 999); // Keep last 1000 alerts
-        
+
         // Check for duplicate suppression
         if ($this->shouldSuppress($alert)) {
             return;
         }
-        
+
         // Send notifications based on severity
         if ($alert['severity'] === 'critical') {
             $this->notifyChannel($alert, ['slack', 'email']);
         } else {
             $this->notifyChannel($alert, ['slack']);
         }
-        
+
         // Mark as sent for duplicate suppression
         $this->markAlertSent($alert);
     }
-    
+
     /**
      * Check if alert should be suppressed (duplicate within window).
-     * 
+     *
      * @param array<string, mixed> $alert
      */
     private function shouldSuppress(array $alert): bool
@@ -926,10 +936,10 @@ class PerformanceAlertingService
         $key = "apm:alert_sent:{$alert['type']}";
         return (bool) Redis::exists($key);
     }
-    
+
     /**
      * Mark alert as sent with TTL for suppression window.
-     * 
+     *
      * @param array<string, mixed> $alert
      */
     private function markAlertSent(array $alert): void
@@ -938,10 +948,10 @@ class PerformanceAlertingService
         $ttl = config('apm.alerting.suppression_window_seconds', 300);
         Redis::setex($key, $ttl, now()->toISOString());
     }
-    
+
     /**
      * Send notifications to specified channels.
-     * 
+     *
      * @param array<string, mixed> $alert
      * @param array<int, string> $channels
      */
@@ -951,10 +961,10 @@ class PerformanceAlertingService
         // Notification::route('slack', config('apm.slack_webhook'))
         //     ->notify(new PerformanceAlertNotification($alert));
     }
-    
+
     /**
      * Get recent alerts.
-     * 
+     *
      * @return array<int, array<string, mixed>>
      */
     public function getRecentAlerts(int $limit = 50): array
@@ -962,7 +972,7 @@ class PerformanceAlertingService
         $alerts = Redis::lrange('apm:alerts', 0, $limit - 1);
         return array_map(fn($a) => json_decode($a, true), $alerts);
     }
-    
+
     /**
      * Acknowledge an alert by ID.
      */
@@ -1009,19 +1019,19 @@ class PerformanceMonitoringMiddleware
     public function __construct(
         private ApmService $apmService
     ) {}
-    
+
     public function handle(Request $request, Closure $next)
     {
         $requestId = Str::uuid()->toString();
         $endpoint = $request->method() . ' ' . $request->path();
-        
+
         $this->apmService->startRequest($requestId, $endpoint);
         $request->attributes->set('apm_request_id', $requestId);
-        
+
         $response = $next($request);
-        
+
         $this->apmService->endRequest($requestId, $response->getStatusCode());
-        
+
         return $response;
     }
 }
@@ -1194,7 +1204,7 @@ CREATE TABLE ucp_apm_metrics (
     cache_misses SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     memory_peak_mb DECIMAL(8,2) NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_endpoint_created (endpoint, created_at),
     INDEX idx_created_at (created_at),
     INDEX idx_duration (duration_ms)
@@ -1215,7 +1225,7 @@ CREATE TABLE ucp_apm_alerts (
     acknowledged_by CHAR(36) NULL,
     acknowledged_at TIMESTAMP NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_type_severity (type, severity),
     INDEX idx_created_at (created_at),
     INDEX idx_acknowledged (acknowledged)
@@ -1239,7 +1249,7 @@ CREATE TABLE ucp_apm_aggregates (
     avg_query_count DECIMAL(8,2) NOT NULL DEFAULT 0,
     cache_hit_rate DECIMAL(5,4) NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     UNIQUE KEY unique_endpoint_period (endpoint, period_type, period_start),
     INDEX idx_period_start (period_start),
     INDEX idx_period_type (period_type)
@@ -1259,9 +1269,9 @@ Located at `config/apm.php`:
 
 return [
     'enabled' => env('APM_ENABLED', true),
-    
+
     'sampling_rate' => env('APM_SAMPLING_RATE', 1.0), // 1.0 = 100%
-    
+
     'alerting' => [
         'enabled' => env('APM_ALERTING_ENABLED', true),
         'suppression_window_seconds' => 300,
@@ -1272,16 +1282,16 @@ return [
             'query_time_p95_ms' => 100,
         ],
     ],
-    
+
     'retention' => [
         'raw_metrics_days' => 7,
         'minute_aggregates_days' => 30,
         'hour_aggregates_days' => 90,
         'day_aggregates_days' => 365,
     ],
-    
+
     'slow_query_threshold_ms' => 100,
-    
+
     'excluded_endpoints' => [
         'health',
         'telescope/*',
@@ -1299,27 +1309,27 @@ return [
 ```php
 it('calculates percentiles correctly', function () {
     $service = new ApmService();
-    
+
     // Test with known dataset
     $metrics = array_map(fn($i) => ['duration_ms' => $i * 10], range(1, 100));
-    
+
     $result = invokePrivateMethod($service, 'aggregateMetrics', [$metrics]);
-    
+
     expect($result['p50_duration_ms'])->toBe(500.0);
     expect($result['p95_duration_ms'])->toBe(950.0);
 });
 
 it('generates alerts when thresholds exceeded', function () {
     $alertService = new PerformanceAlertingService();
-    
+
     $metrics = [
         'p95_duration_ms' => 600,
         'error_rate' => 0.1,
         'cache_hit_rate' => 0.5,
     ];
-    
+
     $alerts = $alertService->checkThresholds($metrics);
-    
+
     expect($alerts)->toHaveCount(3);
     expect($alerts[0]['type'])->toBe('high_response_time');
 });
@@ -1330,12 +1340,12 @@ it('generates alerts when thresholds exceeded', function () {
 ```php
 it('tracks request metrics through middleware', function () {
     $response = $this->get('/api/v2/characters');
-    
+
     $response->assertSuccessful();
-    
+
     // Verify metrics were recorded
     $metrics = Redis::lrange('apm:metrics:GET api/v2/characters:' . now()->format('Y-m-d-H-i'), 0, 0);
-    
+
     expect($metrics)->not->toBeEmpty();
 });
 ```
@@ -1370,4 +1380,5 @@ it('tracks request metrics through middleware', function () {
 
 ---
 
-*This document serves as the authoritative technical specification for the Performance Monitoring & APM System implemented in the Umamusume Pretty Derby Career Planner.*
+*This document serves as the authoritative technical specification for the Performance Monitoring &
+APM System implemented in the Umamusume Pretty Derby Career Planner.*

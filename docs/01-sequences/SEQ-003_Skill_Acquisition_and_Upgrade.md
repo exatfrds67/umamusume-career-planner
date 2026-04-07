@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-004], [SPEC-004], [FLOW-004], [TECH-FLOW-004]
 
 ---
@@ -25,7 +25,10 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the complete skill acquisition and upgrade workflow in the Umamusume Career Planner application, including hint-based SP cost reduction, skill evolution paths, and SP budget management.
+This sequence diagram documents skill acquisition and upgrade behavior at a technical level.
+`StorageMode::ACCOUNT` acquisition and evolution are database-backed as `SkillAcquisition` records.
+`StorageMode::LOCAL` skill planning and hint visibility should be treated as browser-managed or
+advisory-only unless explicitly converted into account-backed persistence.
 
 ### 1.2 Scope
 
@@ -40,12 +43,13 @@ This sequence diagram documents the complete skill acquisition and upgrade workf
 
 **Related Artifacts:**
 
-- PRD: [PRD-004](../prds/PRD-004_Skill_Management.md)
-- SPEC: [SPEC-004](../specs/SPEC-004_Skill_Management_Technical.md)
-- Flow: [FLOW-004](../flows/FLOW-004_Skill_Management_System.md)
-- Tech Flow: [TECH-FLOW-004](../tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
-- Wireframe: [WF-008](../wireframes/WF-008_Skill_Shop_Interface.md), [WF-009](../wireframes/WF-009_Skill_Loadout_Manager.md)
-- User Flow: [UF-005](../user-flows/UF-005_Skill_Management_Flow.md)
+- PRD: [PRD-004](../02-prds/PRD-004_Skill_Management.md)
+- SPEC: [SPEC-004](../02-specs/SPEC-004_Skill_Management_Technical.md)
+- Flow: [FLOW-004](../01-flows/FLOW-004_Skill_Management_System.md)
+- Tech Flow: [TECH-FLOW-004](../01-tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
+- Wireframe: [WF-008](../01-wireframes/WF-008_Skill_Shop_Interface.md),
+[WF-009](../01-wireframes/WF-009_Skill_Loadout_Manager.md)
+- User Flow: [UF-005](../01-user-flows/UF-005_Skill_Management_Flow.md)
 
 ### 1.3 Business Context
 
@@ -77,10 +81,14 @@ Skill management is a critical resource optimization workflow that:
 | **Livewire Component** | Presentation | `SkillCatalog.php`, `SkillAcquisition.php` - Skill browsing and purchase |
 | **SkillController** | Application | Orchestrates skill operations |
 | **SkillService** | Domain Service | Skill acquisition and evolution business logic |
-| **SkillHintService** | Domain Service | Hint tracking and discount calculation |
+| **SkillHintService** | Domain Service | Hint tracking and discount calculation for account-backed skill state; local-mode hint state remains browser-managed until conversion |
 | **SkillEvolutionService** | Domain Service | Evolution path validation and execution |
 | **Database** | Infrastructure | MySQL/MariaDB persistence layer |
 | **EventDispatcher** | Infrastructure | Laravel event broadcasting |
+
+**Storage-mode note:** `StorageMode::LOCAL` state may remain browser-managed and UUID-oriented until
+converted through the storage transition flow documented in
+[SEQ-017](SEQ-017_Storage_Mode_Transition.md).
 
 ### 2.2 Component Locations
 
@@ -115,95 +123,25 @@ app/
 ```mermaid
 sequenceDiagram
     actor User
-    participant UI as Livewire Catalog
+    participant UI as Skill UI
     participant Controller as SkillController
     participant SkillSvc as SkillService
-    participant HintSvc as SkillHintService
-    participant EvolutionSvc as SkillEvolutionService
     participant DB as Database
-    participant Events as EventDispatcher
+    participant Local as Browser localStorage
 
-    Note over User,Events: SKILL BROWSING PHASE
-    User->>UI: Open Skill Catalog
-    UI->>Controller: GET /skills
-    Controller->>SkillSvc: getAvailableSkills(career)
-    SkillSvc->>DB: Load skills + hints
-    DB-->>SkillSvc: Skill list with hint counts
-    SkillSvc->>HintSvc: calculateDiscounts(career, skills)
-    HintSvc-->>SkillSvc: Discounted costs
-    SkillSvc-->>Controller: Skill catalog with costs
-    Controller-->>UI: JSON response
-    UI->>UI: Render catalog
-    UI-->>User: Display skills with costs
+    User->>UI: Browse skill catalog
 
-    Note over User,Events: SKILL ACQUISITION PHASE
-    User->>UI: Select skill to acquire
-    UI->>UI: Show confirmation with cost
-    User->>UI: Confirm purchase
-    UI->>Controller: POST /skills/{id}/acquire
-    Controller->>Controller: Authorize user
-    Controller->>SkillSvc: acquireSkill(career, skill)
-    
-    SkillSvc->>DB: BEGIN TRANSACTION
-    
-    SkillSvc->>HintSvc: getHintCount(career, skill)
-    HintSvc->>DB: SELECT COUNT(*) FROM skill_hints
-    DB-->>HintSvc: hint_count
-    HintSvc-->>SkillSvc: hint_count
-    
-    SkillSvc->>SkillSvc: calculateFinalCost(base_cost, hint_count)
-    Note over SkillSvc: cost = base_cost × (1 - min(hint_count × 0.20, 0.40))
-    
-    SkillSvc->>SkillSvc: validateSPBudget(career, final_cost)
-    
-    alt Sufficient SP
-        SkillSvc->>DB: INSERT skill_acquisitions
-        SkillSvc->>DB: UPDATE careers SET total_sp_available = total_sp_available - final_cost
-        SkillSvc->>DB: UPDATE skill_hints SET is_used = true
-        
-        alt Skill Has Evolution Path
-            SkillSvc->>EvolutionSvc: checkEvolutionAvailable(skill)
-            EvolutionSvc->>DB: Check evolution requirements
-            DB-->>EvolutionSvc: Evolution skill data
-            EvolutionSvc-->>SkillSvc: Evolution available flag
-        end
-        
-        SkillSvc->>DB: COMMIT TRANSACTION
-        
-        SkillSvc->>Events: Dispatch SkillAcquired
-        Events->>Events: Queue event listeners
-        
-        SkillSvc-->>Controller: Acquisition success
-        Controller-->>UI: 201 Created + skill data
-        UI->>UI: Update reactive properties
-        UI-->>User: Display success + evolution option (if available)
-    else Insufficient SP
-        SkillSvc->>DB: ROLLBACK
-        SkillSvc-->>Controller: 422 Insufficient SP
-        Controller-->>UI: Error response
-        UI-->>User: Display error message
-    end
-
-    Note over User,Events: SKILL EVOLUTION PHASE (Optional)
-    User->>UI: Initiate evolution
-    UI->>Controller: POST /skills/{id}/evolve
-    Controller->>EvolutionSvc: evolveSkill(acquisition)
-    
-    EvolutionSvc->>DB: BEGIN TRANSACTION
-    
-    EvolutionSvc->>EvolutionSvc: validateEvolutionRequirements()
-    
-    alt Requirements Met
-        EvolutionSvc->>DB: UPDATE skill_acquisitions SET skill_id = evolved_skill_id, is_evolution = true
-        EvolutionSvc->>DB: COMMIT TRANSACTION
-        EvolutionSvc-->>Controller: Evolution success
-        Controller-->>UI: 200 OK + evolved skill
-        UI-->>User: Display evolved skill
-    else Requirements Not Met
-        EvolutionSvc->>DB: ROLLBACK
-        EvolutionSvc-->>Controller: 422 Requirements not met
-        Controller-->>UI: Error response
-        UI-->>User: Display error message
+    alt StorageMode::ACCOUNT
+        User->>Controller: Acquire or evolve skill
+        Controller->>Controller: Authorize account-backed mutation
+        Controller->>SkillSvc: Execute acquisition/evolution
+        SkillSvc->>DB: Persist SkillAcquisition and related updates
+        SkillSvc-->>Controller: Updated result
+        Controller-->>UI: Account-backed success or error
+    else StorageMode::LOCAL
+        User->>UI: Plan skill purchase or view hint-adjusted cost
+        UI->>Local: Update local skill planning state
+        Local-->>UI: Updated local plan
     end
 ```text
 
@@ -241,7 +179,7 @@ User → Livewire Component → SkillController → SkillService
 public function index(Career $career)
 {
     $skills = $this->skillService->getAvailableSkills($career);
-    
+
     return view('livewire.skills.catalog', [
         'skills' => $skills,
         'totalSP' => $career->total_sp_available,
@@ -259,15 +197,15 @@ public function getAvailableSkills(Career $career): Collection
         ->where('is_active', true)
         ->pluck('skill_id')
         ->toArray();
-    
+
     $skills = Skill::whereNotIn('id', $acquiredSkillIds)
         ->with('evolutionTarget')
         ->get();
-    
+
     return $skills->map(function ($skill) use ($career) {
         $hintCount = $this->hintService->getHintCount($career, $skill);
         $finalCost = $this->calculateFinalCost($skill->base_sp_cost, $hintCount);
-        
+
         return [
             'id' => $skill->id,
             'name' => $skill->name,
@@ -325,13 +263,13 @@ private function calculateFinalCost(int $baseCost, int $hintLevel, bool $hasFast
         5 => 0.40,
         default => 0.40, // Cap at 40%
     };
-    
+
     // Fast Learner adds +10% additional discount
     $fastLearnerDiscount = $hasFastLearner ? 0.10 : 0.00;
-    
+
     // Discounts are additive, capped at 50%
     $totalDiscount = min(0.50, $hintDiscount + $fastLearnerDiscount);
-    
+
     return (int) ceil($baseCost * (1 - $totalDiscount));
 }
 ```
@@ -368,17 +306,17 @@ public function acquireSkill(Career $career, Skill $skill): SkillAcquisition
     return DB::transaction(function () use ($career, $skill) {
         // 1. Get hint count
         $hintCount = $this->hintService->getHintCount($career, $skill);
-        
+
         // 2. Calculate final cost
         $finalCost = $this->calculateFinalCost($skill->base_sp_cost, $hintCount);
-        
+
         // 3. Validate SP budget
         if ($career->total_sp_available < $finalCost) {
             throw new InsufficientSPException(
                 "Insufficient SP. Required: {$finalCost}, Available: {$career->total_sp_available}"
             );
         }
-        
+
         // 4. Create acquisition record
         $acquisition = SkillAcquisition::create([
             'career_id' => $career->id,
@@ -390,22 +328,22 @@ public function acquireSkill(Career $career, Skill $skill): SkillAcquisition
             'is_active' => true,
             'is_evolution' => false,
         ]);
-        
+
         // 5. Deduct SP from budget
         $career->decrement('total_sp_available', $finalCost);
-        
+
         // 6. Mark hints as used
         $this->hintService->markHintsAsUsed($career, $skill);
-        
+
         // 7. Check for evolution availability
         if ($skill->evolutionTarget) {
             $acquisition->evolution_available = $this->evolutionService
                 ->checkEvolutionRequirements($career, $skill);
         }
-        
+
         // 8. Dispatch event
         event(new SkillAcquired($career, $skill, $acquisition));
-        
+
         return $acquisition;
     });
 }
@@ -437,11 +375,11 @@ public function acquireSkill(Career $career, Skill $skill): SkillAcquisition
 public function evolveSkill(SkillAcquisition $acquisition): SkillAcquisition
 {
     $baseSkill = $acquisition->skill;
-    
+
     if (!$baseSkill->evolutionTarget) {
         throw new NoEvolutionPathException("Skill {$baseSkill->name} has no evolution path");
     }
-    
+
     return DB::transaction(function () use ($acquisition, $baseSkill) {
         // Update acquisition to point to evolved skill
         $acquisition->update([
@@ -450,9 +388,9 @@ public function evolveSkill(SkillAcquisition $acquisition): SkillAcquisition
             'evolved_at' => now(),
             'base_skill_id' => $baseSkill->id,
         ]);
-        
+
         event(new SkillEvolved($acquisition->career, $baseSkill, $baseSkill->evolutionTarget));
-        
+
         return $acquisition->fresh();
     });
 }
@@ -462,7 +400,7 @@ public function checkEvolutionRequirements(Career $career, Skill $skill): bool
     if (!$skill->evolutionTarget) {
         return false;
     }
-    
+
     // Evolution is always available if target exists (no additional requirements in base system)
     return true;
 }
@@ -639,7 +577,7 @@ sequenceDiagram
     User->>UI: Attempt skill acquisition
     UI->>Controller: POST /skills/{id}/acquire
     Controller->>Service: acquireSkill(career, skill)
-    
+
     alt Validation Error
         Service-->>Controller: ValidationException
         Controller-->>UI: 422 Validation Error
@@ -757,10 +695,10 @@ $this->cache->forget("skill.hints.career.{$career->id}.*");
 
 | Document | Description |
 | --- | --- |
-| [PRD-004](../prds/PRD-004_Skill_Management.md) | Product requirements for skill management |
-| [SPEC-004](../specs/SPEC-004_Skill_Management_Technical.md) | Technical specification for skill system |
-| [FLOW-004](../flows/FLOW-004_Skill_Management_System.md) | System flow for skill operations |
-| [TECH-FLOW-004](../tech-flow/TECH-FLOW-004_Skill_Management_Flow.md) | Technical flow diagrams |
+| [PRD-004](../02-prds/PRD-004_Skill_Management.md) | Product requirements for skill management |
+| [SPEC-004](../02-specs/SPEC-004_Skill_Management_Technical.md) | Technical specification for skill system |
+| [FLOW-004](../01-flows/FLOW-004_Skill_Management_System.md) | System flow for skill operations |
+| [TECH-FLOW-004](../01-tech-flow/TECH-FLOW-004_Skill_Management_Flow.md) | Technical flow diagrams |
 
 ### 8.2 Related Sequences
 
@@ -774,15 +712,15 @@ $this->cache->forget("skill.hints.career.{$career->id}.*");
 
 | Document | Description |
 | --- | --- |
-| [WF-008](../wireframes/WF-008_Skill_Shop_Interface.md) | Wireframe specification for skill catalog |
-| [WF-009](../wireframes/WF-009_Skill_Loadout_Manager.md) | Skill loadout management wireframe |
-| [UF-005](../user-flows/UF-005_Skill_Management_Flow.md) | User flow for skill management |
+| [WF-008](../01-wireframes/WF-008_Skill_Shop_Interface.md) | Wireframe specification for skill catalog |
+| [WF-009](../01-wireframes/WF-009_Skill_Loadout_Manager.md) | Skill loadout management wireframe |
+| [UF-005](../01-user-flows/UF-005_Skill_Management_Flow.md) | User flow for skill management |
 
 ### 8.4 Database Documentation
 
 | Document | Description |
 | --- | --- |
-| [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
+| [DBD-009](../00-core-docs/009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
 
@@ -818,4 +756,7 @@ $this->cache->forget("skill.hints.career.{$career->id}.*");
 
 ---
 
-*This sequence diagram reflects the current implementation of the skill acquisition and evolution workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/SkillService.php`, `app/Services/SkillHintService.php`, `app/Services/SkillEvolutionService.php`, and related files.*
+*This sequence diagram reflects the current implementation of the skill acquisition and evolution
+workflow as of v2.0.0. For the most up-to-date information, refer to the source code in
+`app/Services/SkillService.php`, `app/Services/SkillHintService.php`,
+`app/Services/SkillEvolutionService.php`, and related files.*

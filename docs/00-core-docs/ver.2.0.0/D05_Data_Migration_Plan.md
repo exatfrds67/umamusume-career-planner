@@ -28,7 +28,9 @@
 
 ## 1. Executive Summary
 
-This Data Migration Plan outlines the strategy for migrating data from five legacy Uma Musume tracking applications into the consolidated Uma Musume Career Planner platform. The migration supports both automated import processes and manual data entry fallbacks.
+This Data Migration Plan outlines the strategy for migrating data from five legacy Uma Musume
+tracking applications into the consolidated Uma Musume Career Planner platform. The migration
+supports both automated import processes and manual data entry fallbacks.
 
 ### 1.1 Migration Scope
 
@@ -72,11 +74,11 @@ flowchart LR
         D[uma-run-tracker<br/>Static HTML + JS]
         E[uma-tracker-form<br/>Native PHP]
     end
-    
+
     subgraph Target["Target System"]
         F[(Uma Musume<br/>Career Planner)]
     end
-    
+
     A -->|MySQL dump/JSON| F
     B -->|JSON API| F
     C -->|MySQL dump| F
@@ -249,7 +251,7 @@ flowchart TD
         A6 --> A7[Execute Import]
         A7 --> A8[Target DB]
     end
-    
+
     subgraph Secondary["Direct DB Migration (Secondary)"]
         B1[Source DB] --> B2[Migration Script]
         B2 --> B3[Schema Mapping]
@@ -257,7 +259,7 @@ flowchart TD
         B4 --> B5[Insert with Transactions]
         B5 --> B6[Target DB]
     end
-    
+
     subgraph Fallback["Manual Entry (Fallback)"]
         C1[Data Entry Templates]
         C2[CSV Bulk Import]
@@ -280,27 +282,27 @@ classDiagram
         +getSchemaVersion() string
         +getSupportedFormats() array
     }
-    
+
     class JsonImportAdapter {
         +detect(file) bool
         +parse(file) Collection
     }
-    
+
     class CsvImportAdapter {
         +detect(file) bool
         +parse(file) Collection
     }
-    
+
     class MySqlDumpAdapter {
         +detect(file) bool
         +parse(file) Collection
     }
-    
+
     class LegacyJsonAdapter {
         +detect(file) bool
         +parse(file) Collection
     }
-    
+
     ImportAdapterInterface <|.. JsonImportAdapter
     ImportAdapterInterface <|.. CsvImportAdapter
     ImportAdapterInterface <|.. MySqlDumpAdapter
@@ -326,32 +328,32 @@ class FormatDetector
         $extension = $file->getClientOriginalExtension();
         $mimeType = $file->getMimeType();
         $content = $file->get();
-        
+
         // JSON detection
         if ($this->isValidJson($content)) {
             return $this->detectJsonSchema($content);
         }
-        
+
         // CSV detection
         if ($this->isValidCsv($content)) {
             return ImportFormat::Csv;
         }
-        
+
         throw new UnsupportedFormatException();
     }
-    
+
     private function detectJsonSchema(string $content): ImportFormat
     {
         $data = json_decode($content, true);
-        
+
         if (isset($data['schema_version'])) {
             return ImportFormat::JsonVersioned;
         }
-        
+
         if (isset($data['career_runs'])) {
             return ImportFormat::JsonLegacy;
         }
-        
+
         return ImportFormat::JsonGeneric;
     }
 }
@@ -372,7 +374,7 @@ flowchart LR
         S4["status: ongoing"]
         S5["year: 1"]
     end
-    
+
     subgraph Target["Target Fields"]
         T1[uuid]
         T2[total_sp_available]
@@ -380,7 +382,7 @@ flowchart LR
         T4["status: in_progress"]
         T5["career_stage: junior"]
     end
-    
+
     S1 -->|Generate UUID| T1
     S2 -->|Direct copy| T2
     S3 -->|Direct copy| T3
@@ -436,7 +438,7 @@ class MigrationValidator
             'guts' => 'integer|min:0|max:1200',
             'wit' => 'integer|min:0|max:1200',
         ];
-        
+
         return Validator::make($plan, $rules);
     }
 }

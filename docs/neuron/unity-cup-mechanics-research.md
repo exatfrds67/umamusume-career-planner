@@ -10,7 +10,10 @@
 
 ## Executive Summary
 
-Unity Cup (known as "Aoharu Hai" in JP) is the second permanent career scenario in Umamusume: Pretty Derby, released November 6, 2025 on Global. Unlike URA Finale which focuses on a single character, Unity Cup emphasizes **team-based progression** where your trainee develops alongside teammates through special training mechanics and team races.
+Unity Cup (known as "Aoharu Hai" in JP) is the second permanent career scenario in Umamusume: Pretty
+Derby, released November 6, 2025 on Global. Unlike URA Finale which focuses on a single character,
+Unity Cup emphasizes **team-based progression** where your trainee develops alongside teammates
+through special training mechanics and team races.
 
 ### Key Differentiators from URA Finale
 
@@ -146,7 +149,8 @@ Higher placements grant **Attribute Bonuses** to entire team:
 - Wait for team member to appear in **optimal training facility**
 - Spirit Burst can only trigger **once per team member**
 
-**Example**: If a Speed-focused support card fills their gauge, wait until they appear in Speed training for maximum benefit.
+**Example**: If a Speed-focused support card fills their gauge, wait until they appear in Speed
+training for maximum benefit.
 
 ### 2.3 Spirit Burst Bonuses
 
@@ -912,7 +916,9 @@ FOREACH member IN team:
 
 ### Content Compliance
 
-All content has been paraphrased and summarized from the above sources to comply with licensing restrictions. No more than 30 consecutive words have been reproduced verbatim from any single source. Factual accuracy has been preserved while condensing information.
+All content has been paraphrased and summarized from the above sources to comply with licensing
+restrictions. No more than 30 consecutive words have been reproduced verbatim from any single
+source. Factual accuracy has been preserved while condensing information.
 
 ---
 

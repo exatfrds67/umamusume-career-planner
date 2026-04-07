@@ -169,8 +169,8 @@ ab -n 500 -c 25 -H "Authorization: Bearer $TOKEN" \
 
 ```sql
 -- Check slow queries
-SELECT * FROM mysql.slow_log 
-ORDER BY start_time DESC 
+SELECT * FROM mysql.slow_log
+ORDER BY start_time DESC
 LIMIT 20;
 
 -- Check query execution plans
@@ -467,4 +467,3 @@ curl https://staging.example.com/api/health | jq .
 | Dev Lead | | |
 | Product Owner | | |
 ```text
-

@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-002], [SPEC-002], [FLOW-002], [TECH-FLOW-002]
 
 ---
@@ -26,12 +26,18 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the complete training block resolution process in the Umamusume Career Planner application, covering prediction generation, training selection, execution, and state updates using **game-accurate mechanics verified from the Global English Server (January 2026)**.
+This sequence diagram documents the training prediction and execution workflow at a technical level.
+Where older examples in this document show account-backed controller and database interactions, they
+should be interpreted as the current authenticated execution path only. Local-mode training planning
+and advisory context should be treated as browser-managed and storage-aware, consistent with
+`FLOW-002` and `TECH-FLOW-002`.
 
 ### 1.2 Scope
 
 **Covers:**
 
+- Account-mode training prediction and execution flows
+- Storage-aware distinction between Local advisory/planning context and Account-mode persistence
 - Training prediction generation for all 5 training facilities (Speed, Stamina, Power, Guts, Wit)
 - **Complete training formula with all multipliers**
 - **Facility level multipliers (1.0× to 2.0×)**
@@ -43,16 +49,21 @@ This sequence diagram documents the complete training block resolution process i
 - Skill hint probability calculation
 - Training execution and stat updates
 - Energy and mood progression
-- Event dispatch and WebSocket broadcasting
+- Event dispatch and polling-visible status updates
+
+**Storage-mode note:** `StorageMode::LOCAL` state may remain browser-managed and UUID-oriented until
+converted through the storage transition flow documented in
+[SEQ-017](SEQ-017_Storage_Mode_Transition.md).
 
 **Related Artifacts:**
 
-- PRD: [PRD-002](../prds/PRD-002_Training_Optimization.md)
-- SPEC: [SPEC-002](../specs/SPEC-002_Training_Optimization_Technical.md)
-- Flow: [FLOW-002](../flows/FLOW-002_Training_Optimization_System.md)
-- Tech Flow: [TECH-FLOW-002](../tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
-- Wireframe: [WF-004](../wireframes/WF-004_Training_Selection_Interface.md), [WF-005](../wireframes/WF-005_Training_Result_Screen.md)
-- User Flow: [UF-003](../user-flows/UF-003_Training_Day_Flow.md)
+- PRD: [PRD-002](../02-prds/PRD-002_Training_Optimization.md)
+- SPEC: [SPEC-002](../02-specs/SPEC-002_Training_Optimization_Technical.md)
+- Flow: [FLOW-002](../01-flows/FLOW-002_Training_Optimization_System.md)
+- Tech Flow: [TECH-FLOW-002](../01-tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
+- Wireframe: [WF-004](../01-wireframes/WF-004_Training_Selection_Interface.md),
+[WF-005](../01-wireframes/WF-005_Training_Result_Screen.md)
+- User Flow: [UF-003](../01-user-flows/UF-003_Training_Day_Flow.md)
 
 ### 1.3 Business Context
 
@@ -69,7 +80,7 @@ Training resolution is the core gameplay loop that:
 - Predictions generated within 200ms (with caching)
 - Training execution completes within 300ms
 - Stat updates reflected immediately in UI
-- WebSocket broadcast to all active sessions
+- Status update propagation to active sessions on refresh
 - Prediction cache invalidated after execution
 - **Formula accuracy matches game within ±1 stat point**
 
@@ -82,9 +93,12 @@ Training resolution is the core gameplay loop that:
 The official training stat gain formula from Umamusume Pretty Derby (Global English Server):
 
 ```text
-Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
-            × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
+Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodModifier)
+            × (1 + FacilityLevelBonus) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
 ```
+
+> **Note**: This formula is an approximation. The game may apply additional hidden mechanics
+> not fully observable from external testing.
 
 **Formula Components:**
 
@@ -93,9 +107,8 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 
 | **Base** | Base stat gain from training type | 10-25 per stat |
 | **StatBonus** | Support card stat bonuses | 0-50+ |
 | **GrowthRate** | Character-specific growth rate | 0-20% per stat |
-| **MoodMultiplier** | Mood effect multiplier | -0.2 to +0.2 |
-| **MoodEffect** | Additional mood bonuses | 0-10% |
-| **TrainingEffect** | Facility level bonus | 0-100% |
+| **MoodModifier** | Mood effect modifier (Great: +0.04, Good: +0.02, Normal: 0, Bad: −0.02, Awful: −0.04) | −0.04 to +0.04 |
+| **FacilityLevelBonus** | Facility level bonus | 0-100% |
 | **NumSupportCards** | Cards present at training | 0-6 |
 | **FriendshipMultiplier** | Friendship training bonus | 1.0-1.35× |
 
@@ -210,7 +223,7 @@ Each training type affects multiple stats:
 | **Database** | Infrastructure | MySQL/MariaDB persistence layer |
 | **Cache** | Infrastructure | Redis prediction cache |
 | **EventDispatcher** | Infrastructure | Laravel event broadcasting |
-| **WebSocketService** | Infrastructure | Laravel Reverb real-time updates |
+| **Status Refresh Flow** | Infrastructure | Queue/cache-backed refresh updates |
 
 ### 3.2 Component Locations
 
@@ -249,115 +262,31 @@ app/
 ```mermaid
 sequenceDiagram
     actor User
-    participant UI as Livewire Selector
+    participant UI as Training UI
     participant Controller as TrainingController
     participant PredictSvc as TrainingPredictionService
     participant ExecSvc as TrainingExecutionService
-    participant StatCalc as StatCalculator
-    participant BonusCalc as BonusCalculator
-    participant BondCalc as BondCalculator
-    participant SoftCapCalc as SoftCapCalculator
-    participant RiskCalc as RiskCalculator
-    participant Cache as Redis Cache
     participant DB as Database
-    participant Events as EventDispatcher
-    participant WS as WebSocket (Reverb)
+    participant Local as Browser localStorage
 
-    Note over User,WS: PREDICTION PHASE
-    User->>UI: View Training Options
-    UI->>Controller: GET /training/predictions/{career_id}
-    Controller->>PredictSvc: getPredictions(career)
-    
-    PredictSvc->>Cache: Check cache (career_id)
-    alt Cache Hit
-        Cache-->>PredictSvc: Cached predictions
-    else Cache Miss
-        PredictSvc->>DB: Load career + support deck + facility levels
-        DB-->>PredictSvc: Career context
-        
-        par Calculate All Facilities (Game Formula)
-            PredictSvc->>StatCalc: calculateWithFormula(Speed, facilityLevel)
-            PredictSvc->>StatCalc: calculateWithFormula(Stamina, facilityLevel)
-            PredictSvc->>StatCalc: calculateWithFormula(Power, facilityLevel)
-            PredictSvc->>StatCalc: calculateWithFormula(Guts, facilityLevel)
-            PredictSvc->>StatCalc: calculateWithFormula(Wit, facilityLevel)
-        end
-        
-        PredictSvc->>BonusCalc: applyDeckBonuses(deck, gains)
-        BonusCalc-->>PredictSvc: Enhanced gains with card presence bonus
-        
-        PredictSvc->>BondCalc: calculateBondGains(deck, hasCharming)
-        BondCalc-->>PredictSvc: Bond gains (+7 base, +9 Charming)
-        
-        PredictSvc->>BondCalc: checkFriendshipStatus(deck)
-        BondCalc-->>PredictSvc: Friendship eligible cards (bond >= 80)
-        
-        PredictSvc->>SoftCapCalc: applySoftCap(gains, currentStats)
-        SoftCapCalc-->>PredictSvc: Capped gains (50% above 1200)
-        
-        PredictSvc->>RiskCalc: calculateRisk(career, facility)
-        RiskCalc-->>PredictSvc: Risk percentages
-        
-        PredictSvc->>PredictSvc: calculateHintChances()
-        PredictSvc->>PredictSvc: rankByRecommendationScore()
-        
-        PredictSvc->>Cache: Store predictions (5min TTL)
+    User->>UI: Open training options
+
+    alt StorageMode::ACCOUNT
+        UI->>Controller: Request account-backed prediction/execution
+        Controller->>PredictSvc: Load predictions from persisted character/career context
+        PredictSvc-->>Controller: Prediction payload
+        User->>Controller: Confirm training action
+        Controller->>ExecSvc: Execute account-backed training
+        ExecSvc->>DB: Persist updated state and training session
+        ExecSvc-->>Controller: Training result
+        Controller-->>UI: Updated account-backed result
+    else StorageMode::LOCAL
+        UI->>Local: Read UUID-backed local run payload
+        UI->>UI: Calculate or request storage-aware advisory context
+        User->>UI: Confirm local training action
+        UI->>Local: Persist updated local run payload
+        UI-->>User: Updated local result without DB write
     end
-    
-    PredictSvc-->>Controller: Ranked predictions array
-    Controller-->>UI: JSON response
-    UI->>UI: Render training options
-    UI-->>User: Display predictions with rankings
-    
-    Note over User,WS: EXECUTION PHASE
-    User->>UI: Select training (e.g., Speed)
-    UI->>Controller: POST /training/execute
-    Controller->>Controller: Authorize user
-    Controller->>ExecSvc: executeTraining(career, facility)
-    
-    ExecSvc->>DB: BEGIN TRANSACTION
-    
-    ExecSvc->>PredictSvc: getPrediction(career, facility)
-    PredictSvc-->>ExecSvc: Prediction data
-    
-    ExecSvc->>ExecSvc: rollForSuccess(risk)
-    
-    Note over ExecSvc: Apply Game Formula
-    ExecSvc->>StatCalc: applyTrainingFormula(base, bonuses, mood, facility, cards)
-    StatCalc-->>ExecSvc: Raw calculated gains
-    
-    ExecSvc->>SoftCapCalc: applySoftCap(rawGains, currentStats)
-    SoftCapCalc-->>ExecSvc: Final capped gains
-    
-    ExecSvc->>BondCalc: calculateBondIncrease(presentCards, hasCharming)
-    BondCalc-->>ExecSvc: Bond increases (+7 or +9 per card)
-    
-    ExecSvc->>ExecSvc: checkFriendshipTrigger(bondLevels)
-    ExecSvc->>ExecSvc: updateEnergy(career, -energyCost)
-    ExecSvc->>ExecSvc: updateMood(career)
-    ExecSvc->>ExecSvc: advanceTurn(career)
-    
-    ExecSvc->>DB: UPDATE careers SET stats, energy, mood, turn
-    ExecSvc->>DB: UPDATE support_cards SET bond_level
-    ExecSvc->>DB: INSERT training_sessions
-    ExecSvc->>DB: INSERT stat_progress
-    
-    alt Skill Hints Received
-        ExecSvc->>DB: INSERT skill_hints
-    end
-    
-    ExecSvc->>DB: COMMIT TRANSACTION
-    
-    ExecSvc->>Cache: Invalidate prediction cache (career_id)
-    
-    ExecSvc->>Events: Dispatch TrainingCompleted
-    Events->>WS: Broadcast character.{id}.updated
-    
-    ExecSvc-->>Controller: TrainingResult
-    Controller-->>UI: 200 OK + updated state
-    UI->>UI: Update reactive properties
-    UI->>UI: Play training animation
-    UI-->>User: Display results + stat changes
 ```text
 
 ### 4.2 Training Formula Calculation Flow
@@ -374,39 +303,37 @@ sequenceDiagram
     participant SoftCapCalc as SoftCapCalculator
 
     Caller->>StatCalc: calculateStatGain(training, career, deck)
-    
+
     Note over StatCalc: Step 1: Base + StatBonus
     StatCalc->>StatCalc: getBaseGain(trainingType)
     StatCalc->>StatCalc: getStatBonus(deck, trainingType)
     StatCalc->>StatCalc: baseTotal = base + statBonus
-    
+
     Note over StatCalc: Step 2: Growth Rate
     StatCalc->>GrowthCalc: getGrowthRate(character, stat)
     GrowthCalc-->>StatCalc: growthRate (0-0.20)
     StatCalc->>StatCalc: afterGrowth = baseTotal × (1 + growthRate)
-    
+
     Note over StatCalc: Step 3: Mood Effect
-    StatCalc->>MoodCalc: getMoodMultiplier(career.mood)
-    MoodCalc-->>StatCalc: moodMult (-0.2 to +0.2)
-    StatCalc->>MoodCalc: getMoodEffect(career)
-    MoodCalc-->>StatCalc: moodEffect (0-0.10)
-    StatCalc->>StatCalc: afterMood = afterGrowth × (1 + moodMult × (1 + moodEffect))
-    
+    StatCalc->>MoodCalc: getMoodModifier(career.mood)
+    MoodCalc-->>StatCalc: moodModifier (-0.04 to +0.04)
+    StatCalc->>StatCalc: afterMood = afterGrowth × (1 + moodModifier)
+
     Note over StatCalc: Step 4: Training Effect (Facility Level)
     StatCalc->>FacilityCalc: getFacilityMultiplier(facilityLevel)
     FacilityCalc-->>StatCalc: facilityMult (1.0-2.0)
     StatCalc->>StatCalc: afterFacility = afterMood × facilityMult
-    
+
     Note over StatCalc: Step 5: Support Card Presence (+5% per card)
     StatCalc->>CardCalc: countPresentCards(deck, trainingType)
     CardCalc-->>StatCalc: numCards (0-6)
     StatCalc->>StatCalc: afterCards = afterFacility × (1 + 0.05 × numCards)
-    
+
     Note over StatCalc: Step 6: Friendship Multiplier
     StatCalc->>FriendCalc: getFriendshipMultiplier(deck, trainingType)
     FriendCalc-->>StatCalc: friendMult (1.0-1.35)
     StatCalc->>StatCalc: rawGain = afterCards × friendMult
-    
+
     Note over StatCalc: Step 7: Apply Soft Cap
     StatCalc->>SoftCapCalc: applySoftCap(rawGain, currentStat)
     SoftCapCalc->>SoftCapCalc: Check if currentStat >= 1200
@@ -420,7 +347,7 @@ sequenceDiagram
         SoftCapCalc->>SoftCapCalc: finalGain = min(rawGain, 100)
     end
     SoftCapCalc-->>StatCalc: finalGain
-    
+
     StatCalc-->>Caller: StatGainResult(finalGain, breakdown)
 ```
 
@@ -435,27 +362,27 @@ sequenceDiagram
     participant DB as Database
 
     Caller->>BondCalc: calculateBondGains(deck, career)
-    
+
     Note over BondCalc: Check for Charming condition
     BondCalc->>ConditionChecker: hasCondition(career, 'Charming')
     ConditionChecker-->>BondCalc: hasCharming (true/false)
-    
+
     loop For each card present at training
         BondCalc->>BondCalc: baseBondGain = hasCharming ? 9 : 7
         BondCalc->>BondCalc: newBondLevel = card.bondLevel + baseBondGain
         BondCalc->>BondCalc: cappedBond = min(newBondLevel, 100)
-        
+
         Note over BondCalc: Check Friendship Threshold
         alt newBondLevel >= 80 AND previousBond < 80
             BondCalc->>BondCalc: Mark card as newly friendship-eligible
         end
     end
-    
+
     BondCalc-->>Caller: BondGainResult(bondChanges, newFriendshipCards)
-    
+
     Note over Caller,FriendshipCalc: Apply Friendship Bonus if Eligible
     Caller->>FriendshipCalc: calculateFriendshipBonus(eligibleCards)
-    
+
     loop For each friendship-eligible card
         FriendshipCalc->>FriendshipCalc: getCardRarity(card)
         alt R Rarity
@@ -466,7 +393,7 @@ sequenceDiagram
             FriendshipCalc->>FriendshipCalc: bonus = 0.20 to 0.35 (20-35%)
         end
     end
-    
+
     FriendshipCalc-->>Caller: totalFriendshipMultiplier
 ```text
 
@@ -484,7 +411,7 @@ sequenceDiagram
 | **Bond Calculation** | ~10ms | Calculate +7/+9 bond gains |
 | **Database Transaction** | ~200ms | Stat updates + bond updates + history inserts |
 | **Event Dispatch** | ~30ms | Queue event listeners |
-| **WebSocket Broadcast** | ~50ms | Real-time update to clients |
+| **Status Refresh** | Request-dependent | Updated state visible on refresh/poll |
 | **UI Update** | ~100ms | Animation and state refresh |
 | **Total (Prediction)** | ~200ms | Server-side processing |
 | **Total (Execution)** | ~300ms | Server-side processing |
@@ -515,33 +442,33 @@ class TrainingPredictionService
         private RiskCalculator $riskCalculator,
         private CacheManager $cache,
     ) {}
-    
+
     public function getPredictions(Career $career): array
     {
         $cacheKey = "training_predictions:{$career->id}";
-        
+
         return $this->cache->remember($cacheKey, 300, function () use ($career) {
             $facilities = TrainingType::cases();
             $predictions = [];
-            
+
             foreach ($facilities as $facility) {
                 $predictions[] = $this->calculatePrediction($career, $facility);
             }
-            
+
             return $this->rankPredictions($predictions, $career);
         });
     }
-    
+
     private function calculatePrediction(Career $career, TrainingType $facility): array
     {
         $deck = $career->supportDeck;
         $facilityLevel = $career->getFacilityLevel($facility);
-        
+
         // Check for Summer Training Camp (all facilities Level 5)
         if ($career->isSummerCamp()) {
             $facilityLevel = 5;
         }
-        
+
         // Step 1: Calculate base stat gains using game formula
         $rawGains = $this->statCalculator->calculateWithGameFormula(
             facility: $facility,
@@ -549,32 +476,32 @@ class TrainingPredictionService
             deck: $deck,
             facilityLevel: $facilityLevel
         );
-        
+
         // Step 2: Apply soft cap (1200 threshold, 50% reduction above)
         $cappedGains = $this->softCapCalculator->applySoftCap(
             gains: $rawGains,
             currentStats: $career->getCurrentStats()
         );
-        
+
         // Step 3: Calculate bond gains (+7 base, +9 with Charming)
         $bondGains = $this->bondCalculator->calculateBondGains(
             deck: $deck,
             facility: $facility,
             hasCharming: $career->hasCondition('Charming')
         );
-        
+
         // Step 4: Check friendship training eligibility (bond >= 80)
         $friendshipCards = $this->bondCalculator->getFriendshipEligibleCards($deck, $facility);
-        
+
         // Step 5: Calculate failure risk
         $risk = $this->riskCalculator->calculateFailureRisk($career, $facility);
-        
+
         // Step 6: Calculate skill hint probability
         $hintChances = $this->calculateHintChances($deck, $facility);
-        
+
         // Step 7: Score recommendation
         $score = $this->scoreTraining($career, $facility, $cappedGains, $risk);
-        
+
         return [
             'facility' => $facility->value,
             'facility_level' => $facilityLevel,
@@ -608,7 +535,7 @@ class TrainingPredictionService
             'efficiency_rating' => $this->rateEfficiency($cappedGains, $risk),
         ];
     }
-    
+
     private function getFacilityMultiplier(int $level): float
     {
         return match ($level) {
@@ -620,7 +547,7 @@ class TrainingPredictionService
             default => 1.00,
         };
     }
-    
+
     private function rankPredictions(array $predictions, Career $career): array
     {
         usort($predictions, fn($a, $b) => $b['recommendation_score'] <=> $a['recommendation_score']);
@@ -639,8 +566,8 @@ class StatCalculator
 {
     /**
      * Calculate stat gains using the verified game formula:
-     * Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
-     *             × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
+     * Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodModifier)
+     *             × (1 + FacilityLevelBonus) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
      */
     public function calculateWithGameFormula(
         TrainingType $facility,
@@ -651,40 +578,39 @@ class StatCalculator
         $character = $career->character;
         $stats = ['speed', 'stamina', 'power', 'guts', 'wit'];
         $gains = [];
-        
+
         foreach ($stats as $stat) {
             // Step 1: Base + StatBonus
             $base = $this->getBaseStat($facility, $stat);
             $statBonus = $this->getStatBonus($deck, $facility, $stat);
             $baseTotal = $base + $statBonus;
-            
+
             // Step 2: Growth Rate (character-specific, 0-20%)
             $growthRate = $character->{"growth_{$stat}"} ?? 0;
             $afterGrowth = $baseTotal * (1 + $growthRate);
-            
-            // Step 3: Mood Effect
-            $moodMultiplier = $this->getMoodMultiplier($career->mood);
-            $moodEffect = $this->getMoodEffect($career);
-            $afterMood = $afterGrowth * (1 + $moodMultiplier * (1 + $moodEffect));
-            
+
+            // Step 3: Mood Modifier
+            $moodModifier = $this->getMoodModifier($career->mood);
+            $afterMood = $afterGrowth * (1 + $moodModifier);
+
             // Step 4: Training Effect (Facility Level)
             $trainingEffect = $this->getFacilityBonus($facilityLevel);
             $afterFacility = $afterMood * (1 + $trainingEffect);
-            
+
             // Step 5: Support Card Presence Bonus (+5% per card, max +30%)
             $numCards = $this->countCardsAtFacility($deck, $facility);
             $afterCards = $afterFacility * (1 + 0.05 * $numCards);
-            
+
             // Step 6: Friendship Multiplier (10-35% based on rarity)
             $friendshipMultiplier = $this->getFriendshipMultiplier($deck, $facility);
             $rawGain = $afterCards * $friendshipMultiplier;
-            
+
             $gains[$stat] = (int) round($rawGain);
         }
-        
+
         return new StatGains($gains);
     }
-    
+
     private function getBaseStat(TrainingType $facility, string $stat): int
     {
         // Base stat gains per training type
@@ -695,21 +621,21 @@ class StatCalculator
             TrainingType::Guts => ['speed' => 0, 'stamina' => 0, 'power' => 9, 'guts' => 22, 'wit' => 0],
             TrainingType::Wit => ['speed' => 9, 'stamina' => 0, 'power' => 0, 'guts' => 0, 'wit' => 22],
         };
-        
+
         return $baseGains[$stat] ?? 0;
     }
-    
-    private function getMoodMultiplier(Mood $mood): float
+
+    private function getMoodModifier(Mood $mood): float
     {
         return match ($mood) {
-            Mood::Great => 0.20,   // +20%
-            Mood::Good => 0.10,    // +10%
+            Mood::Great => 0.04,   // +4%
+            Mood::Good => 0.02,    // +2%
             Mood::Normal => 0.00,  // +0%
-            Mood::Bad => -0.10,    // -10%
-            Mood::Awful => -0.20,  // -20%
+            Mood::Bad => -0.02,    // -2%
+            Mood::Awful => -0.04,  // -4%
         };
     }
-    
+
     private function getFacilityBonus(int $level): float
     {
         // Facility level multipliers: 1.0×, 1.25×, 1.5×, 1.75×, 2.0×
@@ -722,11 +648,11 @@ class StatCalculator
             default => 0.00,
         };
     }
-    
+
     private function getFriendshipMultiplier(SupportDeck $deck, TrainingType $facility): float
     {
         $multiplier = 1.0;
-        
+
         foreach ($deck->cards as $card) {
             if ($this->cardMatchesFacility($card, $facility) && $card->bond_level >= 80) {
                 // Friendship bonus by rarity
@@ -739,7 +665,7 @@ class StatCalculator
                 $multiplier += $bonus;
             }
         }
-        
+
         return $multiplier;
     }
 }
@@ -755,7 +681,7 @@ class SoftCapCalculator
     private const REDUCTION_RATE = 0.5; // 50% gains above soft cap
     private const MAX_GAIN_BELOW_CAP = 100;
     private const MAX_GAIN_ABOVE_CAP = 50;
-    
+
     /**
      * Apply soft cap rules:
      * - Stats below 1200: 100% gains, max +100 per training
@@ -764,17 +690,17 @@ class SoftCapCalculator
     public function applySoftCap(StatGains $rawGains, array $currentStats): StatGains
     {
         $cappedGains = [];
-        
+
         foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
             $currentStat = $currentStats[$stat] ?? 0;
             $rawGain = $rawGains->{$stat};
-            
+
             $cappedGains[$stat] = $this->calculateCappedGain($rawGain, $currentStat);
         }
-        
+
         return new StatGains($cappedGains);
     }
-    
+
     private function calculateCappedGain(int $rawGain, int $currentStat): int
     {
         // Case 1: Already above soft cap
@@ -782,7 +708,7 @@ class SoftCapCalculator
             $reducedGain = (int) ($rawGain * self::REDUCTION_RATE);
             return min($reducedGain, self::MAX_GAIN_ABOVE_CAP);
         }
-        
+
         // Case 2: Will cross soft cap with this gain
         if ($currentStat + $rawGain > self::SOFT_CAP) {
             $belowCapGain = self::SOFT_CAP - $currentStat;
@@ -791,21 +717,21 @@ class SoftCapCalculator
             $totalGain = $belowCapGain + $aboveCapGain;
             return min($totalGain, self::MAX_GAIN_BELOW_CAP);
         }
-        
+
         // Case 3: Entirely below soft cap
         return min($rawGain, self::MAX_GAIN_BELOW_CAP);
     }
-    
+
     public function wasCapApplied(StatGains $rawGains, array $currentStats): array
     {
         $applied = [];
-        
+
         foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
             $currentStat = $currentStats[$stat] ?? 0;
-            $applied[$stat] = $currentStat >= self::SOFT_CAP || 
+            $applied[$stat] = $currentStat >= self::SOFT_CAP ||
                               ($currentStat + $rawGains->{$stat}) > self::SOFT_CAP;
         }
-        
+
         return $applied;
     }
 }
@@ -821,7 +747,7 @@ class BondCalculator
     private const CHARMING_BOND_GAIN = 9;
     private const FRIENDSHIP_THRESHOLD = 80;
     private const MAX_BOND = 100;
-    
+
     /**
      * Calculate bond gains for cards present at training.
      * Base: +7 per training together
@@ -834,7 +760,7 @@ class BondCalculator
     ): array {
         $bondGains = [];
         $bondGain = $hasCharming ? self::CHARMING_BOND_GAIN : self::BASE_BOND_GAIN;
-        
+
         foreach ($deck->cards as $card) {
             if ($this->cardPresentAtFacility($card, $facility)) {
                 $newBond = min($card->bond_level + $bondGain, self::MAX_BOND);
@@ -844,24 +770,24 @@ class BondCalculator
                     'previous_bond' => $card->bond_level,
                     'bond_increase' => $bondGain,
                     'new_bond' => $newBond,
-                    'friendship_unlocked' => $card->bond_level < self::FRIENDSHIP_THRESHOLD 
+                    'friendship_unlocked' => $card->bond_level < self::FRIENDSHIP_THRESHOLD
                                             && $newBond >= self::FRIENDSHIP_THRESHOLD,
                 ];
             }
         }
-        
+
         return $bondGains;
     }
-    
+
     /**
      * Get cards eligible for friendship training (bond >= 80).
      */
     public function getFriendshipEligibleCards(SupportDeck $deck, TrainingType $facility): array
     {
         $eligibleCards = [];
-        
+
         foreach ($deck->cards as $card) {
-            if ($this->cardPresentAtFacility($card, $facility) 
+            if ($this->cardPresentAtFacility($card, $facility)
                 && $card->bond_level >= self::FRIENDSHIP_THRESHOLD) {
                 $eligibleCards[] = [
                     'card_id' => $card->id,
@@ -872,10 +798,10 @@ class BondCalculator
                 ];
             }
         }
-        
+
         return $eligibleCards;
     }
-    
+
     private function getFriendshipBonus(SupportCard $card): float
     {
         return match ($card->rarity) {
@@ -897,13 +823,13 @@ class RiskCalculator
     public function calculateFailureRisk(Career $career, TrainingType $facility): float
     {
         $baseRisk = 10.0; // 10% base failure rate
-        
+
         // Energy penalty: +1% risk per 10 energy below 50
         if ($career->energy < 50) {
             $energyPenalty = (50 - $career->energy) / 10;
             $baseRisk += $energyPenalty;
         }
-        
+
         // Mood modifier
         $moodModifier = match ($career->mood) {
             Mood::Great => -5.0,
@@ -913,14 +839,14 @@ class RiskCalculator
             Mood::Awful => +10.0,
         };
         $baseRisk += $moodModifier;
-        
+
         // Condition debuffs
         foreach ($career->conditions as $condition) {
             if ($condition->type === 'negative') {
                 $baseRisk += $condition->risk_increase;
             }
         }
-        
+
         // Cap at 90% max
         return min(90.0, max(0.0, $baseRisk));
     }
@@ -938,22 +864,22 @@ class TrainingExecutionService
     public function executeTraining(Career $career, TrainingType $facility): TrainingResult
     {
         $prediction = $this->predictionService->getPrediction($career, $facility);
-        
+
         return DB::transaction(function () use ($career, $facility, $prediction) {
             // Roll for success/failure
             $wasSuccessful = $this->rollForSuccess($prediction['risk_percentage']);
-            
+
             // Calculate actual gains using game formula
-            $rawGains = $wasSuccessful 
-                ? $prediction['stat_gains'] 
+            $rawGains = $wasSuccessful
+                ? $prediction['stat_gains']
                 : array_map(fn($v) => (int) ($v * 0.3), $prediction['stat_gains']);
-            
+
             // Apply soft cap (1200 threshold)
             $actualGains = $this->softCapCalculator->applySoftCap(
                 new StatGains($rawGains),
                 $career->getCurrentStats()
             );
-            
+
             // Update career stats
             $career->update([
                 'speed' => $career->speed + $actualGains->speed,
@@ -965,10 +891,10 @@ class TrainingExecutionService
                 'mood' => $this->calculateMoodChange($career, $wasSuccessful),
                 'current_turn' => $career->current_turn + 1,
             ]);
-            
+
             // Update bond levels (+7 base, +9 with Charming)
             $bondUpdates = $this->updateBondLevels($career, $facility, $prediction['bond_gains']);
-            
+
             // Record training session
             TrainingSession::create([
                 'career_id' => $career->id,
@@ -985,7 +911,7 @@ class TrainingExecutionService
                 'cards_present' => $prediction['cards_present'],
                 'skill_hints_gained' => $wasSuccessful ? $this->rollForHints($prediction['skill_hints']) : [],
             ]);
-            
+
             // Record stat progression snapshot
             StatProgress::create([
                 'career_id' => $career->id,
@@ -996,21 +922,21 @@ class TrainingExecutionService
                 'guts' => $career->guts,
                 'wit' => $career->wit,
             ]);
-            
+
             // Invalidate prediction cache
             $this->cache->forget("training_predictions:{$career->id}");
-            
+
             // Dispatch events
             event(new TrainingCompleted($career, $prediction, $wasSuccessful));
-            
+
             return new TrainingResult($career->fresh(), $actualGains, $wasSuccessful, $bondUpdates);
         });
     }
-    
+
     private function updateBondLevels(Career $career, TrainingType $facility, array $bondGains): array
     {
         $updates = [];
-        
+
         foreach ($bondGains as $bondGain) {
             $card = $career->supportDeck->cards->find($bondGain['card_id']);
             if ($card) {
@@ -1023,15 +949,15 @@ class TrainingExecutionService
                 ];
             }
         }
-        
+
         return $updates;
     }
-    
+
     private function rollForSuccess(float $riskPercentage): bool
     {
         return (rand(1, 100) > $riskPercentage);
     }
-    
+
     private function calculateMoodChange(Career $career, bool $wasSuccessful): Mood
     {
         if ($wasSuccessful && rand(1, 100) <= 30) {
@@ -1254,7 +1180,7 @@ sequenceDiagram
     User->>UI: Execute training
     UI->>Controller: POST /training/execute
     Controller->>Service: executeTraining(career, facility)
-    
+
     alt Validation Error
         Service-->>Controller: ValidationException
         Controller-->>UI: 422 Validation Error
@@ -1285,7 +1211,7 @@ sequenceDiagram
 | Constraint violation | Stat exceeds max (prevented by soft cap) | Rollback, log error |
 | Deadlock | Concurrent training execution | Rollback, retry with delay |
 | Cache failure | Redis unavailable | Proceed without cache, log warning |
-| Event dispatch failure | WebSocket unavailable | Complete transaction, queue event for retry |
+| Event dispatch failure | Status refresh unavailable | Complete transaction, queue event for retry |
 | Bond update failure | Invalid card reference | Rollback, log error |
 
 ---
@@ -1302,7 +1228,7 @@ sequenceDiagram
 | Soft cap calculation | <10ms | ~5ms | ✅ Met |
 | Bond calculation | <20ms | ~10ms | ✅ Met |
 | Training execution | <300ms | ~280ms | ✅ Met |
-| WebSocket broadcast | <100ms | ~50ms | ✅ Met |
+| Status refresh propagation | request-dependent | request-dependent | ✅ Implemented |
 | Total user flow (selection + execution) | <2s | ~1.8s | ✅ Met |
 
 ### 8.2 Optimization Strategies
@@ -1375,10 +1301,10 @@ $this->cache->remember("training_predictions:{$career->id}", 300, fn() => $this-
 
 | Document | Description |
 | --- | --- |
-| [PRD-002](../prds/PRD-002_Training_Optimization.md) | Product requirements for training system |
-| [SPEC-002](../specs/SPEC-002_Training_Optimization_Technical.md) | Technical specification for training optimization |
-| [FLOW-002](../flows/FLOW-002_Training_Optimization_System.md) | System flow for training operations |
-| [TECH-FLOW-002](../tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md) | Technical flow diagrams |
+| [PRD-002](../02-prds/PRD-002_Training_Optimization.md) | Product requirements for training system |
+| [SPEC-002](../02-specs/SPEC-002_Training_Optimization_Technical.md) | Technical specification for training optimization |
+| [FLOW-002](../01-flows/FLOW-002_Training_Optimization_System.md) | System flow for training operations |
+| [TECH-FLOW-002](../01-tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md) | Technical flow diagrams |
 
 ### 9.2 Related Sequences
 
@@ -1392,15 +1318,15 @@ $this->cache->remember("training_predictions:{$career->id}", 300, fn() => $this-
 
 | Document | Description |
 | --- | --- |
-| [WF-004](../wireframes/WF-004_Training_Selection_Interface.md) | Wireframe specification for training selection |
-| [WF-005](../wireframes/WF-005_Training_Result_Screen.md) | Training result display wireframe |
-| [UF-003](../user-flows/UF-003_Training_Day_Flow.md) | User flow for training day |
+| [WF-004](../01-wireframes/WF-004_Training_Selection_Interface.md) | Wireframe specification for training selection |
+| [WF-005](../01-wireframes/WF-005_Training_Result_Screen.md) | Training result display wireframe |
+| [UF-003](../01-user-flows/UF-003_Training_Day_Flow.md) | User flow for training day |
 
 ### 9.4 Database Documentation
 
 | Document | Description |
 | --- | --- |
-| [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
+| [DBD-009](../00-core-docs/009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ### 9.5 Game Mechanics Reference
 
@@ -1417,6 +1343,7 @@ $this->cache->remember("training_predictions:{$career->id}", 300, fn() => $this-
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-10 | Development Team | Corrected mood modifier values to game-accurate Great: +4%, Good: +2%, Normal: 0%, Bad: −2%, Awful: −4%; simplified formula by removing MoodEffect multiplicative nesting; renamed MoodMultiplier → MoodModifier and TrainingEffect → FacilityLevelBonus; added approximation note |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added complete training formula, corrected facility multipliers (1.0×-2.0×), updated bond mechanics (+7 base, +9 Charming), soft cap at 1200 with 50% reduction, friendship training threshold at 80% bond, support card presence bonus (+5% per card), Summer Training Camp mechanics |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, caching strategy, WebSocket integration, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
@@ -1445,4 +1372,9 @@ $this->cache->remember("training_predictions:{$career->id}", 300, fn() => $this-
 
 ---
 
-*This sequence diagram reflects the game-accurate training mechanics verified from the Global English Server as of January 2026. The complete training formula, soft cap system, bond mechanics, and friendship training thresholds have been validated against in-game behavior. For the most up-to-date information, refer to the source code in `app/Services/TrainingPredictionService.php`, `app/Services/StatCalculator.php`, `app/Services/SoftCapCalculator.php`, `app/Services/BondCalculator.php`, and related files.*
+*This sequence diagram reflects the game-accurate training mechanics verified from the Global
+English Server as of January 2026. The complete training formula, soft cap system, bond mechanics,
+and friendship training thresholds have been validated against in-game behavior. For the most up-to-
+date information, refer to the source code in `app/Services/TrainingPredictionService.php`,
+`app/Services/StatCalculator.php`, `app/Services/SoftCapCalculator.php`,
+`app/Services/BondCalculator.php`, and related files.*

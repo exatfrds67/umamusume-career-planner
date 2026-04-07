@@ -250,7 +250,7 @@ protected function provider(): AIProviderInterface
             'secret' => 'AWS_BEDROCK_SECRET',
         ],
     ]);
-    
+
     return new BedrockRuntime(
         client: $client,
         model: 'anthropic.claude-v2',
@@ -309,7 +309,7 @@ interface AIProviderInterface
      * @param array<ToolInterface> $tools
      */
     public function setTools(array $tools): AIProviderInterface;
-    
+
     /**
      * The component responsible for mapping NeuronAI Message to provider format.
      */
@@ -319,12 +319,12 @@ interface AIProviderInterface
      * Send a prompt to the AI agent.
      */
     public function chat(array $messages): Message;
-    
+
     /**
      * Yield the LLM response.
      */
     public function stream(array|string $messages, callable $executeToolsCallback): \Generator;
-    
+
     /**
      * Schema validated response.
      */
@@ -348,11 +348,11 @@ use NeuronAI\Providers\MessageMapperInterface;
 class MyAIProvider implements AIProviderInterface
 {
     use HandleWithTools;
-    
+
     protected Client $client;
     protected string $system;
     protected MessageMapperInterface $messageMapper;
-    
+
     public function __construct(
         protected string $key,
         protected string $model
@@ -387,7 +387,7 @@ class MyAIProvider implements AIProviderInterface
                 }, $messages)
             ]
         ])->getBody()->getContents();
-        
+
         $result = \json_decode($result, true);
 
         return new AssistantMessage($result['content']);
@@ -397,7 +397,9 @@ class MyAIProvider implements AIProviderInterface
 
 ### Contributing
 
-We strongly recommend submitting new provider implementations via PR on the official repository or using [Inspector.dev](https://inspector.dev) support channels. Community contributions receive important advancement support.
+We strongly recommend submitting new provider implementations via PR on the official repository or
+using [Inspector.dev](https://inspector.dev) support channels. Community contributions receive
+important advancement support.
 
 ---
 

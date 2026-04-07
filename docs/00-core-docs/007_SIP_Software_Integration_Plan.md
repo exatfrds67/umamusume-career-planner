@@ -27,7 +27,10 @@
 
 ## 1. Purpose
 
-This Software Integration Plan defines the integration strategy for external services, internal subsystems, and AI components within the Umamusume Pretty Derby Career Planner. It ensures seamless coordination between the Laravel 12 backend, Neuron AI agents, MCP servers (42 tool services), external APIs, the OCR pipeline, and the Admin Panel.
+This Software Integration Plan defines the integration strategy for external services, internal
+subsystems, and AI components within the Umamusume Pretty Derby Career Planner. It ensures seamless
+coordination between the Laravel 12 backend, Neuron AI agents, MCP servers (42 tool services),
+external APIs, the OCR pipeline, and the Admin Panel.
 
 ---
 
@@ -174,13 +177,13 @@ flowchart LR
 
     subgraph Integration["Integration Services"]
         ExternalAPI["External API Service"]
-        OCRService["OCR Service"]
+        TesseractService["Tesseract Service"]
         MCPService["MCP Service"]
     end
 
     Laravel --> NeuronAI
     Laravel --> ExternalAPI
-    Laravel --> OCRService
+    Laravel --> TesseractService
     Laravel --> MCPService
     Livewire4 --> Laravel
     NeuronAI --> Ollama
@@ -548,24 +551,24 @@ stateDiagram-v2
 flowchart TD
     Request["API Request"]
     CircuitBreaker{"Circuit Breaker State"}
-    
+
     Request --> CircuitBreaker
     CircuitBreaker -->|Closed| APICall["Make API Call"]
     CircuitBreaker -->|Open| CacheCheck["Check Cache"]
     CircuitBreaker -->|Half-Open| ProbeCall["Probe Request"]
-    
+
     APICall -->|Success| UpdateCache["Update Cache"]
     APICall -->|Failure| IncrementFailure["Increment Failures"]
-    
+
     IncrementFailure -->|Threshold| OpenCircuit["Open Circuit"]
     IncrementFailure -->|Below| ReturnError["Return Error"]
-    
+
     CacheCheck -->|Hit| ReturnCached["Return Cached"]
     CacheCheck -->|Miss| ReturnFallback["Return Fallback"]
-    
+
     ProbeCall -->|Success| CloseCircuit["Close Circuit"]
     ProbeCall -->|Failure| KeepOpen["Keep Open"]
-    
+
     UpdateCache --> ReturnResponse["Return Response"]
 ```text
 
@@ -635,7 +638,7 @@ flowchart TD
         AIService["AI Service"]
         MCPService["MCP Service"]
         ExternalService["External API Service"]
-        OCRService["OCR Service"]
+        TesseractService["Tesseract Service"]
     end
 
     subgraph Alerts["Alert System"]

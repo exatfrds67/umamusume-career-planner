@@ -1,8 +1,8 @@
 # Sidebar Minimize/Collapse Implementation Plan
 
-**Document Version**: 1.0.0  
-**Date**: February 8, 2026  
-**Status**: Planning Phase  
+**Document Version**: 1.0.0
+**Date**: February 8, 2026
+**Status**: Planning Phase
 **Related Documents**: [component-inventory.md](../design/component-inventory.md),
 [000_WIREFRAMES_INDEX.md](../01-wireframes/000_WIREFRAMES_INDEX.md)
 
@@ -97,22 +97,22 @@ sidebar on desktop screens, improving screen real estate management.
 // Alpine.js store for sidebar state
 export default {
     minimized: localStorage.getItem('sidebar-minimized') === 'true',
-    
+
     toggle() {
         this.minimized = !this.minimized;
         localStorage.setItem('sidebar-minimized', this.minimized);
-        
+
         // Dispatch event for other components
         window.dispatchEvent(new CustomEvent('sidebar-toggled', {
             detail: { minimized: this.minimized }
         }));
     },
-    
+
     expand() {
         this.minimized = false;
         localStorage.setItem('sidebar-minimized', false);
     },
-    
+
     minimize() {
         this.minimized = true;
         localStorage.setItem('sidebar-minimized', true);
@@ -151,27 +151,30 @@ Alpine.store('sidebar', sidebarStore);
     <!-- Logo -->
     <div class="flex items-center gap-3" :class="$store.sidebar.minimized ? 'flex-col' : ''">
         <img src="/images/app_logo/uma_musume_race_planner_logo_128.png"
-            alt="{{ config('app.name') }} logo" 
+            alt="{{ config('app.name') }} logo"
             class="h-10 w-10 shrink-0">
-        <span x-show="!$store.sidebar.minimized" 
+        <span x-show="!$store.sidebar.minimized"
               x-transition
               class="text-base font-bold text-primary-600 dark:text-primary-400 leading-tight">
             Umamusume<br>Career Planner
         </span>
     </div>
-    
+
     <!-- Toggle Button (Desktop Only) -->
     <button @click="$store.sidebar.toggle()"
             type="button"
-            class="hidden lg:flex -mr-2 p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="hidden lg:flex -mr-2 p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-
+            gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             :aria-label="$store.sidebar.minimized ? 'Expand sidebar' : 'Minimize sidebar'"
             :aria-expanded="!$store.sidebar.minimized">
         <!-- Chevron Double Left (Minimize) -->
-        <svg x-show="!$store.sidebar.minimized" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <svg x-show="!$store.sidebar.minimized" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-
+        width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
         </svg>
         <!-- Chevron Double Right (Expand) -->
-        <svg x-show="$store.sidebar.minimized" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <svg x-show="$store.sidebar.minimized" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-
+        width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
         </svg>
     </button>
@@ -209,15 +212,16 @@ Alpine.store('sidebar', sidebarStore);
 <!-- Minimized: Show icon with tooltip -->
 <li x-show="$store.sidebar.minimized" x-transition>
     <div x-data="{ tooltip: false }" class="relative">
-        <button @mouseenter="tooltip = true" 
+        <button @mouseenter="tooltip = true"
                 @mouseleave="tooltip = false"
                 class="group flex justify-center rounded-md p-2 ...">
             <svg class="h-6 w-6 shrink-0" ...>...</svg>
         </button>
         <!-- Tooltip -->
-        <div x-show="tooltip" 
+        <div x-show="tooltip"
              x-transition
-             class="absolute left-full ml-2 top-0 z-50 bg-gray-900 text-white text-sm px-3 py-2 rounded-md whitespace-nowrap">
+             class="absolute left-full ml-2 top-0 z-50 bg-gray-900 text-white text-sm px-3 py-2 rounded-md
+             whitespace-nowrap">
             Data Management
         </div>
     </div>
@@ -234,7 +238,8 @@ Alpine.store('sidebar', sidebarStore);
 
 ```blade
 <!-- Desktop Sidebar -->
-<div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col lg:border-r lg:border-gray-200 dark:lg:border-gray-700 lg:bg-white dark:lg:bg-gray-800"
+<div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col lg:border-r
+lg:border-gray-200 dark:lg:border-gray-700 lg:bg-white dark:lg:bg-gray-800"
      :class="$store.sidebar.minimized ? 'lg:w-20' : 'lg:w-72'"
      x-transition:all.duration.300ms>
     <x-app.sidebar />
@@ -261,13 +266,13 @@ Alpine.store('sidebar', sidebarStore);
 @props(['text', 'position' => 'right'])
 
 <div x-data="{ show: false }" class="relative inline-block">
-    <div @mouseenter="show = true" 
+    <div @mouseenter="show = true"
          @mouseleave="show = false"
          @focus="show = true"
          @blur="show = false">
         {{ $slot }}
     </div>
-    
+
     <div x-show="show"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 translate-x-2"
@@ -276,7 +281,8 @@ Alpine.store('sidebar', sidebarStore);
          x-transition:leave-start="opacity-100 translate-x-0"
          x-transition:leave-end="opacity-0 translate-x-2"
          @class([
-             'absolute z-50 px-3 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-gray-700 rounded-lg shadow-lg whitespace-nowrap pointer-events-none',
+             'absolute z-50 px-3 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-gray-700 rounded-lg
+             shadow-lg whitespace-nowrap pointer-events-none',
              'left-full ml-2 top-1/2 -translate-y-1/2' => $position === 'right',
              'right-full mr-2 top-1/2 -translate-y-1/2' => $position === 'left',
          ])
@@ -363,9 +369,9 @@ Add keyboard shortcut documentation to the help modal.
 </button>
 
 <!-- Announce state changes -->
-<div role="status" 
-     aria-live="polite" 
-     aria-atomic="true" 
+<div role="status"
+     aria-live="polite"
+     aria-atomic="true"
      class="sr-only">
     <span x-text="$store.sidebar.minimized ? 'Sidebar minimized' : 'Sidebar expanded'"></span>
 </div>
@@ -438,57 +444,57 @@ import AxeBuilder from '@axe-core/playwright';
 test.describe('Sidebar Minimize Accessibility', () => {
     test('should not have accessibility violations', async ({ page }) => {
         await page.goto('/dashboard');
-        
+
         const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
         expect(accessibilityScanResults.violations).toEqual([]);
-        
+
         // Click minimize button
         await page.click('[aria-label="Minimize sidebar"]');
-        
+
         // Scan again in minimized state
         const minimizedScanResults = await new AxeBuilder({ page }).analyze();
         expect(minimizedScanResults.violations).toEqual([]);
     });
-    
+
     test('toggle button has correct ARIA attributes', async ({ page }) => {
         await page.goto('/dashboard');
-        
+
         const toggleButton = page.locator('[aria-label="Minimize sidebar"]');
         await expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
-        
+
         await toggleButton.click();
         await expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
         await expect(toggleButton).toHaveAttribute('aria-label', 'Expand sidebar');
     });
-    
+
     test('keyboard shortcut works', async ({ page }) => {
         await page.goto('/dashboard');
-        
+
         // Press Alt+B
         await page.keyboard.press('Alt+b');
-        
+
         // Verify sidebar is minimized
         const sidebar = page.locator('.lg\\:w-20');
         await expect(sidebar).toBeVisible();
-        
+
         // Press Alt+B again
         await page.keyboard.press('Alt+b');
-        
+
         // Verify sidebar is expanded
         const expandedSidebar = page.locator('.lg\\:w-72');
         await expect(expandedSidebar).toBeVisible();
     });
-    
+
     test('tooltips appear on hover in minimized state', async ({ page }) => {
         await page.goto('/dashboard');
-        
+
         // Minimize sidebar
         await page.click('[aria-label="Minimize sidebar"]');
-        
+
         // Hover over Dashboard icon
         const dashboardIcon = page.locator('a[href*="dashboard"]').first();
         await dashboardIcon.hover();
-        
+
         // Verify tooltip appears
         const tooltip = page.locator('[role="tooltip"]:has-text("Dashboard")');
         await expect(tooltip).toBeVisible();
@@ -508,23 +514,23 @@ test.describe('Sidebar Visual States', () => {
         await page.goto('/dashboard');
         await expect(page).toHaveScreenshot('sidebar-expanded.png');
     });
-    
+
     test('minimized state matches snapshot', async ({ page }) => {
         await page.goto('/dashboard');
         await page.click('[aria-label="Minimize sidebar"]');
         await page.waitForTimeout(300); // Wait for transition
         await expect(page).toHaveScreenshot('sidebar-minimized.png');
     });
-    
+
     test('transition animation is smooth', async ({ page }) => {
         await page.goto('/dashboard');
-        
+
         // Record video of transition
         await page.video();
-        
+
         await page.click('[aria-label="Minimize sidebar"]');
         await page.waitForTimeout(300);
-        
+
         await page.click('[aria-label="Expand sidebar"]');
         await page.waitForTimeout(300);
     });

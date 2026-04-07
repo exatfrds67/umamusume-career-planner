@@ -2,7 +2,9 @@
 
 ## Overview
 
-The `RecommendationParser` service parses AI responses from the Neuron AI infrastructure (Ollama + AWS Bedrock) into structured `Recommendation` value objects. It handles malformed responses, validates AI output, and provides fallback strategies for natural language parsing.
+The `RecommendationParser` service parses AI responses from the Neuron AI infrastructure (Ollama +
+AWS Bedrock) into structured `Recommendation` value objects. It handles malformed responses,
+validates AI output, and provides fallback strategies for natural language parsing.
 
 ## Features
 
@@ -159,7 +161,8 @@ Based on the analysis, I recommend: {"priority": "high", "action": "Train Speed"
 
 ```
 
-I strongly recommend training at the Speed facility immediately. This is critical because your character needs to improve speed stats urgently.
+I strongly recommend training at the Speed facility immediately. This is critical because your
+character needs to improve speed stats urgently.
 
 ```text
 

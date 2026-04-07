@@ -1,7 +1,7 @@
 # Backend Integration Planning: Character Creation Persistence
 
-**Date**: January 22, 2026  
-**Phase**: Backend Integration (Phase 2 of Character Management PRD-001)  
+**Date**: January 22, 2026
+**Phase**: Backend Integration (Phase 2 of Character Management PRD-001)
 **Status**: ⏳ Planning Complete - Ready for Implementation
 
 ---
@@ -29,18 +29,18 @@ read views.
 - [ ] **1.1**: Review CharacterController::store() existing implementation
   - Check for existing validation, database persistence logic
   - Identify what needs to be added/updated
-  
+
 - [ ] **1.2**: Create StoreCharacterRequest FormRequest
   - Validate: trainee_id (exists), scenario_type (valid enum), name (required, string, 1-255 chars)
   - Validate: parents (array, 2 elements), factors (array of selected factor IDs)
   - Validate: stats (array, 0-1200 per stat), aptitudes (distance/surface/style grades)
   - Validate: supportDeck (array of 6 slot assignments with card IDs)
-  
+
 - [ ] **1.3**: Create FactorInheritance factory + verify 8 factor options seeded
   - Create factory: database/factories/FactorInheritanceFactory.php
   - Verify seeder: database/seeders/FactorInheritanceSeeder.php creates 8 options
   - Run seeder if needed
-  
+
 - [ ] **1.4**: Verify database schema correctness
   - runs table: trainee_id (FK), scenario_type (string/enum), starting_stats (JSON), aptitudes (JSON), created_at,
   updated_at
@@ -57,22 +57,22 @@ read views.
   - Extract scenario_type from formData.scenario_type
   - Extract starting_stats array (speed, stamina, power, guts, wit) as JSON
   - Create Run record with all required fields
-  
+
 - [ ] **2.2**: Add stat validation logic
   - Each stat: 0-1200 range (validation already in FormRequest, but double-check)
   - Optional: sum constraint if game rules require total ≤ 6000
   - Store as JSON in runs.starting_stats column
-  
+
 - [ ] **2.3**: Implement inheritance factor seed logic
   - Loop through formData.factors (array of selected factor IDs)
   - Create FactorInheritance records linking run_id to each factor_id
   - Use pivot table or FactorInheritance model with relationships
-  
+
 - [ ] **2.4**: Implement support deck slot creation
   - Parse formData.supportDeck array (6 objects with slot_type and card_id)
   - Create SupportDeckSlot record for each slot
   - Maintain slot order: index 0-5 → Speed, Stamina, Power, Guts, Wit, Friend
-  
+
 - [ ] **2.5**: Add error handling and transaction rollback
   - Wrap all database operations in DB::transaction()
   - On validation error: return error response with 422 Unprocessable Entity
@@ -86,17 +86,17 @@ read views.
   - formData.trainee contains trainee name/ID (check Alpine data structure)
   - Use Trainee::findOrFail() or Trainee::where('name', ...)->first()
   - Extract trainee_id for database insertion
-  
+
 - [ ] **3.2**: Extract trainee name and avatar URL
   - Query Trainee model after successful Run creation
   - Get name and image_path attributes
   - Return in response for frontend redirect/confirmation
-  
+
 - [ ] **3.3**: Parse formData.supportDeck and create SupportDeckSlot records
   - formData.supportDeck is array of 6 slot objects: { slot_type, card_id, support_card }
   - Create SupportDeckSlot record for each, maintaining order
   - Verify all 6 slots are created (error if < 6)
-  
+
 - [ ] **3.4**: Return success response with 201 Created
   - Response structure: `{ success: true, run_id: 123, character: { name, avatar_url }, redirect_url: '/characters/123'
   }`
@@ -111,23 +111,23 @@ read views.
   - File: resources/views/characters/show.blade.php
   - Extends: layouts.app
   - Sections: header (character name + avatar), stats, aptitudes, parents/factors, support deck
-  
+
 - [ ] **4.2**: Display character name, trainee avatar, scenario type, stats with grade badges
   - Show trainee avatar (from run.trainee.image_path)
   - Show character name (from run.name or trainee.name)
   - Show scenario_type (URA Finale or Unity Cup)
   - Show starting stats with grade badges (A, B, C, D, E based on value ranges)
-  
+
 - [ ] **4.3**: Add collapsible parents/factors summary section
   - Display: Parent A name, Parent B name (or "Not selected" if NULL)
   - Display: Selected factor inheritance names (loop through run.factors)
   - Read-only display (no editing in this view)
-  
+
 - [ ] **4.4**: Add support deck configuration card display
   - Show 6 deck slots: Speed, Stamina, Power, Guts, Wit, Friend
   - For each slot, display assigned support card name + image (or "Empty" if NULL)
   - Show card rarity/type metadata if available
-  
+
 - [ ] **4.5**: Add edit button linking to wizard in edit mode (future enhancement)
   - For now: add comment "Edit mode coming in Phase C"
   - Button would link to /characters/{id}/edit with prefilled form data
@@ -143,21 +143,21 @@ read views.
   - Test missing stats: → validation error on 'stats.speed', etc.
   - Test stat out of range (> 1200): → validation error
   - Test missing supportDeck: → validation error
-  
+
 - [ ] **5.2**: Write feature tests for CharacterController::store() integration
   - Happy path: POST valid form data → 201 Created, run created in DB
   - Verify database: Run record exists with correct trainee_id, scenario_type, starting_stats
   - Verify database: FactorInheritance records created for selected factors
   - Verify database: SupportDeckSlot records created for all 6 slots
   - Error case: invalid trainee_id → 422 Unprocessable Entity
-  
+
 - [ ] **5.3**: Write feature tests for character detail view
   - Test route: GET /characters/{id} → 200 OK
   - Test rendering: verify trainee avatar, character name, scenario type displayed
   - Test stats display: verify all 5 stats shown with correct values
   - Test factors display: verify selected factors listed
   - Test deck display: verify 6 slots displayed (with cards or "Empty")
-  
+
 - [ ] **5.4**: Browser verify end-to-end flow
   - Open wizard at <http://127.0.0.1:8000/characters/create>
   - Fill all 4 steps (trainee, parents, factors, deck, stats, aptitudes)
@@ -323,5 +323,5 @@ This order ensures backend is tested before frontend detail view is built.
 
 ---
 
-**Planning Complete** ✅  
+**Planning Complete** ✅
 **Ready for Implementation** 🚀

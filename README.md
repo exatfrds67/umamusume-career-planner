@@ -797,10 +797,17 @@ See [tests/Browser/README.md](tests/Browser/README.md) for details.
 | [010_SCD](docs/00-core-docs/010_SCD_Source_Code_Documentation.md) | Code structure and conventions |
 | [017_SUM](docs/00-core-docs/017_SUM_Software_User_Manual.md) | User guide and tutorials |
 
+## Documentation
+
+### 🤖 **LLM Reference Index** (Primary for AI Assistants)
+
+**👉 [LLM_REFERENCE_INDEX.md](docs/LLM_REFERENCE_INDEX.md)** — Centralized reference guide for LLMs to quickly locate architecture, APIs, features, and integration documentation. **Start here for all LLM-assisted development.**
+
 ### Technical Documentation
 
 | Document | Description |
 | -------- | ----------- |
+| [Core Docs](docs/00-core-docs/) | SDLC specifications (SDP, DBD, SRS, SDS, glossary) |
 | [PRDs](docs/02-prds/) | Product requirement documents (7 modules) |
 | [SPECs](docs/02-specs/) | Technical specifications (7 modules) |
 | [Flows](docs/01-flows/) | System flow diagrams |

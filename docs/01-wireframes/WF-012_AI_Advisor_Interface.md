@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0
+**Date**: March 9, 2026
 **Related Documents**: [PRD-006], [SPEC-006], [FLOW-006], [SEQ-006]
 
 **Source Specs**:
@@ -13,14 +13,16 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-006](../prds/PRD-006_AI_Advisory.md)
-- SPEC: [SPEC-006](../specs/SPEC-006_AI_Advisory_Technical.md)
-- Flow: [FLOW-006](../flows/FLOW-006_AI_Advisory_System.md)
-- Tech Flow: [TECH-FLOW-006](../tech-flow/TECH-FLOW-006_AI_Advisory_Flow.md)
-- Sequences: [SEQ-006](../sequences/SEQ-006_AI_Advice_Generation.md)
-- User Flows: [UF-007](../user-flows/UF-007_AI_Advisor_Journey.md)
+- PRD: [PRD-006](../02-prds/PRD-006_AI_Advisory.md)
+- SPEC: [SPEC-006](../02-specs/SPEC-006_AI_Advisory_Technical.md)
+- Flow: [FLOW-006](../01-flows/FLOW-006_AI_Advisory_System.md)
+- Tech Flow: [TECH-FLOW-006](../01-tech-flow/TECH-FLOW-006_AI_Advisory_Flow.md)
+- Sequences: [SEQ-006](../01-sequences/SEQ-006_AI_Advice_Generation.md)
+- User Flows: [UF-007](../01-user-flows/UF-007_AI_Advisor_Journey.md)
 - MCP Config: [MCP_SERVER_CONFIGURATION_REFERENCE](../MCP_SERVER_CONFIGURATION_REFERENCE.md)
 - Related WF: [WF-001](WF-001_Dashboard_Overview.md), [WF-004](WF-004_Training_Selection_Interface.md)
+
+> **Alignment Note (March 2026)**: This wireframe has been reviewed for provider-routing consistency, storage-mode framing, and accessibility contract completeness. Provider names and service class names shown in code blocks are **illustrative contracts**; actual provider routing is environment-configured and should be verified against the current implementation before use.
 
 ---
 
@@ -28,9 +30,13 @@
 
 ### 1.1 Purpose
 
-The AI Advisor Interface provides an intelligent conversational interface for training optimization, race strategy, skill recommendations, and career planning. It leverages a hybrid AI architecture combining local Ollama models with AWS Bedrock Claude fallback for optimal performance and cost efficiency.
+The AI Advisor Interface provides an intelligent conversational interface for training optimization,
+race strategy, skill recommendations, and career planning. It routes through a configuration-driven
+advisory layer that selects the appropriate provider (local or cloud) based on environment settings.
 
-**The AI Advisor is built on verified game mechanics from Umamusume Pretty Derby (Global English Server, January 2026)** to provide accurate, actionable advice based on the actual training formula and game systems.
+**The AI Advisor is built on verified game mechanics from Umamusume Pretty Derby (Global English
+Server, January 2026)** to provide accurate, actionable advice based on the actual training formula
+and game systems.
 
 ### 1.2 Key Objectives
 
@@ -56,6 +62,25 @@ The AI Advisor Interface provides an intelligent conversational interface for tr
 
 ---
 
+### 1.4 Storage Mode Support
+
+| Mode | Behavior |
+| --- | --- |
+| **Local Mode** | AI context draws from local character run state; conversation is browser-session scoped |
+| **Account Mode** | AI context draws from database-backed career state; conversation history may persist when authenticated |
+
+Advisory accuracy is equivalent in both modes; context depth may vary based on available state.
+
+### 1.5 Navigation Surface
+
+| Surface | Description |
+| --- | --- |
+| **Entry** | Conceptual: AI advisor route, accessible from dashboard, training selection, and race preparation screens |
+| **Provider routing** | Handled by configuration-driven advisory layer — not hardcoded to a specific model or endpoint |
+| **Degraded mode** | When no provider is reachable, surface a cached or static fallback recommendation |
+
+---
+
 ## 2. Game Mechanics Reference (AI Knowledge Base)
 
 ### 2.1 Training Formula (Verified Jan 2026 - Global English Server)
@@ -63,7 +88,7 @@ The AI Advisor Interface provides an intelligent conversational interface for tr
 The AI Advisor uses the following verified training formula for stat gain predictions:
 
 ```text
-Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
+Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect))
             × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
 ```
 
@@ -166,7 +191,7 @@ The AI Advisor tracks and advises based on critical stat breakpoints:
 │ └────────────────────────────────────────────────────────┘                   │
 │                                                                              │
 │ ┌──────────────────────────────────────────────────────────────────────────┐ │
-│ │ [ 🤖 AI Advisor ] (Ollama - Online)                    Cost: $0.00       │ │
+│ │ [ 🤖 AI Advisor ] (Environment-configured)             Cost: $0.00       │ │
 │ ├──────────────────────────────────────────────────────────────────────────┤ │
 │ │ "Based on your current Speed (850) and the G1 Derby in 5 turns:          │ │
 │ │                                                                          │ │
@@ -196,7 +221,7 @@ The AI Advisor tracks and advises based on critical stat breakpoints:
 │ Turn: 45/78 | Phase: Classic | Next: G1 Derby (5t) │
 ├────────────────────────────────────────────────────┤
 │                                                    │
-│ [ 🤖 AI ] (Ollama - Online)                        │
+│ [ 🤖 AI ] (Environment-configured)                 │
 │ ┌────────────────────────────────────────────────┐ │
 │ │ "Speed Training recommended.                   │ │
 │ │ Expected: +18-22 | 51 pts to soft cap"         │ │
@@ -229,7 +254,7 @@ The AI Advisor tracks and advises based on critical stat breakpoints:
 ├──────────────────────────────┤
 │ T:45/78 | Classic | Derby:5t │
 ├──────────────────────────────┤
-│ [ 🤖 AI ] (Ollama)           │
+│ [ 🤖 AI ] (Env-configured)   │
 │ ┌──────────────────────────┐ │
 │ │ "Speed Training.         │ │
 │ │ +18-22 expected.         │ │
@@ -282,16 +307,16 @@ class ProviderStatus extends Component
 
     protected $listeners = ['ai-response-received' => 'loadUsageMetrics'];
 
-    private function loadProviderStatus()
+    private function loadProviderStatus(): void
     {
-        $ollamaService = app(OllamaService::class);
+        // Illustrative: actual provider resolution is handled by the configured advisory routing layer
         $this->activeProvider = config('ai.default_provider');
-        $this->providerStatus = $ollamaService->isAvailable() ? 'online' : 'offline';
+        $this->providerStatus = 'resolved-at-runtime';
     }
 
     private function loadUsageMetrics()
     {
-        $tracker = app(AICostTracker::class);
+        $tracker = app(CostTrackingService::class);
         $this->monthlyUsage = $tracker->getMonthlyUsage();
         $this->costBudget = config('ai.monthly_budget', 50.00);
     }
@@ -309,9 +334,9 @@ class ProviderStatus extends Component
 ┌────────────────────────────────────────┐
 │ AI Provider Status                     │
 ├────────────────────────────────────────┤
-│ Active Provider: Ollama (Local)        │
+│ Active Provider: Environment-configured│
 │ Status: ● Online                       │
-│ Fallback: AWS Bedrock Claude 3.5 Sonnet│
+│ Fallback: Per configuration            │
 │                                        │
 │ Monthly Usage:                         │
 │ Tokens: 125,430 / 1,000,000            │
@@ -356,7 +381,7 @@ class TurnPhaseIndicator extends Component
     {
         $breakpoints = [];
         $stats = ['speed', 'stamina', 'power', 'guts', 'wit'];
-        
+
         foreach ($stats as $stat) {
             $value = $character->$stat;
             $toSoftCap = max(0, 1200 - $value);
@@ -367,7 +392,7 @@ class TurnPhaseIndicator extends Component
                 'above_cap' => $value > 1200,
             ];
         }
-        
+
         return $breakpoints;
     }
 
@@ -440,17 +465,17 @@ class TrainingFormulaDisplay extends Component
     ): int {
         $moodMultiplier = 0.2;
         $moodEffect = $moodLevel; // -2 to +2
-        
+
         $friendshipMultiplier = $friendshipActive ? 1.2 : 1.0;
         $cardBonus = 1 + (0.05 * $supportCards);
-        
-        $gain = ($base + $statBonus) 
-            * (1 + $growthRate) 
+
+        $gain = ($base + $statBonus)
+            * (1 + $growthRate)
             * (1 + $moodMultiplier * (1 + $moodEffect))
             * (1 + $trainingEffect)
             * $cardBonus
             * $friendshipMultiplier;
-        
+
         return (int) round($gain);
     }
 
@@ -605,11 +630,15 @@ class QuickTopics extends Component
     public function selectTopic(string $topic)
     {
         $prompts = [
-            'training' => 'Based on my current stats and the training formula, which facility should I train at? Consider my growth rates, support card positions, and distance to soft cap.',
-            'race_prep' => 'How should I prepare for my upcoming race? What stats do I need and how many turns do I have?',
-            'skills' => 'Which skills should I prioritize acquiring? Consider my SP budget, hint availability, and character aptitudes.',
+            'training' => 'Based on my current stats and the training formula, which facility should I train at?
+            Consider my growth rates, support card positions, and distance to soft cap.',
+            'race_prep' => 'How should I prepare for my upcoming race? What stats do I need and how many turns
+            do I have?',
+            'skills' => 'Which skills should I prioritize acquiring? Consider my SP budget, hint availability,
+            and character aptitudes.',
             'rest' => 'Should I rest this turn? Consider my energy level, upcoming races, and training opportunities.',
-            'events' => 'What is the optimal choice for the current event? Consider stat gains, skill hints, and long-term impact.',
+            'events' => 'What is the optimal choice for the current event? Consider stat gains, skill hints, and
+            long-term impact.',
         ];
 
         $this->dispatch('topic-selected', [
@@ -693,13 +722,13 @@ class AdvisorChat extends Component
         $this->inputMessage = '';
 
         // Get AI response with game mechanics context
-        $aiService = app(AIAdvisoryService::class);
+        $aiService = app(HybridAIService::class);
         $character = Character::findOrFail($this->characterId);
 
         try {
             $response = $aiService->getAdvice(
-                $character, 
-                'general', 
+                $character,
+                'general',
                 $userMessage->content,
                 $this->gameMechanics // Pass game mechanics to AI
             );
@@ -739,21 +768,21 @@ class AdvisorChat extends Component
     {
         $warnings = [];
         $stats = ['speed', 'stamina', 'power', 'guts', 'wit'];
-        
+
         foreach ($stats as $stat) {
             $value = $character->$stat;
-            
+
             // Approaching soft cap
             if ($value >= 1100 && $value < 1200) {
                 $warnings[] = ucfirst($stat) . " approaching soft cap (1200)";
             }
-            
+
             // Above soft cap
             if ($value >= 1200) {
                 $warnings[] = ucfirst($stat) . " above soft cap - 50% reduced gains";
             }
         }
-        
+
         return !empty($warnings) ? implode('; ', $warnings) : null;
     }
 
@@ -857,7 +886,8 @@ class AdvisorChat extends Component
             <span class="value">{{ $contextData['current_turn'] }} / {{ $contextData['total_turns'] }}</span>
         </div>
         <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ ($contextData['current_turn'] / $contextData['total_turns']) * 100 }}%"></div>
+            <div class="progress-fill" style="width: {{ ($contextData['current_turn'] /
+            $contextData['total_turns']) * 100 }}%"></div>
         </div>
         <div class="context-row">
             <span class="label">Phase:</span>
@@ -897,7 +927,7 @@ class AdvisorChat extends Component
                 <div class="bond-item">
                     <span class="card-name">{{ $card['name'] }}</span>
                     <div class="bond-bar">
-                        <div class="bond-fill {{ $card['bond'] >= 80 ? 'friendship-ready' : '' }}" 
+                        <div class="bond-fill {{ $card['bond'] >= 80 ? 'friendship-ready' : '' }}"
                              style="width: {{ $card['bond'] }}%"></div>
                     </div>
                     <span class="bond-value">{{ $card['bond'] }}%</span>
@@ -951,10 +981,10 @@ class AdvisorChat extends Component
 
 ### 4.8 Cost Tracking Display
 
-**Service**: `app/Services/AI/AICostTracker.php`
+**Service**: `app/Services/AI/CostTrackingService.php`
 
 ```php
-class AICostTracker
+class CostTrackingService
 {
     public function track(AIResponse $response): void
     {
@@ -1127,7 +1157,7 @@ class AdvisorChat extends Component
 sequenceDiagram
     participant User
     participant Chat as AdvisorChat
-    participant AIService as AIAdvisoryService
+    participant AIService as HybridAIService
     participant Mechanics as GameMechanicsService
     participant Router as AI Router
     participant Ollama as Ollama Service
@@ -1254,6 +1284,7 @@ flowchart TD
 | **2.4.7 Focus Visible** | Clear focus indicators on inputs | Visual inspection |
 | **3.2.4 Consistent Identification** | Consistent message formatting | Manual review |
 | **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
+| **1.4.1 Use of Color** | Provider status, confidence scores, and budget warnings convey state by text and icon, not color alone | Visual + screen reader |
 
 ### 8.2 Keyboard Navigation
 
@@ -1273,7 +1304,7 @@ flowchart TD
 ```html
 <!-- New message announcement -->
 <div aria-live="polite" aria-atomic="true" class="sr-only">
-    New AI response received. Confidence: 87%. Provider: Ollama Local.
+    New AI response received. Confidence: 87%. Provider: Environment-configured.
     Training recommendation: Speed. Expected gain: 20 points.
 </div>
 
@@ -1298,6 +1329,23 @@ flowchart TD
 </div>
 ```
 
+### 8.4 Accessibility Interaction Requirements
+
+The following rules MUST be satisfied, independent of visual design or component implementation:
+
+1. **Focus on chat open**: When the AI advisor panel or page is opened, focus moves to the message
+input or the first interactive element.
+2. **Focus return on panel close**: If the advisor is displayed in a dismissible panel, closing it
+returns focus to the triggering element.
+3. **Focus to error**: On failed message submission or provider error, focus moves to the error
+message and it is announced via `aria-live="assertive"`.
+4. **Touch targets**: Message input, Send button, quick-topic chips, and action buttons must have a
+minimum touch area of 44×44 CSS pixels.
+5. **Provider status non-color**: Provider availability (online/offline/degraded) must be conveyed
+by text label, not indicator color alone.
+6. **Degraded-mode announcement**: When the provider is unavailable and a fallback or cached
+response is shown, the degraded state must be announced to screen readers.
+
 ---
 
 ## 9. Performance Specifications
@@ -1308,8 +1356,8 @@ flowchart TD
 | --- | --- | --- |
 | **Page Load** | < 1.5 seconds | Time to first render |
 | **Message Send** | < 300ms | Click to UI update |
-| **AI Response (Ollama)** | < 2 seconds | Local processing |
-| **AI Response (Bedrock)** | < 5 seconds | Cloud processing |
+| **AI Response (Local Provider)** | < 2 seconds | Local processing |
+| **AI Response (Cloud Provider)** | < 5 seconds | Cloud processing |
 | **Context Refresh** | < 500ms | Data reload |
 | **Formula Calculation** | < 50ms | Client-side compute |
 | **Breakpoint Check** | < 100ms | Server-side check |
@@ -1340,12 +1388,12 @@ flowchart TD
 
 ### 10.1 Unit Tests
 
-**Test File**: `tests/Unit/Services/AIAdvisoryServiceTest.php`
+**Test File**: `tests/Unit/Services/AI/CostTrackingServiceTest.php`
 
 ```php
 test('routes simple queries to Ollama', function () {
     $character = Character::factory()->create();
-    $service = app(AIAdvisoryService::class);
+    $service = app(HybridAIService::class);
 
     $response = $service->getAdvice($character, 'training', 'What should I train?');
 
@@ -1357,7 +1405,7 @@ test('falls back to Bedrock when Ollama unavailable', function () {
     Config::set('ai.providers.ollama.enabled', false);
 
     $character = Character::factory()->create();
-    $service = app(AIAdvisoryService::class);
+    $service = app(HybridAIService::class);
 
     $response = $service->getAdvice($character, 'training', 'Complex strategy analysis');
 
@@ -1366,7 +1414,7 @@ test('falls back to Bedrock when Ollama unavailable', function () {
 });
 
 test('tracks AI costs correctly', function () {
-    $tracker = app(AICostTracker::class);
+    $tracker = app(CostTrackingService::class);
 
     $response = new AIResponse(
         provider: 'bedrock',
@@ -1385,7 +1433,7 @@ test('tracks AI costs correctly', function () {
 
 test('calculates training formula correctly', function () {
     $calculator = app(TrainingFormulaCalculator::class);
-    
+
     $gain = $calculator->calculate(
         base: 12,
         statBonus: 5,
@@ -1395,7 +1443,7 @@ test('calculates training formula correctly', function () {
         supportCards: 3,
         friendshipActive: true
     );
-    
+
     // Expected: (12 + 5) × 1.15 × 1.4 × 1.5 × 1.15 × 1.2 ≈ 40
     expect($gain)->toBeGreaterThan(35)
         ->and($gain)->toBeLessThan(45);
@@ -1404,19 +1452,19 @@ test('calculates training formula correctly', function () {
 test('identifies soft cap correctly', function () {
     $character = Character::factory()->create(['speed' => 1250]);
     $service = app(BreakpointService::class);
-    
+
     $breakpoints = $service->analyze($character);
-    
+
     expect($breakpoints['speed']['above_cap'])->toBeTrue()
         ->and($breakpoints['speed']['to_soft_cap'])->toBe(0);
 });
 
 test('warns when approaching soft cap', function () {
     $character = Character::factory()->create(['speed' => 1150]);
-    $service = app(AIAdvisoryService::class);
-    
+    $service = app(HybridAIService::class);
+
     $response = $service->getAdvice($character, 'training', 'Should I train Speed?');
-    
+
     expect($response->breakpointWarning)->toContain('approaching soft cap');
 });
 ```text
@@ -1499,7 +1547,7 @@ test.describe("WF-012: AI Advisor Interface", () => {
 
         // Check provider status
         await expect(page.getByTestId("provider-status")).toBeVisible();
-        await expect(page.getByText(/Ollama/)).toBeVisible();
+        await expect(page.getByTestId("provider-status")).not.toBeEmpty();
 
         // Check turn counter
         await expect(page.getByText(/Turn:/)).toBeVisible();
@@ -1524,7 +1572,7 @@ test.describe("WF-012: AI Advisor Interface", () => {
             timeout: 10000,
         });
         await expect(page.getByText(/Confidence:/)).toBeVisible();
-        
+
         // Check for formula breakdown option
         await expect(page.getByText(/Show Calculation/)).toBeVisible();
     });
@@ -1675,24 +1723,24 @@ test.describe("WF-012: Accessibility", () => {
 
 ### 11.1 Product Requirements
 
-- [PRD-006: AI Advisory](../prds/PRD-006_AI_Advisory.md)
+- [PRD-006: AI Advisory](../02-prds/PRD-006_AI_Advisory.md)
 
 ### 11.2 Technical Specifications
 
-- [SPEC-006: AI Advisory Technical](../specs/SPEC-006_AI_Advisory_Technical.md)
+- [SPEC-006: AI Advisory Technical](../02-specs/SPEC-006_AI_Advisory_Technical.md)
 
 ### 11.3 Flow Documentation
 
-- [FLOW-006: AI Advisory System](../flows/FLOW-006_AI_Advisory_System.md)
-- [TECH-FLOW-006: AI Advisory Flow](../tech-flow/TECH-FLOW-006_AI_Advisory_Flow.md)
+- [FLOW-006: AI Advisory System](../01-flows/FLOW-006_AI_Advisory_System.md)
+- [TECH-FLOW-006: AI Advisory Flow](../01-tech-flow/TECH-FLOW-006_AI_Advisory_Flow.md)
 
 ### 11.4 Sequence Diagrams
 
-- [SEQ-006: AI Advice Generation](../sequences/SEQ-006_AI_Advice_Generation.md)
+- [SEQ-006: AI Advice Generation](../01-sequences/SEQ-006_AI_Advice_Generation.md)
 
 ### 11.5 User Flows
 
-- [UF-007: AI Advisor Journey](../user-flows/UF-007_AI_Advisor_Journey.md)
+- [UF-007: AI Advisor Journey](../01-user-flows/UF-007_AI_Advisor_Journey.md)
 
 ### 11.6 Related Wireframes
 
@@ -1702,7 +1750,7 @@ test.describe("WF-012: Accessibility", () => {
 ### 11.7 Configuration Documentation
 
 - [MCP Server Configuration Reference](../MCP_SERVER_CONFIGURATION_REFERENCE.md)
-- [Software Integration Specifications](../008_SIS_Software_Integration_Specifications.md)
+- [Software Integration Specifications](../00-core-docs/008_SIS_Software_Integration_Specifications.md)
 
 ### 11.8 Game Mechanics Research
 
@@ -1715,6 +1763,7 @@ test.describe("WF-012: Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-09 | Development Team | Alignment review: de-hardcoded provider labels, added storage-mode framing (§1.4–1.5), accessibility interaction requirements (§8.4), softened implementation status |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added complete training formula, corrected stat breakpoints (901/1200/1600), updated career structure (~70-78 turns), added formula display component, breakpoint warnings, enhanced context panel with bond tracking and facility levels |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added hybrid AI architecture, MCP integration, cost tracking, conversation management, accessibility specifications, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
@@ -1723,7 +1772,9 @@ test.describe("WF-012: Accessibility", () => {
 
 ## 13. Notes
 
-**Implementation Status**: ✅ Complete (v2.2.0 Game Mechanics Update)
+**Implementation Status**: Alignment-reviewed concept; specific component classes, provider
+references, and route paths in this document are illustrative and should be verified against the
+current implementation.
 
 **Known Issues**: None
 
@@ -1749,4 +1800,5 @@ test.describe("WF-012: Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the AI Advisor Interface with verified game mechanics from Umamusume Pretty Derby (Global English Server) and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe describes the intended experience for the AI Advisor Interface. Details should be
+verified against current implementation documentation before treating as authoritative._

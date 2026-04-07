@@ -1,9 +1,9 @@
 # SPEC-005: Support Card Management System - Technical Specification
 
-**Document Version**: 2.3.0  
-**Date**: 2026-02-22  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Complete - Implementation verified  
+**Document Version**: 2.3.1
+**Date**: 2026-03-11
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Complete - Implementation verified
 **Classification**: Internal - Development Team
 
 ---
@@ -13,30 +13,32 @@
 | Attribute | Value |
 | --- | --- |
 | **Document ID** | SPEC-005 |
-| **Related PRD** | [PRD-005: Support Card Management](../prds/PRD-005_Support_Card_Management.md) |
-| **Architecture Version** | v2.3.0 |
+| **Related PRD** | [PRD-005: Support Card Management](../02-prds/PRD-005_Support_Card_Management.md) |
+| **Architecture Version** | v2.3.1 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-02-22 |
+| **Last Reviewed** | 2026-03-11 |
 
 ### Related Documents
 
 **Requirements & Design**:
 
-- [SRS Section 3.5: Support Card Management](../003_SRS_Software_Requirement_Specifications.md#35-support-card-management)
-- [SDS Section 4.5: Support Card Architecture](../004_SDS_Software_Design_Specifications.md#45-support-card-module)
+- [SRS Section 3.5: Support Card Management](../00-core-
+docs/003_SRS_Software_Requirement_Specifications.md#35-support-card-management)
+- [SDS Section 4.5: Support Card Architecture](../00-core-
+docs/004_SDS_Software_Design_Specifications.md#45-support-card-module)
 
 **Data & Integration**:
 
-- [DBD Section 5.5: Support Card Tables](../009_DBD_Database_Documentation.md#55-support-card-tables)
-- [API Section 4.5: Support Card Endpoints](../010_API_API_Documentation.md#45-support-card-endpoints)
+- [DBD Section 5.5: Support Card Tables](../00-core-docs/009_DBD_Database_Documentation.md#55-support-card-tables)
+- [API Section 4.5: Support Card Endpoints](../00-core-docs/010_API_API_Documentation.md#45-support-card-endpoints)
 
 **Visual Documentation**:
 
-- [FLOW-005: Support Card Management System](../flows/FLOW-005_Support_Card_Management_System.md)
-- [SEQ-005: Support Card Upgrade](../sequences/SEQ-005_Support_Card_Upgrade.md)
-- [WF-010: Support Card Collection](../wireframes/WF-010_Support_Card_Collection.md)
-- [WF-011: Support Deck Builder](../wireframes/WF-011_Support_Deck_Builder.md)
-- [UF-006: Support Deck Building Flow](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+- [FLOW-005: Support Card Management System](../01-flows/FLOW-005_Support_Card_Management_System.md)
+- [SEQ-005: Support Card Upgrade](../01-sequences/SEQ-005_Support_Card_Upgrade.md)
+- [WF-010: Support Card Collection](../01-wireframes/WF-010_Support_Card_Collection.md)
+- [WF-011: Support Deck Builder](../01-wireframes/WF-011_Support_Deck_Builder.md)
+- [UF-006: Support Deck Building Flow](../01-user-flows/UF-006_Support_Deck_Building_Flow.md)
 
 ---
 
@@ -65,7 +67,10 @@
 
 ### 1.1 Module Purpose
 
-The Support Card Management System handles the complete lifecycle of support cards and deck composition. Support cards are essential training multipliers that provide stat bonuses, skill hints, and event triggers during career runs. This module manages card inventory, deck configuration, bond level progression, limit break mechanics, and meta tier list integration.
+The Support Card Management System handles the complete lifecycle of support cards and deck
+composition. Support cards are essential training multipliers that provide stat bonuses, skill
+hints, and event triggers during career runs. This module manages card inventory, deck
+configuration, bond level progression, limit break mechanics, and meta tier list integration.
 
 **Core Responsibilities**:
 
@@ -91,7 +96,8 @@ In Umamusume Pretty Derby, support cards are the primary force multipliers for t
 - **Friendship Training**: 1.2x multiplier when bond ≥ 80
 - **Limit Breaks**: 0-4 stars enhancing card effects
 
-Strategic deck composition and bond management are critical for achieving optimal training outcomes and successful career runs.
+Strategic deck composition and bond management are critical for achieving optimal training outcomes
+and successful career runs.
 
 ### 1.3 Technical Scope
 
@@ -115,6 +121,10 @@ Strategic deck composition and bond management are critical for achieving optima
 - Card art/asset management (CDN)
 - Training execution logic (SPEC-002)
 - Skill acquisition (SPEC-004)
+
+**Storage Boundary**: Authenticated deck persistence, inventory ownership, and bond progression are
+account-backed concerns in this SPEC. Local mode may support temporary deck planning, but that
+browser-local behavior must not be inferred from the database contracts documented here.
 
 ### 1.4 Technology Stack
 
@@ -167,22 +177,22 @@ graph TB
     API --> FormRequest
     FormRequest --> DeckSvc
     Livewire --> DeckSvc
-    
+
     DeckSvc --> CardSvc
     DeckSvc --> BondSvc
     DeckSvc --> SynergySvc
     DeckSvc --> RecommendSvc
-    
+
     RecommendSvc --> NeuronAI
     SynergySvc --> BonusCalc
-    
+
     CardSvc --> CardModel
     CardSvc --> InventoryModel
     DeckSvc --> DeckModel
-    
+
     CardModel --> DB
     CardModel --> Cache
-    
+
     CardSvc --> External
 ```text
 
@@ -245,9 +255,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Support Card Entity
- * 
+ *
  * Represents a support card definition in the game database.
- * 
+ *
  * @property int $id
  * @property string $name
  * @property string|null $name_jp
@@ -317,20 +327,20 @@ class SupportCard extends Model
 
     /**
      * Calculate bonuses at specific limit break level
-     * 
+     *
      * @param int $limitBreaks 0-4
      * @return array
      */
     public function getBonusesAtLevel(int $limitBreaks): array
     {
         $limitBreaks = max(0, min(4, $limitBreaks));
-        
+
         $bonuses = [];
-        
+
         foreach ($this->base_bonuses as $key => $baseValue) {
             $maxValue = $this->max_bonuses[$key] ?? $baseValue;
             $increment = ($maxValue - $baseValue) / 4; // 4 limit breaks
-            
+
             $bonuses[$key] = $baseValue + ($increment * $limitBreaks);
         }
 
@@ -339,7 +349,7 @@ class SupportCard extends Model
 
     /**
      * Check if card provides specific skill
-     * 
+     *
      * @param int $skillId
      * @return bool
      */
@@ -350,7 +360,7 @@ class SupportCard extends Model
 
     /**
      * Get training bonus for specific stat
-     * 
+     *
      * @param string $stat
      * @param int $limitBreaks
      * @return int
@@ -358,7 +368,7 @@ class SupportCard extends Model
     public function getStatBonus(string $stat, int $limitBreaks = 0): int
     {
         $bonuses = $this->getBonusesAtLevel($limitBreaks);
-        
+
         $bonusKey = match ($stat) {
             'speed' => 'speed_bonus',
             'stamina' => 'stamina_bonus',
@@ -373,7 +383,7 @@ class SupportCard extends Model
 
     /**
      * Check if card is meta relevant
-     * 
+     *
      * @return bool
      */
     public function isMetaTier(): bool
@@ -397,7 +407,7 @@ enum SupportCardRarity: string
     case SSR = 'SSR';
     case SR = 'SR';
     case R = 'R';
-    
+
     public function getBaseBonusMultiplier(): float
     {
         return match($this) {
@@ -440,9 +450,9 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * User Card Inventory Entity
- * 
+ *
  * Represents a user's ownership of a specific support card.
- * 
+ *
  * @property int $id
  * @property string $user_id
  * @property int $support_card_id
@@ -499,7 +509,7 @@ class UserCardInventory extends Model
 
     /**
      * Add limit break
-     * 
+     *
      * @return void
      */
     public function addLimitBreak(): void
@@ -511,7 +521,7 @@ class UserCardInventory extends Model
 
     /**
      * Check if max limit break
-     * 
+     *
      * @return bool
      */
     public function isMaxLimitBreak(): bool
@@ -521,7 +531,7 @@ class UserCardInventory extends Model
 
     /**
      * Get current bonuses
-     * 
+     *
      * @return array
      */
     public function getCurrentBonuses(): array
@@ -549,9 +559,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Support Deck Entity
- * 
+ *
  * Represents a 6-card support deck configuration.
- * 
+ *
  * @property int $id
  * @property string $user_id
  * @property string $name Deck name
@@ -610,7 +620,7 @@ class SupportDeck extends Model
 
     /**
      * Get card at specific position
-     * 
+     *
      * @param int $position 1-6
      * @return SupportCard|null
      */
@@ -621,7 +631,7 @@ class SupportDeck extends Model
 
     /**
      * Get borrowed card
-     * 
+     *
      * @return SupportCard|null
      */
     public function getBorrowedCard(): ?SupportCard
@@ -631,7 +641,7 @@ class SupportDeck extends Model
 
     /**
      * Get owned cards count
-     * 
+     *
      * @return int
      */
     public function getOwnedCardsCount(): int
@@ -641,7 +651,7 @@ class SupportDeck extends Model
 
     /**
      * Validate deck composition
-     * 
+     *
      * @return array{valid: bool, errors: array}
      */
     public function validate(): array
@@ -679,13 +689,13 @@ class SupportDeck extends Model
 
     /**
      * Get type distribution
-     * 
+     *
      * @return array
      */
     public function getTypeDistribution(): array
     {
         $distribution = [];
-        
+
         foreach ($this->cards as $card) {
             $type = $card->specialization;
             $distribution[$type] = ($distribution[$type] ?? 0) + 1;
@@ -696,7 +706,7 @@ class SupportDeck extends Model
 
     /**
      * Calculate average bond level
-     * 
+     *
      * @return float
      */
     public function getAverageBondLevel(): float
@@ -720,9 +730,9 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * Support Deck Card Pivot
- * 
+ *
  * Pivot table with additional deck-specific data.
- * 
+ *
  * @property int $support_deck_id
  * @property int $support_card_id
  * @property int $position 1-6
@@ -756,7 +766,7 @@ class SupportDeckCard extends Pivot
 
     /**
      * Check if friendship training active
-     * 
+     *
      * @return bool
      */
     public function isFriendshipActive(): bool
@@ -766,7 +776,7 @@ class SupportDeckCard extends Pivot
 
     /**
      * Get bond tier
-     * 
+     *
      * @return string
      */
     public function getBondTier(): string
@@ -793,7 +803,7 @@ use App\Models\{SupportDeck, SupportCard, UserCardInventory};
 
 /**
  * Deck Composition Validator
- * 
+ *
  * Validates deck composition rules and constraints.
  */
 class DeckManagementValidator
@@ -804,7 +814,7 @@ class DeckManagementValidator
 
     /**
      * Validate deck configuration
-     * 
+     *
      * @param array $cardConfigs Array of [card_id, is_borrowed, position]
      * @param string $userId
      * @return array{valid: bool, errors: array, warnings: array}
@@ -867,7 +877,7 @@ class DeckManagementValidator
 
     /**
      * Analyze deck composition for warnings
-     * 
+     *
      * @param array $cardConfigs
      * @return array
      */
@@ -907,6 +917,10 @@ class DeckManagementValidator
 
 Manages bond level increases during training.
 
+Bond gain values in this service are intended to reflect verified Global EN training participation
+rules. The caller is responsible for passing whether the card participated, whether Charming is
+active, and whether an exclamation-mark hint or event bonus applied.
+
 ```php
 <?php
 
@@ -917,7 +931,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Bond Progression Service
- * 
+ *
  * Handles bond level increases and friendship training activation.
  */
 class BondProgressionService
@@ -927,7 +941,7 @@ class BondProgressionService
 
     /**
      * Increase bond level for cards
-     * 
+     *
      * @param SupportDeck $deck
      * @param array $bondGains Array of [card_id => gain_amount]
      * @return array Updated bond levels
@@ -964,44 +978,33 @@ class BondProgressionService
 
     /**
      * Calculate bond gain for training session
-     * 
-     * @param SupportCard $card
-     * @param int $currentBond
+     *
      * @param bool $wasAtFacility
+     * @param bool $hasCharming
+     * @param bool $hasExclamation
      * @return int
      */
     public function calculateBondGain(
-        SupportCard $card,
-        int $currentBond,
-        bool $wasAtFacility
+        bool $wasAtFacility,
+        bool $hasCharming = false,
+        bool $hasExclamation = false
     ): int {
         if (!$wasAtFacility) {
             return 0;
         }
 
-        // Base gain
-        $baseGain = 5;
+        $gain = $hasCharming ? 9 : 7;
 
-        // Higher gains at lower bond levels
-        if ($currentBond < 40) {
-            $baseGain = 7;
-        } elseif ($currentBond < 70) {
-            $baseGain = 6;
+        if ($hasExclamation) {
+            $gain += 5;
         }
 
-        // Rarity bonus
-        $rarityBonus = match ($card->rarity) {
-            SupportCardRarity::SSR => 1,
-            SupportCardRarity::SR => 0,
-            SupportCardRarity::R => -1,
-        };
-
-        return max(1, $baseGain + $rarityBonus);
+        return $gain;
     }
 
     /**
      * Check if bond threshold was crossed
-     * 
+     *
      * @param int $previous
      * @param int $current
      * @return array
@@ -1022,7 +1025,7 @@ class BondProgressionService
 
     /**
      * Get friendship status for deck
-     * 
+     *
      * @param SupportDeck $deck
      * @return array
      */
@@ -1032,7 +1035,7 @@ class BondProgressionService
 
         foreach ($deck->cards as $card) {
             $bondLevel = $card->pivot->bond_level;
-            
+
             $status[] = [
                 'card_id' => $card->id,
                 'card_name' => $card->name,
@@ -1059,7 +1062,7 @@ use App\Exceptions\{MaxLimitBreakException, InsufficientResourcesException};
 
 /**
  * Limit Break Service
- * 
+ *
  * Handles limit break (uncap) operations.
  */
 class LimitBreakService
@@ -1068,7 +1071,7 @@ class LimitBreakService
 
     /**
      * Add limit break to card
-     * 
+     *
      * @param UserCardInventory $inventory
      * @return UserCardInventory
      * @throws MaxLimitBreakException
@@ -1092,7 +1095,7 @@ class LimitBreakService
 
     /**
      * Get limit break benefits preview
-     * 
+     *
      * @param UserCardInventory $inventory
      * @return array
      */
@@ -1132,7 +1135,7 @@ class LimitBreakService
 
     /**
      * Get limit break cost (if applicable)
-     * 
+     *
      * @param UserCardInventory $inventory
      * @return array
      */
@@ -1140,7 +1143,7 @@ class LimitBreakService
     {
         // In the actual game, this would require duplicate cards or special items
         // For planning purposes, we can return metadata
-        
+
         return [
             'current_stars' => $inventory->limit_breaks,
             'max_stars' => self::MAX_LIMIT_BREAKS,
@@ -1170,7 +1173,7 @@ use Illuminate\Support\Facades\{DB, Cache};
 
 /**
  * Support Card Management Service
- * 
+ *
  * Handles support card-related business operations.
  */
 class SupportCardDeckService
@@ -1182,7 +1185,7 @@ class SupportCardDeckService
 
     /**
      * Get user's card inventory
-     * 
+     *
      * @param string $userId
      * @param array $filters
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
@@ -1219,7 +1222,7 @@ class SupportCardDeckService
         // Sort
         $sortBy = $filters['sort_by'] ?? 'acquired_at';
         $sortOrder = $filters['sort_order'] ?? 'desc';
-        
+
         $query->orderBy($sortBy, $sortOrder);
 
         return $query->paginate($filters['per_page'] ?? 20);
@@ -1227,7 +1230,7 @@ class SupportCardDeckService
 
     /**
      * Add card to user inventory
-     * 
+     *
      * @param string $userId
      * @param int $supportCardId
      * @param int $limitBreaks
@@ -1263,7 +1266,7 @@ class SupportCardDeckService
 
     /**
      * Search support card catalog
-     * 
+     *
      * @param array $filters
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
@@ -1297,7 +1300,7 @@ class SupportCardDeckService
         // Sort
         $sortBy = $filters['sort_by'] ?? 'meta_score';
         $sortOrder = $filters['sort_order'] ?? 'desc';
-        
+
         $query->orderBy($sortBy, $sortOrder);
 
         return $query->paginate($filters['per_page'] ?? 20);
@@ -1305,7 +1308,7 @@ class SupportCardDeckService
 
     /**
      * Sync support card definitions from external API
-     * 
+     *
      * @return int
      */
     public function syncCardDefinitions(): int
@@ -1343,7 +1346,7 @@ class SupportCardDeckService
 
     /**
      * Get meta tier rankings
-     * 
+     *
      * @param string|null $type Filter by card type
      * @return \Illuminate\Support\Collection
      */
@@ -1382,7 +1385,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Deck Management Service
- * 
+ *
  * Handles support deck creation, updates, and validation.
  */
 class DeckManagementService
@@ -1393,7 +1396,7 @@ class DeckManagementService
 
     /**
      * Create new support deck
-     * 
+     *
      * @param string $userId
      * @param string $name
      * @param array $cardConfigs
@@ -1407,7 +1410,7 @@ class DeckManagementService
     ): SupportDeck {
         // Validate composition
         $validation = $this->validator->validate($cardConfigs, $userId);
-        
+
         if (!$validation['valid']) {
             throw new InvalidDeckCompositionException(
                 "Invalid deck composition: " . implode(', ', $validation['errors'])
@@ -1436,7 +1439,7 @@ class DeckManagementService
 
     /**
      * Update deck configuration
-     * 
+     *
      * @param SupportDeck $deck
      * @param array $cardConfigs
      * @return SupportDeck
@@ -1446,7 +1449,7 @@ class DeckManagementService
     {
         // Validate composition
         $validation = $this->validator->validate($cardConfigs, $deck->user_id);
-        
+
         if (!$validation['valid']) {
             throw new InvalidDeckCompositionException(
                 "Invalid deck composition: " . implode(', ', $validation['errors'])
@@ -1472,7 +1475,7 @@ class DeckManagementService
 
     /**
      * Set active deck for user
-     * 
+     *
      * @param string $userId
      * @param int $deckId
      * @return SupportDeck
@@ -1498,7 +1501,7 @@ class DeckManagementService
 
     /**
      * Clone existing deck
-     * 
+     *
      * @param SupportDeck $sourceDeck
      * @param string $newName
      * @return SupportDeck
@@ -1528,7 +1531,7 @@ class DeckManagementService
 
     /**
      * Get user's decks
-     * 
+     *
      * @param string $userId
      * @return \Illuminate\Support\Collection
      */
@@ -1554,14 +1557,14 @@ use App\Models\SupportDeck;
 
 /**
  * Deck Synergy Analysis Service
- * 
+ *
  * Analyzes deck composition for synergies and optimization.
  */
 class DeckSynergyService
 {
     /**
      * Analyze deck synergy
-     * 
+     *
      * @param SupportDeck $deck
      * @return array
      */
@@ -1579,14 +1582,14 @@ class DeckSynergyService
 
     /**
      * Analyze type distribution
-     * 
+     *
      * @param SupportDeck $deck
      * @return array
      */
     private function analyzeTypeDistribution(SupportDeck $deck): array
     {
         $distribution = $deck->getTypeDistribution();
-        
+
         $diversity = count($distribution);
         $balance = $this->calculateBalance($distribution);
 
@@ -1600,7 +1603,7 @@ class DeckSynergyService
 
     /**
      * Calculate distribution balance
-     * 
+     *
      * @param array $distribution
      * @return float
      */
@@ -1608,31 +1611,31 @@ class DeckSynergyService
     {
         $total = array_sum($distribution);
         $ideal = $total / count($distribution);
-        
+
         $variance = 0;
         foreach ($distribution as $count) {
             $variance += pow($count - $ideal, 2);
         }
-        
+
         $stdDev = sqrt($variance / count($distribution));
-        
+
         // Lower std dev = better balance (max score 100)
         return max(0, 100 - ($stdDev * 30));
     }
 
     /**
      * Analyze stat coverage
-     * 
+     *
      * @param SupportDeck $deck
      * @return array
      */
     private function analyzeStatCoverage(SupportDeck $deck): array
     {
         $stats = ['speed' => 0, 'stamina' => 0, 'power' => 0, 'guts' => 0, 'wit' => 0];
-        
+
         foreach ($deck->cards as $card) {
             $bonuses = $card->getBonusesAtLevel($card->pivot->limit_breaks ?? 0);
-            
+
             foreach ($stats as $stat => $value) {
                 $bonusKey = "{$stat}_bonus";
                 $stats[$stat] += $bonuses[$bonusKey] ?? 0;
@@ -1647,7 +1650,7 @@ class DeckSynergyService
 
     /**
      * Calculate stat coverage score
-     * 
+     *
      * @param array $stats
      * @return float
      */
@@ -1659,14 +1662,14 @@ class DeckSynergyService
 
     /**
      * Analyze skill coverage
-     * 
+     *
      * @param SupportDeck $deck
      * @return array
      */
     private function analyzeSkillCoverage(SupportDeck $deck): array
     {
         $allSkills = [];
-        
+
         foreach ($deck->cards as $card) {
             $allSkills = array_merge($allSkills, $card->skills_provided ?? []);
         }
@@ -1682,7 +1685,7 @@ class DeckSynergyService
 
     /**
      * Calculate meta rating
-     * 
+     *
      * @param SupportDeck $deck
      * @return array
      */
@@ -1707,7 +1710,7 @@ class DeckSynergyService
 
     /**
      * Get overall meta tier
-     * 
+     *
      * @param array $tierCounts
      * @param float $avgScore
      * @return string
@@ -1725,7 +1728,7 @@ class DeckSynergyService
 
     /**
      * Analyze friendship potential
-     * 
+     *
      * @param SupportDeck $deck
      * @return array
      */
@@ -1747,7 +1750,7 @@ class DeckSynergyService
 
     /**
      * Calculate overall deck score
-     * 
+     *
      * @param SupportDeck $deck
      * @return float
      */
@@ -1775,7 +1778,7 @@ class DeckSynergyService
 
     /**
      * Get distribution recommendation
-     * 
+     *
      * @param int $diversity
      * @param float $balance
      * @return string
@@ -2070,7 +2073,7 @@ CREATE TABLE ucp_support_cards (
     last_synced_at TIMESTAMP NULL COMMENT 'NEW: Last sync timestamp from external source',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_rarity (rarity),
     INDEX idx_specialization (specialization),
     INDEX idx_meta_tier (meta_tier),
@@ -2094,7 +2097,7 @@ CREATE TABLE ucp_user_card_inventory (
     is_favorite BOOLEAN NOT NULL DEFAULT FALSE,
     acquired_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     FOREIGN KEY (support_card_id) REFERENCES ucp_support_cards(id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_card (user_id, support_card_id),
@@ -2118,7 +2121,7 @@ CREATE TABLE ucp_support_decks (
     meta_rating VARCHAR(10) NULL COMMENT 'Overall deck tier',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
     INDEX idx_is_active (is_active)
@@ -2139,7 +2142,7 @@ CREATE TABLE ucp_support_deck_cards (
     is_borrowed BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (support_deck_id) REFERENCES ucp_support_decks(id) ON DELETE CASCADE,
     FOREIGN KEY (support_card_id) REFERENCES ucp_support_cards(id) ON DELETE CASCADE,
     UNIQUE KEY unique_deck_position (support_deck_id, position),
@@ -2230,7 +2233,7 @@ class DeckRecommendationService
 
     /**
      * Get AI deck recommendations
-     * 
+     *
      * @param User $user
      * @param Character|null $targetCharacter
      * @param array $goals
@@ -2265,7 +2268,7 @@ class DeckRecommendationService
 
     /**
      * Build AI context
-     * 
+     *
      * @param \Illuminate\Contracts\Pagination\LengthAwarePaginator $inventory
      * @param SupportDeck|null $currentDeck
      * @param Character|null $character
@@ -2294,15 +2297,16 @@ class DeckRecommendationService
             ];
         })->values()) : 'null';
 
-        $characterInfo = $character ? "{$character->name} (Scenario: {$character->scenario_type->value})" : "General purpose";
-        
+        $characterInfo = $character ? "{$character->name} (Scenario: {$character->scenario_type->value})" :
+        "General purpose";
+
         $focusStats = !empty($goals) ? implode(', ', $goals) : "Balanced training";
 
         return <<<CONTEXT
         User Inventory: {$inventoryJson}
-        
+
         Current Deck: {$currentDeckJson}
-        
+
         Target Character: {$characterInfo}
         Focus Stats: {$focusStats}
         CONTEXT;
@@ -2392,7 +2396,7 @@ $cardsAtFacility = $this->getCardsAtFacility($deck, $trainingType);
 foreach ($cardsAtFacility as $card) {
     $bonuses = $card->getBonusesAtLevel($card->pivot->limit_breaks);
     $totalBonus += $bonuses['speed_bonus'] ?? 0;
-    
+
     // Check friendship
     if ($card->pivot->bond_level >= 80) {
         $isFriendship = true;
@@ -2408,7 +2412,7 @@ Support cards provide skill hints:
 // Check if card can hint skill
 if ($card->providesSkill($skillId)) {
     $hintProbability = $card->getBonusesAtLevel($limitBreaks)['hint_rate'] ?? 0;
-    
+
     // Roll for hint
     if (mt_rand(1, 100) <= $hintProbability) {
         app(SkillService::class)->addHint(
@@ -2580,7 +2584,7 @@ test('calculates bonuses at different limit break levels', function () {
         'base_bonuses' => ['speed_bonus' => 10],
         'max_bonuses' => ['speed_bonus' => 18],
     ]);
-    
+
     expect($card->getBonusesAtLevel(0)['speed_bonus'])->toBe(10.0)
         ->and($card->getBonusesAtLevel(2)['speed_bonus'])->toBe(14.0)
         ->and($card->getBonusesAtLevel(4)['speed_bonus'])->toBe(18.0);
@@ -2588,7 +2592,7 @@ test('calculates bonuses at different limit break levels', function () {
 
 test('deck validates composition correctly', function () {
     $deck = SupportDeck::factory()->create();
-    
+
     // Add 5 owned + 1 borrowed
     for ($i = 1; $i <= 5; $i++) {
         $deck->cards()->attach(SupportCard::factory()->create()->id, [
@@ -2596,14 +2600,14 @@ test('deck validates composition correctly', function () {
             'is_borrowed' => false,
         ]);
     }
-    
+
     $deck->cards()->attach(SupportCard::factory()->create()->id, [
         'position' => 6,
         'is_borrowed' => true,
     ]);
-    
+
     $validation = $deck->validate();
-    
+
     expect($validation['valid'])->toBeTrue()
         ->and($validation['errors'])->toBeEmpty();
 });
@@ -2612,17 +2616,17 @@ test('bond level clamps to max 100', function () {
     $pivot = new SupportDeckCard([
         'bond_level' => 95,
     ]);
-    
+
     $pivot->bond_level = 150; // Try to exceed
-    
+
     expect($pivot->bond_level)->toBeLessThanOrEqual(100);
 });
 
 test('friendship activates at bond 80', function () {
     $pivot = new SupportDeckCard(['bond_level' => 85]);
-    
+
     expect($pivot->isFriendshipActive())->toBeTrue();
-    
+
     $pivot->bond_level = 75;
     expect($pivot->isFriendshipActive())->toBeFalse();
 });
@@ -2635,7 +2639,7 @@ test('friendship activates at bond 80', function () {
 
 test('user can create valid support deck', function () {
     $user = User::factory()->create();
-    
+
     // Add cards to inventory
     $cards = SupportCard::factory()->count(6)->create();
     foreach ($cards->take(5) as $card) {
@@ -2644,23 +2648,23 @@ test('user can create valid support deck', function () {
             'support_card_id' => $card->id,
         ]);
     }
-    
+
     $cardConfigs = $cards->map(fn($card, $index) => [
         'card_id' => $card->id,
         'position' => $index + 1,
         'is_borrowed' => $index === 5, // Last one borrowed
     ])->toArray();
-    
+
     $response = $this->actingAs($user)
         ->postJson('/api/v1/support-decks', [
             'name' => 'Test Deck',
             'cards' => $cardConfigs,
         ]);
-    
+
     $response->assertStatus(201)
         ->assertJsonPath('data.name', 'Test Deck')
         ->assertJsonPath('data.validation.valid', true);
-    
+
     $this->assertDatabaseHas('ucp_support_decks', [
         'user_id' => $user->id,
         'name' => 'Test Deck',
@@ -2670,20 +2674,20 @@ test('user can create valid support deck', function () {
 test('deck creation fails with invalid composition', function () {
     $user = User::factory()->create();
     $cards = SupportCard::factory()->count(6)->create();
-    
+
     // All marked as borrowed (invalid)
     $cardConfigs = $cards->map(fn($card, $index) => [
         'card_id' => $card->id,
         'position' => $index + 1,
         'is_borrowed' => true,
     ])->toArray();
-    
+
     $response = $this->actingAs($user)
         ->postJson('/api/v1/support-decks', [
             'name' => 'Invalid Deck',
             'cards' => $cardConfigs,
         ]);
-    
+
     $response->assertStatus(422);
 });
 
@@ -2695,13 +2699,13 @@ test('user can add limit break to owned card', function () {
         'support_card_id' => $card->id,
         'limit_breaks' => 2,
     ]);
-    
+
     $response = $this->actingAs($user)
         ->patchJson("/api/v1/users/inventory/{$inventory->id}/limit-break");
-    
+
     $response->assertStatus(200)
         ->assertJsonPath('data.current_stars', 3);
-    
+
     $inventory->refresh();
     expect($inventory->limit_breaks)->toBe(3);
 });
@@ -2712,10 +2716,10 @@ test('user cannot exceed max limit breaks', function () {
         'user_id' => $user->id,
         'limit_breaks' => 4,
     ]);
-    
+
     $response = $this->actingAs($user)
         ->patchJson("/api/v1/users/inventory/{$inventory->id}/limit-break");
-    
+
     $response->assertStatus(422)
         ->assertJsonPath('error_code', 'LIMIT_BREAK_MAX');
 });
@@ -2723,14 +2727,14 @@ test('user cannot exceed max limit breaks', function () {
 test('deck synergy analysis calculates correctly', function () {
     $user = User::factory()->create();
     $deck = SupportDeck::factory()->for($user)->create();
-    
+
     // Add diverse cards
     $speedCards = SupportCard::factory()->count(3)->create(['specialization' => 'Speed']);
     $staminaCards = SupportCard::factory()->count(2)->create(['specialization' => 'Stamina']);
     $powerCard = SupportCard::factory()->create(['specialization' => 'Power']);
-    
+
     $allCards = $speedCards->concat($staminaCards)->concat([$powerCard]);
-    
+
     foreach ($allCards as $index => $card) {
         $deck->cards()->attach($card->id, [
             'position' => $index + 1,
@@ -2738,10 +2742,10 @@ test('deck synergy analysis calculates correctly', function () {
             'is_borrowed' => $index === 5,
         ]);
     }
-    
+
     $response = $this->actingAs($user)
         ->getJson("/api/v1/support-decks/{$deck->id}/synergy");
-    
+
     $response->assertStatus(200)
         ->assertJsonStructure([
             'data' => [
@@ -2753,7 +2757,7 @@ test('deck synergy analysis calculates correctly', function () {
                 'overall_score',
             ]
         ]);
-    
+
     expect($response->json('data.type_distribution.distribution'))
         ->toHaveKey('Speed', 3)
         ->toHaveKey('Stamina', 2)
@@ -2764,15 +2768,15 @@ test('user can set active deck', function () {
     $user = User::factory()->create();
     $deck1 = SupportDeck::factory()->for($user)->create(['is_active' => true]);
     $deck2 = SupportDeck::factory()->for($user)->create(['is_active' => false]);
-    
+
     $response = $this->actingAs($user)
         ->postJson("/api/v1/support-decks/{$deck2->id}/activate");
-    
+
     $response->assertStatus(200);
-    
+
     $deck1->refresh();
     $deck2->refresh();
-    
+
     expect($deck1->is_active)->toBeFalse()
         ->and($deck2->is_active)->toBeTrue();
 });
@@ -2786,7 +2790,7 @@ test('user can set active deck', function () {
 test('bond increases during training session', function () {
     $deck = SupportDeck::factory()->create();
     $cards = SupportCard::factory()->count(3)->create();
-    
+
     foreach ($cards as $index => $card) {
         $deck->cards()->attach($card->id, [
             'position' => $index + 1,
@@ -2794,19 +2798,19 @@ test('bond increases during training session', function () {
             'is_borrowed' => false,
         ]);
     }
-    
+
     $bondService = app(BondProgressionService::class);
-    
+
     $bondGains = [
         $cards[0]->id => 7,
         $cards[1]->id => 5,
     ];
-    
+
     $updated = $bondService->increaseBond($deck, $bondGains);
-    
+
     expect($updated[$cards[0]->id]['current'])->toBe(7)
         ->and($updated[$cards[1]->id]['current'])->toBe(5);
-    
+
     $deck->refresh();
     expect($deck->getCardAtPosition(1)->pivot->bond_level)->toBe(7);
 });
@@ -2814,16 +2818,16 @@ test('bond increases during training session', function () {
 test('bond progression crosses friendship threshold', function () {
     $deck = SupportDeck::factory()->create();
     $card = SupportCard::factory()->create();
-    
+
     $deck->cards()->attach($card->id, [
         'position' => 1,
         'bond_level' => 75,
         'is_borrowed' => false,
     ]);
-    
+
     $bondService = app(BondProgressionService::class);
     $updated = $bondService->increaseBond($deck, [$card->id => 10]);
-    
+
     expect($updated[$card->id]['threshold_crossed'])->toContain(80);
 });
 
@@ -2845,12 +2849,12 @@ test('external card sync updates database', function () {
             ]
         ], 200),
     ]);
-    
+
     $service = app(SupportCardDeckService::class);
     $syncedCount = $service->syncCardDefinitions();
-    
+
     expect($syncedCount)->toBe(1);
-    
+
     $this->assertDatabaseHas('ucp_support_cards', [
         'id' => 1,
         'name' => 'Kitasan Black',
@@ -2866,7 +2870,7 @@ test('external card sync updates database', function () {
 
 test('AI provides valid deck recommendations', function () {
     $user = User::factory()->create();
-    
+
     // Create inventory
     $cards = SupportCard::factory()->count(20)->create();
     foreach ($cards->take(15) as $card) {
@@ -2876,10 +2880,10 @@ test('AI provides valid deck recommendations', function () {
             'limit_breaks' => rand(0, 4),
         ]);
     }
-    
+
     $service = app(DeckRecommendationService::class);
     $recommendations = $service->getRecommendations($user);
-    
+
     expect($recommendations)->toHaveKeys([
         'recommended_deck',
         'borrowed_card_suggestion',
@@ -2905,7 +2909,7 @@ class SupportCardFactory extends Factory
         $specialization = $this->faker->randomElement([
             'Speed', 'Stamina', 'Power', 'Guts', 'Wit', 'Friend'
         ]);
-        
+
         return [
             'name' => $this->faker->name(),
             'character_name' => $this->faker->firstName(),
@@ -2927,7 +2931,7 @@ class SupportCardFactory extends Factory
             'meta_score' => $this->faker->randomFloat(1, 5.0, 10.0),
         ];
     }
-    
+
     public function ssr(): self
     {
         return $this->state(fn (array $attributes) => [
@@ -2936,7 +2940,7 @@ class SupportCardFactory extends Factory
             'meta_score' => $this->faker->randomFloat(1, 7.0, 10.0),
         ]);
     }
-    
+
     public function metaTier(): self
     {
         return $this->state(fn (array $attributes) => [
@@ -2967,7 +2971,7 @@ class SupportDeckFactory extends Factory
             'is_active' => false,
         ];
     }
-    
+
     public function active(): self
     {
         return $this->state(fn (array $attributes) => [
@@ -3078,6 +3082,7 @@ class SupportDeckFactory extends Factory
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.1 | 2026-03-11 | Development Team | Updated `BondProgressionService::calculateBondGain()` to the verified Global EN participation model (+7 base, +9 with Charming, +5 exclamation) and clarified account-only persistence boundaries for decks and bond tracking. |
 | 2.3.0 | 2026-02-22 | Development Team | Updated service names (SupportCardDeckService, DeckManagementService, FriendshipBondService, DeckOptimizationService, ExternalDataService), Neuron AI v2.11, PHP 8.2+, marked implementation complete |
 | 2.2.0 | 2026-01-28 | Development Team | Updated to align with game-accurate mechanics (v2.2.0 architecture) |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete testing strategy, AI integration, bond system, synergy analysis |
@@ -3096,10 +3101,10 @@ class SupportDeckFactory extends Factory
 
 ---
 
-**Document Control**  
-**Maintained By**: Backend Development Team  
-**Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-03-07  
+**Document Control**
+**Maintained By**: Backend Development Team
+**Review Frequency**: Bi-weekly during active development
+**Next Review Date**: 2026-03-07
 **Distribution**: Development Team, QA Team, Product Management, Game Design Team
 
 ---

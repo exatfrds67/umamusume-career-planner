@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.3.0
+**Date**: February 22, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [D05_DMP]
 
 ---
@@ -25,7 +25,9 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the data migration workflow in the Umamusume Career Planner application, covering import from external sources (JSON, CSV, Excel), legacy format detection, data transformation, validation, conflict resolution, and atomic database persistence.
+This sequence diagram documents the data migration workflow in the Umamusume Career Planner
+application, covering import from external sources (JSON, CSV, Excel), legacy format detection, data
+transformation, validation, conflict resolution, and atomic database persistence.
 
 ### 1.2 Scope
 
@@ -42,10 +44,10 @@ This sequence diagram documents the data migration workflow in the Umamusume Car
 
 **Related Artifacts:**
 
-- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
-- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
-- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
-- Data Migration Plan: [D05_DMP](../005_DMP_Data_Migration_Plan.md)
+- PRD: [PRD-001](../02-prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md)
+- Data Migration Plan: [D05_DMP](../00-core-docs/005_DMP_Data_Migration_Plan.md)
 
 ### 1.3 Business Context
 
@@ -133,10 +135,10 @@ sequenceDiagram
     UI->>Controller: POST /import/upload
     Controller->>Controller: Validate file type and size
     Controller->>Migration: detectFormat(file)
-    
+
     Migration->>Migration: Analyze file structure
     Migration->>Migration: Detect schema version
-    
+
     alt Unsupported Format
         Migration-->>Controller: UnsupportedFormatException
         Controller-->>UI: 422 Invalid format
@@ -151,11 +153,11 @@ sequenceDiagram
     UI->>Controller: GET /import/preview
     Controller->>Migration: parseFile(file, format)
     Migration->>Transform: transformToCanonical(data)
-    
+
     Transform->>Transform: Map legacy fields
     Transform->>Transform: Convert data types
     Transform->>Transform: Normalize enums
-    
+
     Note over Transform: Game-Accurate Migrations (v2.2.0)
     Transform->>Transform: Convert SS→S aptitudes (S is max)
     Transform->>Transform: Migrate hint levels (2→5 system)
@@ -163,21 +165,21 @@ sequenceDiagram
     Transform->>Transform: Normalize support card data
     Transform->>Transform: Validate bond 0-100%
     Transform->>Transform: Validate limit break 0-4
-    
+
     Transform-->>Migration: Transformed data
     Migration->>Validator: validateSchema(data)
-    
+
     Validator->>Validator: Check required fields
     Validator->>Validator: Validate data types
     Validator->>Validator: Check value ranges
-    
+
     Note over Validator: Game-Accurate Validation (v2.2.0)
     Validator->>Validator: Validate aptitudes G-S (no SS)
     Validator->>Validator: Validate hint levels 1-5
     Validator->>Validator: Warn if stats > 1200 soft cap
     Validator->>Validator: Validate support card types
     Validator->>Validator: Validate bond 0-100%
-    
+
     alt Validation Failed
         Validator-->>Migration: ValidationException
         Migration-->>Controller: Validation errors
@@ -186,13 +188,13 @@ sequenceDiagram
     else Validation Passed
         Validator-->>Migration: Validation success
         Migration->>Detector: detectDuplicates(data)
-        
+
         Detector->>DB: Query existing records
         DB-->>Detector: Existing records
-        
+
         Detector->>Detector: Match by character name + scenario
         Detector-->>Migration: Duplicate list
-        
+
         Migration-->>Controller: Preview data + duplicates
         Controller-->>UI: Preview response
         UI-->>User: Display preview + conflict resolution options
@@ -203,26 +205,26 @@ sequenceDiagram
     UI->>UI: Mark duplicates with strategy
     User->>UI: Confirm import
     UI->>Controller: POST /import/execute
-    
+
     Controller->>Controller: Check import size
-    
+
     alt Large Import (>100 records)
         Controller->>Queue: Dispatch ProcessLargeImportJob
         Queue-->>Controller: Job ID
         Controller-->>UI: 202 Accepted + job ID
         UI->>UI: Poll for progress
-        
+
         Queue->>Import: Execute import job
     else Small Import (<=100 records)
         Controller->>Import: executeImport(data, strategy)
     end
-    
+
     Note over User,Audit: IMPORT EXECUTION PHASE
     Import->>DB: BEGIN TRANSACTION
-    
+
     loop For each record
         Import->>Import: Apply resolution strategy
-        
+
         alt Skip Duplicate
             Import->>Import: Log skipped record
         else Overwrite
@@ -234,11 +236,11 @@ sequenceDiagram
             Transform-->>Import: Merged record
             Import->>DB: UPDATE with merged data
         end
-        
+
         Import->>Audit: Log import action
         Audit->>DB: INSERT import_history
     end
-    
+
     alt Import Error
         DB-->>Import: Constraint violation or error
         Import->>DB: ROLLBACK
@@ -249,7 +251,7 @@ sequenceDiagram
         Import->>DB: COMMIT TRANSACTION
         Import->>Audit: Record import summary
         Audit->>DB: UPDATE import_history
-        
+
         Import-->>Controller: ImportResult
         Controller-->>UI: 200 OK + summary
         UI-->>User: Display success + imported count
@@ -295,15 +297,15 @@ class DataMigrationService
         private TransformationService $transformer,
         private ValidationService $validator,
     ) {}
-    
+
     public function detectFormat(UploadedFile $file): FormatDetectionResult
     {
         $extension = $file->getClientOriginalExtension();
         $mimeType = $file->getMimeType();
-        
+
         // Read first 1KB for analysis
         $sample = $this->readFileSample($file, 1024);
-        
+
         // Detect JSON format
         if ($extension === 'json' || $this->isJson($sample)) {
             $version = $this->detectJsonVersion($sample);
@@ -313,7 +315,7 @@ class DataMigrationService
                 adapter: $this->getAdapter('json', $version),
             );
         }
-        
+
         // Detect CSV format
         if ($extension === 'csv' || $this->isCsv($sample)) {
             $headers = $this->detectCsvHeaders($sample);
@@ -323,7 +325,7 @@ class DataMigrationService
                 adapter: $this->getAdapter('csv'),
             );
         }
-        
+
         // Detect Excel format
         if (in_array($extension, ['xlsx', 'xls']) || $this->isExcel($mimeType)) {
             return new FormatDetectionResult(
@@ -332,33 +334,33 @@ class DataMigrationService
                 adapter: $this->getAdapter('excel'),
             );
         }
-        
+
         throw new UnsupportedFormatException("Unsupported file format: {$extension}");
     }
-    
+
     private function detectJsonVersion(string $sample): string
     {
         $data = json_decode($sample, true);
-        
+
         // Check for version field
         if (isset($data['version'])) {
             return $data['version'];
         }
-        
+
         // Check for schema_version field
         if (isset($data['schema_version'])) {
             return $data['schema_version'];
         }
-        
+
         // Detect by structure
         if (isset($data['runs']) && isset($data['characters'])) {
             return 'legacy_v1';
         }
-        
+
         if (isset($data['careers']) && isset($data['uma_musume'])) {
             return '2.0';
         }
-        
+
         return 'unknown';
     }
 }
@@ -387,35 +389,35 @@ class TransformationService
             // Direct mapping for current version
         ],
     ];
-    
+
     /**
      * Valid aptitude grades per game mechanics (G-S, no SS)
      * Verified: Global English Server, January 2026
      */
     private const VALID_APTITUDE_GRADES = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'];
-    
+
     /**
      * Valid support card types
      */
     private const VALID_SUPPORT_CARD_TYPES = ['Speed', 'Stamina', 'Power', 'Guts', 'Wit', 'Friend'];
-    
+
     public function transformToCanonical(array $data, string $version): array
     {
         $mappings = $this->fieldMappings[$version] ?? [];
         $transformed = [];
-        
+
         foreach ($data as $key => $value) {
             $canonicalKey = $mappings[$key] ?? $key;
             $transformed[$canonicalKey] = $this->transformValue($canonicalKey, $value, $version);
         }
-        
+
         // Apply game-accurate migrations
         $transformed = $this->migrateHintLevels($transformed, $version);
         $transformed = $this->migrateSupportCards($transformed, $version);
-        
+
         return $transformed;
     }
-    
+
     private function transformValue(string $field, mixed $value, string $version): mixed
     {
         // Stat value handling - soft cap at 1200, allow higher values
@@ -426,17 +428,17 @@ class TransformationService
             // Do NOT clamp - game allows values above 1200
             return $statValue;
         }
-        
+
         // Aptitude grade normalization - SS → S conversion
         // Game mechanics: S is maximum grade, SS does NOT exist
         if (in_array($field, ['distance_aptitude', 'surface_aptitude', 'style_aptitude',
-                              'turf_aptitude', 'dirt_aptitude', 'sprint_aptitude', 
+                              'turf_aptitude', 'dirt_aptitude', 'sprint_aptitude',
                               'mile_aptitude', 'medium_aptitude', 'long_aptitude',
                               'front_runner_aptitude', 'pace_chaser_aptitude',
                               'late_surger_aptitude', 'end_closer_aptitude'])) {
             return $this->normalizeAptitudeGrade($value);
         }
-        
+
         // Enum normalization
         if ($field === 'scenario_type') {
             return match ($value) {
@@ -445,20 +447,20 @@ class TransformationService
                 default => $value,
             };
         }
-        
+
         // Turn number validation (career spans ~70 turns)
         if ($field === 'current_turn' || $field === 'turn_number') {
             return max(1, min(78, (int) $value));
         }
-        
+
         // Bond percentage normalization (0-100%)
         if ($field === 'bond' || $field === 'bond_percentage' || $field === 'friendship') {
             return max(0, min(100, (int) $value));
         }
-        
+
         return $value;
     }
-    
+
     /**
      * Normalize aptitude grade to valid game values
      * Game mechanics: G → F → E → D → C → B → A → S (S is maximum)
@@ -467,24 +469,24 @@ class TransformationService
     private function normalizeAptitudeGrade(mixed $value): string
     {
         $grade = strtoupper(trim((string) $value));
-        
+
         // SS → S conversion (SS does not exist in game)
         if ($grade === 'SS') {
             return 'S';
         }
-        
+
         // Validate grade is in valid range
         if (in_array($grade, self::VALID_APTITUDE_GRADES)) {
             return $grade;
         }
-        
+
         // Default to A if invalid (baseline grade with no bonus/penalty)
         return 'A';
     }
-    
+
     /**
      * Migrate hint levels from old system (2 levels) to new system (5 levels)
-     * Game mechanics: 
+     * Game mechanics:
      *   - Levels 1-3: 10% discount each
      *   - Levels 4-5: 5% discount each
      *   - Maximum: 40% total discount at level 5
@@ -494,11 +496,11 @@ class TransformationService
         if (!isset($data['skills']) || !is_array($data['skills'])) {
             return $data;
         }
-        
+
         foreach ($data['skills'] as $index => $skill) {
             if (isset($skill['hint_level'])) {
                 $oldLevel = (int) $skill['hint_level'];
-                
+
                 // Legacy system used 0-2 levels, new system uses 1-5
                 if ($version === 'legacy_v1' || $version === '1.0') {
                     // Map old 2-level system to new 5-level system
@@ -516,10 +518,10 @@ class TransformationService
                 }
             }
         }
-        
+
         return $data;
     }
-    
+
     /**
      * Migrate support card data with game-accurate validation
      * Game mechanics:
@@ -532,20 +534,20 @@ class TransformationService
         if (!isset($data['support_cards']) || !is_array($data['support_cards'])) {
             return $data;
         }
-        
+
         foreach ($data['support_cards'] as $index => $card) {
             // Normalize limit break (0-4 range, representing ★ to ★★★★★)
             if (isset($card['limit_break'])) {
                 $lb = (int) $card['limit_break'];
                 $data['support_cards'][$index]['limit_break'] = min(4, max(0, $lb));
             }
-            
+
             // Normalize bond percentage (0-100%)
             if (isset($card['bond'])) {
                 $bond = (int) $card['bond'];
                 $data['support_cards'][$index]['bond'] = min(100, max(0, $bond));
             }
-            
+
             // Validate card type
             if (isset($card['type'])) {
                 $type = ucfirst(strtolower(trim($card['type'])));
@@ -557,7 +559,7 @@ class TransformationService
                 }
             }
         }
-        
+
         return $data;
     }
 }
@@ -576,22 +578,22 @@ class ValidationService
      * Verified: Global English Server, January 2026
      */
     private const VALID_APTITUDE_GRADES = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'];
-    
+
     /**
      * Valid support card types
      */
     private const VALID_SUPPORT_CARD_TYPES = ['Speed', 'Stamina', 'Power', 'Guts', 'Wit', 'Friend'];
-    
+
     /**
      * Stat soft cap - values above this have diminishing returns (50% effectiveness)
      */
     private const STAT_SOFT_CAP = 1200;
-    
+
     public function validateSchema(array $data): ValidationResult
     {
         $errors = [];
         $warnings = [];
-        
+
         // Required field validation
         $requiredFields = ['character_name', 'scenario_type', 'current_turn'];
         foreach ($requiredFields as $field) {
@@ -599,17 +601,17 @@ class ValidationService
                 $errors[] = "Missing required field: {$field}";
             }
         }
-        
+
         // Data type validation
         if (isset($data['speed']) && !is_numeric($data['speed'])) {
             $errors[] = "Field 'speed' must be numeric";
         }
-        
+
         // Enum validation
         if (isset($data['scenario_type']) && !in_array($data['scenario_type'], ['ura_finale', 'unity_cup'])) {
             $errors[] = "Invalid scenario_type: {$data['scenario_type']}";
         }
-        
+
         // Stat range validation (soft cap awareness)
         // Game mechanics: Stats can exceed 1200, but have diminishing returns
         foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
@@ -618,11 +620,12 @@ class ValidationService
                     $errors[] = ucfirst($stat) . " cannot be negative";
                 }
                 if ($data[$stat] > self::STAT_SOFT_CAP) {
-                    $warnings[] = ucfirst($stat) . " ({$data[$stat]}) exceeds soft cap of " . self::STAT_SOFT_CAP . " - diminishing returns apply";
+                    $warnings[] = ucfirst($stat) . " ({$data[$stat]}) exceeds soft cap of " . self::STAT_SOFT_CAP . " -
+                    diminishing returns apply";
                 }
             }
         }
-        
+
         // Aptitude grade validation (G-S only, no SS)
         $aptitudeFields = [
             'distance_aptitude', 'surface_aptitude', 'style_aptitude',
@@ -637,11 +640,12 @@ class ValidationService
                 if ($grade === 'SS') {
                     $warnings[] = "Aptitude grade 'SS' will be converted to 'S' (S is maximum in game)";
                 } elseif (!in_array($grade, self::VALID_APTITUDE_GRADES)) {
-                    $errors[] = "Invalid aptitude grade '{$data[$field]}' for {$field}. Valid grades: G, F, E, D, C, B, A, S";
+                    $errors[] = "Invalid aptitude grade '{$data[$field]}' for {$field}. Valid grades: G, F, E, D, C, B,
+                    A, S";
                 }
             }
         }
-        
+
         // Hint level validation (1-5 range per game mechanics)
         if (isset($data['skills']) && is_array($data['skills'])) {
             foreach ($data['skills'] as $index => $skill) {
@@ -653,7 +657,7 @@ class ValidationService
                 }
             }
         }
-        
+
         // Support card validation
         if (isset($data['support_cards']) && is_array($data['support_cards'])) {
             foreach ($data['support_cards'] as $index => $card) {
@@ -664,7 +668,7 @@ class ValidationService
                         $errors[] = "Support card at index {$index}: limit_break must be 0-4 (current: {$lb})";
                     }
                 }
-                
+
                 // Bond validation (0-100%)
                 if (isset($card['bond'])) {
                     $bond = (int) $card['bond'];
@@ -672,17 +676,18 @@ class ValidationService
                         $errors[] = "Support card at index {$index}: bond must be 0-100% (current: {$bond})";
                     }
                 }
-                
+
                 // Type validation
                 if (isset($card['type'])) {
                     $type = ucfirst(strtolower(trim($card['type'])));
                     if (!in_array($type, self::VALID_SUPPORT_CARD_TYPES)) {
-                        $errors[] = "Support card at index {$index}: invalid type '{$card['type']}'. Valid types: " . implode(', ', self::VALID_SUPPORT_CARD_TYPES);
+                        $errors[] = "Support card at index {$index}: invalid type '{$card['type']}'. Valid types: " .
+                        implode(', ', self::VALID_SUPPORT_CARD_TYPES);
                     }
                 }
             }
         }
-        
+
         // Business rule validation
         if (isset($data['current_turn']) && isset($data['career_stage'])) {
             $expectedStage = $this->calculateExpectedStage($data['current_turn']);
@@ -690,14 +695,14 @@ class ValidationService
                 $warnings[] = "Career stage '{$data['career_stage']}' may not match turn {$data['current_turn']}";
             }
         }
-        
+
         return new ValidationResult(
             isValid: empty($errors),
             errors: $errors,
             warnings: $warnings,
         );
     }
-    
+
     private function calculateExpectedStage(int $turn): string
     {
         return match (true) {
@@ -721,10 +726,10 @@ class DuplicateDetector
     public function detectDuplicates(array $importData, int $userId): array
     {
         $duplicates = [];
-        
+
         foreach ($importData as $index => $record) {
             $existing = $this->findMatchingRecord($record, $userId);
-            
+
             if ($existing) {
                 $duplicates[] = [
                     'import_index' => $index,
@@ -735,17 +740,17 @@ class DuplicateDetector
                 ];
             }
         }
-        
+
         return $duplicates;
     }
-    
+
     private function findMatchingRecord(array $record, int $userId): ?Career
     {
         // Match by character name + scenario
         $query = Career::where('user_id', $userId)
             ->where('character_name', $record['character_name'])
             ->where('scenario_type', $record['scenario_type']);
-        
+
         // Also check creation date if available
         if (isset($record['created_at'])) {
             $createdAt = Carbon::parse($record['created_at']);
@@ -754,35 +759,35 @@ class DuplicateDetector
                 $createdAt->copy()->addHours(1),
             ]);
         }
-        
+
         return $query->first();
     }
-    
+
     private function determineMatchType(array $import, Career $existing): string
     {
         // Exact match (all fields identical)
         if ($this->isExactMatch($import, $existing)) {
             return 'exact';
         }
-        
+
         // Partial match (same character/scenario, different data)
         if ($import['current_turn'] === $existing->current_turn) {
             return 'same_turn';
         }
-        
+
         if ($import['current_turn'] > $existing->current_turn) {
             return 'newer_data';
         }
-        
+
         return 'older_data';
     }
-    
+
     private function findConflictingFields(array $import, Career $existing): array
     {
         $conflicts = [];
-        
+
         $compareFields = ['speed', 'stamina', 'power', 'guts', 'wit', 'current_turn', 'total_sp_available'];
-        
+
         foreach ($compareFields as $field) {
             if (isset($import[$field]) && $import[$field] != $existing->$field) {
                 $conflicts[$field] = [
@@ -791,7 +796,7 @@ class DuplicateDetector
                 ];
             }
         }
-        
+
         return $conflicts;
     }
 }
@@ -816,35 +821,35 @@ class DataImportService
             $skipped = 0;
             $updated = 0;
             $errors = [];
-            
+
             foreach ($records as $index => $record) {
                 try {
                     $result = $this->importRecord($record, $strategy, $userId);
-                    
+
                     match ($result->action) {
                         'imported' => $imported++,
                         'skipped' => $skipped++,
                         'updated' => $updated++,
                     };
-                    
+
                     if ($progressCallback) {
                         $progressCallback($index + 1, count($records));
                     }
-                    
+
                 } catch (\Exception $e) {
                     $errors[] = [
                         'record_index' => $index,
                         'error' => $e->getMessage(),
                         'record_data' => $record,
                     ];
-                    
+
                     // Stop on critical errors
                     if ($e instanceof CriticalImportException) {
                         throw $e;
                     }
                 }
             }
-            
+
             return new ImportResult(
                 imported: $imported,
                 skipped: $skipped,
@@ -853,17 +858,17 @@ class DataImportService
             );
         });
     }
-    
+
     private function importRecord(array $record, string $strategy, int $userId): RecordImportResult
     {
         $existing = $this->findExistingRecord($record, $userId);
-        
+
         if (!$existing) {
             // No conflict, create new
             $career = Career::create(array_merge($record, ['user_id' => $userId]));
             return new RecordImportResult('imported', $career);
         }
-        
+
         // Handle conflict based on strategy
         return match ($strategy) {
             'skip' => new RecordImportResult('skipped', $existing),
@@ -872,18 +877,18 @@ class DataImportService
             'create_new' => $this->createNewRecord($record, $userId),
         };
     }
-    
+
     private function overwriteRecord(Career $existing, array $record): RecordImportResult
     {
         $existing->update($record);
         return new RecordImportResult('updated', $existing);
     }
-    
+
     private function mergeRecord(Career $existing, array $record): RecordImportResult
     {
         // Prefer newer data
         $merged = [];
-        
+
         foreach ($record as $key => $value) {
             // For numeric fields, take the higher value
             if (in_array($key, ['speed', 'stamina', 'power', 'guts', 'wit'])) {
@@ -898,16 +903,16 @@ class DataImportService
                 $merged[$key] = $value ?? $existing->$key;
             }
         }
-        
+
         $existing->update($merged);
         return new RecordImportResult('updated', $existing);
     }
-    
+
     private function createNewRecord(array $record, int $userId): RecordImportResult
     {
         // Add suffix to avoid name conflict
         $record['career_name'] = $record['career_name'] . ' (Imported ' . now()->format('Y-m-d') . ')';
-        
+
         $career = Career::create(array_merge($record, ['user_id' => $userId]));
         return new RecordImportResult('imported', $career);
     }
@@ -1046,6 +1051,10 @@ class DataImportService
 
 #### Hint Level Migration (Legacy 2-Level → Current 5-Level)
 
+> **Note**: This hint-level conversion is a one-time migration applied to legacy data only.
+> New career runs recorded by this application use the 5-level system directly and do not
+> require remapping.
+
 ```json
 {
   "migration_rule": "2-level to 5-level hint system",
@@ -1126,12 +1135,12 @@ sequenceDiagram
     participant Import as DataImportService
     participant DB as Database
     participant Audit as AuditLogger
-    
+
     Import->>DB: BEGIN TRANSACTION
-    
+
     loop For each record
         Import->>DB: INSERT/UPDATE record
-        
+
         alt Constraint Violation
             DB-->>Import: Error
             Import->>DB: ROLLBACK
@@ -1144,7 +1153,7 @@ sequenceDiagram
             Import-->>Import: Return error
         end
     end
-    
+
     Import->>DB: COMMIT
     Import->>Audit: Log success
     Import-->>Import: Return success
@@ -1190,7 +1199,7 @@ sequenceDiagram
 // Optimized batch insert
 DB::transaction(function () use ($records) {
     $chunks = array_chunk($records, 50);
-    
+
     foreach ($chunks as $chunk) {
         Career::insert($chunk);
     }
@@ -1223,10 +1232,10 @@ flowchart TD
     Upload[Upload File] --> Size{Size Check}
     Size -->|Small| Sync[Sync Import]
     Size -->|Large| Queue[Queue Background Job]
-    
+
     Sync --> Process[Process Immediately]
     Queue --> Poll[Poll for Progress]
-    
+
     Process --> Result[Display Result]
     Poll --> Progress{Complete?}
     Progress -->|No| Poll
@@ -1246,10 +1255,10 @@ flowchart TD
 
 | Document | Description |
 | --- | --- |
-| [PRD-001](../prds/PRD-001_Character_Management.md) | Product requirements for character management |
-| [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
-| [FLOW-001](../flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
-| [D05_DMP](../005_DMP_Data_Migration_Plan.md) | Comprehensive data migration plan |
+| [PRD-001](../02-prds/PRD-001_Character_Management.md) | Product requirements for character management |
+| [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
+| [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
+| [D05_DMP](../00-core-docs/005_DMP_Data_Migration_Plan.md) | Comprehensive data migration plan |
 
 ### 8.2 Related Sequences
 
@@ -1263,7 +1272,7 @@ flowchart TD
 
 | Document | Description |
 | --- | --- |
-| [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
+| [DBD-009](../00-core-docs/009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
 
@@ -1273,6 +1282,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-10 | Development Team | Added note that hint-level migration is a one-time conversion for legacy data; new runs use the 5-level system directly (section 5.5) |
 | 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - added SS→S aptitude conversion rule, hint level migration (2→5 levels), stat soft cap handling, support card limit break validation, bond percentage normalization |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, format detection, transformation, validation, duplicate resolution, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
@@ -1301,4 +1311,8 @@ flowchart TD
 
 ---
 
-*This sequence diagram reflects the current implementation of the data migration workflow as of v2.2.0. For the most up-to-date information, refer to the source code in `app/Services/DataManagement/DataMigrationService.php`, `app/Services/DataManagement/DataImportService.php`, and related files. Game mechanics verified against Global English Server (January 2026).*
+*This sequence diagram reflects the current implementation of the data migration workflow as of
+v2.2.0. For the most up-to-date information, refer to the source code in
+`app/Services/DataManagement/DataMigrationService.php`,
+`app/Services/DataManagement/DataImportService.php`, and related files. Game mechanics verified
+against Global English Server (January 2026).*

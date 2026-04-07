@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0
+**Date**: March 9, 2026
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [SEQ-005]
 
 **Source Specs**:
@@ -13,13 +13,15 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-005](../prds/PRD-005_Support_Card_Management.md)
-- SPEC: [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md)
-- Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
-- Tech Flow: [TECH-FLOW-005](../tech-flow/TECH-FLOW-005_Support_Card_Management_Flow.md)
-- Sequences: [SEQ-005](../sequences/SEQ-005_Support_Card_Upgrade.md)
-- User Flows: [UF-006](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+- PRD: [PRD-005](../02-prds/PRD-005_Support_Card_Management.md)
+- SPEC: [SPEC-005](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](../01-flows/FLOW-005_Support_Card_Management_System.md)
+- Tech Flow: [TECH-FLOW-005](../01-tech-flow/TECH-FLOW-005_Support_Card_Management_Flow.md)
+- Sequences: [SEQ-005](../01-sequences/SEQ-005_Support_Card_Upgrade.md)
+- User Flows: [UF-006](../01-user-flows/UF-006_Support_Deck_Building_Flow.md)
 - Related WF: [WF-010](WF-010_Support_Card_Collection.md), [WF-001](WF-001_Dashboard_Overview.md)
+
+> **Alignment Note (March 2026)**: This wireframe has been reviewed for storage-mode consistency, navigation-surface accuracy, and accessibility contract completeness. Component class names and service calls shown in code blocks are **illustrative contracts**; verify against the current implementation before use.
 
 ---
 
@@ -27,7 +29,9 @@
 
 ### 1.1 Purpose
 
-The Support Deck Builder enables players to construct, validate, and optimize their 6-card support decks for training optimization. It provides real-time validation, synergy analysis, and AI-powered deck recommendations.
+The Support Deck Builder enables players to construct, validate, and optimize their 6-card support
+decks for training optimization. It provides real-time validation, synergy analysis, and AI-powered
+deck recommendations.
 
 ### 1.2 Key Objectives
 
@@ -92,6 +96,25 @@ The Support Deck Builder enables players to construct, validate, and optimize th
 | US-006 | As a player, I want to see the presence bonus calculation for my deck | P1 |
 | US-007 | As a player, I want to see limit break levels (★-★★★★★) for each card | P0 |
 | US-008 | As a player, I want to see card type distribution for training focus | P1 |
+
+---
+
+### 1.5 Storage Mode Support
+
+| Mode | Behavior |
+| --- | --- |
+| **Local Mode** | Deck configuration stored in browser alongside local character run |
+| **Account Mode** | Deck saved to database; available across devices when authenticated |
+
+Deck validation and synergy scoring run identically in both modes.
+
+### 1.6 Navigation Surface
+
+| Surface | Description |
+| --- | --- |
+| **Entry** | Conceptual: deck builder route, accessible from character detail or creation wizard |
+| **Save / Continue** | Persists deck and returns to calling context |
+| **Cancel** | Returns to previous context without saving current changes |
 
 ---
 
@@ -273,7 +296,7 @@ class DeckOverview extends Component
         $cardCount = min($cards->count(), 6);
         $bonusPerCard = 5; // +5% per card
         $maxBonus = 30; // Maximum +30%
-        
+
         return [
             'per_card' => $bonusPerCard,
             'total' => min($cardCount * $bonusPerCard, $maxBonus),
@@ -500,7 +523,7 @@ class DeckValidator extends Component
 
         // Rule 2: Type distribution analysis (no hard restrictions, but recommendations)
         $typeCounts = $cards->countBy('card_type');
-        
+
         // Check for training concentration (multiple cards of same type)
         $concentratedTypes = $typeCounts->filter(fn($count) => $count >= 3);
         if ($concentratedTypes->isNotEmpty()) {
@@ -526,7 +549,8 @@ class DeckValidator extends Component
         if ($totalHints < 6) {
             $this->validationResults[] = [
                 'type' => 'info',
-                'message' => "Low skill hint coverage ({$totalHints} hints). Consider cards with more skill hints for SP savings.",
+                'message' => "Low skill hint coverage ({$totalHints} hints). Consider cards with more skill hints
+                for SP savings.",
             ];
         }
 
@@ -708,7 +732,7 @@ class DeckOptimizationService
 {
     /**
      * Optimize deck based on game-accurate mechanics (Global English Server Jan 2026)
-     * 
+     *
      * Key considerations:
      * - 6 slots total, any type combination allowed
      * - Presence bonus: +5% per card in training (max +30%)
@@ -748,7 +772,7 @@ class DeckOptimizationService
             } else {
                 // For concentrated builds, allow up to 3 of focus type
                 $maxPerType = ($strategy === 'concentrated' && $type === ($goals['focus_stat'] ?? null)) ? 3 : 2;
-                
+
                 if ($currentTypeCount < $maxPerType) {
                     $optimizedDeck[] = $card;
                     $typeCount[$type] = $currentTypeCount + 1;
@@ -818,7 +842,7 @@ class DeckOptimizationService
     {
         $reasons = [];
         $typeDistribution = collect($deck)->countBy('card_type');
-        
+
         // Presence bonus reasoning
         $cardCount = count($deck);
         $presenceBonus = min($cardCount * 5, 30);
@@ -1115,6 +1139,7 @@ flowchart TD
 | **2.4.7 Focus Visible** | Clear focus indicators on cards | Visual inspection |
 | **3.2.4 Consistent Identification** | Consistent card status badges | Manual review |
 | **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
+| **1.4.1 Use of Color** | Deck status, validation, and tier badges convey state by text and icon, not color alone | Visual + screen reader |
 
 ### 6.2 Keyboard Navigation
 
@@ -1153,6 +1178,23 @@ flowchart TD
     Deck "Speed Focus Build" saved successfully.
 </div>
 ```
+
+### 6.4 Accessibility Interaction Requirements
+
+The following rules MUST be satisfied, independent of visual design or component implementation:
+
+1. **Focus on slot selection**: When a deck slot is activated to choose a card, focus moves to the
+card selection modal or panel's first interactive element.
+2. **Focus return on modal close**: Closing the card selection modal (confirm, cancel, or Escape)
+returns focus to the deck slot button that triggered it.
+3. **Focus to validation error**: On failed deck validation, focus moves to the first invalid slot
+or error message, and errors are announced via `aria-live="assertive"`.
+4. **Touch targets**: All slot buttons, card selection controls, and action buttons must have a
+minimum touch area of 44×44 CSS pixels.
+5. **Tier and status non-color**: Meta tier (SS/S/A/B) and card validation state must be conveyed by
+text label, not color alone.
+6. **Drag-and-drop alternative**: If drag-and-drop reordering is provided, an equivalent keyboard-
+accessible mechanism must also be available for slot assignment.
 
 ---
 
@@ -1441,24 +1483,24 @@ test.describe("WF-011: Accessibility", () => {
 
 ### 9.1 Product Requirements
 
-- [PRD-005: Support Card Management](../prds/PRD-005_Support_Card_Management.md)
+- [PRD-005: Support Card Management](../02-prds/PRD-005_Support_Card_Management.md)
 
 ### 9.2 Technical Specifications
 
-- [SPEC-005: Support Card Management Technical](../specs/SPEC-005_Support_Card_Management_Technical.md)
+- [SPEC-005: Support Card Management Technical](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
 
 ### 9.3 Flow Documentation
 
-- [FLOW-005: Support Card Management System](../flows/FLOW-005_Support_Card_Management_System.md)
-- [TECH-FLOW-005: Support Card Management Flow](../tech-flow/TECH-FLOW-005_Support_Card_Management_Flow.md)
+- [FLOW-005: Support Card Management System](../01-flows/FLOW-005_Support_Card_Management_System.md)
+- [TECH-FLOW-005: Support Card Management Flow](../01-tech-flow/TECH-FLOW-005_Support_Card_Management_Flow.md)
 
 ### 9.4 Sequence Diagrams
 
-- [SEQ-005: Support Card Upgrade](../sequences/SEQ-005_Support_Card_Upgrade.md)
+- [SEQ-005: Support Card Upgrade](../01-sequences/SEQ-005_Support_Card_Upgrade.md)
 
 ### 9.5 User Flows
 
-- [UF-006: Support Deck Building Flow](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+- [UF-006: Support Deck Building Flow](../01-user-flows/UF-006_Support_Deck_Building_Flow.md)
 
 ### 9.6 Related Wireframes
 
@@ -1471,6 +1513,7 @@ test.describe("WF-011: Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-09 | Development Team | Alignment review: added storage-mode framing (§1.5–1.6), accessibility interaction requirements (§6.4), softened implementation status |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected support card presence bonus (+5% per card, max +30%), added deck synergy indicators, updated card type descriptions, added limit break display (★ to ★★★★★), enhanced type distribution visualization |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added deck overview, auto-optimization, validation system, accessibility specifications, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
@@ -1479,7 +1522,8 @@ test.describe("WF-011: Accessibility", () => {
 
 ## 11. Notes
 
-**Implementation Status**: ✅ Complete
+**Implementation Status**: Alignment-reviewed concept; specific component classes and route paths in
+this document are illustrative and should be verified against the current implementation.
 
 **Known Issues**: None
 
@@ -1494,4 +1538,5 @@ test.describe("WF-011: Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the Support Deck Builder and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe describes the intended experience for the Support Deck Builder. Details should be
+verified against current implementation documentation before treating as authoritative._

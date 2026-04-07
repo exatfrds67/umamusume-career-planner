@@ -2,7 +2,8 @@
 
 ## 1. System Requirements
 
-- **PHP**: 8.4+ (Extensions: bcmath, ctype, curl, dom, fileinfo, json, mbstring, openssl, pdo_mysql, redis, tokenizer, xml)
+- **PHP**: 8.4+ (Extensions: bcmath, ctype, curl, dom, fileinfo, json, mbstring, openssl, pdo_mysql,
+redis, tokenizer, xml)
 - **Database**: MySQL 8.0+ or PostgreSQL 14+
 - **Cache/Queue**: Redis 6.0+
 - **Web Server**: Nginx or Apache

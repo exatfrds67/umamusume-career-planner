@@ -1,7 +1,7 @@
 # ProfileController TODO Resolution Summary
 
-**Date:** January 23, 2026  
-**Status:** ✅ All TODOs Resolved  
+**Date:** January 23, 2026
+**Status:** ✅ All TODOs Resolved
 **Files Modified:** 2
 
 ## Overview
@@ -13,8 +13,8 @@ tracking have been successfully implemented.
 
 ### 1. Training Sessions Tracking
 
-**File:** `app/Http/Controllers/ProfileController.php`  
-**Line:** 29  
+**File:** `app/Http/Controllers/ProfileController.php`
+**Line:** 29
 **Status:** ✅ Resolved
 
 **Original TODO:**
@@ -40,8 +40,8 @@ tracking have been successfully implemented.
 
 ### 2. Races Completed Tracking
 
-**File:** `app/Http/Controllers/ProfileController.php`  
-**Line:** 30  
+**File:** `app/Http/Controllers/ProfileController.php`
+**Line:** 30
 **Status:** ✅ Resolved
 
 **Original TODO:**
@@ -70,7 +70,7 @@ tracking have been successfully implemented.
 
 ### User Model Enhancements
 
-**File:** `app/Models/User.php`  
+**File:** `app/Models/User.php`
 **Status:** ✅ Implemented
 
 Added two new relationship methods to support the statistics:
@@ -133,8 +133,8 @@ All necessary tables and relationships already exist:
 ### Relationship Chain
 
 ```text
-User (id) 
-  → Character (user_id) 
+User (id)
+  → Character (user_id)
     → TrainingSession (character_id)
     → Race (character_id)
 ```
@@ -196,16 +196,16 @@ $g1Races = $user->races()
 
 ```sql
 -- Training sessions count
-SELECT COUNT(*) 
-FROM ucp_training_sessions 
-INNER JOIN ucp_characters ON ucp_training_sessions.character_id = ucp_characters.id 
+SELECT COUNT(*)
+FROM ucp_training_sessions
+INNER JOIN ucp_characters ON ucp_training_sessions.character_id = ucp_characters.id
 WHERE ucp_characters.user_id = ?
 
 -- Completed races count
-SELECT COUNT(*) 
-FROM ucp_races 
-INNER JOIN ucp_characters ON ucp_races.character_id = ucp_characters.id 
-WHERE ucp_characters.user_id = ? 
+SELECT COUNT(*)
+FROM ucp_races
+INNER JOIN ucp_characters ON ucp_races.character_id = ucp_characters.id
+WHERE ucp_characters.user_id = ?
   AND ucp_races.finish_position IS NOT NULL
 ```text
 
@@ -234,20 +234,20 @@ test('user can count training sessions', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
     TrainingSession::factory()->for($character)->count(5)->create();
-    
+
     expect($user->trainingSessions()->count())->toBe(5);
 });
 
 test('user can count completed races', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
-    
+
     // Create completed races
     Race::factory()->for($character)->count(3)->create(['finish_position' => 1]);
-    
+
     // Create incomplete race
     Race::factory()->for($character)->create(['finish_position' => null]);
-    
+
     expect($user->races()->whereNotNull('finish_position')->count())->toBe(3);
 });
 ```text
@@ -258,15 +258,15 @@ test('user can count completed races', function () {
 test('profile shows correct statistics', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
-    
+
     TrainingSession::factory()->for($character)->count(10)->create();
     Race::factory()->for($character)->count(5)->create(['finish_position' => 1]);
-    
+
     $response = $this->actingAs($user)->get(route('profile.show'));
-    
+
     $response->assertOk();
     $response->assertViewHas('stats', function ($stats) {
-        return $stats['training_sessions'] === 10 
+        return $stats['training_sessions'] === 10
             && $stats['races_completed'] === 5;
     });
 });

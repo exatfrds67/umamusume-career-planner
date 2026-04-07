@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -27,7 +27,10 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the error reporting and retry workflow in the Umamusume Career Planner application, covering exception handling, logging, retry strategies, job queue management, APM integration, and **game-accurate validation rules** based on the Global English Server mechanics.
+This sequence diagram documents the error reporting and retry workflow in the Umamusume Career
+Planner application, covering exception handling, logging, retry strategies, job queue management,
+APM integration, and **game-accurate validation rules** based on the Global English Server
+mechanics.
 
 ### 1.2 Scope
 
@@ -47,10 +50,10 @@ This sequence diagram documents the error reporting and retry workflow in the Um
 
 **Related Artifacts:**
 
-- PRD: [PRD-007](../prds/PRD-007_External_Integration.md)
-- SPEC: [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
-- Flow: [FLOW-007](../flows/FLOW-007_External_Integration_System.md)
-- Tech Flow: [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
+- PRD: [PRD-007](../02-prds/PRD-007_External_Integration.md)
+- SPEC: [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md)
+- Flow: [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md)
+- Tech Flow: [TECH-FLOW-007](../01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
 
 ### 1.3 Business Context
 
@@ -147,7 +150,7 @@ sequenceDiagram
     Note over User,DB: GAME DATA VALIDATION FLOW
     User->>App: Submit game data
     App->>GameVal: Validate game data
-    
+
     alt Valid Data
         GameVal-->>App: Validation passed
         App->>App: Process data
@@ -172,7 +175,7 @@ sequenceDiagram
     Note over User,DB: SYNCHRONOUS ERROR HANDLING
     User->>App: Trigger action
     App->>App: Execute business logic
-    
+
     alt Success Path
         App-->>User: Return success response
     else Error Encountered
@@ -180,15 +183,15 @@ sequenceDiagram
         Handler->>Handler: Categorize error
         Handler->>ErrorLog: Log error details
         ErrorLog->>DB: Store error log
-        
+
         Handler->>APM: Report error metrics
         APM->>APM: Track error rate
-        
+
         alt Critical Error
             Handler->>Notify: Send alert
             Notify->>Notify: Queue admin notification
         end
-        
+
         Handler-->>User: Return error response
     end
 
@@ -196,25 +199,25 @@ sequenceDiagram
     App->>Queue: Dispatch job
     Queue->>Worker: Deliver job
     Worker->>Worker: Execute job
-    
+
     alt Job Success
         Worker->>DB: Mark job complete
         Worker-->>Queue: Acknowledge
     else Job Failure
         Worker->>ErrorLog: Log failure details
         ErrorLog->>DB: Store job error
-        
+
         Worker->>APM: Report job failure
-        
+
         alt Retry Eligible
             Worker->>Worker: Calculate backoff delay
             Worker->>Queue: Requeue with delay
-            
+
             Note over Queue,Worker: Exponential Backoff
             Queue->>Queue: Wait backoff period
             Queue->>Worker: Redeliver job
             Worker->>Worker: Retry execution
-            
+
             alt Retry Success
                 Worker->>DB: Mark job complete
             else Max Retries Reached
@@ -267,17 +270,17 @@ class Handler extends ExceptionHandler
         ValidationException::class,
         AuthenticationException::class,
     ];
-    
+
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
             $this->reportToAPM($e);
-            
+
             if ($this->shouldAlert($e)) {
                 $this->sendAlert($e);
             }
         });
-        
+
         // Game-specific validation errors
         $this->renderable(function (GameValidationException $e, Request $request) {
             return response()->json([
@@ -291,7 +294,7 @@ class Handler extends ExceptionHandler
                 'corrected_value' => $e->getCorrectedValue(),
             ], 422);
         });
-        
+
         $this->renderable(function (AptitudeValidationException $e, Request $request) {
             return response()->json([
                 'error' => 'Invalid aptitude grade',
@@ -303,7 +306,7 @@ class Handler extends ExceptionHandler
                 'suggestion' => $e->getSuggestion(),
             ], 422);
         });
-        
+
         $this->renderable(function (ExternalAPIException $e, Request $request) {
             return response()->json([
                 'error' => 'External service unavailable',
@@ -311,7 +314,7 @@ class Handler extends ExceptionHandler
                 'code' => 'EXT_SERVICE_ERROR',
             ], 503);
         });
-        
+
         $this->renderable(function (AIProviderException $e, Request $request) {
             return response()->json([
                 'error' => 'AI service error',
@@ -320,7 +323,7 @@ class Handler extends ExceptionHandler
             ], 503);
         });
     }
-    
+
     protected function reportToAPM(Throwable $e): void
     {
         app(APMService::class)->reportException($e, [
@@ -329,14 +332,14 @@ class Handler extends ExceptionHandler
             'route' => request()->route()?->getName(),
         ]);
     }
-    
+
     protected function shouldAlert(Throwable $e): bool
     {
         return $e instanceof CriticalException
             || $e instanceof DatabaseConnectionException
             || $this->isHighErrorRate();
     }
-    
+
     protected function sendAlert(Throwable $e): void
     {
         app(NotificationService::class)->notifyAdmins(
@@ -369,32 +372,32 @@ class GameValidationException extends Exception
     ) {
         parent::__construct($message, 0, $previous);
     }
-    
+
     public function getField(): string
     {
         return $this->field;
     }
-    
+
     public function getInvalidValue(): mixed
     {
         return $this->invalidValue;
     }
-    
+
     public function getValidRange(): ?array
     {
         return $this->validRange;
     }
-    
+
     public function wasAutoCorrected(): bool
     {
         return $this->autoCorrected;
     }
-    
+
     public function getCorrectedValue(): mixed
     {
         return $this->correctedValue;
     }
-    
+
     public function context(): array
     {
         return [
@@ -411,7 +414,7 @@ class GameValidationException extends Exception
 class AptitudeValidationException extends GameValidationException
 {
     public const VALID_GRADES = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'];
-    
+
     public function __construct(
         string $field,
         string $invalidGrade,
@@ -419,8 +422,9 @@ class AptitudeValidationException extends GameValidationException
         bool $autoCorrected = false,
         ?string $correctedValue = null
     ) {
-        $message = "Invalid aptitude grade '{$invalidGrade}' for {$field}. Valid grades: G-S (SS is not valid in Global English Server)";
-        
+        $message = "Invalid aptitude grade '{$invalidGrade}' for {$field}. Valid grades: G-S (SS is not
+        valid in Global English Server)";
+
         parent::__construct(
             $message,
             $field,
@@ -429,12 +433,12 @@ class AptitudeValidationException extends GameValidationException
             $autoCorrected,
             $correctedValue
         );
-        
+
         $this->suggestion = $suggestion;
     }
-    
+
     public readonly ?string $suggestion;
-    
+
     public function getSuggestion(): ?string
     {
         return $this->suggestion;
@@ -453,7 +457,7 @@ class ExternalAPIException extends Exception
     ) {
         parent::__construct($message, 0, $previous);
     }
-    
+
     public function context(): array
     {
         return [
@@ -476,7 +480,7 @@ class AIProviderException extends Exception
     ) {
         parent::__construct($message, 0, $previous);
     }
-    
+
     public function context(): array
     {
         return [
@@ -502,7 +506,8 @@ class AIProviderException extends Exception
 | Surface Aptitude | G, F, E, D, C, B, A, S | SS, SSS, or numeric | SS → S |
 | Running Style Aptitude | G, F, E, D, C, B, A, S | SS, SSS, or numeric | SS → S |
 
-**Note:** SS grade does NOT exist in the Global English Server. Any SS values should be auto-corrected to S with a warning.
+**Note:** SS grade does NOT exist in the Global English Server. Any SS values should be auto-
+corrected to S with a warning.
 
 #### 5.1.2 Stat Range Validation
 
@@ -514,7 +519,8 @@ class AIProviderException extends Exception
 | Guts | 0-1200 | 1201-1600 | >1600 |
 | Wit (Intelligence) | 0-1200 | 1201-1600 | >1600 |
 
-**Note:** Stats above 1200 are possible with factors and bonuses but values >1600 are unrealistic and should be rejected.
+**Note:** Stats above 1200 are possible with factors and bonuses but values >1600 are unrealistic
+and should be rejected.
 
 #### 5.1.3 Hint Level Validation
 
@@ -559,17 +565,17 @@ class GameDataValidator
     public const VALID_HINT_LEVELS = [1, 2, 3, 4, 5];
     public const VALID_LIMIT_BREAKS = [0, 1, 2, 3, 4];
     public const VALID_CARD_TYPES = ['Speed', 'Stamina', 'Power', 'Guts', 'Wit', 'Friend', 'Group'];
-    
+
     private array $warnings = [];
     private array $corrections = [];
-    
+
     public function validate(array $data): ValidationResult
     {
         $this->warnings = [];
         $this->corrections = [];
-        
+
         $errors = [];
-        
+
         // Validate aptitude grades
         foreach (['distance_aptitude', 'surface_aptitude', 'running_style_aptitude'] as $field) {
             if (isset($data[$field])) {
@@ -583,7 +589,7 @@ class GameDataValidator
                 }
             }
         }
-        
+
         // Validate stat ranges
         foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
             if (isset($data[$stat])) {
@@ -596,7 +602,7 @@ class GameDataValidator
                 }
             }
         }
-        
+
         // Validate turn number
         if (isset($data['turn_number'])) {
             $result = $this->validateTurnNumber($data['turn_number']);
@@ -604,7 +610,7 @@ class GameDataValidator
                 $errors[] = $result['error'];
             }
         }
-        
+
         // Validate hint levels
         if (isset($data['hint_level'])) {
             $result = $this->validateHintLevel($data['hint_level']);
@@ -612,7 +618,7 @@ class GameDataValidator
                 $errors[] = $result['error'];
             }
         }
-        
+
         // Validate support card data
         if (isset($data['support_cards'])) {
             foreach ($data['support_cards'] as $index => $card) {
@@ -622,7 +628,7 @@ class GameDataValidator
                 }
             }
         }
-        
+
         // Validate SP balance
         if (isset($data['sp_balance']) && $data['sp_balance'] < 0) {
             $errors[] = new ValidationError(
@@ -632,7 +638,7 @@ class GameDataValidator
                 ['min' => 0]
             );
         }
-        
+
         // Validate bond percentage
         if (isset($data['bond_percentage'])) {
             if ($data['bond_percentage'] < 0 || $data['bond_percentage'] > 100) {
@@ -644,7 +650,7 @@ class GameDataValidator
                 );
             }
         }
-        
+
         return new ValidationResult(
             valid: empty($errors),
             errors: $errors,
@@ -653,11 +659,11 @@ class GameDataValidator
             correctedData: $data
         );
     }
-    
+
     private function validateAptitude(string $field, string $value): array
     {
         $upperValue = strtoupper(trim($value));
-        
+
         // Check for SS grade (not valid in Global English Server)
         if ($upperValue === 'SS' || $upperValue === 'SSS') {
             return [
@@ -668,7 +674,7 @@ class GameDataValidator
                 'message' => "SS grade auto-corrected to S for {$field} (SS not valid in Global English Server)",
             ];
         }
-        
+
         if (!in_array($upperValue, self::VALID_APTITUDE_GRADES)) {
             return [
                 'error' => new AptitudeValidationException(
@@ -680,10 +686,10 @@ class GameDataValidator
                 'corrected_value' => null,
             ];
         }
-        
+
         return ['error' => null, 'corrected' => false, 'corrected_value' => null];
     }
-    
+
     private function validateStat(string $stat, int $value): array
     {
         if ($value < 0) {
@@ -697,7 +703,7 @@ class GameDataValidator
                 'warning' => null,
             ];
         }
-        
+
         if ($value > self::STAT_WARNING_THRESHOLD) {
             return [
                 'error' => new StatRangeException(
@@ -709,17 +715,18 @@ class GameDataValidator
                 'warning' => null,
             ];
         }
-        
+
         if ($value > self::MAX_STAT_VALUE) {
             return [
                 'error' => null,
-                'warning' => "Stat {$stat} value {$value} exceeds normal cap of " . self::MAX_STAT_VALUE . " (possible with factors/bonuses)",
+                'warning' => "Stat {$stat} value {$value} exceeds normal cap of " . self::MAX_STAT_VALUE . "
+                (possible with factors/bonuses)",
             ];
         }
-        
+
         return ['error' => null, 'warning' => null];
     }
-    
+
     private function validateTurnNumber(int $turn): array
     {
         if ($turn < 1 || $turn > self::MAX_TURN_NUMBER) {
@@ -732,10 +739,10 @@ class GameDataValidator
                 ),
             ];
         }
-        
+
         return ['error' => null];
     }
-    
+
     private function validateHintLevel(int $level): array
     {
         if (!in_array($level, self::VALID_HINT_LEVELS)) {
@@ -748,14 +755,14 @@ class GameDataValidator
                 ),
             ];
         }
-        
+
         return ['error' => null];
     }
-    
+
     private function validateSupportCard(array $card, int $index): array
     {
         $errors = [];
-        
+
         // Validate card type
         if (isset($card['type']) && !in_array($card['type'], self::VALID_CARD_TYPES)) {
             $errors[] = new GameValidationException(
@@ -765,7 +772,7 @@ class GameDataValidator
                 self::VALID_CARD_TYPES
             );
         }
-        
+
         // Validate limit break
         if (isset($card['limit_break']) && !in_array($card['limit_break'], self::VALID_LIMIT_BREAKS)) {
             $errors[] = new GameValidationException(
@@ -775,7 +782,7 @@ class GameDataValidator
                 self::VALID_LIMIT_BREAKS
             );
         }
-        
+
         return ['errors' => $errors];
     }
 }
@@ -786,35 +793,35 @@ class GameDataValidator
 ```mermaid
 flowchart TD
     Input[Receive Game Data]
-    
+
     Input --> AptVal{Validate Aptitudes}
-    
+
     AptVal -->|SS Grade| AutoCorrect[Auto-correct SS → S]
     AptVal -->|Invalid Grade| AptError[Aptitude Error]
     AptVal -->|Valid G-S| StatVal{Validate Stats}
-    
+
     AutoCorrect --> LogCorrection[Log Correction]
     LogCorrection --> StatVal
-    
+
     StatVal -->|>1600| StatError[Stat Range Error]
     StatVal -->|1201-1600| StatWarn[Add Warning]
     StatVal -->|0-1200| TurnVal{Validate Turn}
-    
+
     StatWarn --> TurnVal
-    
+
     TurnVal -->|<1 or >78| TurnError[Turn Range Error]
     TurnVal -->|1-78| HintVal{Validate Hints}
-    
+
     HintVal -->|Invalid Level| HintError[Hint Level Error]
     HintVal -->|1-5| CardVal{Validate Cards}
-    
+
     CardVal -->|Invalid Type| CardError[Card Type Error]
     CardVal -->|Invalid LB| LBError[Limit Break Error]
     CardVal -->|Valid| SPVal{Validate SP}
-    
+
     SPVal -->|Negative| SPError[SP Balance Error]
     SPVal -->|≥0| Success[Validation Passed]
-    
+
     AptError --> CollectErrors[Collect All Errors]
     StatError --> CollectErrors
     TurnError --> CollectErrors
@@ -822,7 +829,7 @@ flowchart TD
     CardError --> CollectErrors
     LBError --> CollectErrors
     SPError --> CollectErrors
-    
+
     CollectErrors --> ReturnErrors[Return Validation Result]
     Success --> ReturnSuccess[Return Success + Warnings]
 ```text
@@ -840,7 +847,7 @@ class CalculationValidator
     {
         $required = ['base_gain', 'motivation_modifier', 'bond_bonus', 'facility_level'];
         $errors = [];
-        
+
         foreach ($required as $component) {
             if (!isset($components[$component])) {
                 $errors[] = new CalculationException(
@@ -851,7 +858,7 @@ class CalculationValidator
                 );
             }
         }
-        
+
         // Validate motivation modifier range (0.8 - 1.2)
         if (isset($components['motivation_modifier'])) {
             $mod = $components['motivation_modifier'];
@@ -864,20 +871,20 @@ class CalculationValidator
                 );
             }
         }
-        
+
         return new ValidationResult(
             valid: empty($errors),
             errors: $errors
         );
     }
-    
+
     /**
      * Validate soft cap calculation
      */
     public function validateSoftCapCalculation(int $baseStat, int $calculatedGain): ValidationResult
     {
         $errors = [];
-        
+
         // Soft cap kicks in at 1200
         if ($baseStat >= 1200) {
             $maxGain = (int) floor($calculatedGain * 0.5); // 50% reduction after soft cap
@@ -890,13 +897,13 @@ class CalculationValidator
                 );
             }
         }
-        
+
         return new ValidationResult(
             valid: empty($errors),
             errors: $errors
         );
     }
-    
+
     /**
      * Validate hint discount calculation
      */
@@ -909,7 +916,7 @@ class CalculationValidator
             4 => 0.35, // 35%
             5 => 0.40, // 40% max
         ];
-        
+
         if (!isset($discountRates[$hintLevel])) {
             return new ValidationResult(
                 valid: false,
@@ -921,10 +928,10 @@ class CalculationValidator
                 )]
             );
         }
-        
+
         $expectedDiscount = (int) floor($baseCost * $discountRates[$hintLevel]);
         $expectedCost = $baseCost - $expectedDiscount;
-        
+
         if ($discountedCost !== $expectedCost) {
             return new ValidationResult(
                 valid: false,
@@ -936,7 +943,7 @@ class CalculationValidator
                 )]
             );
         }
-        
+
         return new ValidationResult(valid: true, errors: []);
     }
 }
@@ -1120,36 +1127,36 @@ class CalculationValidator
 ```mermaid
 flowchart TD
     Error[Error Encountered]
-    
+
     Error --> GameVal{Game Validation?}
-    
+
     GameVal -->|Yes| AutoFix{Auto-Correctable?}
     GameVal -->|No| Type{Error Type?}
-    
+
     AutoFix -->|Yes| ApplyFix[Apply Auto-Correction]
     AutoFix -->|No| UserPrompt[Prompt User for Fix]
-    
+
     ApplyFix --> LogFix[Log Correction]
     LogFix --> Continue[Continue Processing]
-    
+
     UserPrompt --> ReturnError[Return Validation Error]
-    
+
     Type -->|Transient| Retriable{Retriable?}
     Type -->|Permanent| Log[Log Error]
-    
+
     Retriable -->|Yes| Attempts{Attempts < Max?}
     Retriable -->|No| Log
-    
+
     Attempts -->|Yes| Backoff[Calculate Backoff]
     Attempts -->|No| Failed[Move to Failed Jobs]
-    
+
     Backoff --> Delay[Wait Backoff Period]
     Delay --> Retry[Retry Job]
-    
+
     Retry --> Success{Success?}
     Success -->|Yes| Complete[Mark Complete]
     Success -->|No| Attempts
-    
+
     Failed --> Alert[Alert Admin]
     Log --> Alert
 ```
@@ -1185,7 +1192,7 @@ class GameDataRecoveryService
 {
     private array $corrections = [];
     private array $warnings = [];
-    
+
     /**
      * Attempt to recover/correct game data
      */
@@ -1193,21 +1200,21 @@ class GameDataRecoveryService
     {
         $this->corrections = [];
         $this->warnings = [];
-        
+
         // Auto-correct aptitude grades
         foreach (['distance_aptitude', 'surface_aptitude', 'running_style_aptitude'] as $field) {
             if (isset($data[$field])) {
                 $data[$field] = $this->recoverAptitude($field, $data[$field]);
             }
         }
-        
+
         // Auto-correct numeric strings
         foreach (['speed', 'stamina', 'power', 'guts', 'wit', 'turn_number', 'sp_balance'] as $field) {
             if (isset($data[$field]) && is_string($data[$field])) {
                 $data[$field] = $this->recoverNumeric($field, $data[$field]);
             }
         }
-        
+
         return new RecoveryResult(
             recovered: true,
             data: $data,
@@ -1215,12 +1222,12 @@ class GameDataRecoveryService
             warnings: $this->warnings
         );
     }
-    
+
     private function recoverAptitude(string $field, string $value): string
     {
         $original = $value;
         $value = strtoupper(trim($value));
-        
+
         // SS/SSS → S (Global English Server doesn't have SS)
         if (in_array($value, ['SS', 'SSS'])) {
             $this->corrections[$field] = [
@@ -1231,7 +1238,7 @@ class GameDataRecoveryService
             $this->warnings[] = "Aptitude grade '{$original}' for {$field} was auto-corrected to 'S'";
             return 'S';
         }
-        
+
         // Log if we normalized case/whitespace
         if ($value !== $original) {
             $this->corrections[$field] = [
@@ -1240,23 +1247,23 @@ class GameDataRecoveryService
                 'reason' => 'Normalized case/whitespace',
             ];
         }
-        
+
         return $value;
     }
-    
+
     private function recoverNumeric(string $field, string $value): int
     {
         $parsed = (int) $value;
-        
+
         $this->corrections[$field] = [
             'original' => $value,
             'corrected' => $parsed,
             'reason' => 'Converted string to integer',
         ];
-        
+
         return $parsed;
     }
-    
+
     /**
      * Rollback to last valid state
      */
@@ -1267,25 +1274,25 @@ class GameDataRecoveryService
             ->where('is_valid', true)
             ->orderBy('created_at', 'desc')
             ->first();
-        
+
         if (!$lastValid) {
             Log::warning('No valid snapshot found for rollback', [
                 'career_run_id' => $careerRunId,
             ]);
             return null;
         }
-        
+
         // Restore from snapshot
         $careerRun = CareerRun::find($careerRunId);
         $careerRun->fill($lastValid->data);
         $careerRun->save();
-        
+
         Log::info('Rolled back to last valid state', [
             'career_run_id' => $careerRunId,
             'snapshot_id' => $lastValid->id,
             'snapshot_date' => $lastValid->created_at,
         ]);
-        
+
         return $careerRun;
     }
 }
@@ -1309,18 +1316,20 @@ class UserPromptService
                 field: $error->getField(),
                 options: ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'],
                 suggestion: $this->suggestAptitude($error->getValue()),
-                helpText: 'Valid grades are G (lowest) through S (highest). Note: SS grade does not exist in the Global English Server.',
+                helpText: 'Valid grades are G (lowest) through S (highest). Note: SS grade does not exist in the
+                Global English Server.',
             ),
-            
+
             'STAT_OUT_OF_RANGE' => new UserPrompt(
                 title: 'Stat Value Out of Range',
                 message: "The stat value {$error->getValue()} exceeds the maximum realistic value.",
                 field: $error->getField(),
                 inputType: 'number',
                 constraints: ['min' => 0, 'max' => 1600],
-                helpText: 'Stats typically range from 0-1200, with values up to 1600 possible through factors and bonuses.',
+                helpText: 'Stats typically range from 0-1200, with values up to 1600 possible through factors and
+                bonuses.',
             ),
-            
+
             'TURN_INVALID' => new UserPrompt(
                 title: 'Invalid Turn Number',
                 message: "Turn {$error->getValue()} is outside the valid range.",
@@ -1329,7 +1338,7 @@ class UserPromptService
                 constraints: ['min' => 1, 'max' => 78],
                 helpText: 'Career runs span 78 turns from Junior Year through Senior Year.',
             ),
-            
+
             'HINT_LEVEL_INVALID' => new UserPrompt(
                 title: 'Invalid Hint Level',
                 message: "Hint level {$error->getValue()} is not valid.",
@@ -1337,7 +1346,7 @@ class UserPromptService
                 options: [1, 2, 3, 4, 5],
                 helpText: 'Hint levels range from 1 to 5, with each level providing additional SP discount.',
             ),
-            
+
             default => new UserPrompt(
                 title: 'Invalid Data',
                 message: $error->getMessage(),
@@ -1345,7 +1354,7 @@ class UserPromptService
             ),
         };
     }
-    
+
     private function suggestAptitude(string $invalid): ?string
     {
         // Common typos/mistakes
@@ -1363,7 +1372,7 @@ class UserPromptService
             '7' => 'A',
             '8' => 'S',
         ];
-        
+
         return $suggestions[strtoupper($invalid)] ?? null;
     }
 }
@@ -1392,23 +1401,23 @@ class ErrorLoggingService
             'request_id' => request()->header('X-Request-ID'),
             'game_server' => 'global_english',
         ];
-        
+
         // Log at appropriate level based on auto-correction
         if ($exception->wasAutoCorrected()) {
             Log::info('Game data auto-corrected', $logData);
         } else {
             Log::warning('Game validation error', $logData);
         }
-        
+
         // Track for analytics
         $this->trackValidationError($exception);
     }
-    
+
     private function trackValidationError(GameValidationException $exception): void
     {
         // Increment error counter for monitoring
         Cache::increment("validation_errors:{$exception->getField()}:" . date('Y-m-d-H'));
-        
+
         // Track common invalid values for UX improvement
         $key = "invalid_values:{$exception->getField()}";
         $invalidValues = Cache::get($key, []);
@@ -1511,10 +1520,10 @@ CREATE INDEX idx_snapshots_career_run ON career_run_snapshots(career_run_id, is_
 
 | Document | Description |
 | --- | --- |
-| [PRD-007](../prds/PRD-007_External_Integration.md) | Product requirements for external integration |
-| [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
-| [FLOW-007](../flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
-| [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md) | Technical flow diagrams |
+| [PRD-007](../02-prds/PRD-007_External_Integration.md) | Product requirements for external integration |
+| [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
+| [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
+| [TECH-FLOW-007](../01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md) | Technical flow diagrams |
 
 ### 10.2 Related Sequences
 
@@ -1580,4 +1589,7 @@ CREATE INDEX idx_snapshots_career_run ON career_run_snapshots(career_run_id, is_
 
 ---
 
-*This sequence diagram reflects the current implementation of the error reporting and retry workflow as of v2.2.0, with game-accurate validation rules verified against the Global English Server (January 2026). For the most up-to-date information, refer to the source code in `app/Exceptions/Handler.php`, `app/Services/Validation/*`, `app/Jobs/*`, and related files.*
+*This sequence diagram reflects the current implementation of the error reporting and retry workflow
+as of v2.2.0, with game-accurate validation rules verified against the Global English Server
+(January 2026). For the most up-to-date information, refer to the source code in
+`app/Exceptions/Handler.php`, `app/Services/Validation/*`, `app/Jobs/*`, and related files.*

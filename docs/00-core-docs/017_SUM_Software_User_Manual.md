@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.0
-**Date**: February 22, 2026
+**Document Version**: 2.4.1
+**Date**: March 10, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 and Global English server gameplay scope
 
 ---
 
@@ -36,7 +36,9 @@
 
 ### 1.1 Welcome
 
-Welcome to the **Umamusume Pretty Derby Career Planner**, your comprehensive tool for planning, tracking, and optimizing your training runs in *Uma Musume: Pretty Derby*. This application consolidates features from multiple legacy tracking tools into a unified, modern platform.
+Welcome to the **Umamusume Pretty Derby Career Planner**, your comprehensive tool for planning,
+tracking, and optimizing your training runs in *Uma Musume: Pretty Derby*. This application
+consolidates features from multiple legacy tracking tools into a unified, modern platform.
 
 ### 1.2 Application Overview
 
@@ -82,14 +84,21 @@ mindmap
 
 ### 1.3 Key Features
 
-- **Feature**: **Character State Management**; **Description**: Complete tracking of Speed, Stamina, Power, Guts, and Wit stats with aptitude grades and factor inheritance
-- **Feature**: **Training Prediction Engine**; **Description**: AI-powered predictions for stat gains, risk assessment, and optimal training recommendations
-- **Feature**: **Race Preparation & Strategy**; **Description**: Comprehensive race planning with readiness scores, win probability, and running style optimization
-- **Feature**: **Skill Management**; **Description**: Full skill catalog with hint tracking, SP cost reduction, and evolution path planning
-- **Feature**: **Support Card Configuration**; **Description**: 6-card deck building with synergy analysis, bond tracking, and meta tier integration
-- **Feature**: **AI Advisory System**; **Description**: Hybrid AI using local Ollama and AWS Bedrock Claude models for intelligent recommendations
+- **Feature**: **Character State Management**; **Description**: Complete tracking of Speed, Stamina,
+Power, Guts, and Wit stats with aptitude grades and factor inheritance
+- **Feature**: **Training Prediction Engine**; **Description**: AI-powered predictions for stat
+gains, risk assessment, and optimal training recommendations
+- **Feature**: **Race Preparation & Strategy**; **Description**: Comprehensive race planning with
+readiness scores, win probability, and running style optimization
+- **Feature**: **Skill Management**; **Description**: Full skill catalog with hint tracking, SP cost
+reduction, and evolution path planning
+- **Feature**: **Support Card Configuration**; **Description**: 6-card deck building with synergy
+analysis, bond tracking, and meta tier integration
+- **Feature**: **AI Advisory System**; **Description**: Hybrid AI using local Ollama and AWS Bedrock
+Claude models for intelligent recommendations
 - **Feature**: **Dual Storage Modes**; **Description**: Flexible storage with Local (browser) or Account (cloud) options
-- **Feature**: **External Integration**; **Description**: Real-time data sync with umapyoi.net, OCR screenshot processing, and community tools
+- **Feature**: **External Integration**; **Description**: Real-time data sync with umapyoi.net, OCR
+screenshot processing, and community tools
 
 ### 1.4 System Requirements
 
@@ -155,8 +164,10 @@ flowchart TB
     Local -->|"Convert"| Account
 ```text
 
-- **Mode**: **Local**; **Pros**: Instant start, no account needed, works offline; **Cons**: Data stays on this browser/device only; **Best For**: Quick tests, anonymous usage
-- **Mode**: **Account**; **Pros**: Cross-device sync, secure cloud backup; **Cons**: Requires internet connection; **Best For**: Long-term tracking, multi-device access
+- **Mode**: **Local**; **Pros**: Instant start, no account needed, works offline; **Cons**: Data
+stays on this browser/device only; **Best For**: Quick tests, anonymous usage
+- **Mode**: **Account**; **Pros**: Cross-device sync, secure cloud backup; **Cons**: Requires
+internet connection; **Best For**: Long-term tracking, multi-device access
 
 > **Tip:** You can start in Local Mode and convert your plans to Account Mode later!
 
@@ -188,7 +199,8 @@ flowchart TB
 
 ### 3.2 Dashboard Components
 
-- **Component**: **Stats Panel**; **Description**: Current character stats with grade indicators (Speed, Stamina, Power, Guts, Wit)
+- **Component**: **Stats Panel**; **Description**: Current character stats with grade indicators
+(Speed, Stamina, Power, Guts, Wit)
 - **Component**: **Goals Progress**; **Description**: Active goals with progress bars and completion status
 - **Component**: **Upcoming Races**; **Description**: Next 3 races with date, grade, and readiness percentage
 - **Component**: **Training Suggestions**; **Description**: Top 3 recommended training options with gains and risk
@@ -199,7 +211,8 @@ flowchart TB
 
 - **Navigation Item**: Dashboard; **Route**: `/dashboard`; **Description**: Main overview and stats
 - **Navigation Item**: Character; **Route**: `/characters`; **Description**: Character management
-- **Navigation Item**: Training; **Route**: `/characters/{id}/training`; **Description**: Training selection and predictions
+- **Navigation Item**: Training; **Route**: `/characters/{id}/training`; **Description**: Training
+selection and predictions
 - **Navigation Item**: Races; **Route**: `/races`; **Description**: Race calendar and strategy
 - **Navigation Item**: Skills; **Route**: `/skills`; **Description**: Skill catalog and management
 - **Navigation Item**: Support Cards; **Route**: `/support-cards`; **Description**: Card collection and deck building
@@ -208,7 +221,8 @@ flowchart TB
 - **Navigation Item**: Performance; **Route**: `/performance`; **Description**: System performance dashboard
 - **Navigation Item**: Admin Panel; **Route**: `/admin`; **Description**: System administration (admin users)
 - **Navigation Item**: OCR Upload; **Route**: `/ocr`; **Description**: Screenshot data extraction
-- **Navigation Item**: Data Management; **Route**: `/data-management`; **Description**: Import, export, backup, and migration
+- **Navigation Item**: Data Management; **Route**: `/data-management`; **Description**: Import,
+export, backup, and migration
 - **Navigation Item**: Settings; **Route**: `/settings`; **Description**: User preferences and configuration
 
 ---
@@ -246,10 +260,13 @@ flowchart LR
 │  │ [SELECT]        │ [SELECT]        │ [SELECT]        │  │
 │  └─────────────────┴─────────────────┴─────────────────┘  │
 │                                                            │
-│  Scenario: [URA Finals ▼]                                  │
+│  Scenario: [URA Finals / Unity Cup ▼]                      │
 │                          [← BACK]  [NEXT →]                │
 └────────────────────────────────────────────────────────────┘
 ```
+
+- **Available Scenarios**: URA Finals for the standard championship route, or Unity Cup for the
+team-based Global English server scenario
 
 #### Step 2: Parent Selection & Factor Inheritance
 
@@ -307,33 +324,48 @@ View and manage your character's current state:
 
 ### Stat Types and Ranges
 
-- **Stat**: Speed; **Description**: Maximum running speed; **Range**: 0-1200; **Priority**: ★★★★★
-- **Stat**: Stamina; **Description**: HP and effective stamina; **Range**: 0-1200; **Priority**: ★★★★
-- **Stat**: Power; **Description**: Acceleration and lane-changing; **Range**: 0-1200; **Priority**: ★★★
-- **Stat**: Guts; **Description**: Last spurt and stamina consumption; **Range**: 0-1200; **Priority**: ★
-- **Stat**: Wit; **Description**: Skill activation rate; **Range**: 0-1200; **Priority**: ★★
+- **Stat**: Speed; **Description**: Maximum running speed and top-end race pace; **Range**: 0-1200;
+**Priority**: Varies by race type
+- **Stat**: Stamina; **Description**: Effective endurance for distance racing and race events;
+**Range**: 0-1200; **Priority**: Varies by race type
+- **Stat**: Power; **Description**: Acceleration, lane-changing, and pace transitions; **Range**:
+0-1200; **Priority**: Varies by race type
+- **Stat**: Guts; **Description**: Position holding, late-race resilience, and final-phase
+performance; **Range**: 0-1200; **Priority**: Varies by race type
+- **Stat**: Wit; **Description**: Skill activation reliability, kakari avoidance, and race
+stability; **Range**: 0-1200; **Priority**: Varies by race type
 
 ### Grade Scale
 
-- **Grade**: SS; **Value Range**: 1100+
-- **Grade**: S; **Value Range**: 950-1099
-- **Grade**: A; **Value Range**: 850-949
-- **Grade**: B+; **Value Range**: 750-849
-- **Grade**: B; **Value Range**: 650-749
-- **Grade**: C+; **Value Range**: 550-649
-- **Grade**: C; **Value Range**: 450-549
-- **Grade**: D+; **Value Range**: 350-449
-- **Grade**: D; **Value Range**: 250-349
-- **Grade**: E; **Value Range**: 150-249
-- **Grade**: F; **Value Range**: 0-149
+- **Grade**: S; **Value Range**: 1000+
+- **Grade**: A; **Value Range**: 800-999
+- **Grade**: B; **Value Range**: 600-799
+- **Grade**: C; **Value Range**: 400-599
+- **Grade**: D; **Value Range**: 200-399
+- **Grade**: E; **Value Range**: 100-199
+- **Grade**: F; **Value Range**: 0-99
+- **Grade**: G; **Value Range**: Lowest tier
 
-### 4.4 Aptitude System
+> **Note**: These grade bands are planner-facing approximations for quick reading, not official in-game stat grades. For Global English server competitive play, many builds aim to reach 1200 in their primary stat, especially Speed.
+
+### 4.4 Stat Priorities by Race Type
+
+- **Sprint / Mile**: Prioritize Speed first, then Power, then Wit for reliable skill activation.
+- **Medium**: Prioritize Speed and Stamina together, with Power and Wit supporting consistency.
+- **Long**: Prioritize Stamina and Speed first, then Guts for stronger late-race performance.
+- **Champions Meeting / PvP**: Aim for 1200 Speed whenever the build allows, meet the distance-
+appropriate Stamina requirement, and push Wit toward 800+ for skill reliability.
+
+> **Note**: These are community-derived guidelines for the Global English server meta and will shift with race conditions, deck quality, and event rotations.
+
+### 4.5 Aptitude System
 
 ### Aptitude Categories
 
 - **Category**: Distance; **Types**: Sprint (1000-1400m), Mile (1401-1800m), Medium (1801-2400m), Long (2401m+)
 - **Category**: Surface; **Types**: Turf, Dirt
-- **Category**: Running Style; **Types**: Front Runner (Nige), Pace Chaser (Senkou), Late Surger (Sashi), End Closer (Oikomi)
+- **Category**: Running Style; **Types**: Front Runner (Nige), Pace Chaser (Senkou), Late Surger
+(Sashi), End Closer (Oikomi)
 
 ### Aptitude Ratings & Effectiveness
 
@@ -346,7 +378,7 @@ View and manage your character's current state:
 - **Rating**: F; **Effectiveness**: -70%/-80%; **Notes**: Severe penalty
 - **Rating**: G; **Effectiveness**: -90%; **Notes**: Minimum grade
 
-> **Note**: S is the maximum aptitude grade. SS does NOT exist in the current game version. Only S-rank provides positive bonuses; all grades below A incur penalties.
+> **Note**: S is the maximum aptitude grade. SS does NOT exist for aptitudes in the current game version. Only S-rank provides positive bonuses; A-rank is the baseline with no bonus or penalty.
 
 ---
 
@@ -365,6 +397,8 @@ flowchart LR
 - **Stage**: Classic; **Turn Range**: 25-48; **Description**: Competitive racing and skill development
 - **Stage**: Senior; **Turn Range**: 49-72; **Description**: Peak performance and championship preparation
 - **Stage**: URA Finals; **Turn Range**: 73-78; **Description**: Final championship races
+
+> **Scenario Support:** The planner currently documents two Global English server scenarios: **URA Finals** and **Unity Cup**. Both share the same early Junior / Classic / Senior planning structure, but Unity Cup adds team-based scenario mechanics and scenario-specific endgame events.
 
 ### 5.2 Turn Progression
 
@@ -489,7 +523,9 @@ Risk levels are color-coded:
 
 ### 6.5 Friendship Training
 
-When support cards build bond, each card becomes rainbow-ready at bond 80+. In this application's planner logic, Friendship Training is treated as active once 3 or more cards simultaneously reach bond 80+:
+When support cards build bond, each card becomes rainbow-ready at bond 80+. In this application's
+planner logic, Friendship Training is treated as active once 3 or more cards simultaneously reach
+bond 80+:
 
 ```mermaid
 flowchart TD
@@ -504,7 +540,8 @@ flowchart TD
 - **Bond Gain**: Matching training actions raise participating card bond by 5 per session in the planner
 - **Rainbow-Ready State**: Individual card reaches bond 80+
 - **Active Friendship Training**: Planner marks it active at 3 cards with bond 80+
-- **UI Surface**: Training predictions display friendship status, cards at threshold, and estimated turns until activation
+- **UI Surface**: Training predictions display friendship status, cards at threshold, and estimated
+turns until activation
 
 ---
 
@@ -512,7 +549,9 @@ flowchart TD
 
 ### 7.1 Race Calendar
 
-The planner models a full **72-turn** career structure with two turns per month across three in-game years. Stage planning follows Pre-Debut, Junior, Classic, and Senior. Mandatory races, fan thresholds, and the late-March Inspiration Events are surfaced as planning constraints.
+The planner models a full **72-turn** career structure with two turns per month across three in-game
+years. Stage planning follows Pre-Debut, Junior, Classic, and Senior. Mandatory races, fan
+thresholds, and the late-March Inspiration Events are surfaced as planning constraints.
 
 ```text
 ┌────────────────────────────────────────────────────────────┐
@@ -594,6 +633,23 @@ flowchart TD
 - **Factor**: Skill Synergy; **Impact**: Matching skills boost probability
 - **Factor**: Competitor Strength; **Impact**: Stronger field reduces probability
 
+### 7.6 Competitive PvP - Champions Meeting
+
+Champions Meeting is a competitive 3v3 game mode where race outcomes are heavily influenced by stat
+caps, running-style coverage, and skill reliability. This planner does not treat Champions Meeting
+as a dedicated application module yet, but the normal race-planning tools are still useful for
+preparing PvP builds.
+
+- **Stat Caps**: Speed should be as close to 1200 as possible for most PvP builds, with Stamina
+adjusted to the target race distance.
+- **Wit Reliability**: Aim for 800+ Wit when possible so key acceleration and positioning skills trigger consistently.
+- **Team Composition**: Build complementary styles rather than three copies of the same role unless
+the event meta specifically rewards it.
+- **Skill Selection**: Prioritize acceleration, recovery, and positioning skills that fit the race
+distance and the runner's style.
+- **Debuff Planning**: Red debuff skills can matter in PvP, but they should support an overall team
+plan rather than replace core stat coverage.
+
 ---
 
 ## 8. Skill Management
@@ -656,7 +712,8 @@ Hints reduce SP cost progressively:
 
 - **Wit Function**: Wit controls skill activation reliability and reduces the risk of race mishaps such as kakari
 - **Planner Threshold**: 400+ Wit is treated as the reliable floor for most builds
-- **API Surface**: Training predictions expose a `wit_adequacy` block with current Wit, estimated activation chance, status text, and whether the 400+ threshold is met
+- **API Surface**: Training predictions expose a `wit_adequacy` block with current Wit, estimated
+activation chance, status text, and whether the 400+ threshold is met
 - **Advisory Behavior**: AI advice calls out low-Wit runs when phase-critical skills are likely to misfire
 
 ### 8.5 Skill Evolution
@@ -682,6 +739,15 @@ flowchart LR
 - **Status**: Acquired; **Icon**: ✅; **Description**: Skill purchased and owned
 - **Status**: Skipped; **Icon**: ❌; **Description**: Decided not to acquire
 - **Status**: Suggested; **Icon**: 💭; **Description**: Recommended by AI or planning
+
+### 8.7 Skill Colors and Strategy
+
+- **Yellow (Buff)**: Improve speed, acceleration, or positioning and form the backbone of most builds.
+- **Blue (Recovery)**: Restore stamina and are especially important for longer races.
+- **Red (Debuff)**: Interfere with rivals and are most useful in dedicated PvP strategies.
+- **Green (Adaptivity)**: Grant situational bonuses tied to weather, track, season, or other conditions.
+
+> **Note**: These functional color groupings are common community shorthand. They are separate from rarity colors such as Normal (white), Rare (gold), and Unique (rainbow).
 
 ---
 
@@ -775,7 +841,8 @@ flowchart TD
 
 - **Level**: 0-79%; **Reward**: Standard card bonuses and bond-building events
 - **Level**: 80%+; **Reward**: Card becomes rainbow-ready
-- **Deck Threshold**: 3 cards at 80%+; **Reward**: Friendship Training status becomes active in predictions and AI advice
+- **Deck Threshold**: 3 cards at 80%+; **Reward**: Friendship Training status becomes active in
+predictions and AI advice
 
 ---
 
@@ -832,9 +899,12 @@ flowchart TD
 ### 10.3 Advisory Topics
 
 - **Topic**: Training; **Description**: Optimal training selection; **Example Questions**: "What should I train next?"
-- **Topic**: Race Strategy; **Description**: Pre-race preparation; **Example Questions**: "Am I ready for the upcoming G1?"
-- **Topic**: Skill Build; **Description**: Skill acquisition planning; **Example Questions**: "Which skills should I prioritize?"
-- **Topic**: Career Planning; **Description**: Long-term strategy with inheritance timing and calendar awareness; **Example Questions**: "How can I reach A+ grade by turn 60?"
+- **Topic**: Race Strategy; **Description**: Pre-race preparation; **Example Questions**: "Am I
+ready for the upcoming G1?"
+- **Topic**: Skill Build; **Description**: Skill acquisition planning; **Example Questions**: "Which
+skills should I prioritize?"
+- **Topic**: Career Planning; **Description**: Long-term strategy with inheritance timing and
+calendar awareness; **Example Questions**: "How can I reach A+ grade by turn 60?"
 
 ### 10.4 AI Response Components
 
@@ -843,9 +913,11 @@ flowchart TD
 - **Component**: Confidence; **Description**: AI's certainty level (0-100%)
 - **Component**: Risks; **Description**: Potential downsides
 - **Component**: Alternatives; **Description**: Other options to consider
-- **Component**: Friendship Status; **Description**: Whether friendship training is active or how many turns remain until activation
+- **Component**: Friendship Status; **Description**: Whether friendship training is active or how
+many turns remain until activation
 - **Component**: Wit Adequacy; **Description**: Current Wit reliability for skill activation
-- **Component**: Calendar / Inheritance Context; **Description**: Upcoming races, seasonal camp windows, and late-March Inspiration Events when relevant
+- **Component**: Calendar / Inheritance Context; **Description**: Upcoming races, seasonal camp
+windows, and late-March Inspiration Events when relevant
 
 ### 10.5 AI Providers
 
@@ -1080,13 +1152,19 @@ flowchart TD
 
 ### 14.2 Issue Solutions
 
-- **Issue**: **Connection Lost**; **Cause**: Internet dropped; **Solution**: App enters Offline Mode. Changes saved as draft. Reconnect to sync.
-- **Issue**: **Missing Local Data**; **Cause**: Different browser or cleared cache; **Solution**: Ensure same browser. Incognito mode deletes data when closed.
+- **Issue**: **Connection Lost**; **Cause**: Internet dropped; **Solution**: App enters Offline
+Mode. Changes saved as draft. Reconnect to sync.
+- **Issue**: **Missing Local Data**; **Cause**: Different browser or cleared cache; **Solution**:
+Ensure same browser. Incognito mode deletes data when closed.
 - **Issue**: **Skill Not Found**; **Cause**: Name mismatch; **Solution**: Try Japanese name. Check spelling.
-- **Issue**: **Stats Not Saving**; **Cause**: Form not submitted; **Solution**: Click "Save" after changes. Check for validation errors.
-- **Issue**: **Slow Performance**; **Cause**: Too many plans; **Solution**: Archive old completed plans. Clear browser cache.
-- **Issue**: **AI Not Responding**; **Cause**: Local AI unavailable; **Solution**: System falls back to cloud AI. Check Ollama installation.
-- **Issue**: **Export Failed**; **Cause**: Large data set; **Solution**: Try exporting fewer plans. Check browser memory.
+- **Issue**: **Stats Not Saving**; **Cause**: Form not submitted; **Solution**: Click "Save" after
+changes. Check for validation errors.
+- **Issue**: **Slow Performance**; **Cause**: Too many plans; **Solution**: Archive old completed
+plans. Clear browser cache.
+- **Issue**: **AI Not Responding**; **Cause**: Local AI unavailable; **Solution**: System falls back
+to cloud AI. Check Ollama installation.
+- **Issue**: **Export Failed**; **Cause**: Large data set; **Solution**: Try exporting fewer plans.
+Check browser memory.
 
 ### 14.3 Connection State Management
 
@@ -1224,9 +1302,18 @@ When reporting a bug, please include:
 
 ## Document History
 
-- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated version alignment to v2.3.0, refreshed technology references (Livewire 4, Pest v4, PHPUnit v12), dated February 2026
-- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Comprehensive update aligned with v2.0.0 codebase, integrated PRD/SPEC/Flow documentation, added AI Advisory, OCR, and detailed feature documentation
-- **Version**: 2.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Added Mermaid diagrams, expanded content
+- **Version**: 2.4.1; **Date**: 2026-03-10; **Author**: Development Team; **Changes**: Normalized
+stat-grade wording to planner-facing approximations; clarified that S is the maximum aptitude grade;
+added Global English server Unity Cup references; added race-type stat priorities, Champions Meeting
+guidance, and skill-color strategy notes
+- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated
+version alignment to v2.3.0, refreshed technology references (Livewire 4, Pest v4, PHPUnit v12),
+dated February 2026
+- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Comprehensive
+update aligned with v2.0.0 codebase, integrated PRD/SPEC/Flow documentation, added AI Advisory, OCR,
+and detailed feature documentation
+- **Version**: 2.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Added Mermaid
+diagrams, expanded content
 - **Version**: 1.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial draft
 
 ---
@@ -1246,4 +1333,5 @@ When reporting a bug, please include:
 
 ---
 
-### This manual reflects the current implementation of Umamusume Career Planner v2.4.0. For the latest updates, please refer to the online documentation
+### This manual reflects the current implementation of Umamusume Career Planner v2.4.0. For the
+latest updates, please refer to the online documentation

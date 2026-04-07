@@ -151,7 +151,7 @@ AWS_DEFAULT_REGION=us-east-1
 │   │   └── Resources/        # API resources
 │   ├── Enums/                # PHP enums (8 enums)
 │   ├── Livewire/             # Livewire 4 components (AdvisoryPanel, etc.)
-│   ├── Models/               # Eloquent models (~30 models)
+│   ├── Models/               # Eloquent models (~40 models)
 │   ├── Neuron/               # Neuron AI agents & tools
 │   ├── Policies/             # Authorization policies
 │   ├── Providers/            # Service providers
@@ -270,13 +270,13 @@ use App\Models\User;
 
 it('creates a character', function () {
     $user = User::factory()->create();
-    
+
     $response = $this->actingAs($user)
         ->postJson('/api/v1/characters', [
             'name' => 'Test Character',
             'scenario_type' => 'ura_finale',
         ]);
-    
+
     $response->assertCreated()
         ->assertJsonStructure(['data' => ['id', 'name']]);
 });

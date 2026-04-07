@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.4.0
+**Date**: March 10, 2026
 **Related Documents**: [PRD-004], [SPEC-004], [SRS], [BRS]
 
 **Source Specifications**:
@@ -13,13 +13,14 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-004](../prds/PRD-004_Skill_Management.md)
-- SPEC: [SPEC-004](../specs/SPEC-004_Skill_Management_Technical.md)
-- Flow: [FLOW-004](../flows/FLOW-004_Skill_Management_System.md)
-- Tech Flow: [TECH-FLOW-004](../tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
-- Wireframes: [WF-008](../wireframes/WF-008_Skill_Shop_Interface.md), [WF-009](../wireframes/WF-009_Skill_Loadout_Manager.md)
-- Sequences: [SEQ-003](../sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
-- User Manual: [D17](../D17_SUM_Software_User_Manual.md#8-skill-management)
+- PRD: [PRD-004](../02-prds/PRD-004_Skill_Management.md)
+- SPEC: [SPEC-004](../02-specs/SPEC-004_Skill_Management_Technical.md)
+- Flow: [FLOW-004](../01-flows/FLOW-004_Skill_Management_System.md)
+- Tech Flow: [TECH-FLOW-004](../01-tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
+- Wireframes: [WF-008](../01-wireframes/WF-008_Skill_Shop_Interface.md),
+[WF-009](../01-wireframes/WF-009_Skill_Loadout_Manager.md)
+- Sequences: [SEQ-003](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- User Manual: [017_SUM](../00-core-docs/017_SUM_Software_User_Manual.md#8-skill-management)
 
 ---
 
@@ -40,20 +41,45 @@
 
 ### 1.1 Purpose
 
-The Skill Management Flow guides users through the complete process of browsing, acquiring, and managing skills for their character. This flow incorporates the skill hint system for SP cost reduction, skill evolution tracking, and AI-powered recommendations to optimize skill builds for specific goals.
+The Skill Management Flow guides users through browsing, planning, acquiring, and managing skills
+for the active career context. This flow incorporates the skill hint system for SP cost reduction,
+skill evolution tracking, and AI-powered recommendations to optimize skill builds for specific
+goals. Use `Career` and `SkillAcquisition` terminology consistently in user-facing documentation,
+even where older examples later in this document still show legacy `CareerRun` naming.
 
 ### 1.2 Scope
 
 | Aspect | Description |
 | --- | --- |
 | **Entry Point** | Skill shop access from dashboard, training results, or race preparation |
-| **Exit Point** | Skill acquired and added to active loadout, or skill build plan saved |
+| **Exit Point** | Skill acquired in account mode, or planning or build state updated in the current storage mode context |
 | **Duration** | 2-5 minutes per skill acquisition; 10-15 minutes for full build planning |
-| **User Type** | All users with active career runs |
+| **User Type** | Users with an active run in the current storage mode context: browser-local run state in Local mode, authenticated persisted career context in Account mode |
 
-### 1.3 Business Context
+### 1.3 Storage Mode Support
 
-**Business Goal**: Enable efficient skill acquisition planning and execution through intelligent recommendations, hint tracking, and SP budget optimization.
+- `StorageMode::ACCOUNT`: implemented for authenticated skill views, acquisition, evolution, and
+saved build behavior where the current account-backed surface supports it.
+- `StorageMode::LOCAL`: skill planning and hint visibility should be treated as browser-local or
+advisory until a verified local persistence path is documented.
+
+### 1.4 Navigation Surface
+
+This document uses conceptual labels such as Skill Catalog, Skill Shop, and Build Manager / Loadout
+Manager for the user journey. Treat those labels as UX shorthand unless the current UI surface
+explicitly uses the same names. Where implementation-backed navigation is relevant, the current web
+entry is the skill surface documented in the aligned skill tech flow.
+
+### 1.5 Persistence Boundary Note
+
+Browsing, planning, and recommendation do not necessarily imply the same persistence behavior as
+account-backed acquisition or evolution. Local-mode planning should not be described as if it
+automatically writes the same persisted records as authenticated skill acquisition.
+
+### 1.6 Business Context
+
+**Business Goal**: Enable efficient skill acquisition planning and execution through intelligent
+recommendations, hint tracking, and SP budget optimization.
 
 **Success Metrics**:
 
@@ -71,66 +97,66 @@ The Skill Management Flow guides users through the complete process of browsing,
 ```mermaid
 flowchart TD
     Start([Access Skill Shop]) --> CheckContext{Entry Context?}
-    
+
     CheckContext -->|Dashboard| Browse[Browse All Skills]
     CheckContext -->|Post-Training| HintNotify[Show Hint Gained Notification]
     CheckContext -->|Race Prep| RaceRecommend[Race-Specific Recommendations]
-    
+
     HintNotify --> ViewHint[View Updated Hint Status]
     RaceRecommend --> Browse
     ViewHint --> Browse
-    
+
     Browse --> FilterSearch[Filter & Search Skills]
     FilterSearch --> SelectSkill[Select Skill for Details]
-    
+
     SelectSkill --> ViewDetails[View Skill Details]
     ViewDetails --> CheckPrereq{Prerequisites Met?}
-    
+
     CheckPrereq -->|No| ShowRequirements[Show Unmet Requirements]
     CheckPrereq -->|Yes| CheckSP{Sufficient SP?}
-    
+
     ShowRequirements --> PlanAcquisition[Add to Acquisition Plan]
     PlanAcquisition --> ContinueBrowse{Continue Browsing?}
-    
+
     CheckSP -->|No| ShowDeficit[Show SP Deficit & Farming Tips]
     CheckSP -->|Yes| CalculateCost[Calculate Final Cost with Hints]
-    
+
     ShowDeficit --> PlanAcquisition
-    
+
     CalculateCost --> ReviewPurchase[Review Purchase Summary]
     ReviewPurchase --> UserConfirm{Confirm Purchase?}
-    
+
     UserConfirm -->|No| ContinueBrowse
     UserConfirm -->|Yes| ExecutePurchase[Execute Skill Acquisition]
-    
+
     ExecutePurchase --> DeductSP[Deduct SP from Balance]
     DeductSP --> AddSkill[Add Skill to Inventory]
     AddSkill --> CheckEvolution{Evolution Available?}
-    
+
     CheckEvolution -->|Yes| OfferEvolution[Offer Evolution Upgrade]
-    CheckEvolution -->|No| UpdateLoadout
-    
+    CheckEvolution -->|No| UpdateBuildState
+
     OfferEvolution --> EvolutionChoice{User Evolves?}
     EvolutionChoice -->|Yes| ExecuteEvolution[Execute Evolution]
-    EvolutionChoice -->|No| UpdateLoadout[Update Active Loadout]
-    
-    ExecuteEvolution --> UpdateLoadout
-    UpdateLoadout --> LogHistory[Log Acquisition History]
+    EvolutionChoice -->|No| UpdateBuildState[Update active skill or build state]
+
+    ExecuteEvolution --> UpdateBuildState
+    UpdateBuildState --> LogHistory[Log Acquisition History]
     LogHistory --> ShowSuccess[Show Success Message]
-    
+
     ShowSuccess --> NextAction{Next Action?}
     NextAction -->|Acquire More| Browse
-    NextAction -->|Manage Loadout| LoadoutManager[Open Loadout Manager]
+    NextAction -->|Manage Build| LoadoutManager[Open Build Manager / Loadout Manager]
     NextAction -->|Return| Dashboard[Return to Dashboard]
-    
+
     ContinueBrowse -->|Yes| Browse
     ContinueBrowse -->|No| ViewPlan[View Acquisition Plan]
     ViewPlan --> LoadoutManager
-    
-    LoadoutManager --> OptimizeLoadout[AI-Optimize Loadout]
-    OptimizeLoadout --> SaveLoadout[Save Loadout Configuration]
+
+    LoadoutManager --> OptimizeLoadout[AI-optimize build]
+    OptimizeLoadout --> SaveLoadout[Save build configuration]
     SaveLoadout --> Dashboard
-    
+
     style Start fill:#e3f2fd
     style Dashboard fill:#c8e6c9
     style ExecutePurchase fill:#f3e5f5
@@ -142,64 +168,64 @@ flowchart TD
 ```mermaid
 stateDiagram-v2
     [*] --> SkillShopEntry
-    
+
     SkillShopEntry --> CatalogBrowsing: Load catalog
-    
+
     CatalogBrowsing --> FilterApplied: Apply filters
     CatalogBrowsing --> SearchExecuted: Execute search
     CatalogBrowsing --> SkillSelected: Select skill
-    
+
     FilterApplied --> CatalogBrowsing: Update results
     SearchExecuted --> CatalogBrowsing: Update results
-    
+
     SkillSelected --> SkillDetailView: Load details
-    
+
     SkillDetailView --> PrerequisiteCheck: Check requirements
-    
+
     PrerequisiteCheck --> RequirementsUnmet: Prerequisites missing
     PrerequisiteCheck --> SPCheck: Prerequisites satisfied
-    
+
     RequirementsUnmet --> PlanningMode: Add to plan
-    
+
     SPCheck --> InsufficientSP: SP < Cost
     SPCheck --> CostCalculation: SP >= Cost
-    
+
     InsufficientSP --> PlanningMode: Defer acquisition
     InsufficientSP --> SPFarmingSuggestion: Get farming tips
-    
+
     CostCalculation --> HintApplication: Apply hint discounts
     HintApplication --> FinalCostDisplay: Display final cost
-    
+
     FinalCostDisplay --> PurchaseConfirmation: User confirms
     PurchaseConfirmation --> SkillAcquisition: Execute purchase
-    
+
     SkillAcquisition --> InventoryUpdate: Add to inventory
     InventoryUpdate --> SPDeduction: Deduct SP
     SPDeduction --> EvolutionCheck: Check evolution
-    
+
     EvolutionCheck --> EvolutionAvailable: Conditions met
     EvolutionCheck --> LoadoutUpdate: No evolution
-    
+
     EvolutionAvailable --> EvolutionDialog: Show evolution option
     EvolutionDialog --> EvolutionExecuted: User confirms
     EvolutionDialog --> LoadoutUpdate: User declines
-    
+
     EvolutionExecuted --> ReplaceSkill: Replace with evolved
     ReplaceSkill --> LoadoutUpdate: Update active skills
-    
+
     LoadoutUpdate --> HistoryLog: Log acquisition
     HistoryLog --> SuccessNotification: Notify user
-    
+
     SuccessNotification --> CatalogBrowsing: Continue shopping
     SuccessNotification --> LoadoutManagement: Manage loadout
     SuccessNotification --> [*]: Exit
-    
+
     PlanningMode --> AcquisitionPlan: Save to plan
     AcquisitionPlan --> CatalogBrowsing: Continue planning
     AcquisitionPlan --> [*]: Exit
-    
+
     SPFarmingSuggestion --> CatalogBrowsing: Return to catalog
-    
+
     LoadoutManagement --> LoadoutOptimization: AI optimize
     LoadoutOptimization --> LoadoutSave: Save configuration
     LoadoutSave --> [*]: Exit
@@ -212,6 +238,26 @@ stateDiagram-v2
 ### 3.1 Step 1: Skill Catalog Access and Browsing
 
 **Purpose**: Navigate the skill catalog with filtering and search capabilities.
+
+**Empty-State Note**:
+
+- If no active run exists in the current storage mode context, the skill flow should redirect the
+user back to a relevant setup or run-selection flow.
+- If no affordable or recommended skills are currently available, the catalog should remain
+browsable without implying an acquisition failure.
+
+### 3.1.1 Loading and Processing States
+
+When the skill catalog, hint discounts, advisory guidance, acquisition confirmation, or evolution
+checks are loading, the UI should present an explicit processing state. Recommended messaging:
+
+- "Loading skill catalog..."
+- "Calculating SP cost..."
+- "Checking evolution options..."
+- "Saving skill acquisition..."
+- "Updating build state..."
+
+Buttons should enter a disabled loading state while account-backed acquisition or evolution is in progress.
 
 #### 3.1.1 Skill Catalog Interface
 
@@ -292,7 +338,7 @@ class SkillCatalog extends Component
     public array $rarityFilters = [];
     public array $statusFilters = ['available'];
     public string $sortBy = 'cost_asc';
-    
+
     public function render()
     {
         $skills = Skill::query()
@@ -313,10 +359,10 @@ class SkillCatalog extends Component
             })
             ->orderBy(...$this->getSortColumns())
             ->paginate(20);
-        
+
         $recommendations = app(AISkillRecommendationService::class)
             ->getRecommendations(auth()->user()->currentCareer);
-        
+
         return view('livewire.skills.skill-catalog', [
             'skills' => $skills,
             'recommendations' => $recommendations,
@@ -422,25 +468,26 @@ class SkillPrerequisiteService
     {
         $requirements = $skill->prerequisites ?? [];
         $unmet = [];
-        
+
         foreach ($requirements as $requirement) {
             if (!$this->isRequirementMet($career, $requirement)) {
                 $unmet[] = $requirement;
             }
         }
-        
+
         return new PrerequisiteCheck(
             met: empty($unmet),
             unmetRequirements: $unmet,
             progress: $this->calculateProgress($career, $requirements),
         );
     }
-    
+
     private function isRequirementMet(CareerRun $career, array $requirement): bool
     {
         return match($requirement['type']) {
             'skill_owned' => $career->skills()->where('skill_id', $requirement['skill_id'])->exists(),
-            'race_completed' => $career->raceResults()->where('grade', $requirement['grade'])->count() >= $requirement['count'],
+            'race_completed' => $career->raceResults()->where('grade', $requirement['grade'])->count() >=
+            $requirement['count'],
             'stat_threshold' => $career->{$requirement['stat']} >= $requirement['value'],
             'turn_minimum' => $career->current_turn >= $requirement['turn'],
             default => false,
@@ -497,7 +544,7 @@ sequenceDiagram
     participant Career as Career Run
     participant DB as Database
     participant Cache
-    
+
     User->>UI: Click "Acquire Now"
     UI->>Service: acquireSkill(career, skill)
     Service->>Service: Calculate final cost with hints
@@ -525,17 +572,17 @@ class SkillAcquisitionService
     {
         $costCalculation = app(SkillCostCalculator::class)
             ->calculateFinalCost($career, $skill);
-        
+
         if ($career->total_sp_available < $costCalculation->finalCost) {
             throw new InsufficientSPException(
                 "Insufficient SP. Need {$costCalculation->finalCost}, have {$career->total_sp_available}"
             );
         }
-        
+
         DB::transaction(function () use ($career, $skill, $costCalculation) {
             // Deduct SP
             $career->decrement('total_sp_available', $costCalculation->finalCost);
-            
+
             // Create acquisition record
             $acquisition = SkillAcquisition::create([
                 'career_run_id' => $career->id,
@@ -547,12 +594,12 @@ class SkillAcquisitionService
                 'status' => SkillStatus::Acquired,
                 'is_active' => true,
             ]);
-            
+
             // Mark hints as used
             SkillHint::where('career_run_id', $career->id)
                 ->where('skill_id', $skill->id)
                 ->update(['is_used' => true]);
-            
+
             // Log activity
             activity()
                 ->performedOn($career)
@@ -563,11 +610,11 @@ class SkillAcquisitionService
                 ])
                 ->log('skill_acquired');
         });
-        
+
         Cache::forget("career.{$career->id}.skills");
-        
+
         event(new SkillAcquired($career, $skill, $costCalculation));
-        
+
         return new AcquisitionResult(
             success: true,
             skill: $skill,
@@ -653,18 +700,18 @@ class SkillEvolutionService
         if (!$skill->evolution_from_id) {
             return null;
         }
-        
+
         $evolvedSkill = Skill::find($skill->evolution_from_id);
         $requirements = $evolvedSkill->evolution_requirements ?? [];
-        
+
         $allMet = collect($requirements)->every(function ($requirement) use ($career) {
             return $this->isRequirementMet($career, $requirement);
         });
-        
+
         if (!$allMet) {
             return null;
         }
-        
+
         return new EvolutionOption(
             normalSkill: $skill,
             rareSkill: $evolvedSkill,
@@ -672,13 +719,13 @@ class SkillEvolutionService
             improvements: $this->calculateImprovements($skill, $evolvedSkill),
         );
     }
-    
+
     public function executeEvolution(CareerRun $career, Skill $normalSkill, Skill $rareSkill): void
     {
         DB::transaction(function () use ($career, $normalSkill, $rareSkill) {
             // Deduct evolution cost
             $career->decrement('total_sp_available', $rareSkill->evolution_cost);
-            
+
             // Update acquisition record
             SkillAcquisition::where('career_run_id', $career->id)
                 ->where('skill_id', $normalSkill->id)
@@ -687,7 +734,7 @@ class SkillEvolutionService
                     'is_evolution' => true,
                     'evolution_cost' => $rareSkill->evolution_cost,
                 ]);
-            
+
             // Log evolution
             activity()
                 ->performedOn($career)
@@ -698,7 +745,7 @@ class SkillEvolutionService
                 ])
                 ->log('skill_evolved');
         });
-        
+
         event(new SkillEvolved($career, $normalSkill, $rareSkill));
     }
 }
@@ -766,6 +813,16 @@ class SkillEvolutionService
 
 ## 4. Decision Points
 
+### 4.3 Planning vs Acquisition
+
+- Skill browsing, planning, and AI recommendation can exist without an immediate persisted acquisition.
+- Account-backed acquisition and evolution should be described separately from browser-local planning.
+
+### 4.4 No Affordable Skill Branch
+
+- If the user lacks SP or prerequisites, the flow should support planning, deferment, or return to
+training rather than implying a dead end.
+
 ### 4.1 Decision Tree
 
 ```mermaid
@@ -773,29 +830,29 @@ flowchart TD
     D1{Acquire Skill Now?}
     D1 -->|Yes| D2{Sufficient SP?}
     D1 -->|No| Plan[Add to Acquisition Plan]
-    
+
     D2 -->|Yes| D3{Prerequisites Met?}
     D2 -->|No| Farm[Farm SP Strategy]
-    
+
     D3 -->|Yes| Execute[Execute Acquisition]
     D3 -->|No| Wait[Wait for Prerequisites]
-    
+
     Execute --> D4{Evolution Available?}
     D4 -->|Yes| D5{Evolve Now?}
     D4 -->|No| Loadout[Update Loadout]
-    
+
     D5 -->|Yes| D6{Sufficient SP for Evolution?}
     D5 -->|No| Loadout
-    
+
     D6 -->|Yes| Evolve[Execute Evolution]
     D6 -->|No| DeferEvolve[Defer Evolution]
-    
+
     Evolve --> Loadout
     DeferEvolve --> Loadout
     Plan --> D7{Continue Shopping?}
     Farm --> D7
     Wait --> D7
-    
+
     D7 -->|Yes| Browse[Browse More Skills]
     D7 -->|No| ViewPlan[Review Acquisition Plan]
 ```text
@@ -855,6 +912,9 @@ flowchart TD
 | Skill Sparks | Variable | Yes | Event-based bonus |
 | Hint Books | +1 Hint Level | Yes | Consumable item |
 
+Hint levels are tracked per skill and per character context. When a skill is purchased, the applied
+hint discount for that skill is consumed and cannot be reused for another purchase.
+
 ### 5.2.2 Skill Rarities
 
 | Rarity | Display | Description | SP Cost Range |
@@ -905,22 +965,22 @@ class SkillHintService
         4 => 35,
         5 => 40,
     ];
-    
+
     public function awardHint(CareerRun $career, Skill $skill, string $source): ?SkillHint
     {
         $currentLevel = SkillHint::where('career_run_id', $career->id)
             ->where('skill_id', $skill->id)
             ->where('is_used', false)
             ->count();
-        
+
         // Cap at 5 hints (40% max discount)
         if ($currentLevel >= 5) {
             return null;
         }
-        
+
         $newLevel = $currentLevel + 1;
         $discount = self::HINT_DISCOUNTS[$newLevel] ?? 40;
-        
+
         $hint = SkillHint::create([
             'career_run_id' => $career->id,
             'skill_id' => $skill->id,
@@ -930,25 +990,25 @@ class SkillHintService
             'discount_percentage' => $discount,
             'is_used' => false,
         ]);
-        
+
         event(new SkillHintAwarded($career, $skill, $hint));
-        
+
         return $hint;
     }
-    
+
     public function calculateTotalDiscount(CareerRun $career, Skill $skill): int
     {
         $hintLevel = SkillHint::where('career_run_id', $career->id)
             ->where('skill_id', $skill->id)
             ->where('is_used', false)
             ->count();
-        
+
         // Get base discount from hint level
         $baseDiscount = self::HINT_DISCOUNTS[min($hintLevel, 5)] ?? 0;
-        
+
         // Add Fast Learner condition bonus (+10%)
         $fastLearnerBonus = $career->hasCondition('fast_learner') ? 10 : 0;
-        
+
         // Cap total discount at 50% (40% hints + 10% Fast Learner)
         return min(50, $baseDiscount + $fastLearnerBonus);
     }
@@ -986,23 +1046,23 @@ test('skill acquisition flow completes successfully', function () {
     $career = CareerRun::factory()->create([
         'total_sp_available' => 500,
     ]);
-    
+
     $skill = Skill::factory()->create([
         'base_sp_cost' => 120,
     ]);
-    
+
     // Award hint for discount
     SkillHint::factory()->create([
         'career_run_id' => $career->id,
         'skill_id' => $skill->id,
         'discount_percentage' => 20,
     ]);
-    
+
     $service = app(SkillAcquisitionService::class);
     $result = $service->acquireSkill($career, $skill);
-    
+
     $career->refresh();
-    
+
     expect($result->success)->toBeTrue()
         ->and($result->costPaid)->toBe(96) // 120 - 20%
         ->and($career->total_sp_available)->toBe(404) // 500 - 96
@@ -1019,17 +1079,17 @@ test('skill acquisition flow completes successfully', function () {
 ```mermaid
 flowchart TD
     Error[Error Encountered] --> Type{Error Type}
-    
+
     Type -->|SP| E1[Insufficient SP]
     Type -->|Prerequisites| E2[Prerequisites Not Met]
     Type -->|Evolution| E3[Evolution Conditions Missing]
     Type -->|Database| E4[Save Failed]
-    
+
     E1 --> R1[Show SP Deficit<br/>Suggest Farming]
     E2 --> R2[Show Missing Prerequisites<br/>Provide Roadmap]
     E3 --> R3[Show Evolution Requirements<br/>Track Progress]
     E4 --> R4[Rollback Transaction<br/>Retry or Report]
-    
+
     R1 --> Resolve[User Action]
     R2 --> Resolve
     R3 --> Resolve
@@ -1055,6 +1115,31 @@ flowchart TD
 | Evolution failure | Check conditions display | Allow later evolution | Skip evolution |
 | Database timeout | Retry transaction (3x) | Queue for later processing | Contact support |
 
+### 7.4 Storage-Aware and Empty-State Guidance
+
+- No active run: return the user to setup or the current run context selector.
+- No hints or no affordable skills: keep the catalog available and support planning or deferment.
+- Local mode: avoid implying that all skill acquisitions persist through the same account-backed path.
+- Offline or degraded advisory: continue with currently visible catalog data and deterministic UI
+guidance where possible.
+
+### 7.5 Local Planning and Connectivity Guidance
+
+When the user is in `StorageMode::LOCAL` and adds a skill to a plan rather than executing an
+account-backed acquisition, the UI should confirm that the planning state was updated locally, for
+example:
+
+- "Skill added to local plan"
+- "Plan updated in this browser"
+- "No SP deducted until an account-backed acquisition path is used"
+
+Connectivity expectations should remain explicit:
+
+- Skill browsing and local planning may remain available with already-loaded or browser-local state.
+- Account-backed acquisition, evolution, and saved-build persistence require connectivity and an authenticated session.
+- If offline, the user should be guided toward planning actions rather than being shown a failed
+purchase flow as if it were retryable locally.
+
 ---
 
 ## 8. Related Flows
@@ -1066,20 +1151,28 @@ After skill acquisition, users may proceed to:
 | Flow | Document Reference | Entry Condition |
 | --- | --- | --- |
 | Training Day Flow | [UF-003](UF-003_Training_Day_Flow.md) | Resume training with new skill |
-| Race Preparation | [UF-004](UF-004_Race_Day_Flow.md) | Optimize loadout for upcoming race |
-| Loadout Optimization | Internal | Fine-tune active skill configuration |
+| Race Preparation | [UF-004](UF-004_Race_Day_Flow.md) | Optimize build state for upcoming race |
+| Build Optimization | Internal | Fine-tune active skill or build configuration |
 | Skill Evolution | Internal | Upgrade Normal skills to Rare |
 
 ### 8.2 Alternative Entry Points
 
 | Entry Point | Scenario | Flow Adjustment |
+
+### 8.3 Storage-Aware References
+
+- [UF-003_Training_Day_Flow.md](UF-003_Training_Day_Flow.md)
+- [UF-004_Race_Day_Flow.md](UF-004_Race_Day_Flow.md)
+- [TECH-FLOW-004](../01-tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
+- [SEQ-003](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- [SEQ-017](../01-sequences/SEQ-017_Storage_Mode_Transition.md)
 | --- | --- | --- |
 | Training Results | Hint gained from training | Skip catalog, go to updated skill |
 | Race Prep | Race-specific skill needs | Pre-filter by race requirements |
 | AI Recommendation | Proactive skill suggestion | Direct to recommended skill detail |
 | Goal Setting | Skill required for goal | Show skills aligned with goal |
 
-### 8.3 Integration Points
+### 8.4 Integration Points
 
 ```mermaid
 flowchart LR
@@ -1090,21 +1183,21 @@ flowchart LR
         Evolution[Skill Evolution]
         Loadout[Loadout Manager]
     end
-    
+
     subgraph ExternalServices[External Services]
         AIService[AI Recommendation Service]
         HintService[Hint Tracking Service]
         CostService[Cost Calculation Service]
         EvolutionService[Evolution Service]
     end
-    
+
     subgraph DataLayer[Data Layer]
         SkillRepo[Skill Repository]
         CareerRepo[Career Repository]
         HintRepo[Hint Repository]
         Cache[Cache Manager]
     end
-    
+
     Catalog --> AIService
     Detail --> HintService
     Detail --> CostService
@@ -1112,7 +1205,7 @@ flowchart LR
     Acquire --> CareerRepo
     Evolution --> EvolutionService
     Loadout --> AIService
-    
+
     AIService --> Cache
     SkillRepo --> Cache
     CareerRepo --> Cache
@@ -1124,6 +1217,8 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.0 | 2026-03-10 | Development Team | Clarified hint lifecycle: hints are tracked per skill/character context and consumed when the discounted skill purchase is completed |
+| 2.3.0 | 2026-03-10 | Development Team | Updated storage-aware wording, clarified local planning versus account-backed acquisition, added loading and connectivity guidance, and corrected core-document links |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: 5-level hint system (10%/20%/30%/35%/40%), Fast Learner condition bonus, Skill Sparks, Hint Books, skill rarities (Normal/Rare/Unique) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added skill hint system details, evolution mechanics, loadout management; comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1133,17 +1228,18 @@ flowchart LR
 
 ## References
 
-- [Software Development Plan (SDP)](../D01_SDP_Software_Development_Plan.md)
-- [Business Requirements Specifications (BRS)](../D02_BRS_Business_Requirements_Specifications.md)
-- [Software Requirements Specifications (SRS)](../D03_SRS_Software_Requirement_Specifications.md)
-- [Software User Manual (SUM)](../D17_SUM_Software_User_Manual.md)
-- [SPEC-004: Skill Management Technical](../specs/SPEC-004_Skill_Management_Technical.md)
-- [FLOW-004: Skill Management System](../flows/FLOW-004_Skill_Management_System.md)
-- [TECH-FLOW-004: Skill Management Flow](../tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
-- [WF-008: Skill Shop Interface](../wireframes/WF-008_Skill_Shop_Interface.md)
-- [WF-009: Skill Loadout Manager](../wireframes/WF-009_Skill_Loadout_Manager.md)
-- [SEQ-003: Skill Acquisition and Upgrade](../sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- [001_SDP](../00-core-docs/001_SDP_Software_Development_Plan.md)
+- [002_BRS](../00-core-docs/002_BRS_Business_Requirements_Specifications.md)
+- [003_SRS](../00-core-docs/003_SRS_Software_Requirement_Specifications.md)
+- [017_SUM](../00-core-docs/017_SUM_Software_User_Manual.md)
+- [SPEC-004: Skill Management Technical](../02-specs/SPEC-004_Skill_Management_Technical.md)
+- [FLOW-004: Skill Management System](../01-flows/FLOW-004_Skill_Management_System.md)
+- [TECH-FLOW-004: Skill Management Flow](../01-tech-flow/TECH-FLOW-004_Skill_Management_Flow.md)
+- [WF-008: Skill Shop Interface](../01-wireframes/WF-008_Skill_Shop_Interface.md)
+- [WF-009: Skill Loadout Manager](../01-wireframes/WF-009_Skill_Loadout_Manager.md)
+- [SEQ-003: Skill Acquisition and Upgrade](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
 
 ---
 
-*This user flow reflects the current skill management system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current skill management system implementation as of version 2.4.0. For
+the latest updates, refer to the online documentation.*

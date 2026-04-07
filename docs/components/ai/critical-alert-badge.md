@@ -66,15 +66,15 @@ integrates seamlessly with the advisory panel.
 
 ```blade
 {{-- With custom ID and data attributes --}}
-<x-ai.critical-alert-badge 
-    :alert-count="2" 
+<x-ai.critical-alert-badge
+    :alert-count="2"
     id="header-alert-badge"
     data-testid="alert-badge"
 />
 
 {{-- With custom classes --}}
-<x-ai.critical-alert-badge 
-    :alert-count="2" 
+<x-ai.critical-alert-badge
+    :alert-count="2"
     class="custom-spacing"
 />
 ```text
@@ -263,4 +263,3 @@ For issues or questions about this component:
 1. Check the demo page: `/demo/critical-alert-badge`
 2. Review the test file for usage examples
 3. Consult the AI Training Advisory System spec: `.kiro/specs/ai-training-advisory/`
-

@@ -1,9 +1,9 @@
 # SPEC-001: Character Management System - Technical Specification
 
-**Document Version**: 2.3.0  
-**Date**: 2026-02-22  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Complete - Implementation verified  
+**Document Version**: 2.3.1
+**Date**: 2026-03-11
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Complete - Implementation verified
 **Classification**: Internal - Development Team
 
 ---
@@ -13,30 +13,32 @@
 | Attribute | Value |
 | --- | --- |
 | **Document ID** | SPEC-001 |
-| **Related PRD** | [PRD-001: Character Management](../prds/PRD-001_Character_Management.md) |
-| **Architecture Version** | v2.3.0 |
+| **Related PRD** | [PRD-001: Character Management](../02-prds/PRD-001_Character_Management.md) |
+| **Architecture Version** | v2.3.1 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-02-22 |
+| **Last Reviewed** | 2026-03-11 |
 
 ### Related Documents
 
 **Requirements & Design**:
 
-- [SRS Section 3.1: Character Management](../003_SRS_Software_Requirement_Specifications.md#31-character-management)
-- [SDS Section 4.1: Character Management Architecture](../004_SDS_Software_Design_Specifications.md#41-character-management-module)
+- [SRS Section 3.1: Character Management](../00-core-
+docs/003_SRS_Software_Requirement_Specifications.md#31-character-management)
+- [SDS Section 4.1: Character Management Architecture](../00-core-
+docs/004_SDS_Software_Design_Specifications.md#41-character-management-module)
 
 **Data & Integration**:
 
-- [DBD Section 5.1: Character Tables](../009_DBD_Database_Documentation.md#51-character-tables)
-- [API Section 4.1: Character Endpoints](../010_API_API_Documentation.md#41-character-management-endpoints)
+- [DBD Section 5.1: Character Tables](../00-core-docs/009_DBD_Database_Documentation.md#51-character-tables)
+- [API Section 4.1: Character Endpoints](../00-core-docs/010_API_API_Documentation.md#41-character-management-endpoints)
 
 **Visual Documentation**:
 
-- [FLOW-001: Character Management System](../flows/FLOW-001_Character_Management_System.md)
-- [SEQ-001: Character Creation Sequence](../sequences/SEQ-001_Character_Creation_Sequence.md)
-- [WF-002: Character Creation Wizard](../wireframes/WF-002_Character_Creation_Wizard.md)
-- [WF-003: Character Detail Management](../wireframes/WF-003_Character_Detail_Management.md)
-- [UF-002: Career Setup Flow](../user-flows/UF-002_Career_Setup_Flow.md)
+- [FLOW-001: Character Management System](../01-flows/FLOW-001_Character_Management_System.md)
+- [SEQ-001: Character Creation Sequence](../01-sequences/SEQ-001_Character_Creation_Sequence.md)
+- [WF-002: Character Creation Wizard](../01-wireframes/WF-002_Character_Creation_Wizard.md)
+- [WF-003: Character Detail Management](../01-wireframes/WF-003_Character_Detail_Management.md)
+- [UF-002: Career Setup Flow](../01-user-flows/UF-002_Career_Setup_Flow.md)
 
 ---
 
@@ -62,7 +64,9 @@
 
 ### 1.1 Module Purpose
 
-The Character Management System is the foundational module responsible for managing Uma Musume trainee characters throughout their lifecycle. It handles character creation, state tracking (stats, energy, mood), aptitude configuration, and factor inheritance mechanics.
+The Character Management System is the foundational module responsible for managing Uma Musume
+trainee characters throughout their lifecycle. It handles character creation, state tracking (stats,
+energy, mood), aptitude configuration, and factor inheritance mechanics.
 
 **Core Responsibilities**:
 
@@ -102,6 +106,10 @@ In Umamusume Pretty Derby, each trainee character represents a single career run
 - Skill management (handled by SPEC-004)
 - Support deck configuration (handled by SPEC-005)
 
+**Storage Boundary**: This SPEC defines the account-backed character persistence contract. Browser-
+local creation, UUID-wrapped local payloads, and Local-to-Account conversion are governed by the
+storage-mode architecture and must not be implied by the database contracts in this document.
+
 ### 1.4 Technology Stack
 
 | Component | Technology | Version | Purpose |
@@ -128,7 +136,7 @@ graph TB
     end
 
     subgraph "Application Layer"
-        CharService[CharacterStateService]
+        CharService[CharacterManagementService]
         StateService[CharacterStateService]
         FactorService[FactorService]
     end
@@ -151,22 +159,22 @@ graph TB
     API --> FormRequest
     FormRequest --> CharService
     Livewire --> CharService
-    
+
     CharService --> StateService
     CharService --> FactorService
     CharService --> Repository
-    
+
     StateService --> Model
     FactorService --> Factor
     Repository --> Model
-    
+
     Model --> DB
     Model --> Events
     Model --> ValueObjects
-    
+
     CharService --> Cache
     CharService --> External
-    
+
     Events -.->|Analytics| EventListeners[Event Listeners]
 ```text
 
@@ -201,7 +209,7 @@ graph TB
 | Pattern | Implementation | Purpose |
 | --- | --- | --- |
 | **Repository** | `CharacterRepository` | Abstract data access logic |
-| **Service Layer** | `CharacterStateService` | Encapsulate business operations |
+| **Service Layer** | `CharacterManagementService`, `CharacterStateService` | Encapsulate workflow orchestration and state mutation operations |
 | **Factory** | `CharacterFactory` | Streamline object creation |
 | **Value Object** | `StatCollection` | Encapsulate stat logic |
 | **Observer** | Event Listeners | React to domain events |
@@ -213,7 +221,10 @@ graph TB
 
 ### 3.1 Character Entity
 
-The `Character` model represents a single trainee instance within a user's account.
+The `Character` model represents a single trainee instance within account-backed persistence.
+
+This entity definition describes authenticated database persistence. Local mode uses browser-local
+wrapped payloads and UUID-oriented state until conversion.
 
 ```php
 <?php
@@ -229,9 +240,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Character Entity
- * 
+ *
  * Represents an Uma Musume trainee instance with stats, aptitudes, and inheritance.
- * 
+ *
  * @property int $id
  * @property string $user_id
  * @property string $name
@@ -332,11 +343,11 @@ class Character extends Model
     public function updateStats(array $deltas): void
     {
         $stats = $this->stats;
-        
+
         foreach ($deltas as $stat => $delta) {
             $stats->add($stat, $delta);
         }
-        
+
         $this->stats = $stats;
     }
 
@@ -350,15 +361,22 @@ class Character extends Model
         if (!$this->goals) {
             return false;
         }
-        
+
         $goal = collect($this->goals)->firstWhere('id', $goalId);
-        
+
         return $goal['status'] ?? false === 'completed';
     }
 }
 ```
 
 ### 3.2 Aptitude Model
+
+Aptitude grades are limited to `G`, `F`, `E`, `D`, `C`, `B`, `A`, and `S`. `S` is the maximum valid
+grade. `SS` is invalid and must not appear in schema definitions, validation rules, examples, or
+appendices.
+
+Use canonical style identifiers `nige`, `senkou`, `sashi`, and `oikomi`. If UI-facing English labels
+are shown, document them as presentation aliases only.
 
 ```php
 <?php
@@ -371,13 +389,13 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Aptitude Entity
- * 
+ *
  * Represents character compatibility ratings for distance, surface, and running style.
- * 
+ *
  * @property int $id
  * @property int $character_id
  * @property AptitudeCategory $category
- * @property string $type Specific type (e.g., 'mile', 'turf', 'front_runner')
+ * @property string $type Specific type (e.g., 'mile', 'turf', 'nige')
  * @property AptitudeGrade $grade Rating from G to S (S is maximum)
  * @property int $bonus_value Numeric bonus applied
  */
@@ -427,9 +445,9 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Factor Entity
- * 
+ *
  * Represents inherited traits from parent characters.
- * 
+ *
  * @property int $id
  * @property int $character_id
  * @property int|null $source_character_id Parent character ID
@@ -506,19 +524,22 @@ enum MoodStatus: string
     case Normal = 'normal';
     case Good = 'good';
     case Great = 'great';
-    
+
     public function getMultiplier(): float
     {
         return match($this) {
-            self::Awful => 0.90,
-            self::Bad => 0.95,
+            self::Awful => 0.80,
+            self::Bad => 0.90,
             self::Normal => 1.00,
-            self::Good => 1.05,
-            self::Great => 1.10,
+            self::Good => 1.10,
+            self::Great => 1.20,
         };
     }
 }
 ```
+
+These multipliers are the verified mood values used by the training system and should be treated as
+the canonical character-state source for training-related calculations.
 
 **AptitudeGrade**:
 
@@ -529,10 +550,10 @@ namespace App\Enums;
 
 /**
  * AptitudeGrade Enum
- * 
+ *
  * Game-accurate aptitude grades (G-S). S is maximum grade.
  * A-rank is baseline (0% modifier). Only S provides positive bonus.
- * 
+ *
  * Modifiers vary by category:
  * - Surface (Power): S=+5%, A=0%, B=-10%, C=-20%, D=-30%, E=-50%, F=-70%, G=-90%
  * - Distance (Speed): S=+5%, A=0%, B=-10%, C=-20%, D=-40%, E=-60%, F=-80%, G=-90%
@@ -548,7 +569,7 @@ enum AptitudeGrade: string
     case E = 'E';
     case F = 'F';
     case G = 'G';
-    
+
     /**
      * Get surface aptitude modifier (affects Power)
      */
@@ -565,7 +586,7 @@ enum AptitudeGrade: string
             self::G => -0.90,  // -90%
         };
     }
-    
+
     /**
      * Get distance aptitude modifier (affects Speed)
      */
@@ -582,7 +603,7 @@ enum AptitudeGrade: string
             self::G => -0.90,  // -90%
         };
     }
-    
+
     /**
      * Get running style aptitude modifier (affects Wit)
      */
@@ -599,7 +620,7 @@ enum AptitudeGrade: string
             self::G => -0.90,  // -90%
         };
     }
-    
+
     /**
      * Get legacy bonus value (for backward compatibility)
      * @deprecated Use category-specific modifiers instead
@@ -617,7 +638,7 @@ enum AptitudeGrade: string
             self::G => -30,
         };
     }
-    
+
     public function upgrade(): self
     {
         return match($this) {
@@ -645,7 +666,7 @@ namespace App\ValueObjects;
 
 /**
  * StatCollection Value Object
- * 
+ *
  * Encapsulates stat logic with game-accurate soft cap handling.
  * Stats can exceed 1200 but values above 1200 have diminishing returns (50% effectiveness).
  * Per-training cap: +100 (reduced to +50 if stat > 1200)
@@ -656,7 +677,7 @@ class StatCollection
     private const SOFT_CAP = 1200;
     private const PER_TRAINING_CAP = 100;
     private const PER_TRAINING_CAP_ABOVE_SOFT = 50;
-    
+
     public function __construct(
         private array $stats = [
             'speed' => 0,
@@ -668,28 +689,28 @@ class StatCollection
     ) {
         $this->validateAll();
     }
-    
+
     /**
      * Add stat value with per-training cap enforcement
      */
     public function add(string $stat, int $value): void
     {
         $current = $this->stats[$stat] ?? 0;
-        
+
         // Apply per-training cap based on current stat level
-        $maxGain = $current > self::SOFT_CAP 
-            ? self::PER_TRAINING_CAP_ABOVE_SOFT 
+        $maxGain = $current > self::SOFT_CAP
+            ? self::PER_TRAINING_CAP_ABOVE_SOFT
             : self::PER_TRAINING_CAP;
-        
+
         $cappedValue = min($value, $maxGain);
         $this->stats[$stat] = max(self::STAT_MIN, $current + $cappedValue);
     }
-    
+
     public function get(string $stat): int
     {
         return $this->stats[$stat] ?? 0;
     }
-    
+
     /**
      * Get effective stat value (with diminishing returns above soft cap)
      * Values above 1200 count for 50% effectiveness
@@ -697,21 +718,21 @@ class StatCollection
     public function getEffective(string $stat): int
     {
         $value = $this->stats[$stat] ?? 0;
-        
+
         if ($value <= self::SOFT_CAP) {
             return $value;
         }
-        
+
         // Diminishing returns: values above 1200 count for half
         $excess = $value - self::SOFT_CAP;
         return self::SOFT_CAP + (int)($excess * 0.5);
     }
-    
+
     public function toArray(): array
     {
         return $this->stats;
     }
-    
+
     /**
      * Get array of effective values (with diminishing returns applied)
      */
@@ -723,7 +744,7 @@ class StatCollection
         }
         return $effective;
     }
-    
+
     private function validateAll(): void
     {
         foreach ($this->stats as $stat => $value) {
@@ -733,11 +754,19 @@ class StatCollection
 }
 ```
 
+A-rank is the baseline (`0%`) grade. Category-specific modifiers must follow PRD-001 separately for
+Surface, Distance, and Style; no single legacy bonus table should override those category-specific
+calculations.
+
+`StatCollection` enforces non-negative values and per-training gain caps; it does not impose a hard
+max of 1200. Values above 1200 remain valid persisted values and become subject to diminishing-
+return logic through effective-value accessors.
+
 ---
 
 ## 4. Service Layer
 
-### 4.1 CharacterStateService
+### 4.1 CharacterManagementService
 
 Main orchestration service for character operations.
 
@@ -754,10 +783,10 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Character Management Service
- * 
+ *
  * Handles business logic for character lifecycle management.
  */
-class CharacterStateService
+class CharacterManagementService
 {
     public function __construct(
         private CharacterRepository $repository,
@@ -768,7 +797,7 @@ class CharacterStateService
 
     /**
      * Create a new character instance
-     * 
+     *
      * @param array $data Character creation data
      * @return Character
      * @throws \App\Exceptions\CharacterCreationException
@@ -810,9 +839,12 @@ class CharacterStateService
         });
     }
 
+    // This create flow describes the authenticated account-backed persistence path.
+    // Local-mode creation stores browser-local state and does not invoke the same DB transaction path until conversion.
+
     /**
      * Update character state
-     * 
+     *
      * @param Character $character
      * @param array $changes
      * @return Character
@@ -824,7 +856,7 @@ class CharacterStateService
 
     /**
      * Get character by ID with caching
-     * 
+     *
      * @param int $id
      * @return Character|null
      */
@@ -839,7 +871,7 @@ class CharacterStateService
 
     /**
      * Invalidate character cache
-     * 
+     *
      * @param Character $character
      * @return void
      */
@@ -850,7 +882,7 @@ class CharacterStateService
 
     /**
      * Merge external API data with user input
-     * 
+     *
      * @param array $userData
      * @param array $externalData
      * @return array
@@ -867,7 +899,7 @@ class CharacterStateService
 
     /**
      * Apply inheritance bonuses to base stats
-     * 
+     *
      * @param array $baseStats
      * @param array $inheritance
      * @return array
@@ -875,17 +907,17 @@ class CharacterStateService
     private function applyInheritanceToStats(array $baseStats, array $inheritance): array
     {
         $stats = new \App\ValueObjects\StatCollection($baseStats);
-        
+
         foreach ($inheritance['stat_bonuses'] ?? [] as $stat => $bonus) {
             $stats->add($stat, $bonus);
         }
-        
+
         return $stats->toArray();
     }
 
     /**
      * Create aptitude records
-     * 
+     *
      * @param Character $character
      * @param array $aptitudes
      * @param array $inheritance
@@ -897,7 +929,7 @@ class CharacterStateService
             foreach ($types as $type => $grade) {
                 // Apply red factor bonuses if applicable
                 $finalGrade = $this->applyAptitudeInheritance($category, $type, $grade, $inheritance);
-                
+
                 $character->aptitudes()->create([
                     'category' => $category,
                     'type' => $type,
@@ -910,7 +942,7 @@ class CharacterStateService
 
     /**
      * Create factor records
-     * 
+     *
      * @param Character $character
      * @param array $inheritance
      * @return void
@@ -930,7 +962,7 @@ class CharacterStateService
 
     /**
      * Apply red factor bonuses to aptitude grades
-     * 
+     *
      * @param string $category
      * @param string $type
      * @param string $baseGrade
@@ -944,19 +976,19 @@ class CharacterStateService
         array $inheritance
     ): string {
         $bonus = 0;
-        
+
         foreach ($inheritance['aptitude_bonuses'] ?? [] as $aptBonus) {
             if ($aptBonus['category'] === $category && $aptBonus['type'] === $type) {
                 $bonus += $aptBonus['levels'];
             }
         }
-        
+
         $grade = \App\Enums\AptitudeGrade::from($baseGrade);
-        
+
         for ($i = 0; $i < $bonus; $i++) {
             $grade = $grade->upgrade();
         }
-        
+
         return $grade->value;
     }
 }
@@ -976,14 +1008,14 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Character State Management Service
- * 
+ *
  * Handles validation and persistence of character state changes.
  */
 class CharacterStateService
 {
     /**
      * Update character state with validation
-     * 
+     *
      * @param Character $character
      * @param array $changes
      * @return Character
@@ -1027,7 +1059,7 @@ class CharacterStateService
 
     /**
      * Validate condition data structure
-     * 
+     *
      * @param array $conditions
      * @return array
      */
@@ -1058,27 +1090,27 @@ use App\Enums\FactorType;
 
 /**
  * Factor Inheritance Calculation Service
- * 
+ *
  * Handles calculation of inherited bonuses from parent characters.
  */
 class FactorService
 {
     private const BLUE_FACTOR_VALUES = [
-        1 => 10,  // 1-star
-        2 => 15,  // 2-star
-        3 => 20,  // 3-star
+        1 => 5,
+        2 => 12,
+        3 => 21,
     ];
 
     /**
      * Calculate inheritance from parent characters
-     * 
+     *
      * @param array $parentIds
      * @return array
      */
     public function calculateInheritance(array $parentIds): array
     {
         $parents = Character::with('factors')->whereIn('id', $parentIds)->get();
-        
+
         $inheritance = [
             'stat_bonuses' => [],
             'aptitude_bonuses' => [],
@@ -1101,7 +1133,7 @@ class FactorService
 
     /**
      * Apply blue factor (stat bonus)
-     * 
+     *
      * @param array &$inheritance
      * @param \App\Models\Factor $factor
      * @return void
@@ -1110,9 +1142,9 @@ class FactorService
     {
         $stat = $factor->target;
         $bonus = self::BLUE_FACTOR_VALUES[$factor->stars] ?? 0;
-        
+
         $inheritance['stat_bonuses'][$stat] = ($inheritance['stat_bonuses'][$stat] ?? 0) + $bonus;
-        
+
         $inheritance['factors'][] = [
             'source_id' => $factor->character_id,
             'type' => FactorType::Stat,
@@ -1124,7 +1156,7 @@ class FactorService
 
     /**
      * Apply red factor (aptitude bonus)
-     * 
+     *
      * @param array &$inheritance
      * @param \App\Models\Factor $factor
      * @return void
@@ -1132,13 +1164,13 @@ class FactorService
     private function applyAptitudeFactor(array &$inheritance, $factor): void
     {
         [$category, $type] = explode(':', $factor->target);
-        
+
         $inheritance['aptitude_bonuses'][] = [
             'category' => $category,
             'type' => $type,
             'levels' => $factor->stars,
         ];
-        
+
         $inheritance['factors'][] = [
             'source_id' => $factor->character_id,
             'type' => FactorType::Aptitude,
@@ -1150,7 +1182,7 @@ class FactorService
 
     /**
      * Apply green/white factor (skill hint)
-     * 
+     *
      * @param array &$inheritance
      * @param \App\Models\Factor $factor
      * @return void
@@ -1161,7 +1193,7 @@ class FactorService
             'skill_id' => $factor->target,
             'hint_level' => $factor->stars,
         ];
-        
+
         $inheritance['factors'][] = [
             'source_id' => $factor->character_id,
             'type' => FactorType::Skill,
@@ -1178,6 +1210,10 @@ class FactorService
 ## 5. API Specification
 
 ### 5.1 Endpoint Overview
+
+These endpoints describe the account-backed API contract where exposed. If current Laravel route
+registration differs, registered route files and storage-aware technical flow documents take
+precedence.
 
 | Method | Endpoint | Description | Auth Required |
 | --- | --- | --- | --- |
@@ -1221,10 +1257,10 @@ Accept: application/json
             "dirt": "C"
         },
         "style": {
-            "front_runner": "B",
-            "pace_chaser": "A",
-            "late_surger": "B",
-            "end_closer": "C"
+            "nige": "B",
+            "senkou": "A",
+            "sashi": "B",
+            "oikomi": "C"
         }
     },
     "goals": [
@@ -1297,7 +1333,7 @@ Accept: application/json
                 "category": "distance",
                 "type": "mile",
                 "grade": "A",
-                "bonus_value": 10
+                "bonus_value": 0
             }
         ],
         "factors": [
@@ -1306,7 +1342,7 @@ Accept: application/json
                 "factor_type": "stat",
                 "target": "speed",
                 "stars": 3,
-                "bonus_value": 20
+                "bonus_value": 21
             }
         ],
         "created_at": "2026-01-24T10:00:00Z",
@@ -1437,7 +1473,7 @@ CREATE TABLE ucp_characters (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
     INDEX idx_trainee_id (trainee_id),
@@ -1455,10 +1491,10 @@ CREATE TABLE ucp_aptitudes (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     character_id BIGINT UNSIGNED NOT NULL,
     category ENUM('distance', 'surface', 'style') NOT NULL,
-    type VARCHAR(50) NOT NULL COMMENT 'sprint, mile, turf, front_runner, etc.',
-    grade ENUM('SS', 'S', 'A', 'B', 'C', 'D', 'E', 'F', 'G') NOT NULL,
+    type VARCHAR(50) NOT NULL COMMENT 'sprint, mile, turf, nige, etc.',
+    grade ENUM('S', 'A', 'B', 'C', 'D', 'E', 'F', 'G') NOT NULL,
     bonus_value TINYINT NOT NULL DEFAULT 0,
-    
+
     FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE CASCADE,
     UNIQUE KEY unique_aptitude (character_id, category, type),
     INDEX idx_grade (grade)
@@ -1478,7 +1514,7 @@ CREATE TABLE ucp_factors (
     target VARCHAR(100) NOT NULL COMMENT 'Stat name, aptitude type, or skill ID',
     stars TINYINT UNSIGNED NOT NULL CHECK (stars BETWEEN 1 AND 3),
     bonus_value SMALLINT NULL,
-    
+
     FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE CASCADE,
     FOREIGN KEY (source_character_id) REFERENCES ucp_characters(id) ON DELETE SET NULL,
     INDEX idx_character_id (character_id),
@@ -1505,17 +1541,15 @@ CREATE TABLE ucp_factors (
 
 ## 7. Business Logic
 
-### 7.1 Stat Clamping Rules
+### 7.1 Stat Value Rules
 
-All character stats must be clamped to the valid range:
-
-- **Minimum**: 0
-- **Maximum**: 1200
-- **Enforcement**: Validated in `StatCollection` value object
+Character stats must remain non-negative and may exceed the 1200 soft cap. The soft cap affects
+effective value and gain handling, not storage validity. Per-training gain caps are enforced
+separately in domain logic.
 
 ```php
 // Example usage
-$stats = new StatCollection(['speed' => 1500]); // Clamped to 1200
+$stats = new StatCollection(['speed' => 1500]);
 $stats->add('speed', -2000); // Results in 0
 ```
 
@@ -1531,29 +1565,23 @@ Energy governs training risk and recovery:
 
 ### 7.3 Mood Effects
 
-Mood status affects training outcomes:
-
-| Status | Multiplier | Training Gain Impact |
-| --- | --- | --- |
-| Awful | 0.90x | -10% effectiveness |
-| Bad | 0.95x | -5% effectiveness |
-| Normal | 1.00x | Baseline |
-| Good | 1.05x | +5% effectiveness |
-| Great | 1.10x | +10% effectiveness |
+Mood state is stored at the character-management layer, but calculation multipliers are subsystem-
+specific. For training calculations, the verified values are Great `+20%`, Good `+10%`, Normal `0%`,
+Bad `-10%`, and Awful `-20%`. Character management persists mood state; downstream calculation
+services apply the mechanical modifiers.
 
 ### 7.4 Inheritance Calculation
 
 **Blue Factors (Stats)**:
 
-- 1-star: +10 to target stat
-- 2-star: +15 to target stat
-- 3-star: +20 to target stat
+- 1-star: +5 to target stat
+- 2-star: +12 to target stat
+- 3-star: +21 to target stat
 
 **Red Factors (Aptitudes)**:
 
-- 1-star: +1 grade level
-- 2-star: +2 grade levels
-- 3-star: +3 grade levels
+- Increase aptitude grade by one level per applicable inheritance step, capped at `S`, per current game-accurate rules.
+- Additional inheritance beyond `S` has no further effect.
 
 **Green/White Factors (Skills)**:
 
@@ -1588,7 +1616,7 @@ Goals are stored as JSON arrays with the following structure:
 
 ### 8.1 External API Integration
 
-**Primary Source**: `umapyoi.net`  
+**Primary Source**: `umapyoi.net`
 **Fallback**: `gametora.com`
 
 **Data Synced**:
@@ -1677,7 +1705,7 @@ App\Exceptions\CharacterException (Base)
 | Code | HTTP Status | Description | Resolution |
 | --- | --- | --- | --- |
 | `CHAR_NOT_FOUND` | 404 | Character ID does not exist | Verify ID |
-| `CHAR_INVALID_STAT` | 422 | Stat value outside 0-1200 | Validate input |
+| `CHAR_INVALID_STAT` | 422 | Stat payload is malformed, negative, or violates persistence-layer validation rules | Validate input |
 | `CHAR_PARENT_INCOMPATIBLE` | 422 | Parent selection invalid | Choose different parents |
 | `CHAR_SCENARIO_INVALID` | 422 | Unsupported scenario type | Use valid scenario |
 | `CHAR_EXTERNAL_API_FAIL` | 503 | External API unavailable | Retry or use cache |
@@ -1693,7 +1721,7 @@ App\Exceptions\CharacterException (Base)
     'parent_ids' => 'nullable|array|size:2',
     'parent_ids.*' => 'integer|exists:ucp_characters,id',
     'aptitudes' => 'required|array',
-    'aptitudes.*.*.grade' => 'required|in:SS,S,A,B,C,D,E,F,G',
+    'aptitudes.*.*.grade' => 'required|in:S,A,B,C,D,E,F,G',
 ]
 ```text
 
@@ -1789,12 +1817,14 @@ class StoreCharacterRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255', 'regex:/^[\pL\s\-]+$/u'],
-            'current_stats.*' => ['integer', 'between:0,1200'],
+            'current_stats.*' => ['integer', 'min:0'],
             // ... additional rules
         ];
     }
 }
 ```
+
+Soft-cap behavior is enforced in domain logic, not by rejecting values above 1200 at persistence time.
 
 ### 11.3 SQL Injection Prevention
 
@@ -1827,29 +1857,30 @@ protected $guarded = [
 **Coverage Targets**: 80% minimum
 
 ```php
-// tests/Unit/Services/CharacterStateServiceTest.php
+// tests/Unit/Services/CharacterManagementServiceTest.php
 
 test('creates character with inheritance from parents', function () {
     $parent1 = Character::factory()->create();
     $parent2 = Character::factory()->create();
-    
+
     $data = [
         'name' => 'Test Character',
         'trainee_id' => 1001,
         'scenario_type' => 'ura_finale',
         'parent_ids' => [$parent1->id, $parent2->id],
     ];
-    
-    $character = app(CharacterStateService::class)->create($data);
-    
+
+    $character = app(CharacterManagementService::class)->create($data);
+
     expect($character->current_stats['speed'])->toBeGreaterThan(0)
         ->and($character->factors)->toHaveCount(2);
 });
 
 test('clamps stat values to valid range', function () {
     $stats = new StatCollection(['speed' => 1500]);
-    
-    expect($stats->get('speed'))->toBe(1200);
+
+    expect($stats->get('speed'))->toBe(1500);
+    expect($stats->getEffective('speed'))->toBe(1350);
 });
 ```
 
@@ -1860,19 +1891,19 @@ test('clamps stat values to valid range', function () {
 
 test('authenticated user can create character', function () {
     $user = User::factory()->create();
-    
+
     $response = $this->actingAs($user)
         ->postJson('/api/v1/characters', [
             'name' => 'Special Week',
             'trainee_id' => 1001,
             'scenario_type' => 'ura_finale',
         ]);
-    
+
     $response->assertStatus(201)
         ->assertJsonStructure([
             'data' => ['id', 'name', 'current_stats']
         ]);
-    
+
     $this->assertDatabaseHas('ucp_characters', [
         'user_id' => $user->id,
         'name' => 'Special Week',
@@ -1883,10 +1914,10 @@ test('user cannot view another users character', function () {
     $user1 = User::factory()->create();
     $user2 = User::factory()->create();
     $character = Character::factory()->for($user2)->create();
-    
+
     $response = $this->actingAs($user1)
         ->getJson("/api/v1/characters/{$character->id}");
-    
+
     $response->assertStatus(403);
 });
 ```text
@@ -1904,10 +1935,10 @@ test('blue factors correctly apply stat bonuses', function () {
         'stars' => 3,
         'bonus_value' => 20,
     ]);
-    
+
     $service = app(FactorService::class);
     $inheritance = $service->calculateInheritance([$parent->id]);
-    
+
     expect($inheritance['stat_bonuses']['speed'])->toBe(20);
 });
 ```
@@ -1958,21 +1989,12 @@ class CharacterFactory extends Factory
 
 ## 13. Appendices
 
-### Appendix A: Stat Grade Mapping
+### Appendix A: Grade Mapping Note
 
-| Grade | Stat Range | Training Difficulty |
-| --- | --- | --- |
-| SS | 1100-1200 | Extremely Hard |
-| S | 950-1099 | Very Hard |
-| A | 850-949 | Hard |
-| B+ | 750-849 | Moderate+ |
-| B | 650-749 | Moderate |
-| C+ | 550-649 | Easy+ |
-| C | 450-549 | Easy |
-| D+ | 350-449 | Very Easy+ |
-| D | 250-349 | Very Easy |
-| E | 150-249 | Trivial |
-| F | 0-149 | Minimal |
+This appendix must not introduce `SS` or plus/minus variants that conflict with the game-accurate
+grade language used elsewhere in the specification set. Aptitude grades are `G` through `S` only. If
+UI or reporting layers use app-specific presentation bands, they must be documented separately and
+must not be presented as game-native aptitude grades.
 
 ### Appendix B: Scenario Comparison
 
@@ -2026,6 +2048,7 @@ class CharacterFactory extends Factory
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.1 | 2026-03-11 | Development Team | Corrected `MoodStatus` training multipliers to verified Global EN values and clarified that they are canonical for training calculations. |
 | 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0: CharacterStateService, FactorService, ExternalDataService, GameTora fallback, PHP 8.2+, status complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics: S max aptitude grade (removed SS), category-specific aptitude modifiers, stat soft cap with diminishing returns above 1200, per-training caps |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added enums, value objects |
@@ -2043,10 +2066,10 @@ class CharacterFactory extends Factory
 
 ---
 
-**Document Control**  
-**Maintained By**: Backend Development Team  
-**Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-03-07  
+**Document Control**
+**Maintained By**: Backend Development Team
+**Review Frequency**: Bi-weekly during active development
+**Next Review Date**: 2026-03-07
 **Distribution**: Development Team, QA Team, Product Management
 
 ---

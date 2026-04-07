@@ -155,7 +155,8 @@ $result = $orchestration->executeWorkflow($workflow['id'], ['career_goals' => $g
 
 ```php
 // Message passing
-public function sendMessage(string $fromAgentId, string $toAgentId, string $type, array $payload, int $priority = self::PRIORITY_NORMAL): array
+public function sendMessage(string $fromAgentId, string $toAgentId, string $type, array $payload,
+int $priority = self::PRIORITY_NORMAL): array
 public function broadcastMessage(string $fromAgentId, array $toAgentIds, array $payload): array
 public function receiveMessages(string $agentId, int $limit = 10): array
 public function markAsRead(string $agentId, string $messageId): bool
@@ -521,4 +522,3 @@ AI-powered features throughout the application.
 ---
 
 **Validates**: Requirements 56.3, 56.4, 13.2
-

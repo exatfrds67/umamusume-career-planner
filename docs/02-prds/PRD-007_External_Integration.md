@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0  
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Current - Aligned with codebase v2.2.0
 **Related Documents**: [SRS-FR-08], [SDS-4.7], [DBD-2.1], [SPEC-007]
 
 **Source Specs**:
@@ -17,22 +17,40 @@
 
 **Related Artifacts**:
 
-- SPEC: [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
-- Flow: [FLOW-007](../flows/FLOW-007_External_Integration_System.md)
-- Sequence: [SEQ-007](../sequences/SEQ-007_External_Data_Sync.md)
-- User Flows: [UF-008](../user-flows/UF-008_OCR_and_Data_Import_Flow.md)
+- SPEC: [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md)
+- Flow: [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md)
+- Sequence: [SEQ-007](../01-sequences/SEQ-007_External_Data_Sync.md)
+- User Flows: [UF-008](../01-user-flows/UF-008_OCR_and_Data_Import_Flow.md)
 
 ---
 
 ## Table of Contents
 
 - [PRD-007: External Integration System](#prd-007-external-integration-system)
+  - [Umamusume Pretty Derby Career Planner](#umamusume-pretty-derby-career-planner)
+  - [Table of Contents](#table-of-contents)
   - [1. Executive Summary](#1-executive-summary)
+    - [1.1 Purpose](#11-purpose)
+    - [1.2 Problem Statement](#12-problem-statement)
+    - [1.3 Solution Overview](#13-solution-overview)
   - [2. Product Overview](#2-product-overview)
+    - [2.1 Objectives](#21-objectives)
+    - [2.2 Scope (In)](#22-scope-in)
+    - [2.3 Scope (Out)](#23-scope-out)
   - [3. User Stories](#3-user-stories)
   - [4. Functional Requirements](#4-functional-requirements)
+    - [4.1 External Data Sync \[FR-08.1, FR-08.3\]](#41-external-data-sync-fr-081-fr-083)
+    - [4.2 Game Mechanics Data Sync \[FR-08.2\]](#42-game-mechanics-data-sync-fr-082)
+    - [4.3 OCR Pipeline \[FR-08.4\]](#43-ocr-pipeline-fr-084)
+    - [4.4 Data Management \[FR-09\]](#44-data-management-fr-09)
+    - [4.5 Sync Status Updates \[FR-08.5\]](#45-sync-status-updates-fr-085)
   - [5. User Interface Requirements](#5-user-interface-requirements)
+    - [5.1 OCR Upload Modal](#51-ocr-upload-modal)
+    - [5.2 Sync Status Dashboard (Admin)](#52-sync-status-dashboard-admin)
+    - [5.3 Import/Export Panel](#53-importexport-panel)
   - [6. Data and Integration](#6-data-and-integration)
+    - [6.1 Data Models](#61-data-models)
+    - [6.2 Service Architecture](#62-service-architecture)
   - [7. Non-Functional Requirements](#7-non-functional-requirements)
   - [8. Success Metrics](#8-success-metrics)
   - [9. Release Plan](#9-release-plan)
@@ -49,14 +67,17 @@ Ensure the application maintains up-to-date game data and provides robust data i
 
 ### 1.2 Problem Statement
 
-Game data changes frequently (new banners, balance patches). Manual updates are unsustainable. Additionally, manually inputting character stats for planning is tedious and error-prone.
+Game data changes frequently (new banners, balance patches). Manual updates are unsustainable.
+Additionally, manually inputting character stats for planning is tedious and error-prone.
 
 ### 1.3 Solution Overview
 
 - **API Sync**: Automated background jobs to fetch data from `umapyoi.net` (Primary) and `umamusumedb.com` (Fallback).
-- **OCR Pipeline**: Automated extraction of game stats from screenshots using **Tesseract** with **GD** image preprocessing.
+- **OCR Pipeline**: Automated extraction of game stats from screenshots using **Tesseract** with
+**GD** image preprocessing.
 - **Resilience**: Implementation of **Circuit Breaker** patterns to handle external API downtime gracefully.
-- **Real-time**: **WebSocket (Laravel Reverb)** integration to push updates to connected clients.
+- **Status Delivery**: Queue-backed sync completion, cached status, and polling-friendly UI refresh
+flows for connected clients.
 
 ---
 
@@ -74,7 +95,8 @@ Game data changes frequently (new banners, balance patches). Manual updates are 
 - **OCR Service**: Image upload, preprocessing, text extraction, and parsing logic.
 - **Data Management**: Import/Export of user plans (JSON/CSV/Excel).
 - **Caching**: Redis-backed caching for external responses (24h TTL).
-- **Real-time**: Broadcasting sync completion events via WebSockets.
+- **Status Delivery**: Surface sync completion through persisted status records, cache state, and
+next-refresh UI indicators.
 
 ### 2.3 Scope (Out)
 
@@ -88,7 +110,7 @@ Game data changes frequently (new banners, balance patches). Manual updates are 
 | ID | Actor | Story | Acceptance Criteria |
 | --- | --- | --- | --- |
 | US-7.1 | Admin | I want the card database to update automatically when a new banner drops. | Scheduled job runs daily; fetches new cards; updates DB. |
-| US-7.2 | Player | I want to upload a screenshot of my character's end-of-run stats to save time. | Upload image -> System fills in Speed/Stamina/etc. fields. |
+| US-7.2 | Player | I want to upload a screenshot of my character's end-of-run stats to save time. | Upload image → system extracts candidate values → low-confidence fields are flagged for manual review before apply. Applying OCR-derived data must respect the active storage mode. The system must not auto-persist extracted values without a confirmed apply step. |
 | US-7.3 | Player | I want to export my race plans to Excel to share with my circle. | "Export" button generates a valid .xlsx file. |
 | US-7.4 | System | I want to stop calling an API if it keeps timing out to prevent app lag. | Circuit breaker opens after 5 failures; returns cached/stale data. |
 
@@ -133,26 +155,30 @@ Ensure synced data reflects accurate game mechanics:
 
 ### 4.3 OCR Pipeline [FR-08.4]
 
+The OCR pipeline must: (1) validate MIME type and file signature before processing, (2) preprocess
+images for OCR, (3) extract candidate values, (4) score confidence per field, and (5) require manual
+review for low-confidence outputs. If OCR fails, the system must return a recoverable error state
+and preserve the original upload context for retry or manual entry.
+
+**Implementation Reference**:
+
 - **Preprocessing**: Resize to max 2000px, Grayscale, Adaptive Thresholding (GD Library).
 - **Extraction**: Tesseract OCR engine (v5+) with Japanese/English language packs.
 - **Parsing**: Regex-based extraction for Stats (S/S/P/G/W), Skill names, and Race results.
-- **Validation**: Confidence scoring. Flag low-confidence (<80%) fields for manual user review.
+- **Confidence Threshold**: 80% (flag below for manual review).
 
 ### 4.4 Data Management [FR-09]
 
-- **Import**:
-  - Detect format (JSON v1/v2, CSV).
-  - Validate schema.
-  - Conflict resolution (Skip/Overwrite/Copy).
-- **Export**:
-  - JSON (Full backup).
-  - Excel/CSV (Tabular data for analysis).
+Import and export actions must identify whether they are review-only, local-apply, or account-
+persist actions. After import, the system must show a summary of created, updated, skipped, and
+errored items. Export options must state whether the output reflects browser-local data, account-
+backed data, or the current visible report scope.
 
-### 4.5 Real-time Updates [FR-08.5]
+### 4.5 Sync Status Updates [FR-08.5]
 
-- **Technology**: Laravel Reverb.
-- **Events**: `DataSyncCompleted`, `OCRProcessingFinished`.
-- **UX**: Show "New Data Available" toast to active users without page reload.
+- **Technology**: Laravel jobs, cache-backed status tracking, and HTTP refresh endpoints.
+- **Events/Signals**: Persist sync and OCR completion state for admin dashboards and polling clients.
+- **UX**: Show updated sync status and "new data available" messaging on the next refresh or poll cycle.
 
 ---
 
@@ -173,8 +199,9 @@ Ensure synced data reflects accurate game mechanics:
 
 ### 5.3 Import/Export Panel
 
-- **Export**: Checkboxes for data types (Characters, Decks, History). Format dropdown.
-- **Import**: File picker. Conflict resolution radio buttons.
+The panel must include empty-state guidance, format guidance, and conflict controls only when
+conflicts are detected. After an import or export action, the user must receive a clear post-action
+summary.
 
 ---
 
@@ -190,7 +217,7 @@ Ensure synced data reflects accurate game mechanics:
 
 - **ExternalAPIService**: Facade for API clients.
 - **CircuitBreaker**: Middleware state machine (Closed -> Open -> Half-Open).
-- **OCRService**: Orchestrator for ImageProc -> Tesseract -> Parser.
+- **TesseractService**: Orchestrator for image preprocessing, OCR extraction, and parsing workflows.
 
 ---
 
@@ -200,9 +227,8 @@ Ensure synced data reflects accurate game mechanics:
 - **Performance**:
   - API Sync: Background job, zero impact on frontend latency.
   - OCR: < 5 seconds processing time per image.
-- **Security**:
-  - Validate all uploaded files (MIME type, magic bytes) to prevent malware.
-  - Sanitize all external strings before DB insertion (XSS prevention).
+- **Security**: Validate uploaded files by MIME type and signature, sanitize external strings before
+persistence, and do not partially and silently persist rejected or invalid payloads.
 
 ---
 
@@ -235,7 +261,8 @@ Ensure synced data reflects accurate game mechanics:
 
 - **Assumption**: `umapyoi.net` API remains free and public.
 - **Assumption**: Tesseract language data files are installed on the server environment.
-- **Open Question**: How to handle copyright on card images fetched from external APIs? *Current: Proxy/Cache images locally.*
+- **Open Question**: How to handle copyright on card images fetched from external APIs? *Current:
+Proxy/Cache images locally.*
 
 ---
 

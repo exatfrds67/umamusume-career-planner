@@ -1,8 +1,8 @@
 # External Data Browser - Filtering & Sorting Features
 
-**Document Version**: 1.1.0  
-**Date**: 2026-01-25  
-**Status**: Implemented  
+**Document Version**: 1.1.0
+**Date**: 2026-01-25
+**Status**: Implemented
 
 ## Overview
 
@@ -284,4 +284,3 @@ clean view of all data.
 - Added sorting options for both tabs
 - Added active filters summary
 - Added clear filters functionality
-

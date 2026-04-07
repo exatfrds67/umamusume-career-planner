@@ -1,3 +1,350 @@
+# Uma Musume Career Planner - Copilot Instructions
+
+## Overview
+
+Comprehensive local-first Laravel 12+ application for Umamusume Pretty Derby career optimization. Features AI-powered recommendations (Neuron AI), turn-by-turn character progression tracking, skill management, support card deck building, race strategy planning, and dual storage modes (localStorage + database).
+
+**Stack**: Laravel 12+, PHP 8.2+, Livewire 4, Alpine.js, TailwindCSS v4, Vite 7, Pest 4
+
+## Quick Reference
+
+### Commands
+
+```bash
+# Setup
+composer install && npm install && php artisan migrate --seed
+
+# Development
+composer run dev  # Runs all services (Vite + Horizon)
+php artisan serve # Application server
+npm run dev       # Vite only
+
+# Testing
+php artisan test --compact              # Pest tests
+npm run playwright:test                 # E2E tests
+php artisan test --filter=testName      # Specific test
+
+# Code Quality
+vendor/bin/pint --dirty                 # Format PHP
+npm run prettier:fix                    # Format JS/CSS
+vendor/bin/phpstan analyse              # Static analysis
+```
+
+### Key Models & Relationships
+
+```
+User → Character (careers) → Career
+                           → SkillAcquisition (pivot)
+                           → TrainingSession
+                           → Race
+                           → Event
+                           → ParentCharacter (inheritance)
+
+Career → skillAcquisitions
+      → trainingSessions
+      → races
+      → events
+      → runSnapshots
+
+Character → careers
+         → factors
+         → skills (via SkillAcquisition)
+         → supportCards (deck)
+```
+
+### Core Enums
+
+```php
+StorageMode: LOCAL, ACCOUNT              // Dual storage architecture
+CareerPhase: JUNIOR, CLASSIC, SENIOR, URA_FINALE
+AffinityGrade: High, Standard, Low       // Parent affinity
+Mood: VeryGood, Good, Normal, Bad, VeryBad
+RunningStyle: Nige, Senkou, Sashi, Oikomi
+RaceDistance: Sprint, Mile, Medium, Long, Dirt
+```
+
+### Route Patterns
+
+```php
+// Character management (authenticated)
+/characters                              // Index
+/characters/create                       // Create
+/characters/{character}                  // Show (career view)
+/characters/{character}/edit             // Edit
+/characters/{character}/training         // Training interface
+/characters/{character}/deck-builder     // Support card deck
+/characters/{character}/factors          // Inheritance factors
+
+// Careers (via character context)
+
+/reports/career/{career}                // Career report
+/reports/character/{character}           // Character summary
+
+// Skills, races, AI
+/skills                                  // Skill catalog
+/races                                   // Race database
+/races/calendar                          // 72-turn calendar
+/ai/chat                                 // AI advisory chat
+/ai/dashboard                            // AI monitoring
+
+// Data management
+/import, /export, /backup                // Data operations
+/data-management                         // Unified hub
+/ocr/upload                              // Screenshot OCR
+
+// Admin (requires admin role)
+/admin/dashboard                         // System overview
+/admin/users                             // User management
+```
+
+## Architecture Patterns
+
+### Service Layer (Business Logic)
+
+All business logic belongs in services. Controllers and Livewire components orchestrate only.
+
+**Key Services**:
+
+- `TrainingAdvisoryService`: AI-powered training recommendations
+- `TrainingCalculationService`: Stat growth calculations
+- `TrainingPredictionService`: Outcome predictions
+- `SkillService`, `SkillAnalysisService`: Skill management
+- `CareerAnalyticsService`, `CareerReportingService`: Analytics
+- `DeckManagementService`: Support card deck operations
+- `RaceExecutionService`, `RaceConditionService`: Race logic
+- `LocalStorageService`: Browser storage abstraction
+- `DataImportService`, `DataExportService`: Import/export
+- `BackupService`: Backup/restore operations
+
+### Dual Storage Mode
+
+**Local Mode** (localStorage):
+
+- Guest users, offline-capable
+- UUID-based identification
+- Serialized to JSON in browser
+- No authentication required
+
+**Account Mode** (database):
+
+- Authenticated users
+- Full relational storage
+- Sync across devices
+- Supports all features
+
+**Critical**: All features touching character/career data must handle both modes transparently. Use `StorageMode` enum and `LocalStorageService` abstraction.
+
+### Livewire Components
+
+**Major Components**:
+
+- `App\Livewire\Admin\*`: Admin panel components
+- `App\Livewire\Analytics\*`: Analytics dashboards
+- `App\Livewire\Settings\*`: User preferences
+- `App\Livewire\Simulation\*`: Scenario simulations
+- `AdvisoryPanel`: AI recommendation display
+- `NotificationDropdown`: Real-time notifications
+- `SynergyBuildPlanner`: Skill synergy analysis
+
+**Alpine Integration**: Many UI interactions (modals, dropdowns, tabs, toasts) use Alpine.js components in `resources/js/components/` and `resources/views/components/`.
+
+## Development Guidelines
+
+### Database
+
+- Use Eloquent relationships over raw queries
+- Eager load to prevent N+1 (see `QueryOptimizationService`)
+- Soft deletes for user data (careers, characters)
+- JSON columns for flexible metadata (`career_metadata`, `acquisition_context`, etc.)
+- Proper indexes on frequently queried columns
+
+### Testing Strategy
+
+**Run minimal tests** - never full suite unless explicitly requested (see user memory).
+
+```bash
+# Run specific test file
+php artisan test tests/Feature/CareerTest.php --compact
+
+# Run specific test
+php artisan test --filter=it_creates_career_with_valid_data
+
+# Browser tests (Pest 4)
+php artisan test tests/Browser/ --compact
+```
+
+**Test Coverage**:
+
+- Feature tests for Livewire components and controllers
+- Unit tests for services (calculations, validations)
+- Browser tests (Playwright) for critical user flows
+- Mock external APIs (Ollama, Bedrock) in tests
+
+### Frontend
+
+**TailwindCSS v4**:
+
+- Use utility classes, not `@apply`
+- Dark mode: `dark:` prefix (follows system preference)
+- Responsive: mobile-first breakpoints
+- Custom theme in `resources/css/app.css` using `@theme` directive
+
+**Alpine.js**:
+
+- Persistent state: `x-persist` for localStorage
+- Dropdowns: `x-data="dropdown()"` pattern
+- Modals: `x-data="modal()"` pattern
+- Dark mode toggle: `x-data="darkMode()"` in `app.js`
+
+**Component Library**: See `resources/views/components/COMPONENT_LIBRARY.md` for reusable Blade components.
+
+### Security
+
+- **Authorization**: Laravel policies for all resource access
+- **Validation**: Form Requests for controllers, Livewire validation rules for components
+- **CSRF**: Enabled by default (Livewire handles automatically)
+- **Rate limiting**: Applied to AI endpoints, OCR uploads
+- **Privacy**: Consent management (`ConsentRecord` model), deletion requests (`DeletionRequest`)
+- **Sanitization**: DOMPurify for user HTML content
+
+### Performance
+
+- **Caching**: Redis for:
+  - Skill catalog (`SkillCatalogCacheService`)
+  - Race requirements (`RaceRequirementsCacheService`)
+  - Recommendations (`RecommendationCacheService`)
+  - Query results (`QueryOptimizationService`)
+- **Queues**: Laravel Horizon for:
+  - AI inference jobs
+  - OCR processing
+  - Bulk imports/exports
+  - Notification dispatch
+- **APM**: `ApmService` tracks performance metrics
+- **Monitoring**: Telescope for debugging, Horizon for queues
+
+## AI Integration (Neuron AI)
+
+**Providers**:
+
+- **Local**: Ollama (privacy-first, offline)
+- **Cloud**: AWS Bedrock Claude (high accuracy)
+
+**Features**:
+
+- Training recommendations with turn-by-turn context
+- Race readiness analysis
+- Skill acquisition advisory
+- Deck optimization suggestions
+- Real-time streaming chat interface
+- Wit adequacy checks
+- Inheritance timing recommendations
+
+**Configuration**: `config/ai.php`, `config/neuron.php`
+
+## Common Patterns
+
+### Creating New Features
+
+1. **Model**: Define Eloquent model with relationships and casts
+2. **Migration**: Create table with proper indexes and foreign keys
+3. **Factory**: Generate realistic test data
+4. **Service**: Implement business logic in dedicated service class
+5. **Controller/Livewire**: Create thin orchestration layer
+6. **Routes**: Register routes in `routes/web.php` (authenticated group)
+7. **Views**: Create Blade templates using component library
+8. **Tests**: Write feature tests for endpoints, unit tests for service logic
+9. **Format**: Run `vendor/bin/pint --dirty`
+
+### Enum Usage
+
+Prefer enums over magic strings:
+
+```php
+// Good
+$career->current_phase = CareerPhase::CLASSIC;
+if ($mood === Mood::VeryGood) { ... }
+
+// Bad
+$career->current_phase = 'classic_year';
+if ($mood === 'very_good') { ... }
+```
+
+### JSON Columns
+
+Cast to arrays and validate structure:
+
+```php
+protected function casts(): array
+{
+    return [
+        'support_deck' => 'array',
+        'career_metadata' => 'array',
+    ];
+}
+
+// Validate structure in Form Request
+'career_metadata' => 'nullable|array',
+'career_metadata.notes' => 'nullable|string',
+```
+
+## Documentation
+
+**Read first**: `AGENTS.md` for full AI agent guidelines (v2.1.0)
+
+**Key docs**:
+
+- `docs/00-core-docs/`: Architecture (SDP, SRS, SDS, DBD)
+- `docs/02-prds/`: Product requirements per module
+- `docs/02-specs/`: Technical specifications
+- `docs/01-flows/`: System flows (Mermaid diagrams)
+- `docs/01-sequences/`: Interaction sequences
+- `resources/views/components/COMPONENT_LIBRARY.md`: UI components
+
+**Creating docs**: Place in `docs/` subdirectories only. Follow markdownlint rules (see AGENTS.md Documentation Standards).
+
+## Troubleshooting
+
+### Vite Manifest Error
+
+```bash
+# Build assets
+npm run build
+
+# Or start dev server
+npm run dev
+```
+
+### Horizon Not Starting (Windows)
+
+Use WSL: `wsl php artisan horizon` (see CLAUDE.md for setup)
+
+### Queue Jobs Not Processing
+
+```bash
+# Check Horizon
+php artisan horizon:status
+
+# Restart Horizon
+php artisan horizon:terminate
+php artisan horizon
+```
+
+### Test Failures
+
+```bash
+# Clear caches
+php artisan config:clear
+php artisan cache:clear
+php artisan test:clear
+
+# Run with verbose output
+php artisan test --filter=failing_test
+```
+
+---
+
+**For comprehensive guidelines**: See `AGENTS.md` (v2.1.0) for AI agent development standards, architecture details, and complete development workflow.
+
 <laravel-boost-guidelines>
 === foundation rules ===
 
@@ -12,14 +359,16 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
 - laravel/sanctum (SANCTUM) - v4
+- livewire/livewire (LIVEWIRE) - v4
 - larastan/larastan (LARASTAN) - v3
 - laravel/horizon (HORIZON) - v5
 - laravel/mcp (MCP) - v0
 - laravel/pint (PINT) - v1
 - laravel/sail (SAIL) - v1
 - laravel/telescope (TELESCOPE) - v5
-- pestphp/pest (PEST) - v3
-- phpunit/phpunit (PHPUNIT) - v11
+- pestphp/pest (PEST) - v4
+- phpunit/phpunit (PHPUNIT) - v12
+- alpinejs (ALPINEJS) - v3
 - tailwindcss (TAILWINDCSS) - v4
 
 ## Conventions
@@ -83,6 +432,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 
 ## PHP
 
+- Always use strict typing at the head of a `.php` file: `declare(strict_types=1);`.
 - Always use curly braces for control structures, even if it has one line.
 
 ### Constructors
@@ -184,6 +534,51 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ### Models
 - Casts can and likely should be set in a `casts()` method on a model rather than the `$casts` property. Follow existing conventions from other models.
 
+=== livewire/core rules ===
+
+## Livewire
+
+- Use the `search-docs` tool to find exact version-specific documentation for how to write Livewire and Livewire tests.
+- Use the `php artisan make:livewire [Posts\CreatePost]` Artisan command to create new components.
+- State should live on the server, with the UI reflecting it.
+- All Livewire requests hit the Laravel backend; they're like regular HTTP requests. Always validate form data and run authorization checks in Livewire actions.
+
+## Livewire Best Practices
+- Livewire components require a single root element.
+- Use `wire:loading` and `wire:dirty` for delightful loading states.
+- Add `wire:key` in loops:
+
+    ```blade
+    @foreach ($items as $item)
+        <div wire:key="item-{{ $item->id }}">
+            {{ $item->name }}
+        </div>
+    @endforeach
+    ```
+
+- Prefer lifecycle hooks like `mount()`, `updatedFoo()` for initialization and reactive side effects:
+
+<code-snippet name="Lifecycle Hook Examples" lang="php">
+    public function mount(User $user) { $this->user = $user; }
+    public function updatedSearch() { $this->resetPage(); }
+</code-snippet>
+
+## Testing Livewire
+
+<code-snippet name="Example Livewire Component Test" lang="php">
+    Livewire::test(Counter::class)
+        ->assertSet('count', 0)
+        ->call('increment')
+        ->assertSet('count', 1)
+        ->assertSee(1)
+        ->assertStatus(200);
+</code-snippet>
+
+<code-snippet name="Testing Livewire Component Exists on Page" lang="php">
+    $this->get('/posts/create')
+    ->assertSeeLivewire(CreatePost::class);
+</code-snippet>
+
 === pint/core rules ===
 
 ## Laravel Pint Code Formatter
@@ -241,6 +636,50 @@ it('has emails', function (string $email) {
     'james' => 'james@laravel.com',
     'taylor' => 'taylor@laravel.com',
 ]);
+</code-snippet>
+
+=== pest/v4 rules ===
+
+## Pest 4
+
+- Pest 4 is a huge upgrade to Pest and offers: browser testing, smoke testing, visual regression testing, test sharding, and faster type coverage.
+- Browser testing is incredibly powerful and useful for this project.
+- Browser tests should live in `tests/Browser/`.
+- Use the `search-docs` tool for detailed guidance on utilizing these features.
+
+### Browser Testing
+- You can use Laravel features like `Event::fake()`, `assertAuthenticated()`, and model factories within Pest 4 browser tests, as well as `RefreshDatabase` (when needed) to ensure a clean state for each test.
+- Interact with the page (click, type, scroll, select, submit, drag-and-drop, touch gestures, etc.) when appropriate to complete the test.
+- If requested, test on multiple browsers (Chrome, Firefox, Safari).
+- If requested, test on different devices and viewports (like iPhone 14 Pro, tablets, or custom breakpoints).
+- Switch color schemes (light/dark mode) when appropriate.
+- Take screenshots or pause tests for debugging when appropriate.
+
+### Example Tests
+
+<code-snippet name="Pest Browser Test Example" lang="php">
+it('may reset the password', function () {
+    Notification::fake();
+
+    $this->actingAs(User::factory()->create());
+
+    $page = visit('/sign-in'); // Visit on a real browser...
+
+    $page->assertSee('Sign In')
+        ->assertNoJavascriptErrors() // or ->assertNoConsoleLogs()
+        ->click('Forgot Password?')
+        ->fill('email', 'nuno@laravel.com')
+        ->click('Send Reset Link')
+        ->assertSee('We have emailed your password reset link!')
+
+    Notification::assertSent(ResetPassword::class);
+});
+</code-snippet>
+
+<code-snippet name="Pest Smoke Testing Example" lang="php">
+$pages = visit(['/', '/about', '/contact']);
+
+$pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
 </code-snippet>
 
 === tailwindcss/core rules ===

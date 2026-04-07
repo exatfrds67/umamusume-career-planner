@@ -10,7 +10,7 @@
     function myFunction() {
         // logic here
     }
-    
+
     document.addEventListener('DOMContentLoaded', () => {
         myFunction();
     });
@@ -113,7 +113,7 @@ const { initialValue } = window.myComponentData || {};
 document.addEventListener('alpine:init', () => {
     Alpine.data('myComponent', () => ({
         count: initialValue || 0,
-        
+
         increment() {
             this.count++;
         }
@@ -131,7 +131,7 @@ document.addEventListener('alpine:init', () => {
  */
 async function fetchDataWithRetry(url, maxRetries = 3) {
     let lastError = null;
-    
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             const response = await fetch(url, {
@@ -142,24 +142,24 @@ async function fetchDataWithRetry(url, maxRetries = 3) {
                 },
                 body: JSON.stringify({ /* data */ })
             });
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
-            
+
             return await response.json();
         } catch (error) {
             lastError = error;
-            
+
             if (attempt < maxRetries) {
                 // Exponential backoff
-                await new Promise(resolve => 
+                await new Promise(resolve =>
                     setTimeout(resolve, Math.pow(2, attempt) * 1000)
                 );
             }
         }
     }
-    
+
     throw lastError;
 }
 ```
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function toggleFields() {
         const value = selectElement.value;
-        
+
         if (value === 'option1') {
             conditionalField.classList.remove('hidden');
             conditionalField.querySelector('input').required = true;
@@ -242,17 +242,17 @@ window.addEventListener('my-event', (event) => {
 ```javascript
 // Success toast
 window.dispatchEvent(new CustomEvent('toast', {
-    detail: { 
-        type: 'success', 
-        message: 'Operation completed!' 
+    detail: {
+        type: 'success',
+        message: 'Operation completed!'
     }
 }));
 
 // Error toast
 window.dispatchEvent(new CustomEvent('toast', {
-    detail: { 
-        type: 'error', 
-        message: 'Something went wrong' 
+    detail: {
+        type: 'error',
+        message: 'Something went wrong'
     }
 }));
 ```text

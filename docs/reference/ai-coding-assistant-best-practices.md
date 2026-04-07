@@ -1,6 +1,6 @@
 # AI Coding Assistant Best Practices - Research Compilation
 
-**Compiled:** January 2026  
+**Compiled:** January 2026
 **Purpose:** Comprehensive guidelines for AI coding assistants based on official documentation from major platforms
 
 ## Table of Contents
@@ -620,7 +620,8 @@ This document synthesizes best practices from leading AI coding platforms includ
 - Chat for code snippets and guidance
 - Leverage AWS best practices
 
-**Source:** [AWS Prescriptive Guidance - Code Generation](https://docs.aws.amazon.com/prescriptive-guidance/latest/best-practices-code-generation/code-generation.html)
+**Source:** [AWS Prescriptive Guidance - Code Generation](https://docs.aws.amazon.com/prescriptive-
+guidance/latest/best-practices-code-generation/code-generation.html)
 
 ---
 
@@ -649,7 +650,8 @@ This document synthesizes best practices from leading AI coding platforms includ
 - Open relevant files for context
 - Use specific assertion methods in tests
 
-**Source:** [GitHub Copilot Best Practices](https://docs.github.com/en/copilot/using-github-copilot/best-practices-for-using-github-copilot)
+**Source:** [GitHub Copilot Best Practices](https://docs.github.com/en/copilot/using-github-
+copilot/best-practices-for-using-github-copilot)
 
 ---
 
@@ -769,17 +771,25 @@ This document synthesizes best practices from leading AI coding platforms includ
 
 1. **Anthropic Claude Code**
    - [Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices) - February 2025
-   - [Claude 4 Prompt Engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices)
+   - [Claude 4 Prompt Engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-
+   engineering/claude-4-best-practices)
 
 2. **Amazon Q Developer**
-   - [Best Practices for Code Generation](https://docs.aws.amazon.com/prescriptive-guidance/latest/best-practices-code-generation/code-generation.html)
-   - [FAQs about Amazon Q Developer](https://docs.aws.amazon.com/prescriptive-guidance/latest/best-practices-code-generation/faq.html)
-   - [Software Coding Practices in an AI Assistant World](https://community.aws/content/2jJurAxlqVbtRLxG1kPmFDkdh5k/software-coding-practices-in-an-ai-assistant-world)
+   - [Best Practices for Code Generation](https://docs.aws.amazon.com/prescriptive-
+   guidance/latest/best-practices-code-generation/code-generation.html)
+   - [FAQs about Amazon Q Developer](https://docs.aws.amazon.com/prescriptive-guidance/latest/best-
+   practices-code-generation/faq.html)
+   - [Software Coding Practices in an AI Assistant
+   World](https://community.aws/content/2jJurAxlqVbtRLxG1kPmFDkdh5k/software-coding-practices-in-an-ai-
+   assistant-world)
 
 3. **GitHub Copilot**
-   - [Best Practices for Using GitHub Copilot](https://docs.github.com/en/copilot/using-github-copilot/best-practices-for-using-github-copilot)
-   - [Using GitHub Copilot in Your IDE](https://github.blog/developer-skills/github/how-to-use-github-copilot-in-your-ide-tips-tricks-and-best-practices/)
-   - [10 Advanced Tips & Tricks](https://www.coderabbit.ai/blog/github-copilot-best-practices-10-tips-and-tricks-that-actually-help)
+   - [Best Practices for Using GitHub Copilot](https://docs.github.com/en/copilot/using-github-
+   copilot/best-practices-for-using-github-copilot)
+   - [Using GitHub Copilot in Your IDE](https://github.blog/developer-skills/github/how-to-use-github-
+   copilot-in-your-ide-tips-tricks-and-best-practices/)
+   - [10 Advanced Tips & Tricks](https://www.coderabbit.ai/blog/github-copilot-best-practices-10-tips-
+   and-tricks-that-actually-help)
 
 4. **OpenAI Codex**
    - [Codex Prompting Guide](https://cookbook.openai.com/examples/gpt-5/codex_prompting_guide)
@@ -788,7 +798,8 @@ This document synthesizes best practices from leading AI coding platforms includ
 5. **Google Gemini Code Assist**
    - [Code with Gemini Code Assist](https://cloud.google.com/gemini/docs/codeassist/write-code-gemini)
    - [Customize Gemini Behavior](https://developers.google.com/gemini-code-assist/docs/customize-gemini-behavior-github)
-   - [Five Best Practices for AI Coding Assistants](https://cloud.google.com/blog/topics/developers-practitioners/five-best-practices-for-using-ai-coding-assistants)
+   - [Five Best Practices for AI Coding Assistants](https://cloud.google.com/blog/topics/developers-
+   practitioners/five-best-practices-for-using-ai-coding-assistants)
 
 6. **Cursor IDE**
    - [Cursor IDE Rules for AI](https://kirill-markin.com/articles/cursor-ide-rules-for-ai/)
@@ -812,26 +823,31 @@ This document synthesizes best practices from leading AI coding platforms includ
 
 1. **Security Best Practices**
    - [AI Coding Security & Best Practices](https://techbytes.app/guides/ai-coding-series/part-3/)
-   - [Security Implications of AI Code Generation](https://www.gocodeo.com/post/security-implications-of-ai-code-generation-auditing-and-hardening-generated-code)
-   - [5 Security Best Practices for Generative AI](https://snyk.io/blog/5-security-best-practices-generative-ai-code-assistants-copilot/)
+   - [Security Implications of AI Code Generation](https://www.gocodeo.com/post/security-implications-
+   of-ai-code-generation-auditing-and-hardening-generated-code)
+   - [5 Security Best Practices for Generative AI](https://snyk.io/blog/5-security-best-practices-
+   generative-ai-code-assistants-copilot/)
    - [How to Keep AI-Generated Code Secure](https://blog.codacy.com/how-to-keep-your-ai-generated-code-secure)
 
 2. **Testing and Validation**
     - [Testing Vibe-Coded Apps](https://rafter.so/blog/testing-vibe-coded-apps)
-    - [Best Practices for Secure AI-Generated Code](https://coderfacts.com/security-and-best-practices/secure-ai-code-vibe-coding/)
+    - [Best Practices for Secure AI-Generated Code](https://coderfacts.com/security-and-best-
+    practices/secure-ai-code-vibe-coding/)
 
 ### Community Resources
 
 1. **General AI Coding**
     - [Best Practices for AI-Assisted Development](https://www.cladlabs.ai/blog/ai-development-best-practices)
     - [AI Code Assistant Guidelines](https://aiddbot.com/rules-for-assitants)
-    - [Practical Guide to AI-Assisted Programming](https://www.makingdatamistakes.com/making-tea-while-ai-codes-a-practical-guide-to-2024s-development-revolution/)
+    - [Practical Guide to AI-Assisted Programming](https://www.makingdatamistakes.com/making-tea-while-
+    ai-codes-a-practical-guide-to-2024s-development-revolution/)
 
 ---
 
 ## Conclusion
 
-AI coding assistants are powerful tools that can significantly boost developer productivity when used correctly. The key to success lies in:
+AI coding assistants are powerful tools that can significantly boost developer productivity when
+used correctly. The key to success lies in:
 
 1. **Providing Rich Context** - Open relevant files, include imports, document conventions
 2. **Being Specific** - Clear, detailed prompts yield better results
@@ -840,11 +856,13 @@ AI coding assistants are powerful tools that can significantly boost developer p
 5. **Prioritizing Security** - Never trust AI-generated code without security review
 6. **Following Best Practices** - Leverage platform-specific features and workflows
 
-By following these guidelines from official sources and adapting them to your specific needs, you can maximize the value of AI coding assistants while maintaining code quality, security, and maintainability.
+By following these guidelines from official sources and adapting them to your specific needs, you
+can maximize the value of AI coding assistants while maintaining code quality, security, and
+maintainability.
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** January 2026  
-**Compiled By:** AI Research Assistant  
+**Document Version:** 1.0
+**Last Updated:** January 2026
+**Compiled By:** AI Research Assistant
 **Review Status:** Ready for team review and adoption

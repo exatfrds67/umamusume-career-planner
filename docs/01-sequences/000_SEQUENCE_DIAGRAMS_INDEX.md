@@ -1,10 +1,38 @@
 # SEQUENCE DIAGRAMS: Critical Interaction Flows
 
-**Document Version**: 2.2.0 | **Date**: February 22, 2026 | **Status**: Production-Aligned with game-accurate mechanics
+**Document Version**: 2.3.0 | **Date**: March 8, 2026 | **Status**: Production-aligned and storage-aware
 
 ## Overview
 
-Sequence diagrams document the detailed interactions between system components during critical operations in the Umamusume Pretty Derby Career Planner v2.2.0. These diagrams show message flows, timing, and dependencies for key workflows in the Laravel 12 application with AI integration, MCP services, and external API interactions.
+Sequence diagrams document the detailed interactions between system components during critical
+operations in the Umamusume Pretty Derby Career Planner. The current set now treats
+`StorageMode::LOCAL` and `StorageMode::ACCOUNT` as first-class concerns: when a flow is browser-
+managed in local mode, the sequence says so explicitly instead of implying a database write.
+
+**Index note:** `SD-*` labels are navigational group identifiers inside this index. They do not
+always map 1:1 to `SEQ-*` filenames.
+
+### Index Maintenance Note
+
+Several summary sequence snippets below are legacy overview diagrams and may not reflect the current
+storage-aware route surface in full detail.
+
+For authoritative current behavior, prefer these updated sequence documents:
+
+- `SEQ-001_Character_Creation_Sequence.md`
+- `SEQ-004_Race_Registration_and_Outcome.md`
+- `SEQ-005_Support_Card_Upgrade.md`
+- `SEQ-006_AI_Advice_Generation.md`
+- `SEQ-012_Run_Snapshot_and_Restore.md`
+- `SEQ-016_Support_Deck_Configuration.md`
+- `SEQ-017_Storage_Mode_Transition.md`
+
+In particular:
+
+- `StorageMode::LOCAL` is browser-managed and UUID-oriented.
+- `StorageMode::ACCOUNT` uses authenticated database-backed flows.
+- Race entry uses `POST /characters/{character}/races/{gameRace}/enter`.
+- Storage-aware advisory requests should not be collapsed into account-only chat flows.
 
 ---
 
@@ -26,7 +54,7 @@ Sequence diagrams document the detailed interactions between system components d
 
 ### SD-001: Character Creation Flow
 
-**Duration**: ~500ms (including database operations)  
+**Duration**: ~500ms (including database operations)
 **Critical Path**: Form validation → Database inserts → Event dispatch → Response
 
 ```mermaid
@@ -45,21 +73,21 @@ sequenceDiagram
     UI->>Controller: POST /characters
     Controller->>Controller: Validate Request
     Controller->>CharacterStateService: create(data)
-    
+
     CharacterStateService->>Database: INSERT characters
     Database-->>CharacterStateService: character_id
-    
+
     CharacterStateService->>FactorService: calculateInheritance(character)
     FactorService->>FactorService: Calculate bonuses
     FactorService-->>CharacterStateService: factor_data
-    
+
     CharacterStateService->>Database: INSERT factors
     CharacterStateService->>Database: INSERT aptitudes
     CharacterStateService->>Database: INSERT goals
-    
+
     CharacterStateService->>EventDispatcher: Dispatch CharacterCreated
     EventDispatcher->>EventDispatcher: Queue listeners
-    
+
     CharacterStateService-->>Controller: Character object
     Controller-->>UI: 201 Created + character data
     UI->>UI: Update component state
@@ -68,11 +96,11 @@ sequenceDiagram
 
 **Related Documents:**
 
-- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
-- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
-- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
-- Tech Flow: [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
-- Wireframe: [WF-002](../wireframes/WF-002_Character_Creation_Wizard.md)
+- PRD: [PRD-001](../02-prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md)
+- Tech Flow: [TECH-FLOW-001](../01-tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
+- Wireframe: [WF-002](../01-wireframes/WF-002_Character_Creation_Wizard.md)
 
 ---
 
@@ -80,7 +108,7 @@ sequenceDiagram
 
 ### SD-002: Training Prediction & Selection
 
-**Duration**: ~200ms (with caching) | ~1.2s (cache miss)  
+**Duration**: ~200ms (with caching) | ~1.2s (cache miss)
 **Parallel Operations**: Prediction calculation + Cache management
 
 ```mermaid
@@ -97,14 +125,14 @@ sequenceDiagram
     User->>Livewire: View Training Options
     Livewire->>Controller: GET /training/predictions/{career_id}
     Controller->>TrainingService: getPredictions(career)
-    
+
     TrainingService->>Cache: Check prediction cache
     alt Cache Hit
         Cache-->>TrainingService: Cached predictions
     else Cache Miss
         TrainingService->>Database: Load career context
         Database-->>TrainingService: Career + Support Deck
-        
+
         par Calculate All Facilities
             TrainingService->>PredictionEngine: predictSpeed()
             TrainingService->>PredictionEngine: predictStamina()
@@ -112,16 +140,16 @@ sequenceDiagram
             TrainingService->>PredictionEngine: predictGuts()
             TrainingService->>PredictionEngine: predictWit()
         end
-        
+
         PredictionEngine->>SupportBonusCalculator: applyDeckBonuses()
         SupportBonusCalculator-->>PredictionEngine: Modified gains
         PredictionEngine->>PredictionEngine: calculateRisk()
         PredictionEngine->>PredictionEngine: calculateHints()
         PredictionEngine-->>TrainingService: Prediction results
-        
+
         TrainingService->>Cache: Store predictions (5min TTL)
     end
-    
+
     TrainingService->>TrainingService: Rank by recommendation score
     TrainingService-->>Controller: Ranked predictions array
     Controller-->>Livewire: JSON response
@@ -131,15 +159,15 @@ sequenceDiagram
 
 **Related Documents:**
 
-- PRD: [PRD-002](../prds/PRD-002_Training_Optimization.md)
-- SPEC: [SPEC-002](../specs/SPEC-002_Training_Optimization_Technical.md)
-- Flow: [FLOW-002](../flows/FLOW-002_Training_Optimization_System.md)
-- Tech Flow: [TECH-FLOW-002](../tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
-- Wireframe: [WF-004](../wireframes/WF-004_Training_Selection_Interface.md)
+- PRD: [PRD-002](../02-prds/PRD-002_Training_Optimization.md)
+- SPEC: [SPEC-002](../02-specs/SPEC-002_Training_Optimization_Technical.md)
+- Flow: [FLOW-002](../01-flows/FLOW-002_Training_Optimization_System.md)
+- Tech Flow: [TECH-FLOW-002](../01-tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
+- Wireframe: [WF-004](../01-wireframes/WF-004_Training_Selection_Interface.md)
 
 ### SD-003: Training Execution & State Update
 
-**Duration**: ~300ms  
+**Duration**: ~300ms
 **Transaction Scope**: Database writes + Event dispatch
 
 ```mermaid
@@ -151,31 +179,31 @@ sequenceDiagram
     participant StatService
     participant Database
     participant EventBus
-    participant WebSocket
+    participant ClientRefresh
 
     User->>Livewire: Execute Training
     Livewire->>Controller: POST /training/execute
     Controller->>Controller: Authorize user
     Controller->>TrainingService: executeTraining(career, facility)
-    
+
     TrainingService->>Database: BEGIN TRANSACTION
-    
+
     TrainingService->>StatService: calculateGains(career, facility)
     StatService-->>TrainingService: Stat deltas
-    
+
     TrainingService->>Database: UPDATE careers (stats, energy, mood, turn)
     TrainingService->>Database: INSERT training_sessions
     TrainingService->>Database: INSERT stat_progress
-    
+
     alt Skill Hints Received
         TrainingService->>Database: INSERT skill_hints
     end
-    
+
     TrainingService->>Database: COMMIT TRANSACTION
-    
+
     TrainingService->>EventBus: Dispatch TrainingCompleted
-    EventBus->>WebSocket: Broadcast character.{id}.updated
-    
+    EventBus->>ClientRefresh: Mark UI state stale / refreshable
+
     TrainingService-->>Controller: TrainingResult
     Controller-->>Livewire: 200 OK + updated state
     Livewire->>Livewire: Update reactive properties
@@ -185,7 +213,7 @@ sequenceDiagram
 **Related Documents:**
 
 - Sequence: [SEQ-002](SEQ-002_Training_Block_Resolution.md)
-- Wireframe: [WF-005](../wireframes/WF-005_Training_Result_Screen.md)
+- Wireframe: [WF-005](../01-wireframes/WF-005_Training_Result_Screen.md)
 
 ---
 
@@ -193,7 +221,7 @@ sequenceDiagram
 
 ### SD-004: Race Preparation & Analysis
 
-**Duration**: ~400ms  
+**Duration**: ~400ms
 **Complexity**: Multi-factor readiness calculation
 
 ```mermaid
@@ -201,50 +229,50 @@ sequenceDiagram
     participant User
     participant Livewire
     participant Controller
-    participant RaceService
+    participant RaceConditionService
     participant ReadinessCalculator
     participant StrategyEngine
     participant Database
 
     User->>Livewire: View Race Details
     Livewire->>Controller: GET /races/{id}/analyze
-    Controller->>RaceService: analyzeRace(race, career)
-    
-    RaceService->>Database: Load race requirements
-    RaceService->>Database: Load career stats
-    Database-->>RaceService: Race + Career data
-    
-    RaceService->>ReadinessCalculator: calculate(career, race)
-    
+    Controller->>RaceConditionService: analyzeRace(race, career)
+
+    RaceConditionService->>Database: Load race requirements
+    RaceConditionService->>Database: Load career stats
+    Database-->>RaceConditionService: Race + Career data
+
+    RaceConditionService->>ReadinessCalculator: calculate(career, race)
+
     par Readiness Factors
         ReadinessCalculator->>ReadinessCalculator: scoreStatFit()
         ReadinessCalculator->>ReadinessCalculator: scoreAptitudes()
         ReadinessCalculator->>ReadinessCalculator: scoreSkills()
         ReadinessCalculator->>ReadinessCalculator: scoreMoodCondition()
     end
-    
-    ReadinessCalculator-->>RaceService: Readiness score (0-100)
-    
-    RaceService->>StrategyEngine: recommendStrategy(career, race)
+
+    ReadinessCalculator-->>RaceConditionService: Readiness score (0-100)
+
+    RaceConditionService->>StrategyEngine: recommendStrategy(career, race)
     StrategyEngine->>StrategyEngine: Analyze running styles
     StrategyEngine->>StrategyEngine: Calculate win probability
-    StrategyEngine-->>RaceService: Strategy recommendation
-    
-    RaceService-->>Controller: Analysis result
+    StrategyEngine-->>RaceConditionService: Strategy recommendation
+
+    RaceConditionService-->>Controller: Analysis result
     Controller-->>Livewire: JSON response
     Livewire-->>User: Display analysis
 ```
 
 **Related Documents:**
 
-- PRD: [PRD-003](../prds/PRD-003_Race_Strategy.md)
-- SPEC: [SPEC-003](../specs/SPEC-003_Race_Strategy_Technical.md)
-- Flow: [FLOW-003](../flows/FLOW-003_Race_Strategy_System.md)
-- Wireframe: [WF-007](../wireframes/WF-007_Race_Preparation_Screen.md)
+- PRD: [PRD-003](../02-prds/PRD-003_Race_Strategy.md)
+- SPEC: [SPEC-003](../02-specs/SPEC-003_Race_Strategy_Technical.md)
+- Flow: [FLOW-003](../01-flows/FLOW-003_Race_Strategy_System.md)
+- Wireframe: [WF-007](../01-wireframes/WF-007_Race_Preparation_Screen.md)
 
 ### SD-005: Race Execution & Result Recording
 
-**Duration**: ~350ms  
+**Duration**: ~350ms
 **Sequential**: Result validation → Character update → Database writes
 
 ```mermaid
@@ -252,36 +280,36 @@ sequenceDiagram
     participant User
     participant Livewire
     participant Controller
-    participant RaceService
+    participant RaceConditionService
     participant CharacterStateService
     participant Database
     participant EventBus
 
     User->>Livewire: Submit Race Result
     Livewire->>Controller: POST /races/{id}/complete
-    Controller->>RaceService: recordResult(race, placement)
-    
-    RaceService->>RaceService: Validate placement
-    RaceService->>RaceService: Calculate rewards
-    
-    RaceService->>Database: BEGIN TRANSACTION
-    
-    RaceService->>Database: INSERT race_results
-    RaceService->>CharacterStateService: updateFromRace(character, rewards)
-    
+    Controller->>RaceConditionService: recordResult(race, placement)
+
+    RaceConditionService->>RaceConditionService: Validate placement
+    RaceConditionService->>RaceConditionService: Calculate rewards
+
+    RaceConditionService->>Database: BEGIN TRANSACTION
+
+    RaceConditionService->>Database: INSERT race_results
+    RaceConditionService->>CharacterStateService: updateFromRace(character, rewards)
+
     CharacterStateService->>Database: UPDATE characters (fans, grade)
     CharacterStateService->>Database: UPDATE careers (sp_earned)
-    
+
     alt Milestone Achieved
         CharacterStateService->>Database: INSERT achievements
     end
-    
-    RaceService->>Database: COMMIT TRANSACTION
-    
-    RaceService->>EventBus: Dispatch RaceCompleted
+
+    RaceConditionService->>Database: COMMIT TRANSACTION
+
+    RaceConditionService->>EventBus: Dispatch RaceCompleted
     EventBus->>EventBus: Notify achievement listeners
-    
-    RaceService-->>Controller: Result summary
+
+    RaceConditionService-->>Controller: Result summary
     Controller-->>Livewire: 200 OK + result data
     Livewire-->>User: Display race outcome
 ```text
@@ -296,7 +324,7 @@ sequenceDiagram
 
 ### SD-006: Skill Acquisition with Hint Calculation
 
-**Duration**: ~350ms  
+**Duration**: ~350ms
 **Key Logic**: Hint discount calculation + Evolution path check
 
 ```mermaid
@@ -311,52 +339,52 @@ sequenceDiagram
     User->>Livewire: Acquire Skill
     Livewire->>Controller: POST /skills/acquire
     Controller->>SkillService: acquireSkill(career, skill)
-    
+
     SkillService->>Database: Load skill details
     SkillService->>HintService: getHintCount(career, skill)
     HintService->>Database: COUNT skill_hints
     Database-->>HintService: hint_count
     HintService-->>SkillService: hint_count
-    
+
     SkillService->>SkillService: calculateFinalCost()
     Note over SkillService: base_cost × (1 - hint_discount)
     Note over SkillService: 5 levels: 10%/20%/30%/35%/40% max
-    
+
     SkillService->>SkillService: Validate SP budget
-    
+
     alt Sufficient SP
         SkillService->>Database: BEGIN TRANSACTION
         SkillService->>Database: INSERT skill_acquisitions
         SkillService->>Database: UPDATE careers (total_sp_available)
         SkillService->>Database: UPDATE skill_hints (is_used = true)
-        
+
         alt Has Evolution Path
             SkillService->>Database: Check evolution requirements
             alt Evolution Available
                 SkillService->>SkillService: Mark evolution_available
             end
         end
-        
+
         SkillService->>Database: COMMIT TRANSACTION
         SkillService-->>Controller: Acquisition success
     else Insufficient SP
         SkillService-->>Controller: 422 Insufficient SP
     end
-    
+
     Controller-->>Livewire: Response
     Livewire-->>User: Display result
 ```
 
 **Related Documents:**
 
-- PRD: [PRD-004](../prds/PRD-004_Skill_Management.md)
-- SPEC: [SPEC-004](../specs/SPEC-004_Skill_Management_Technical.md)
-- Flow: [FLOW-004](../flows/FLOW-004_Skill_Management_System.md)
-- Wireframe: [WF-008](../wireframes/WF-008_Skill_Shop_Interface.md)
+- PRD: [PRD-004](../02-prds/PRD-004_Skill_Management.md)
+- SPEC: [SPEC-004](../02-specs/SPEC-004_Skill_Management_Technical.md)
+- Flow: [FLOW-004](../01-flows/FLOW-004_Skill_Management_System.md)
+- Wireframe: [WF-008](../01-wireframes/WF-008_Skill_Shop_Interface.md)
 
 ### SD-007: Skill Evolution Process
 
-**Duration**: ~250ms  
+**Duration**: ~250ms
 **Operation**: Atomic skill replacement
 
 ```mermaid
@@ -370,23 +398,23 @@ sequenceDiagram
     User->>Livewire: Evolve Skill
     Livewire->>Controller: POST /skills/{id}/evolve
     Controller->>SkillService: evolveSkill(acquisition)
-    
+
     SkillService->>Database: Load skill + evolution target
     SkillService->>SkillService: Validate evolution requirements
-    
+
     alt Requirements Met
         SkillService->>Database: BEGIN TRANSACTION
-        
+
         SkillService->>Database: UPDATE skill_acquisitions
         Note over SkillService,Database: Set skill_id to evolved_skill_id
         Note over SkillService,Database: Set is_evolution = true
-        
+
         SkillService->>Database: COMMIT TRANSACTION
         SkillService-->>Controller: Evolution success
     else Requirements Not Met
         SkillService-->>Controller: 422 Requirements not met
     end
-    
+
     Controller-->>Livewire: Response
     Livewire-->>User: Display evolution result
 ```text
@@ -401,7 +429,7 @@ sequenceDiagram
 
 ### SD-008: Support Deck Validation & Composition
 
-**Duration**: ~200ms  
+**Duration**: ~200ms
 **Validation**: 6-card constraint + Type balance
 
 ```mermaid
@@ -416,18 +444,18 @@ sequenceDiagram
     User->>Livewire: Update Deck
     Livewire->>Controller: POST /support-decks/validate
     Controller->>DeckService: validateDeck(cards)
-    
+
     DeckService->>ValidationService: validate(cards)
-    
+
     par Validation Rules
         ValidationService->>ValidationService: checkCardCount() [Exactly 6]
         ValidationService->>ValidationService: checkOwnership() [5 owned + 1 borrowed]
         ValidationService->>ValidationService: checkDuplicates() [No duplicates]
         ValidationService->>ValidationService: checkTypeBalance()
     end
-    
+
     ValidationService-->>DeckService: Validation result
-    
+
     alt Validation Passed
         DeckService->>DeckService: Calculate synergy score
         DeckService->>Database: UPSERT support_decks
@@ -435,29 +463,29 @@ sequenceDiagram
     else Validation Failed
         DeckService-->>Controller: 422 Validation errors
     end
-    
+
     Controller-->>Livewire: Response
     Livewire-->>User: Display validation result
 ```
 
 **Related Documents:**
 
-- PRD: [PRD-005](../prds/PRD-005_Support_Card_Management.md)
-- SPEC: [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md)
-- Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
-- Wireframe: [WF-011](../wireframes/WF-011_Support_Deck_Builder.md)
+- PRD: [PRD-005](../02-prds/PRD-005_Support_Card_Management.md)
+- SPEC: [SPEC-005](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](../01-flows/FLOW-005_Support_Card_Management_System.md)
+- Wireframe: [WF-011](../01-wireframes/WF-011_Support_Deck_Builder.md)
 
 ### SD-016.5: Support Deck Configuration (NEW)
 
-**Duration**: ~100ms (card assignment) | ~200ms (full synergy calculation)  
+**Duration**: ~100ms (card assignment) | ~200ms (full synergy calculation)
 **Scope**: Deck creation, card slot management, synergy optimization
 
 **Related Documents:**
 
 - Sequence File: [SEQ-016](SEQ-016_Support_Deck_Configuration.md)
-- SPEC: [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md)
-- Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
-- User Flow: [UF-006](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+- SPEC: [SPEC-005](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](../01-flows/FLOW-005_Support_Card_Management_System.md)
+- User Flow: [UF-006](../01-user-flows/UF-006_Support_Deck_Building_Flow.md)
 
 **Key Features:**
 
@@ -467,13 +495,31 @@ sequenceDiagram
 - Deck activation for training integration
 - External card metadata synchronization
 
+### SD-017: Storage Mode Transition
+
+**Duration**: Validation depends on payload size | conversion is per-item transactional
+**Scope**: Local payload validation, duplicate handling, account conversion, optional local cleanup
+
+**Related Documents:**
+
+- Sequence File: [SEQ-017](SEQ-017_Storage_Mode_Transition.md)
+- Flow: [FLOW-009](../01-flows/FLOW-009_Storage_Migration_System.md)
+- Sequence File: [SEQ-001](SEQ-001_Character_Creation_Sequence.md)
+
+**Key Features:**
+
+- `StorageMode` resolution via middleware and session
+- UUID-oriented local payload validation
+- Batch local-to-account conversion through `LocalStorageService`
+- Duplicate detection and partial-success reporting
+
 ---
 
 ## AI Advisory Sequences
 
 ### SD-009: Hybrid AI Recommendation Flow
 
-**Duration**: ~2.5s (with Ollama) | ~4s (with Bedrock fallback)  
+**Duration**: ~2.5s (with Ollama) | ~4s (with Bedrock fallback)
 **Complexity Routing**: Simple → Ollama | Complex → Bedrock
 
 ```mermaid
@@ -491,13 +537,13 @@ sequenceDiagram
     User->>Livewire: Request Training Advice
     Livewire->>Controller: POST /ai/advice
     Controller->>AdviceService: getAdvice(career, topic)
-    
+
     AdviceService->>Database: Load career context
     Database-->>AdviceService: Career + Stats + Goals
-    
+
     AdviceService->>AIRouter: selectProvider(topic, complexity)
     AIRouter->>AIRouter: Analyze complexity
-    
+
     alt Simple Query & Ollama Available
         AIRouter-->>AdviceService: Use Ollama
         AdviceService->>OllamaService: generate(prompt)
@@ -512,10 +558,10 @@ sequenceDiagram
         AdviceService->>CostTracker: record(tokens, cost)
         CostTracker->>Database: INSERT ai_usage_logs
     end
-    
+
     AdviceService->>AdviceService: Format response
     AdviceService->>Database: INSERT ai_conversations
-    
+
     AdviceService-->>Controller: Advice object
     Controller-->>Livewire: JSON response
     Livewire-->>User: Display recommendation
@@ -523,15 +569,15 @@ sequenceDiagram
 
 **Related Documents:**
 
-- PRD: [PRD-006](../prds/PRD-006_AI_Advisory.md)
-- SPEC: [SPEC-006](../specs/SPEC-006_AI_Advisory_Technical.md)
-- Flow: [FLOW-006](../flows/FLOW-006_AI_Advisory_System.md)
-- Tech Flow: [TECH-FLOW-006](../tech-flow/TECH-FLOW-006_AI_Advisory_Flow.md)
-- Wireframe: [WF-012](../wireframes/WF-012_AI_Advisor_Interface.md)
+- PRD: [PRD-006](../02-prds/PRD-006_AI_Advisory.md)
+- SPEC: [SPEC-006](../02-specs/SPEC-006_AI_Advisory_Technical.md)
+- Flow: [FLOW-006](../01-flows/FLOW-006_AI_Advisory_System.md)
+- Tech Flow: [TECH-FLOW-006](../01-tech-flow/TECH-FLOW-006_AI_Advisory_Flow.md)
+- Wireframe: [WF-012](../01-wireframes/WF-012_AI_Advisor_Interface.md)
 
 ### SD-010: MCP Tool Execution
 
-**Duration**: ~500ms  
+**Duration**: ~500ms
 **MCP Integration**: Server lifecycle + Tool routing
 
 ```mermaid
@@ -545,24 +591,24 @@ sequenceDiagram
 
     NeuronAgent->>MCPOrchestrator: Execute tool request
     MCPOrchestrator->>MCPClient: route(tool_name, params)
-    
+
     MCPClient->>MCPClient: Validate tool permissions
     MCPClient->>MCPServer: Connect to server
-    
+
     alt Server Available
         MCPServer->>MCPServer: Execute tool
         MCPServer-->>MCPClient: Tool result
-        
+
         MCPClient->>MCPMonitoring: Log tool usage
         MCPMonitoring->>Database: INSERT mcp_tool_usage
-        
+
         MCPClient-->>MCPOrchestrator: Success response
     else Server Unavailable
         MCPClient->>MCPClient: Apply fallback logic
         MCPClient->>MCPMonitoring: Log error
         MCPClient-->>MCPOrchestrator: Fallback response
     end
-    
+
     MCPOrchestrator-->>NeuronAgent: Processed result
 ```
 
@@ -577,7 +623,7 @@ sequenceDiagram
 
 ### SD-011: External API Sync with Circuit Breaker
 
-**Duration**: ~300ms (success) | ~100ms (cached fallback)  
+**Duration**: ~300ms (success) | ~100ms (cached fallback)
 **Resilience**: Circuit breaker pattern + Cache fallback
 
 ```mermaid
@@ -592,10 +638,10 @@ sequenceDiagram
 
     Scheduler->>ExternalDataService: Trigger sync job
     ExternalDataService->>CircuitBreaker: checkState()
-    
+
     alt Circuit CLOSED (Normal)
         CircuitBreaker->>PrimaryAPI: Fetch game data
-        
+
         alt Success
             PrimaryAPI-->>CircuitBreaker: 200 OK + data
             CircuitBreaker->>CircuitBreaker: Reset failure count
@@ -605,7 +651,7 @@ sequenceDiagram
         else Failure
             PrimaryAPI-->>CircuitBreaker: Timeout/Error
             CircuitBreaker->>CircuitBreaker: Increment failure count
-            
+
             alt Threshold Exceeded
                 CircuitBreaker->>CircuitBreaker: OPEN circuit
                 CircuitBreaker->>Cache: Return cached data
@@ -615,7 +661,7 @@ sequenceDiagram
                 CircuitBreaker->>Cache: Update cache
             end
         end
-        
+
     else Circuit OPEN (Failure state)
         CircuitBreaker->>Cache: Return cached data
         Note over CircuitBreaker: Background: Schedule recovery check
@@ -627,27 +673,27 @@ sequenceDiagram
             CircuitBreaker->>CircuitBreaker: Keep OPEN
         end
     end
-    
+
     ExternalDataService-->>Scheduler: Sync complete
 ```text
 
 **Related Documents:**
 
-- PRD: [PRD-007](../prds/PRD-007_External_Integration.md)
-- SPEC: [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
-- Flow: [FLOW-007](../flows/FLOW-007_External_Integration_System.md)
-- Tech Flow: [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
+- PRD: [PRD-007](../02-prds/PRD-007_External_Integration.md)
+- SPEC: [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md)
+- Flow: [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md)
+- Tech Flow: [TECH-FLOW-007](../01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
 
 ### SD-012: OCR Screenshot Processing
 
-**Duration**: ~3s (preprocessing + extraction + validation)  
+**Duration**: ~3s (preprocessing + extraction + validation)
 **Pipeline**: Upload → Preprocess → OCR → Parse → Validate
 
 ```mermaid
 sequenceDiagram
     participant User
     participant Controller
-    participant OCRService
+    participant TesseractService
     participant ImagePreprocessor
     participant TesseractEngine
     participant DataParser
@@ -655,48 +701,48 @@ sequenceDiagram
     participant Database
 
     User->>Controller: Upload screenshot
-    Controller->>OCRService: processScreenshot(file)
-    
-    OCRService->>ImagePreprocessor: prepare(file)
+    Controller->>TesseractService: processScreenshot(file)
+
+    TesseractService->>ImagePreprocessor: prepare(file)
     ImagePreprocessor->>ImagePreprocessor: Validate MIME type
     ImagePreprocessor->>ImagePreprocessor: Resize (max 2000px)
     ImagePreprocessor->>ImagePreprocessor: Convert to grayscale
     ImagePreprocessor->>ImagePreprocessor: Apply threshold
-    ImagePreprocessor-->>OCRService: Preprocessed image
-    
-    OCRService->>OCRService: Detect regions of interest
-    
-    OCRService->>TesseractEngine: extractText(regions)
+    ImagePreprocessor-->>TesseractService: Preprocessed image
+
+    TesseractService->>TesseractService: Detect regions of interest
+
+    TesseractService->>TesseractEngine: extractText(regions)
     TesseractEngine->>TesseractEngine: OCR processing
-    TesseractEngine-->>OCRService: Raw text + confidence
-    
-    OCRService->>DataParser: parse(text)
+    TesseractEngine-->>TesseractService: Raw text + confidence
+
+    TesseractService->>DataParser: parse(text)
     DataParser->>DataParser: Pattern matching
     DataParser->>DataParser: Field extraction
-    DataParser-->>OCRService: Structured data
-    
-    OCRService->>ValidationService: validate(data)
+    DataParser-->>TesseractService: Structured data
+
+    TesseractService->>ValidationService: validate(data)
     ValidationService->>ValidationService: Validate stat ranges
     ValidationService->>ValidationService: Check confidence scores
-    ValidationService-->>OCRService: Validation result
-    
+    ValidationService-->>TesseractService: Validation result
+
     alt High Confidence (>85%)
-        OCRService->>Database: Store extraction
-        OCRService-->>Controller: Auto-import ready
+        TesseractService->>Database: Store extraction
+        TesseractService-->>Controller: Auto-import ready
     else Medium Confidence (70-85%)
-        OCRService->>Database: Store extraction
-        OCRService-->>Controller: Review required
+        TesseractService->>Database: Store extraction
+        TesseractService-->>Controller: Review required
     else Low Confidence (<70%)
-        OCRService-->>Controller: Manual entry recommended
+        TesseractService-->>Controller: Manual entry recommended
     end
-    
+
     Controller-->>User: OCR result + preview
 ```
 
 **Related Documents:**
 
 - Sequence: [SEQ-007](SEQ-007_External_Data_Sync.md)
-- User Flow: [UF-008](../user-flows/UF-008_OCR_and_Data_Import_Flow.md)
+- User Flow: [UF-008](../01-user-flows/UF-008_OCR_and_Data_Import_Flow.md)
 
 ---
 
@@ -704,7 +750,7 @@ sequenceDiagram
 
 ### SD-013: Data Import with Conflict Resolution
 
-**Duration**: ~2s for 50 records  
+**Duration**: ~2s for 50 records
 **Conflict Handling**: Skip | Overwrite | Merge | Rename
 
 ```mermaid
@@ -719,56 +765,56 @@ sequenceDiagram
 
     User->>Controller: Upload import file
     Controller->>ImportService: import(file, options)
-    
+
     ImportService->>FormatDetector: detect(file)
     FormatDetector-->>ImportService: Format (JSON/CSV/Excel)
-    
+
     ImportService->>ImportService: Parse file
     ImportService->>Validator: validate(records)
-    
+
     par Validation
         Validator->>Validator: Schema validation
         Validator->>Validator: Business rules
         Validator->>Validator: Data integrity
     end
-    
+
     Validator-->>ImportService: Validation result
-    
+
     alt Validation Errors & Stop on Error
         ImportService-->>Controller: 422 Validation errors
     else Validation Passed or Skip Errors
         ImportService->>ConflictResolver: findDuplicates(records)
         ConflictResolver->>Database: Check existing records
         Database-->>ConflictResolver: Duplicates found
-        
+
         ConflictResolver->>ConflictResolver: Apply resolution strategy
         Note over ConflictResolver: Strategy: Skip/Overwrite/Merge/Rename
-        
+
         ConflictResolver-->>ImportService: Resolved records
-        
+
         ImportService->>Database: BEGIN TRANSACTION
-        
+
         loop For each record
             ImportService->>Database: INSERT/UPDATE record
         end
-        
+
         ImportService->>Database: COMMIT TRANSACTION
-        
+
         ImportService->>Database: INSERT import_history
         ImportService-->>Controller: Import result
     end
-    
+
     Controller-->>User: Success count + warnings
 ```text
 
 **Related Documents:**
 
-- DMP: [005_DMP](../005_DMP_Data_Migration_Plan.md)
-- Tech Flow: [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
+- DMP: [005_DMP](../00-core-docs/005_DMP_Data_Migration_Plan.md)
+- Tech Flow: [TECH-FLOW-007](../01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
 
 ### SD-014: Data Export Generation
 
-**Duration**: ~5s for 1000 records (Excel) | ~1s (JSON)  
+**Duration**: ~5s for 1000 records (Excel) | ~1s (JSON)
 **Format Support**: JSON | Excel | CSV
 
 ```mermaid
@@ -782,18 +828,18 @@ sequenceDiagram
 
     User->>Controller: Request export
     Controller->>ExportService: export(options)
-    
+
     ExportService->>QueryBuilder: buildQuery(options)
     QueryBuilder->>QueryBuilder: Apply filters
     QueryBuilder->>QueryBuilder: Apply eager loading
     QueryBuilder->>QueryBuilder: Paginate if needed
     QueryBuilder-->>ExportService: Query
-    
+
     ExportService->>QueryBuilder: Execute query
     QueryBuilder-->>ExportService: Data collection
-    
+
     ExportService->>FormatAdapter: transform(data, format)
-    
+
     alt JSON Export
         FormatAdapter->>FormatAdapter: Add schema version
         FormatAdapter->>FormatAdapter: Format relationships
@@ -808,21 +854,21 @@ sequenceDiagram
         FormatAdapter->>FormatAdapter: Escape delimiters
         FormatAdapter-->>ExportService: CSV string
     end
-    
+
     ExportService->>FileStorage: Store file
     FileStorage-->>ExportService: File path
-    
+
     ExportService-->>Controller: Download URL
     Controller-->>User: Download file
 ```
 
 **Related Documents:**
 
-- DMP: [005_DMP](../005_DMP_Data_Migration_Plan.md)
+- DMP: [005_DMP](../00-core-docs/005_DMP_Data_Migration_Plan.md)
 
 ### SD-015: Backup and Restore
 
-**Duration**: ~10s (backup) | ~15s (restore)  
+**Duration**: ~10s (backup) | ~15s (restore)
 **Scope**: Full database backup with metadata
 
 ```mermaid
@@ -838,34 +884,34 @@ sequenceDiagram
         Note over User,Compression: BACKUP FLOW
         User->>Controller: Create backup
         Controller->>BackupService: createBackup()
-        
+
         BackupService->>Database: Export all tables
         Database-->>BackupService: SQL dump
-        
+
         BackupService->>BackupService: Add metadata
         Note over BackupService: Version, timestamp, schema
-        
+
         BackupService->>Compression: Compress data
         Compression-->>BackupService: .zip file
-        
+
         BackupService->>FileStorage: Store backup
         FileStorage-->>BackupService: Backup ID
-        
+
         BackupService-->>Controller: Backup created
         Controller-->>User: Download backup
     end
-    
+
     rect rgb(240, 220, 200)
         Note over User,Compression: RESTORE FLOW
         User->>Controller: Upload backup
         Controller->>BackupService: restoreBackup(file)
-        
+
         BackupService->>Compression: Decompress file
         Compression-->>BackupService: Backup data
-        
+
         BackupService->>BackupService: Validate backup
         Note over BackupService: Check version compatibility
-        
+
         alt Compatible Version
             BackupService->>Database: BEGIN TRANSACTION
             BackupService->>Database: TRUNCATE tables
@@ -875,7 +921,7 @@ sequenceDiagram
         else Incompatible Version
             BackupService-->>Controller: 422 Version mismatch
         end
-        
+
         Controller-->>User: Restore result
     end
 ```text
@@ -888,47 +934,45 @@ sequenceDiagram
 
 ## System Operations Sequences
 
-### SD-016: WebSocket Real-time Updates
+### SD-016: Background Status Updates
 
-**Duration**: <100ms per connection  
-**Protocol**: Laravel Reverb WebSocket
+**Duration**: Request/queue dependent
+**Protocol**: HTTP + queue-backed status refresh
 
 ```mermaid
 sequenceDiagram
     participant Client1
     participant Client2
-    participant WebSocketServer as Laravel Reverb
+    participant StatusStore as Cache / Queue State
     participant EventDispatcher
     participant CharacterStateService
     participant Database
 
-    Client1->>WebSocketServer: Connect & Subscribe
-    Note over Client1,WebSocketServer: Channel: character.{id}
-    Client2->>WebSocketServer: Connect & Subscribe
-    Note over Client2,WebSocketServer: Channel: character.{id}
-    
+    Client1->>StatusStore: Poll character status
+    Client2->>StatusStore: Poll character status
+
     CharacterStateService->>Database: UPDATE character stats
     Database-->>CharacterStateService: Success
-    
+
     CharacterStateService->>EventDispatcher: Dispatch CharacterUpdated
-    EventDispatcher->>WebSocketServer: Broadcast event
-    
-    par Broadcast to All Subscribers
-        WebSocketServer->>Client1: character.updated event
-        WebSocketServer->>Client2: character.updated event
+    EventDispatcher->>StatusStore: Persist refreshed status
+
+    par Next UI refresh cycle
+        StatusStore->>Client1: Updated character state
+        StatusStore->>Client2: Updated character state
     end
-    
+
     Client1->>Client1: Update UI (Alpine.js)
     Client2->>Client2: Update UI (Alpine.js)
 ```
 
 **Related Documents:**
 
-- SPEC: [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
+- SPEC: [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md)
 
 ### SD-017: Cache Management
 
-**Duration**: ~50ms (hit) | ~200ms (miss)  
+**Duration**: ~50ms (hit) | ~200ms (miss)
 **Cache Layer**: Redis with TTL management
 
 ```mermaid
@@ -940,7 +984,7 @@ sequenceDiagram
 
     Service->>CacheManager: get(key)
     CacheManager->>Redis: GET key
-    
+
     alt Cache Hit
         Redis-->>CacheManager: Cached value
         CacheManager-->>Service: Return value
@@ -951,7 +995,7 @@ sequenceDiagram
         CacheManager->>Redis: SET key value EX ttl
         CacheManager-->>Service: Return value
     end
-    
+
     Note over Service: Later: Data updated
     Service->>CacheManager: invalidate(key)
     CacheManager->>Redis: DEL key
@@ -961,13 +1005,13 @@ sequenceDiagram
 
 **Related Documents:**
 
-- SDS: [004_SDS](../004_SDS_Software_Design_Specifications.md)
+- SDS: [004_SDS](../00-core-docs/004_SDS_Software_Design_Specifications.md)
 
 ---
 
 ## Summary
 
-**Total Sequences**: 17 critical flows  
+**Total Sequences**: 17 critical flows
 **Coverage Areas**:
 
 - **Character Management**: SD-001
@@ -983,7 +1027,7 @@ sequenceDiagram
 **Key Architecture Patterns**:
 
 1. **Service Layer Orchestration**: Controllers delegate to services for business logic
-2. **Event-Driven Updates**: Database changes trigger events for WebSocket broadcasts
+2. **Event-Driven Updates**: Database changes trigger events, queued follow-up work, and polling-visible refresh states
 3. **Caching Strategy**: Multi-layer caching (Redis) with TTL management
 4. **Transaction Management**: ACID compliance for critical operations
 5. **Hybrid AI Routing**: Complexity-based provider selection (Ollama vs Bedrock)
@@ -1010,12 +1054,12 @@ sequenceDiagram
 
 ## Related Documentation
 
-- **Technical Flows**: [TECH-FLOW Index](../tech-flow/000_TECH_FLOW_INDEX.md)
-- **System Flows**: [FLOW Index](../flows/000_FLOWS_INDEX.md)
-- **Technical Specs**: [SPEC Index](../specs/000_SPECS_INDEX.md)
-- **User Flows**: [UF Index](../user-flows/000_USER_FLOW_DIAGRAMS_INDEX.md)
-- **Database Documentation**: [DBD - 009](../009_DBD_Database_Documentation.md)
-- **Integration Plan**: [SIP - 007](../007_SIP_Software_Integration_Plan.md)
+- **Technical Flows**: [TECH-FLOW Index](../01-tech-flow/000_TECH_FLOW_INDEX.md)
+- **System Flows**: [FLOW Index](../01-flows/000_FLOWS_INDEX.md)
+- **Technical Specs**: [SPEC Index](../02-specs/000_SPECS_INDEX.md)
+- **User Flows**: [UF Index](../01-user-flows/000_USER_FLOW_DIAGRAMS_INDEX.md)
+- **Database Documentation**: [DBD - 009](../00-core-docs/009_DBD_Database_Documentation.md)
+- **Integration Plan**: [SIP - 007](../00-core-docs/007_SIP_Software_Integration_Plan.md)
 
 ---
 
@@ -1028,4 +1072,5 @@ sequenceDiagram
 
 ---
 
-*This index reflects the production sequence diagrams for Umamusume Career Planner v2.0.0. All sequences are validated against the current Laravel 12 implementation.*
+*This index reflects the production sequence diagrams for Umamusume Career Planner v2.0.0. All
+sequences are validated against the current Laravel 12 implementation.*

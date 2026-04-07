@@ -5,15 +5,15 @@
 ```text
 Line 30: <div class="space-y-6" x-data="deckBuilder(@js($deckData), {{ $character->id }})" x-init="...">
     ↓ ALPINE COMPONENT STARTS HERE
-    
+
     Line 103: <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         ↓ GRID CONTAINER STARTS
-        
+
         Line 105: <div class="lg:col-span-2 space-y-4">
             ↓ LEFT COLUMN (Deck Slots & Statistics)
         Line ~347: </div>
         ↑ LEFT COLUMN ENDS
-        
+
         Line 370: <aside aria-labelledby="library-heading" class="space-y-4">
             ↓ RIGHT COLUMN (Card Library)
             - Uses x-model="searchQuery" (line 381)
@@ -21,7 +21,7 @@ Line 30: <div class="space-y-6" x-data="deckBuilder(@js($deckData), {{ $characte
             - Uses x-model="filterTier" (line 395)
         Line 449: </aside>
         ↑ RIGHT COLUMN ENDS
-        
+
         Line 450: <!-- Edit Card Details Modal (Inside Alpine Component) -->
         Line 451: <div x-show="showEditModal" ...>
             ↓ EDIT MODAL
@@ -33,10 +33,10 @@ Line 30: <div class="space-y-6" x-data="deckBuilder(@js($deckData), {{ $characte
             - Uses saveEditModal()
         Line 539: </div>
         ↑ EDIT MODAL ENDS
-        
+
     Line 540: </div><!-- End grid -->
     ↑ GRID CONTAINER ENDS
-    
+
 Line 541: </div><!-- End Alpine component -->
 ↑ ALPINE COMPONENT ENDS
 

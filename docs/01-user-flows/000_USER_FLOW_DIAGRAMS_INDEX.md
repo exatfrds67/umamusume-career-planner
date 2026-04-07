@@ -1,318 +1,115 @@
-# USER FLOW DIAGRAMS: Complete Journey Maps
+# USER FLOW DIAGRAMS: Journey Map Index
 
-**Document Version**: 2.2.0 | **Date**: January 28, 2026 | **Status**: Current - Aligned with v2.2.0 and game-accurate mechanics
+**Document Version**: 2.3.0
+**Date**: March 8, 2026
+**Project**: UmamusumeCareerPlanner
+**Status**: Needs continued alignment review for storage-mode support, current navigation surfaces,
+and reporting/export journey coverage. Core user-journey coverage exists, but some flows still
+reflect earlier account-centric assumptions.
+
+---
 
 ## Overview
 
-User flow diagrams document the complete journeys users take through the system. These maps show decision points, alternate paths, error recovery, and system states at each stage.
+User flow documents describe the user-facing journeys through the application: onboarding, run
+setup, day-to-day actions, advisory usage, deck building, import workflows, and storage transition.
+They should reflect the current storage-aware architecture and distinguish clearly between:
 
-**Changes in v2.2.0**:
+- browser-local actions in `StorageMode::LOCAL`
+- authenticated persisted actions in `StorageMode::ACCOUNT`
+- conceptual UI labels versus currently registered routes or entry points
 
-- Added Performance Monitoring dashboard flow
-- Added Support Deck Configuration flow
-- Enhanced external sync tracking
-
-**Changes in v2.0.0**:
-
-- Added Storage Mode selection (Local vs Account)
-- Separated Career Setup and Training Loop flows
-- Added AI Advisory flow with hybrid routing
-- Added OCR and Data Import flows
-- Integration of Neuron AI agents and MCP tools
+Where a user flow mixes conceptual UX language with implementation references, the navigation path
+should be treated as conceptual unless the document explicitly names a current route or screen entry
+surface.
 
 ---
 
-## UF-001: New Player Onboarding Flow
+## Document Index
 
-```text
+### UF-001: Onboarding Flow
 
-START: Launch App
-    │
-    ├─ [First Time?]
-    │   └─ NO → [Dashboard]
-    │
-    └─ YES
-        │
-        ├─ Welcome Screen
-        │   ├─ Tutorial Toggle
-        │   └─ [Get Started]
-        │
-        ├─ Storage Mode Selection
-        │   ├─ [Local Mode] (No Login, Offline capable)
-        │   │   └─ Initialize Local Storage
-        │   └─ [Account Mode] (Cloud Sync, Cross-device)
-        │       └─ Login / Register Flow
-        │
-        ├─ Initial Setup
-        │   ├─ [Set User Name]
-        │   ├─ [Select Avatar]
-        │   └─ [Preferences: Dark/Light, Language]
-        │
-        └─ Onboarding Complete
-            ├─ [Trigger Dashboard Tutorial]
-            └─ [→ Dashboard]
+**Status**: Refined for navigation-surface clarity and more precise Local-to-Account wording
 
-```
+- File: [UF-001_Onboarding_Flow.md](UF-001_Onboarding_Flow.md)
 
-**Decision Points**: 3 (Tutorial, Storage Mode, Account Creation)  
-**Success Metric**: User lands on dashboard with preferred storage mode active
+### UF-002: Career Setup Flow
 
----
+**Status**: Refined for clearer local versus account persistence semantics and recovery wording
 
-## UF-002: Career Setup Flow
+- File: [UF-002_Career_Setup_Flow.md](UF-002_Career_Setup_Flow.md)
 
-```text
+### UF-003: Training Day Flow
 
-START: Create New Run
-    │
-    ├─ [Select Trainee]
-    │   ├─ Filter by Rarity/Distance
-    │   └─ [Select Character]
-    │
-    ├─ [Select Scenario]
-    │   └─ URA Finals / Unity Cup / Grand Masters
-    │
-    ├─ [Inheritance Configuration]
-    │   ├─ Select Parent A
-    │   ├─ Select Parent B
-    │   └─ [Preview Factor Bonuses] (Stats + Skills)
-    │
-    ├─ [Support Deck Build]
-    │   ├─ Select 6 cards
-    │   │   ├─ 5 Owned
-    │   │   └─ 1 Borrowed (Friend Slot)
-    │   └─ [Validate Deck] (Check Type balance)
-    │
-    └─ [Confirm & Start]
-        ├─ Initialize Run State (Day 1)
-        └─ [→ Training Screen]
+**Status**: Updated for storage-aware execution boundaries, degraded advisory behavior, and no-run handling
 
-```
+- File: [UF-003_Training_Day_Flow.md](UF-003_Training_Day_Flow.md)
 
-**Decision Points**: 4 (Trainee, Scenario, Parents, Deck)  
-**Dependencies**: Character roster, Support Card inventory
+### UF-004: Race Day Flow
+
+**Status**: Updated for storage-aware race planning versus account-backed race execution and reporting
+
+- File: [UF-004_Race_Day_Flow.md](UF-004_Race_Day_Flow.md)
+
+### UF-005: Skill Management Flow
+
+**Status**: Refined for storage-aware planning versus acquisition semantics and empty-state handling
+
+- File: [UF-005_Skill_Management_Flow.md](UF-005_Skill_Management_Flow.md)
+
+### UF-006: Support Deck Building Flow
+
+**Status**: Updated for local draft versus authenticated deck persistence and empty-state handling
+
+- File: [UF-006_Support_Deck_Building_Flow.md](UF-006_Support_Deck_Building_Flow.md)
+
+### UF-007: AI Advisor Journey
+
+**Status**: Updated for config-driven providers, chat versus advisory surfaces, and storage-aware advisory payloads
+
+- File: [UF-007_AI_Advisor_Journey.md](UF-007_AI_Advisor_Journey.md)
+
+### UF-008: OCR and Data Import Flow
+
+**Status**: Updated for storage-aware ingestion, review-only outcomes, and partial-save handling
+
+- File: [UF-008_OCR_and_Data_Import_Flow.md](UF-008_OCR_and_Data_Import_Flow.md)
+
+### UF-009: Storage Mode Transition Flow
+
+**Status**: Added to cover local-to-account validation, duplicate handling, and cleanup choice
+
+- File: [UF-009_Storage_Mode_Transition_Flow.md](UF-009_Storage_Mode_Transition_Flow.md)
+
+### UF-010: Career Reporting and Export Flow
+
+**Status**: Added to document account-backed reporting, comparisons, and exports without implying local-mode parity
+
+- File: [UF-010_Career_Reporting_and_Export_Flow.md](UF-010_Career_Reporting_and_Export_Flow.md)
+
+### UF-011: Target Race Planning Flow
+
+**Status**: Added to separate target planning from race entry and reporting
+
+- File: [UF-011_Target_Race_Planning_Flow.md](UF-011_Target_Race_Planning_Flow.md)
 
 ---
 
-## UF-003: Training Day Flow
+## Cross-Cutting Guidance
 
-```text
-
-START: Turn Start
-    │
-    ├─ [View Status]
-    │   ├─ Current Turn / Total Turns
-    │   ├─ Energy / Mood
-    │   └─ Active Conditions
-    │
-    ├─ [Check Training Options]
-    │   ├─ Request AI Predictions
-    │   │   ├─ Speed | Stamina | Power | Guts | Wisdom
-    │   │   └─ [Display Gains + Failure Risk]
-    │   │
-    │   └─ Check for Support Events / Hints
-    │
-    ├─ [Select Action]
-    │   ├─ Train → [Execute Training]
-    │   ├─ Rest → [Restore Energy]
-    │   ├─ Race → [Go to Race Prep] (See UF-004)
-    │   └─ Skill Shop → [Go to Skills] (See UF-005)
-    │
-    ├─ [Action Execution]
-    │   ├─ Update Stats
-    │   ├─ Process Events (Support/Scenario)
-    │   └─ Update Mood/Condition
-    │
-    └─ [Turn End]
-        └─ Advance to Next Turn
-
-```
-
-**Loops**: Repeats 78 times per career  
-**AI Integration**: Training Prediction Engine (Neuron)
+- Every user flow should state whether an action is browser-local, authenticated and persisted, or advisory-only.
+- Replace vague references to "all users with active career runs" with storage-aware wording that
+distinguishes browser-local runs from authenticated persisted runs.
+- Add a navigation-surface note when a document uses conceptual UI labels such as dashboard, shop,
+wizard, or advisor interface.
+- Offline behavior should be described per action. Local planning can remain available offline,
+while account-backed saves, exports, and server-side mutations require connectivity.
+- When a new user flow is added or materially rewritten, update this index in the same change set.
 
 ---
 
-## UF-004: Race Day Flow
+## Current Review Focus
 
-```text
-
-START: Race Week
-    │
-    ├─ [Analyze Race]
-    │   ├─ Distance / Surface / Grade
-    │   ├─ Opponent Strength
-    │   └─ Win Probability Calculation
-    │
-    ├─ [Preparation Phase]
-    │   ├─ Check Readiness
-    │   │   └─ Stats vs Requirements
-    │   ├─ [AI Strategy Advice]
-    │   │   └─ Recommended Running Style (Nige/Senkou/Sashi/Oikomi)
-    │   └─ Skill Check
-    │       └─ Purchase recommended skills?
-    │
-    ├─ [Race Execution]
-    │   ├─ [Start Race]
-    │   ├─ Simulation / Animation
-    │   └─ [Display Results]
-    │
-    └─ [Post-Race]
-        ├─ Award Stats / SP / Fans
-        ├─ Update Career History
-        └─ [→ Resume Training Loop]
-
-```
-
-**Decision Points**: Strategy selection, Skill acquisition  
-**Key Metric**: Win Probability %
-
----
-
-## UF-005: Skill Management Flow
-
-```text
-
-START: Skill Shop
-    │
-    ├─ [View Catalog]
-    │   ├─ Filter: Acquired / Available / Hints
-    │   └─ Sort: SP Cost / Priority
-    │
-    ├─ [Select Skill]
-    │   ├─ Check Requirements (Pt cost, Prerequisites)
-    │   ├─ Check Hint Level (Discount 0-40%, 5 levels)
-    │   └─ Check Evolution Status (Normal → Rare)
-    │
-    ├─ [AI Recommendation]
-    │   └─ "High Priority for upcoming Long Distance race"
-    │
-    ├─ [Acquire Action]
-    │   ├─ Deduct SP
-    │   ├─ Add to Active Skills
-    │   └─ Resolve Evolution (if applicable)
-    │
-    └─ [Update Loadout]
-        └─ Save Configuration
-
-```
-
-**Optimization**: SP Budget Management  
-**Integration**: Skill Evolution System
-
----
-
-## UF-006: Support Deck Building Flow
-
-```text
-
-START: Deck Editor
-    │
-    ├─ [Select Slot 1-6]
-    │
-    ├─ [Card Selection]
-    │   ├─ Filter by Type (Speed/Stamina/etc.)
-    │   ├─ Filter by Meta Tier (SS/S/A/B)
-    │   └─ Check Bond/Level status
-    │
-    ├─ [Deck Analysis]
-    │   ├─ Calculate Synergy Score
-    │   ├─ Check Type Distribution
-    │   └─ [AI Optimization Request]
-    │       └─ "Suggest changes for Speed focus"
-    │
-    └─ [Save Deck]
-        └─ Validate Constraints (1 Friend max, 6 Total)
-
-```
-
-**Decision Points**: Card selection, Synergy optimization  
-**External Data**: Meta Tier sync from umapyoi.net
-
----
-
-## UF-007: AI Advisor Journey
-
-```text
-
-START: Ask Question
-    │
-    ├─ [User Query]
-    │   └─ "How do I fix my Stamina?"
-    │
-    ├─ [Context Assembly]
-    │   ├─ Current Run State (Stats, Turn, Deck)
-    │   └─ User Preferences
-    │
-    ├─ [Router]
-    │   ├─ Is Ollama available?
-    │   │   ├─ YES → [Route Local] (Cost: $0)
-    │   │   └─ NO → [Route Cloud] (AWS Bedrock)
-    │   └─ Complexity Check
-    │
-    ├─ [Generation]
-    │   ├─ Agent Processing (Neuron)
-    │   └─ Response Formatting
-    │
-    └─ [Response Delivery]
-        ├─ Show Advice with Confidence Score
-        ├─ [Action Buttons] (Apply/Dismiss)
-        └─ Track Token Usage
-
-```
-
-**Integration**: Ollama (Local), AWS Bedrock (Cloud)  
-**Metrics**: Latency, Cost, Token Usage
-
----
-
-## UF-008: OCR & Data Import Flow
-
-```text
-
-START: Import Action
-    │
-    ├─ [Select Source]
-    │   ├─ File (JSON/Excel)
-    │   └─ Screenshot (OCR)
-    │
-    ├─ PATH A: File Import
-    │   ├─ Upload File
-    │   ├─ Validate Schema
-    │   └─ Conflict Resolution (Skip/Overwrite)
-    │
-    ├─ PATH B: OCR Import
-    │   ├─ Upload Image
-    │   ├─ Preprocess (Resize/Grayscale)
-    │   ├─ Tesseract Extraction
-    │   ├─ Data Parsing
-    │   └─ [Validation Gate]
-    │       ├─ High Confidence → Auto-fill
-    │       └─ Low Confidence → Manual Review UI
-    │
-    └─ [Save Data]
-        └─ Update Character/Run Record
-
-```
-
-**Dependencies**: Tesseract Service, Validation Logic  
-**Error Handling**: Manual correction UI for low confidence reads
-
----
-
-## Summary Matrix
-
-| Flow | Length | Decision Points | Loops | AI Involvement |
-| --- | --- | --- | --- | --- |
-| UF-001 | 5 min | 3 | No | None |
-| UF-002 | 5-10 min | 4 | No | Deck recommendation |
-| UF-003 | Continuous | 50+ | Yes | Training prediction, Risk assessment |
-| UF-004 | 5 min | 3 | No | Win probability, Strategy advice |
-| UF-005 | Variable | 10+ | No | Build recommendations |
-| UF-006 | 5-10 min | 6 | No | Synergy analysis |
-| UF-007 | 1 min | 1 | No | Full conversational AI |
-| UF-008 | 2 min | 2 | No | OCR Confidence scoring |
-
-**Total Flows**: 8 major user journeys  
-**System Version**: 2.1.0  
-**Related**: [TECH-FLOW Index](../tech-flow/000_TECH_FLOW_INDEX.md), [SPEC Index](../specs/000_SPECS_INDEX.md)
+- Cross-document consistency and future drift prevention rather than major structural correction
+- Any remaining user flows that need stronger offline or degraded-state wording during future feature changes
+- Keeping navigation-surface notes aligned when route surfaces or entry points change

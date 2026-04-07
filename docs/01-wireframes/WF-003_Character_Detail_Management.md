@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [SEQ-001]
 
 **Source Specs**:
@@ -13,12 +13,12 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
-- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
-- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
-- Tech Flow: [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
-- Sequences: [SEQ-001](../sequences/SEQ-001_Character_Creation_Sequence.md)
-- User Flows: [UF-002](../user-flows/UF-002_Career_Setup_Flow.md)
+- PRD: [PRD-001](../02-prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md)
+- Tech Flow: [TECH-FLOW-001](../01-tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
+- Sequences: [SEQ-001](../01-sequences/SEQ-001_Character_Creation_Sequence.md)
+- User Flows: [UF-002](../01-user-flows/UF-002_Career_Setup_Flow.md)
 - Related WF: [WF-002](WF-002_Character_Creation_Wizard.md), [WF-001](WF-001_Dashboard_Overview.md)
 
 ---
@@ -27,7 +27,9 @@
 
 ### 1.1 Purpose
 
-The Character Detail & Management screen provides a comprehensive view and management interface for individual career runs. It serves as the central hub for monitoring character state, tracking progression, managing goals, and accessing training/race features.
+The Character Detail & Management screen provides a comprehensive view and management interface for
+individual career runs. It serves as the central hub for monitoring character state, tracking
+progression, managing goals, and accessing training/race features.
 
 ### 1.2 Key Objectives
 
@@ -37,7 +39,7 @@ The Character Detail & Management screen provides a comprehensive view and manag
 | **Goal Tracking** | Visual progress toward short-term and long-term objectives |
 | **Quick Actions** | One-click access to training, races, skills, and AI advisor |
 | **Analytics Display** | Stat trends, race history, and performance metrics |
-| **Real-time Updates** | Live stat updates via WebSocket connections |
+| **Status Refresh** | Live stat updates via cached state and polling/request refresh |
 
 ### 1.3 User Stories
 
@@ -518,7 +520,7 @@ class AIQuickAdvisor extends Component
 │ G1 race. Your stamina is adequate.   │
 │                                      │
 │ Confidence: 85%                      │
-│ Provider: Ollama Local               │
+│ Provider: Environment-configured     │
 │                                      │
 │ [Ask AI] [View Details] [Dismiss]    │
 └──────────────────────────────────────┘
@@ -613,20 +615,21 @@ class DetailPage extends Component
 
 ### 4.2 Real-time Updates
 
-**WebSocket Integration**:
+**Status Refresh Integration**:
 
 ```javascript
-// Listen for character updates
-Echo.private(`character.${characterId}`)
-    .listen("CharacterStatsUpdated", (e) => {
-        Livewire.dispatch("character-updated", e.character);
-    })
-    .listen("TrainingCompleted", (e) => {
-        Livewire.dispatch("training-completed", e.session);
-    })
-    .listen("RaceCompleted", (e) => {
-        Livewire.dispatch("race-completed", e.result);
-    });
+// Dispatch refresh events after state-changing actions
+window.addEventListener('character-updated', () => {
+    Livewire.dispatch('character-updated');
+});
+
+window.addEventListener('training-completed', () => {
+    Livewire.dispatch('training-completed');
+});
+
+window.addEventListener('race-completed', () => {
+    Livewire.dispatch('race-completed');
+});
 ```text
 
 ### 4.3 Cache Strategy
@@ -651,7 +654,7 @@ sequenceDiagram
     participant DetailPage
     participant Service
     participant Database
-    participant WebSocket
+    participant StatusRefresh
 
     User->>DetailPage: Click [ENTER] on race
     DetailPage->>Service: validateRaceEntry(character, race)
@@ -660,7 +663,7 @@ sequenceDiagram
     alt Readiness >= 70%
         DetailPage->>Database: Create race entry
         Database-->>DetailPage: Entry confirmed
-        DetailPage->>WebSocket: Broadcast race-entered
+        DetailPage->>StatusRefresh: Persist race-entered status
         DetailPage->>User: Show success toast
     else Readiness < 70%
         DetailPage->>User: Show confirmation modal
@@ -699,14 +702,14 @@ sequenceDiagram
 sequenceDiagram
     participant Training
     participant Character
-    participant WebSocket
+    participant StatusRefresh
     participant DetailPage
     participant StatsPanel
 
     Training->>Character: Execute training
     Character->>Character: Update stats
-    Character->>WebSocket: Broadcast stats-updated
-    WebSocket->>DetailPage: Notify update
+    Character->>StatusRefresh: Persist stats-updated state
+    StatusRefresh->>DetailPage: Next refresh sees update
     DetailPage->>StatsPanel: Refresh component
     StatsPanel->>StatsPanel: Animate stat changes
     StatsPanel->>User: Show updated values
@@ -776,7 +779,7 @@ sequenceDiagram
 | **Component Render** | < 300ms | Stats panel render time |
 | **Stat Update Animation** | < 500ms | Smooth transition |
 | **API Response** | < 200ms | Character data fetch |
-| **WebSocket Latency** | < 100ms | Real-time update delay |
+| **Status Refresh Latency** | request dependent | Refresh/update delay |
 
 ### 7.2 Optimization Strategies
 
@@ -908,7 +911,7 @@ test.describe("WF-003: Character Detail Management", () => {
         const statValue = page.getByTestId("stat-speed-value");
         const initialValue = await statValue.textContent();
 
-        // Trigger training completion via WebSocket simulation
+        // Trigger training completion via dispatched refresh event
         await page.evaluate(() => {
             window.Echo.private("character.1").trigger(
                 "CharacterStatsUpdated",
@@ -1003,19 +1006,19 @@ test.describe("WF-003: Accessibility", () => {
 
 | Document | Reference |
 | --- | --- |
-| Product Requirements | [PRD-001](../prds/PRD-001_Character_Management.md) |
-| Technical Specifications | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) |
-| System Flow | [FLOW-001](../flows/FLOW-001_Character_Management_System.md) |
-| Technical Flow | [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md) |
+| Product Requirements | [PRD-001](../02-prds/PRD-001_Character_Management.md) |
+| Technical Specifications | [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md) |
+| System Flow | [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md) |
+| Technical Flow | [TECH-FLOW-001](../01-tech-flow/TECH-FLOW-001_Character_Management_Flow.md) |
 
 ### 9.2 User Flows
 
 | Document | Reference |
 | --- | --- |
-| Dashboard Navigation | [UF-001](../user-flows/UF-001_Dashboard_Navigation_Flow.md) |
-| Career Setup | [UF-002](../user-flows/UF-002_Career_Setup_Flow.md) |
-| Training Day | [UF-003](../user-flows/UF-003_Training_Day_Flow.md) |
-| Race Day | [UF-004](../user-flows/UF-004_Race_Day_Flow.md) |
+| Dashboard Navigation | [UF-001](../01-user-flows/UF-001_Dashboard_Navigation_Flow.md) |
+| Career Setup | [UF-002](../01-user-flows/UF-002_Career_Setup_Flow.md) |
+| Training Day | [UF-003](../01-user-flows/UF-003_Training_Day_Flow.md) |
+| Race Day | [UF-004](../01-user-flows/UF-004_Race_Day_Flow.md) |
 
 ### 9.3 Related Wireframes
 
@@ -1032,14 +1035,15 @@ test.describe("WF-003: Accessibility", () => {
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected stat grades (no A-/B+, S is max), aptitude terminology (Nige/Senkou/Sashi/Oikomi), soft cap indicator at 1200 |
-| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added real-time WebSocket updates, AI quick advisor, enhanced accessibility specifications, performance targets, and testing requirements |
+| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added AI quick advisor, enhanced accessibility specifications, performance targets, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 
 ---
 
 ## 11. Notes
 
-**Implementation Status**: ✅ Complete
+**Implementation Status**: Alignment-reviewed concept; specific component classes and route paths in
+this document are illustrative and should be verified against the current implementation.
 
 **Known Issues**: None
 
@@ -1054,4 +1058,6 @@ test.describe("WF-003: Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the Character Detail & Management screen and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe describes the intended experience for the Character Detail & Management screen.
+Details should be verified against current implementation documentation before treating as
+authoritative._

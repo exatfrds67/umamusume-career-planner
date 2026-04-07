@@ -223,12 +223,12 @@ function aiDashboard() {
     performance: {...},
     costs: {...},
     loading: false,
-    
+
     init() {
       this.loadDashboard();
       setInterval(() => this.loadDashboard(), 5000);
     },
-    
+
     async loadDashboard() {
       // Fetch dashboard data from API
     }

@@ -2,7 +2,8 @@
 
 ## Issue Summary
 
-The radar chart component was not displaying character stats correctly. Stats were clustering near the center of the pentagon instead of being properly distributed across the chart area.
+The radar chart component was not displaying character stats correctly. Stats were clustering near
+the center of the pentagon instead of being properly distributed across the chart area.
 
 ## Root Cause
 
@@ -13,11 +14,12 @@ In `resources/views/components/stat-radar-chart.blade.php`, there was a critical
 1. **ViewBox dimensions**: Set to 64/128/192 (for sm/md/lg sizes)
 2. **Blade template calculations**: Using 128/256/384 (double the viewBox size)
 
-This mismatch caused the grid lines and data points to be calculated at positions that were twice as large as the coordinate space, resulting in all points clustering near the center.
+This mismatch caused the grid lines and data points to be calculated at positions that were twice as
+large as the coordinate space, resulting in all points clustering near the center.
 
 ### Code Location
 
-**File**: `resources/views/components/stat-radar-chart.blade.php`  
+**File**: `resources/views/components/stat-radar-chart.blade.php`
 **Lines**: 51-55
 
 **Before (Incorrect)**:
@@ -49,7 +51,7 @@ This mismatch caused the grid lines and data points to be calculated at position
 The SVG coordinate system uses a viewBox that defines the internal coordinate space:
 
 - **Small (sm)**: viewBox="0 0 64 64"
-- **Medium (md)**: viewBox="0 0 128 128"  
+- **Medium (md)**: viewBox="0 0 128 128"
 - **Large (lg)**: viewBox="0 0 192 192"
 
 All calculations for points, grid lines, and radial lines must use these same dimensions.
@@ -62,7 +64,8 @@ The bug affected three types of SVG elements:
 2. **Radial lines** (lines from center to each axis)
 3. **Data points** (circles at each stat value)
 
-All were being calculated using coordinates that were 2x larger than the viewBox, causing them to render outside the visible area or cluster incorrectly.
+All were being calculated using coordinates that were 2x larger than the viewBox, causing them to
+render outside the visible area or cluster incorrectly.
 
 ### PHP Component Methods (Already Correct)
 
@@ -105,7 +108,8 @@ Character ID: 162 (Special Week)
 ]
 ```
 
-These points now correctly fall within the 0-64 coordinate space and will render properly distributed across the pentagon.
+These points now correctly fall within the 0-64 coordinate space and will render properly
+distributed across the pentagon.
 
 ## Files Modified
 
@@ -167,9 +171,9 @@ This fix is part of the larger "Character Stats Display Fix" spec which addresse
 
 ## Document Information
 
-**Document Type**: Bug Fix Summary  
-**Version**: 1.0.0  
-**Date**: January 31, 2026  
-**Status**: Complete  
-**Author**: Kiro AI Assistant  
+**Document Type**: Bug Fix Summary
+**Version**: 1.0.0
+**Date**: January 31, 2026
+**Status**: Complete
+**Author**: Kiro AI Assistant
 **Related Spec**: character-stats-display-fix

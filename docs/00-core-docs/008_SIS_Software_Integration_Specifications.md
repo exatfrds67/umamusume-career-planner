@@ -6,7 +6,7 @@
 **Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.4.0, 30 models, 51 migrations, 42 MCP tools
+**Status**: Current - Aligned to codebase v2.4.0, 40 models, 67 migrations, 42 MCP tools
 
 ---
 
@@ -25,7 +25,10 @@
 
 ## 1. Introduction
 
-This document provides detailed technical specifications for all integration points within the Umamusume Pretty Derby Career Planner application. It serves as the authoritative reference for developers implementing and maintaining integrations between the Laravel 12 backend and external services, AI providers, and internal subsystems.
+This document provides detailed technical specifications for all integration points within the
+Umamusume Pretty Derby Career Planner application. It serves as the authoritative reference for
+developers implementing and maintaining integrations between the Laravel 12 backend and external
+services, AI providers, and internal subsystems.
 
 ### 1.1 Scope
 
@@ -41,11 +44,13 @@ This specification covers:
 ### 1.2 Related Documents
 
 - **Document**: Software Integration Plan; **Reference**: [SIP - 007_SIP](007_SIP_Software_Integration_Plan.md)
-- **Document**: Software Design Specifications; **Reference**: [SDS - 004_SDS](004_SDS_Software_Design_Specifications.md)
+- **Document**: Software Design Specifications; **Reference**: [SDS -
+004_SDS](004_SDS_Software_Design_Specifications.md)
 - **Document**: AI Advisory System Flow; **Reference**: [FLOW-006](../flows/FLOW-006_AI_Advisory_System.md)
 - **Document**: External Integration Flow; **Reference**: [FLOW-007](../flows/FLOW-007_External_Integration_System.md)
 - **Document**: AI Advisory Technical Spec; **Reference**: [SPEC-006](../specs/SPEC-006_AI_Advisory_Technical.md)
-- **Document**: External Integration Tech Flow; **Reference**: [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
+- **Document**: External Integration Tech Flow; **Reference**: [TECH-FLOW-007](../tech-flow/TECH-
+FLOW-007_External_Integration_Flow.md)
 
 ---
 
@@ -137,7 +142,7 @@ app/Services/Neuron/
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │  AIAdvisoryService (Orchestration)                        │   │
+│  │  HybridAIService (Provider orchestration)                │   │
 │  │  • Route requests to appropriate provider                 │   │
 │  │  • Handle fallback logic                                  │   │
 │  │  • Track costs and usage                                  │   │
@@ -154,9 +159,12 @@ app/Services/Neuron/
 ### 2.4 Provider Cost Tracking
 
 - **Provider**: Ollama; **Model**: llama3.2; **Input Cost**: $0.00; **Output Cost**: $0.00; **Notes**: Local processing
-- **Provider**: Bedrock; **Model**: Claude Sonnet 4; **Input Cost**: $3.00/1M; **Output Cost**: $15.00/1M; **Notes**: Recommended fallback
-- **Provider**: Bedrock; **Model**: Claude Opus 4; **Input Cost**: $5.00/1M; **Output Cost**: $25.00/1M; **Notes**: Complex reasoning
-- **Provider**: Bedrock; **Model**: Claude Haiku 4.5; **Input Cost**: $1.00/1M; **Output Cost**: $5.00/1M; **Notes**: Simple queries
+- **Provider**: Bedrock; **Model**: Claude 4.5 Sonnet; **Input Cost**: $3.00/1M; **Output Cost**:
+$15.00/1M; **Notes**: Recommended fallback
+- **Provider**: Bedrock; **Model**: Claude 4.5 Opus; **Input Cost**: $5.00/1M; **Output Cost**:
+$25.00/1M; **Notes**: Complex reasoning
+- **Provider**: Bedrock; **Model**: Claude 4.5 Haiku; **Input Cost**: $1.00/1M; **Output Cost**:
+$5.00/1M; **Notes**: Simple queries
 
 ---
 
@@ -174,15 +182,13 @@ The Model Context Protocol (MCP) integration enables tool-based AI interactions.
 
 ### 3.2 MCP Server Types
 
-- **Server Type**: Memory; **Location**: Local; **Purpose**: Conversation context persistence
-- **Server Type**: Filesystem; **Location**: Local; **Purpose**: Document and file access
-- **Server Type**: Fetch; **Location**: Local; **Purpose**: HTTP resource retrieval
-- **Server Type**: AWS API; **Location**: Remote; **Purpose**: AWS service API integration
-- **Server Type**: AWS Knowledge; **Location**: Remote; **Purpose**: AWS knowledge base queries
-- **Server Type**: AWS Pricing; **Location**: Remote; **Purpose**: AWS cost/pricing lookups
-- **Server Type**: Context7; **Location**: Remote; **Purpose**: Context-aware tool services
-- **Server Type**: Tool Chaining; **Location**: Local; **Purpose**: Multi-step tool orchestration
-- **Server Type**: Umapyoi; **Location**: Remote (optional); **Purpose**: Game data API integration
+- **Server Type**: Memory MCP; **Location**: Local; **Purpose**: Conversation context persistence
+- **Server Type**: Filesystem MCP; **Location**: Local; **Purpose**: Document and file access
+- **Server Type**: Fetch MCP; **Location**: Local; **Purpose**: HTTP resource retrieval
+- **Server Type**: AWS MCP; **Location**: Remote; **Purpose**: AWS API/Knowledge/Pricing tools integration
+- **Server Type**: Context7 MCP; **Location**: Remote; **Purpose**: Context-aware tool services
+- **Server Type**: Tool Chaining MCP; **Location**: Local; **Purpose**: Multi-step tool orchestration
+- **Server Type**: Custom MCP; **Location**: Remote (optional); **Purpose**: Domain-specific tools
 
 ### 3.3 MCP Service Architecture
 
@@ -226,8 +232,10 @@ The application integrates with external game data sources for character, skill,
 
 **Configuration File**: `config/external-apis.php`
 
-- **API**: umapyoi.net; **Client Class**: `UmapyoiApiClient`; **Purpose**: Primary game data source (characters, support cards); **Cache TTL**: 24 hours
-- **API**: GameTora; **Client Class**: `GameToraScraperService`; **Purpose**: Skill, race data via web scraping; **Cache TTL**: 24 hours
+- **API**: umapyoi.net; **Client Class**: `UmapyoiApiClient`; **Purpose**: Primary game data source
+(characters, support cards); **Cache TTL**: 24 hours
+- **API**: GameTora; **Client Class**: `GameToraScraperService`; **Purpose**: Skill, race data via
+web scraping; **Cache TTL**: 24 hours
 
 ```
 app/Services/ExternalAPI/
@@ -395,7 +403,8 @@ class AIAdvisoryRequest extends FormRequest
 - **Input Source**: Form inputs; **Sanitization Method**: Laravel validation + Eloquent escaping; **Notes**: Automatic
 - **Input Source**: File uploads; **Sanitization Method**: MIME validation + virus scan; **Notes**: Strict type checking
 - **Input Source**: API responses; **Sanitization Method**: JSON schema validation; **Notes**: External data
-- **Input Source**: OCR output; **Sanitization Method**: Pattern matching + range validation; **Notes**: Manual review option
+- **Input Source**: OCR output; **Sanitization Method**: Pattern matching + range validation;
+**Notes**: Manual review option
 
 ---
 
@@ -410,7 +419,7 @@ class AIAdvisoryRequest extends FormRequest
 │                                                                 │
 │  app/Services/                                                  │
 │  ├── AI/                                                        │
-│  │   ├── AIAdvisoryService.php      (Orchestration)            │
+│  │   ├── HybridAIService.php        (Provider orchestration)   │
 │  │   ├── AIDashboardService.php     (Dashboard analytics)      │
 │  │   ├── HybridAIService.php        (Provider routing)         │
 │  │   ├── OllamaService.php          (Local AI)                 │
@@ -431,7 +440,7 @@ class AIAdvisoryRequest extends FormRequest
 │  │   ├── AgentRoutingService.php    (Routing)                  │
 │  │   ├── AgentMemoryService.php     (Memory)                   │
 │  │   ├── CostManagementService.php  (Cost tracking)            │
-│  │   ├── RealTimeMonitoringService.php (Real-time)            │
+│  │   ├── RealTimeMonitoringService.php (Operational monitoring)│
 │  │   ├── Tools/ (6 tool services)                                │
 │  │   └── Agents/ (9 orchestration agents)                        │
 │  │                                                              │
@@ -474,8 +483,8 @@ All integration services are registered in service providers:
 
 public function register(): void
 {
-    $this->app->singleton(AIAdvisoryService::class);
-    $this->app->singleton(MCPOrchestrator::class);
+    $this->app->singleton(HybridAIService::class);
+    $this->app->singleton(MCPHealthDashboardService::class);
     $this->app->singleton(ExternalAPIService::class);
     $this->app->singleton(TesseractService::class);
 }
@@ -495,7 +504,7 @@ public function register(): void
 ### 8.1 AI Advisory Request Flow
 
 ```text
-User Query ──► Controller ──► AIAdvisoryService
+User Query ──► Controller ──► HybridAIService
                                     │
                     ┌───────────────┼───────────────┐
                     ▼               ▼               ▼
@@ -572,10 +581,15 @@ Image Upload ──► Validation ──► Storage
 
 ## Document Control
 
-- **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated service layer (AI/MCP/ExternalAPI/OCR/Admin/Neuron), 42 MCP tools, 9 agents, GameTora scraper, Admin Panel services
-- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated Neuron agent tree, Bedrock model names (Claude 4.x), version alignment to v2.3.0
-- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated specs to match configured integrations; added architecture diagrams
-- **Version**: 2.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Major revision with Neuron AI and MCP integration
+- **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated
+service layer (AI/MCP/ExternalAPI/OCR/Admin/Neuron), 42 MCP tools, 9 agents, GameTora scraper, Admin
+Panel services
+- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated
+Neuron agent tree, Bedrock model names (Claude 4.x), version alignment to v2.3.0
+- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated specs
+to match configured integrations; added architecture diagrams
+- **Version**: 2.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Major
+revision with Neuron AI and MCP integration
 - **Version**: 1.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial specification
 
 ---
@@ -585,11 +599,14 @@ Image Upload ──► Validation ──► Storage
 ### A. Environment Variables Reference
 
 - **Variable**: `AI_DEFAULT_PROVIDER`; **Service**: AI; **Default**: `ollama`; **Description**: Primary AI provider
-- **Variable**: `OLLAMA_BASE_URL`; **Service**: AI; **Default**: `http://localhost:11434`; **Description**: Ollama API endpoint
+- **Variable**: `OLLAMA_BASE_URL`; **Service**: AI; **Default**: `http://localhost:11434`;
+**Description**: Ollama API endpoint
 - **Variable**: `BEDROCK_ENABLED`; **Service**: AI; **Default**: `false`; **Description**: Enable AWS Bedrock fallback
 - **Variable**: `MCP_ENABLED`; **Service**: MCP; **Default**: `true`; **Description**: Enable MCP integration
-- **Variable**: `EXTERNAL_API_CACHE_TTL`; **Service**: External; **Default**: `86400`; **Description**: Cache duration in seconds
-- **Variable**: `OCR_CONFIDENCE_THRESHOLD`; **Service**: OCR; **Default**: `80`; **Description**: Minimum confidence percentage
+- **Variable**: `EXTERNAL_API_CACHE_TTL`; **Service**: External; **Default**: `86400`;
+**Description**: Cache duration in seconds
+- **Variable**: `OCR_CONFIDENCE_THRESHOLD`; **Service**: OCR; **Default**: `80`; **Description**:
+Minimum confidence percentage
 
 ### B. Error Codes
 
@@ -605,4 +622,5 @@ Image Upload ──► Validation ──► Storage
 
 ---
 
-### This specification reflects the integration details of the current implementation and serves as the authoritative reference for all integration-related development
+### This specification reflects the integration details of the current implementation and serves as
+the authoritative reference for all integration-related development

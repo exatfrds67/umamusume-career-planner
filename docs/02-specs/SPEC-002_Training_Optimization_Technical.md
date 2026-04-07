@@ -1,9 +1,9 @@
 # SPEC-002: Training Optimization System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate training formula  
+**Document Version**: 2.2.0
+**Date**: 2026-01-28
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Active - Partially aligned; read with storage-aware tech-flow documentation for current execution boundaries
 **Classification**: Internal - Development Team
 
 ---
@@ -13,7 +13,7 @@
 | Attribute | Value |
 | --- | --- |
 | **Document ID** | SPEC-002 |
-| **Related PRD** | [PRD-002: Training Optimization](../prds/PRD-002_Training_Optimization.md) |
+| **Related PRD** | [PRD-002: Training Optimization](../02-prds/PRD-002_Training_Optimization.md) |
 | **Architecture Version** | v2.2.0 |
 | **Approval Status** | Approved |
 | **Last Reviewed** | 2026-01-28 |
@@ -22,20 +22,20 @@
 
 **Requirements & Design**:
 
-- [SRS Section 3.2: Training System](../003_SRS_Software_Requirement_Specifications.md#32-training-system)
-- [SDS Section 4.2: Training Architecture](../004_SDS_Software_Design_Specifications.md#42-training-module)
+- [SRS Section 3.2: Training System](../00-core-docs/003_SRS_Software_Requirement_Specifications.md#32-training-system)
+- [SDS Section 4.2: Training Architecture](../00-core-docs/004_SDS_Software_Design_Specifications.md#42-training-module)
 
 **Data & Integration**:
 
-- [DBD Section 5.2: Training Tables](../009_DBD_Database_Documentation.md#52-training-tables)
-- [API Section 4.2: Training Endpoints](../010_API_API_Documentation.md#42-training-endpoints)
+- [DBD Section 5.2: Training Tables](../00-core-docs/009_DBD_Database_Documentation.md#52-training-tables)
+- [API Section 4.2: Training Endpoints](../00-core-docs/010_API_API_Documentation.md#42-training-endpoints)
 
 **Visual Documentation**:
 
-- [FLOW-002: Training Optimization System](../flows/FLOW-002_Training_Optimization_System.md)
-- [SEQ-002: Training Session Execution](../sequences/SEQ-002_Training_Session_Execution.md)
-- [WF-004: Training Optimizer Interface](../wireframes/WF-004_Training_Optimizer_Interface.md)
-- [UF-003: Training Optimization Flow](../user-flows/UF-003_Training_Optimization_Flow.md)
+- [FLOW-002: Training Optimization System](../01-flows/FLOW-002_Training_Optimization_System.md)
+- [SEQ-002: Training Block Resolution](../01-sequences/SEQ-002_Training_Block_Resolution.md)
+- [WF-004: Training Selection Interface](../01-wireframes/WF-004_Training_Selection_Interface.md)
+- [UF-003: Training Day Flow](../01-user-flows/UF-003_Training_Day_Flow.md)
 
 ---
 
@@ -111,6 +111,12 @@ This module provides deterministic predictions to enable informed decision-makin
 - Skill acquisition (SPEC-004)
 - Support deck configuration (SPEC-005)
 
+### Storage Boundary Note
+
+This specification primarily describes authenticated, account-backed training execution and
+persisted history. Local-mode planning or local state progression must be documented as browser-
+backed where supported and must not imply identical database persistence.
+
 ### 1.4 Technology Stack
 
 | Component | Technology | Version | Purpose |
@@ -119,9 +125,7 @@ This module provides deterministic predictions to enable informed decision-makin
 | **Language** | PHP | 8.3+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Data persistence |
 | **Cache** | Redis | 7.x | Prediction caching |
-| **AI** | Neuron Framework | 1.x | Advisory agents |
-| **AI Provider (Local)** | Ollama | Latest | Local recommendations |
-| **AI Provider (Cloud)** | AWS Bedrock Claude | 4.5 | Complex analysis |
+| **AI / Advisory** | Config-driven advisory routing | Environment-dependent | Hybrid advisory integration where applicable |
 
 ---
 
@@ -138,9 +142,9 @@ graph TB
     end
 
     subgraph "Application Layer"
-        TrainingSvc[TrainingService]
+        TrainingSvc[TrainingExecutionService]
         PredictionSvc[TrainingPredictionService]
-        AdvisorySvc[AIAdvisoryService]
+        AdvisorySvc[HybridAIService]
     end
 
     subgraph "Domain Layer"
@@ -158,16 +162,16 @@ graph TB
     API --> FormRequest
     FormRequest --> TrainingSvc
     Livewire --> PredictionSvc
-    
+
     TrainingSvc --> Session
     TrainingSvc --> DB
-    
+
     PredictionSvc --> Calculators
     PredictionSvc --> Cache
-    
+
     AdvisorySvc --> NeuronAI
     AdvisorySvc --> PredictionSvc
-    
+
     Calculators --> StatGainCalc[StatGainCalculator]
     Calculators --> BonusCalc[SupportBonusCalculator]
     Calculators --> RiskCalc[RiskCalculator]
@@ -207,7 +211,7 @@ graph TB
 | **Strategy** | Calculator interfaces | Pluggable calculation algorithms |
 | **DTO** | `TrainingPrediction` | Immutable prediction data |
 | **Repository** | `TrainingSessionRepository` | Data access abstraction |
-| **Service Layer** | `TrainingService` | Business logic encapsulation |
+| **Service Layer** | `TrainingPredictionService`, `TrainingExecutionService` | Business logic encapsulation with separate prediction and execution responsibilities |
 | **Cache-Aside** | Redis predictions | Performance optimization |
 | **Chain of Responsibility** | Risk calculators | Modular risk assessment |
 
@@ -231,19 +235,26 @@ use App\ValueObjects\StatCollection;
 
 /**
  * Stat Gain Calculator
- * 
+ *
  * Calculates base stat gains for training facilities using game-accurate formula.
- * 
+ *
  * Game-Accurate Training Formula:
- * Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
+ * Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect))
  *             × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
- * 
+ *
+ * The calculation pipeline must apply facility level, mood, support presence,
+ * growth rates, and friendship multipliers consistently with the verified
+ * formula in PRD-002. If any factor is omitted in an example, treat the example
+ * as partial rather than normative.
+ *
  * Per-training cap: +100 (reduced to +50 if stat > 1200)
  */
 class StatGainCalculator
 {
     /**
-     * Base stat gains per training type
+     * Base stat gains per training type.
+     * Illustrative implementation example only. Canonical game-accurate base values
+     * should be sourced from the verified training data/config used by the application.
      */
     private const FACILITY_BASE_GAINS = [
         'speed' => ['speed' => 10, 'power' => 5],
@@ -258,12 +269,12 @@ class StatGainCalculator
      */
     private const LEVEL_MULTIPLIERS = [
         1 => 1.0,
-        2 => 1.1,
-        3 => 1.2,
-        4 => 1.3,
-        5 => 1.5,
+        2 => 1.25,
+        3 => 1.5,
+        4 => 1.75,
+        5 => 2.0,
     ];
-    
+
     /**
      * Per-training stat gain caps
      */
@@ -273,7 +284,7 @@ class StatGainCalculator
 
     /**
      * Calculate base stat gains using game-accurate formula
-     * 
+     *
      * @param TrainingType $type Training facility type
      * @param Character $character Character instance
      * @param int $facilityLevel Facility level (1-5)
@@ -286,25 +297,25 @@ class StatGainCalculator
     ): StatCollection {
         $baseGains = self::FACILITY_BASE_GAINS[$type->value] ?? [];
         $growthRates = $character->growth_rates;
-        
+
         // Apply facility level multiplier
         $levelMultiplier = self::LEVEL_MULTIPLIERS[$facilityLevel] ?? 1.0;
 
         $gains = [];
-        
+
         foreach ($baseGains as $stat => $baseValue) {
             // Apply growth rate bonus (e.g., 20% = 1.20x)
             $growthBonus = 1 + (($growthRates[$stat] ?? 0) / 100);
-            
+
             // Calculate final gain
             $finalGain = $baseValue * $levelMultiplier * $growthBonus;
-            
+
             // Apply per-training cap based on current stat
             $currentStat = $character->current_stats[$stat] ?? 0;
-            $cap = $currentStat > self::SOFT_CAP 
-                ? self::PER_TRAINING_CAP_ABOVE_SOFT 
+            $cap = $currentStat > self::SOFT_CAP
+                ? self::PER_TRAINING_CAP_ABOVE_SOFT
                 : self::PER_TRAINING_CAP;
-            
+
             $gains[$stat] = (int) min($cap, round($finalGain));
         }
 
@@ -313,10 +324,10 @@ class StatGainCalculator
 
     /**
      * Calculate gains with all modifiers applied (game-accurate formula)
-     * 
-     * Formula: (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
+     *
+     * Formula: (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect))
      *          × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
-     * 
+     *
      * @param TrainingType $type
      * @param Character $character
      * @param int $facilityLevel
@@ -336,27 +347,27 @@ class StatGainCalculator
         bool $isFriendshipTraining = false
     ): StatCollection {
         $baseGains = $this->calculateBase($type, $character, $facilityLevel);
-        
+
         // Support card presence bonus: +5% per card
         $cardPresenceBonus = 1 + (0.05 * $numSupportCards);
-        
+
         // Friendship training multiplier (1.2x when bond >= 80)
         $friendshipMultiplier = $isFriendshipTraining ? 1.2 : 1.0;
-        
+
         $modifiedGains = [];
-        
+
         foreach ($baseGains->toArray() as $stat => $value) {
             $modified = $value * $moodMultiplier * $supportMultiplier * $cardPresenceBonus * $friendshipMultiplier;
-            
+
             // Apply per-training cap
             $currentStat = $character->current_stats[$stat] ?? 0;
-            $cap = $currentStat > self::SOFT_CAP 
-                ? self::PER_TRAINING_CAP_ABOVE_SOFT 
+            $cap = $currentStat > self::SOFT_CAP
+                ? self::PER_TRAINING_CAP_ABOVE_SOFT
                 : self::PER_TRAINING_CAP;
-            
+
             $modifiedGains[$stat] = (int) min($cap, round($modified));
         }
-        
+
         return new StatCollection($modifiedGains);
     }
 }
@@ -365,6 +376,10 @@ class StatGainCalculator
 ### 3.2 Support Bonus Calculator
 
 Aggregates bonuses from support cards present at a training facility.
+
+Implementations must use the currently registered support-deck relationships and eager-load card and
+pivot data before iteration. This SPEC does not require a specific pivot schema beyond bond and deck
+membership semantics.
 
 ```php
 <?php
@@ -377,7 +392,7 @@ use App\Enums\TrainingType;
 
 /**
  * Support Bonus Calculator
- * 
+ *
  * Calculates stat bonuses from support cards at training facilities.
  */
 class SupportBonusCalculator
@@ -394,7 +409,7 @@ class SupportBonusCalculator
 
     /**
      * Calculate total support bonuses for a facility
-     * 
+     *
      * @param CareerRun $career
      * @param TrainingType $type
      * @param array $cardsAtFacility Card IDs present at facility
@@ -406,7 +421,7 @@ class SupportBonusCalculator
         array $cardsAtFacility
     ): array {
         $deck = $career->supportDeck;
-        
+
         if (!$deck) {
             return [
                 'multiplier' => 1.0,
@@ -421,13 +436,13 @@ class SupportBonusCalculator
 
         foreach ($cardsAtFacility as $cardId) {
             $card = $deck->cards()->find($cardId);
-            
+
             if (!$card) {
                 continue;
             }
 
             $bondLevel = $card->pivot->bond_level ?? 0;
-            
+
             // Get base bonus for this card's specialization
             $baseBonus = $this->getCardBonus($card, $type);
             $totalBonus += $baseBonus;
@@ -462,7 +477,7 @@ class SupportBonusCalculator
 
     /**
      * Get bonus value for a specific card and training type
-     * 
+     *
      * @param \App\Models\SupportCard $card
      * @param TrainingType $type
      * @return int
@@ -505,14 +520,16 @@ use App\Enums\MoodStatus;
 
 /**
  * Training Risk Calculator
- * 
+ *
  * Calculates failure probability for training actions.
+ * Risk thresholds shown here are implementation guidance, not a user-facing contract.
+ * The UI should present derived risk bands while the calculator remains deterministic and testable.
  */
 class RiskCalculator
 {
     /**
      * Calculate training failure risk
-     * 
+     *
      * @param Character $character
      * @param TrainingType $type
      * @return array{risk: float, factors: array}
@@ -522,10 +539,10 @@ class RiskCalculator
         $baseRisk = $this->calculateBaseRisk($character->energy_level);
         $moodModifier = $this->getMoodModifier($character->mood_status);
         $typeModifier = $this->getTrainingTypeModifier($type);
-        
+
         // Combine risk factors
         $totalRisk = ($baseRisk + $moodModifier + $typeModifier);
-        
+
         // Clamp to valid range (0-100%)
         $totalRisk = max(0, min(100, $totalRisk));
 
@@ -541,11 +558,11 @@ class RiskCalculator
 
     /**
      * Calculate base risk from energy level
-     * 
+     *
      * Energy > 50: 0% risk
      * Energy 30-50: Linear 0% -> 15%
      * Energy < 30: Exponential 15% -> 70%
-     * 
+     *
      * @param int $energy Energy level (0-100)
      * @return float
      */
@@ -568,7 +585,7 @@ class RiskCalculator
 
     /**
      * Get mood modifier for risk
-     * 
+     *
      * @param MoodStatus $mood
      * @return float
      */
@@ -585,7 +602,7 @@ class RiskCalculator
 
     /**
      * Get training type modifier
-     * 
+     *
      * @param TrainingType $type
      * @return float
      */
@@ -600,14 +617,14 @@ class RiskCalculator
 
     /**
      * Resolve training outcome based on risk
-     * 
+     *
      * @param float $riskPercentage
      * @return bool True if successful, false if failed
      */
     public function resolveOutcome(float $riskPercentage): bool
     {
         $roll = mt_rand(1, 10000) / 100; // Random 0.00-100.00
-        
+
         return $roll > $riskPercentage;
     }
 }
@@ -627,14 +644,14 @@ use App\Models\SupportCard;
 
 /**
  * Skill Hint Probability Calculator
- * 
+ *
  * Calculates chances of receiving skill hints during training.
  */
 class SkillHintCalculator
 {
     /**
      * Calculate skill hint probability
-     * 
+     *
      * @param CareerRun $career
      * @param array $cardsAtFacility
      * @return array{hints: array, probability: float}
@@ -642,7 +659,7 @@ class SkillHintCalculator
     public function calculate(CareerRun $career, array $cardsAtFacility): array
     {
         $deck = $career->supportDeck;
-        
+
         if (!$deck) {
             return ['hints' => [], 'probability' => 0.0];
         }
@@ -652,14 +669,14 @@ class SkillHintCalculator
 
         foreach ($cardsAtFacility as $cardId) {
             $card = $deck->cards()->find($cardId);
-            
+
             if (!$card) {
                 continue;
             }
 
             $hintRate = $card->hint_rate ?? 10; // Base 10%
             $bondBonus = ($card->pivot->bond_level ?? 0) / 10; // +1% per 10 bond
-            
+
             $finalRate = min(50, $hintRate + $bondBonus); // Cap at 50%
 
             // Get skills this card can hint
@@ -685,7 +702,7 @@ class SkillHintCalculator
 
     /**
      * Get skills a card can provide hints for
-     * 
+     *
      * @param SupportCard $card
      * @param CareerRun $career
      * @return array
@@ -694,10 +711,10 @@ class SkillHintCalculator
     {
         // Get skills from card metadata
         $cardSkills = $card->skills_provided ?? [];
-        
+
         // Filter out skills already owned by character
         $ownedSkills = $career->character->skills->pluck('id')->toArray();
-        
+
         return collect($cardSkills)
             ->reject(fn($skill) => in_array($skill['id'], $ownedSkills))
             ->values()
@@ -713,6 +730,15 @@ class SkillHintCalculator
 ### 4.1 TrainingPredictionService
 
 Generates forecast data for all training options for the current turn.
+
+If no active run exists in the current storage context, prediction requests must fail with a
+recoverable validation or not-found response and must not fabricate prediction output. Deterministic
+predictions remain available without AI provider availability. Advisory output is optional
+enrichment and must not block baseline prediction rendering.
+
+This service describes the persisted account-backed prediction path. Local-mode advisory or local-
+state prediction flows must normalize browser-local state before invoking equivalent calculations
+and must not be assumed to share the same route or cache-key surface.
 
 ```php
 <?php
@@ -732,7 +758,7 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Training Prediction Service
- * 
+ *
  * Generates predictions for all available training options.
  */
 class TrainingPredictionService
@@ -746,7 +772,7 @@ class TrainingPredictionService
 
     /**
      * Get predictions for all training options
-     * 
+     *
      * @param CareerRun $career
      * @return array<TrainingPrediction>
      */
@@ -763,7 +789,7 @@ class TrainingPredictionService
 
     /**
      * Generate fresh predictions
-     * 
+     *
      * @param CareerRun $career
      * @return array<TrainingPrediction>
      */
@@ -790,7 +816,7 @@ class TrainingPredictionService
 
     /**
      * Predict training outcome
-     * 
+     *
      * @param CareerRun $career
      * @param TrainingType $type
      * @return TrainingPrediction
@@ -798,7 +824,7 @@ class TrainingPredictionService
     private function predictTraining(CareerRun $career, TrainingType $type): TrainingPrediction
     {
         $character = $career->character;
-        
+
         // Simulate card distribution (in real scenario, this comes from game state)
         $cardsAtFacility = $this->getCardsAtFacility($career, $type);
 
@@ -843,14 +869,14 @@ class TrainingPredictionService
 
     /**
      * Predict rest outcome
-     * 
+     *
      * @param \App\Models\Character $character
      * @return TrainingPrediction
      */
     private function predictRest($character): TrainingPrediction
     {
         $energyGain = 50;
-        
+
         // Bonus energy in good mood
         if (in_array($character->mood_status, [MoodStatus::Good, MoodStatus::Great])) {
             $energyGain += 10;
@@ -873,7 +899,7 @@ class TrainingPredictionService
 
     /**
      * Calculate energy cost for training
-     * 
+     *
      * @param TrainingType $type
      * @param bool $isFriendship
      * @return int
@@ -899,7 +925,7 @@ class TrainingPredictionService
 
     /**
      * Calculate bond gains for active cards
-     * 
+     *
      * @param array $cards
      * @return array
      */
@@ -907,7 +933,7 @@ class TrainingPredictionService
     {
         return array_map(function ($card) {
             $baseGain = 5;
-            
+
             // Higher gains for lower bond levels
             if ($card['bond_level'] < 50) {
                 $baseGain = 7;
@@ -922,7 +948,7 @@ class TrainingPredictionService
 
     /**
      * Calculate recommendation score
-     * 
+     *
      * @param StatCollection $gains
      * @param float $risk
      * @param int $energyCost
@@ -955,7 +981,7 @@ class TrainingPredictionService
 
     /**
      * Get stat priority based on career goals
-     * 
+     *
      * @param string $stat
      * @param CareerRun $career
      * @return float
@@ -963,7 +989,7 @@ class TrainingPredictionService
     private function getStatPriority(string $stat, CareerRun $career): float
     {
         $goals = $career->character->goals ?? [];
-        
+
         foreach ($goals as $goal) {
             if ($goal['type'] === 'stat' && $goal['target'] === $stat) {
                 return 1.5; // Prioritize goal stats
@@ -975,7 +1001,7 @@ class TrainingPredictionService
 
     /**
      * Calculate rest recommendation score
-     * 
+     *
      * @param \App\Models\Character $character
      * @param int $energyGain
      * @return int
@@ -995,8 +1021,8 @@ class TrainingPredictionService
     }
 
     /**
-     * Get cards present at facility (simulation)
-     * 
+    * Get cards present at facility
+     *
      * @param CareerRun $career
      * @param TrainingType $type
      * @return array
@@ -1004,12 +1030,14 @@ class TrainingPredictionService
     private function getCardsAtFacility(CareerRun $career, TrainingType $type): array
     {
         $deck = $career->supportDeck;
-        
+
         if (!$deck) {
             return [];
         }
 
-        // Filter cards by specialization matching training type
+        // Card presence should be derived from current normalized run state.
+        // Required relationships should be eager loaded before prediction generation
+        // to avoid per-facility query loops.
         return $deck->cards()
             ->where('specialization', ucfirst($type->value))
             ->pluck('id')
@@ -1018,9 +1046,13 @@ class TrainingPredictionService
 }
 ```
 
-### 4.2 TrainingService
+### 4.2 TrainingExecutionService
 
 Handles execution of training actions with validation and persistence.
+
+The execution transaction described below applies to authenticated account-backed runs. Local-mode
+execution or progression, where supported, must update browser-local state instead of assuming
+database persistence, training-session history insertion, or cache-tag invalidation.
 
 ```php
 <?php
@@ -1036,10 +1068,10 @@ use Illuminate\Support\Facades\{DB, Cache};
 
 /**
  * Training Execution Service
- * 
+ *
  * Handles training action execution and state updates.
  */
-class TrainingService
+class TrainingExecutionService
 {
     public function __construct(
         private TrainingPredictionService $predictionService,
@@ -1048,7 +1080,7 @@ class TrainingService
 
     /**
      * Execute training action
-     * 
+     *
      * @param CareerRun $career
      * @param string $facilityType
      * @return TrainingResult
@@ -1098,7 +1130,7 @@ class TrainingService
 
     /**
      * Validate turn limit
-     * 
+     *
      * @param CareerRun $career
      * @return void
      * @throws \App\Exceptions\InvalidTrainingException
@@ -1114,7 +1146,7 @@ class TrainingService
 
     /**
      * Apply successful training results
-     * 
+     *
      * @param CareerRun $career
      * @param TrainingPrediction $prediction
      * @return TrainingResult
@@ -1155,7 +1187,7 @@ class TrainingService
 
     /**
      * Apply failure penalties
-     * 
+     *
      * @param CareerRun $career
      * @param TrainingPrediction $prediction
      * @return TrainingResult
@@ -1206,7 +1238,7 @@ class TrainingService
 
     /**
      * Create training session record
-     * 
+     *
      * @param CareerRun $career
      * @param TrainingPrediction $prediction
      * @param TrainingResult $result
@@ -1232,7 +1264,7 @@ class TrainingService
 
     /**
      * Update career run state
-     * 
+     *
      * @param CareerRun $career
      * @param TrainingResult $result
      * @return void
@@ -1245,7 +1277,7 @@ class TrainingService
 
     /**
      * Apply bond gains to support deck
-     * 
+     *
      * @param CareerRun $career
      * @param array $bondGains
      * @return void
@@ -1262,7 +1294,7 @@ class TrainingService
 
     /**
      * Roll for skill hints based on probability
-     * 
+     *
      * @param TrainingPrediction $prediction
      * @return array
      */
@@ -1276,7 +1308,7 @@ class TrainingService
 
         foreach ($prediction->hints as $hint) {
             $roll = mt_rand(1, 10000) / 100;
-            
+
             if ($roll <= $hint['probability']) {
                 $gained[] = $hint;
             }
@@ -1292,6 +1324,10 @@ class TrainingService
 ## 5. API Specification
 
 ### 5.1 Endpoint Overview
+
+Where current registered routes differ from the examples below, the route files and updated storage-
+aware technical flow and user-flow documents take precedence. The API examples here describe the
+account-backed contract conceptually.
 
 | Method | Endpoint | Description | Auth Required |
 | --- | --- | --- | --- |
@@ -1510,7 +1546,7 @@ CREATE TABLE ucp_training_sessions (
     energy_delta TINYINT NOT NULL COMMENT 'Energy change (negative for consumption)',
     mood_change VARCHAR(20) NULL COMMENT 'Mood status after training if changed',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (career_id) REFERENCES ucp_careers(id) ON DELETE CASCADE,
     INDEX idx_career_turn (career_id, turn_number),
     INDEX idx_training_type (training_type),
@@ -1519,6 +1555,9 @@ CREATE TABLE ucp_training_sessions (
 ```text
 
 ### 6.2 Table: `ucp_careers` (Updates)
+
+Illustrative code in this SPEC may use legacy `CareerRun` terminology; when implementing or patching
+code, prefer the repository's active `Career` and related model names and route-model conventions.
 
 Training execution updates these fields:
 
@@ -1667,11 +1706,11 @@ try {
 
 | Mood | Stat Multiplier | Risk Modifier | Duration |
 | --- | --- | --- | --- |
-| Awful | 0.90x | +10% | 3-5 turns |
-| Bad | 0.95x | +5% | 2-3 turns |
+| Awful | 0.80x | +10% | 3-5 turns |
+| Bad | 0.90x | +5% | 2-3 turns |
 | Normal | 1.00x | 0% | Baseline |
-| Good | 1.05x | -2% | 2-4 turns |
-| Great | 1.10x | -5% | 3-6 turns |
+| Good | 1.10x | -2% | 2-4 turns |
+| Great | 1.20x | -5% | 3-6 turns |
 
 ---
 
@@ -1737,7 +1776,7 @@ foreach ($hintsGained as $hint) {
 
 - `UpdateTrainingAnalytics`: Track training patterns
 - `InvalidateTrainingCache`: Clear prediction cache
-- `NotifyLowEnergy`: Alert user via WebSocket
+- `NotifyLowEnergy`: Alert user via queued notification or next refresh cycle
 
 ---
 
@@ -1761,6 +1800,8 @@ App\Exceptions\TrainingException (Base)
 | `TRAIN_TURN_LIMIT` | 422 | Career reached max turns | Start new career |
 | `TRAIN_INSUFFICIENT_ENERGY` | 422 | Energy below minimum threshold | Rest first |
 | `TRAIN_CAREER_NOT_FOUND` | 404 | Career run not found | Verify ID |
+| `TRAIN_NO_ACTIVE_RUN` | 404 | No active run exists in the current storage context | Return to setup or resume flow |
+| `TRAIN_ADVISORY_UNAVAILABLE` | 503 | Advisory provider unavailable; deterministic predictions may still be returned | Retry advisory or continue with deterministic output |
 | `TRAIN_PREDICTION_FAILED` | 500 | Prediction generation failed | Retry request |
 
 ### 10.3 Validation Rules
@@ -1778,6 +1819,12 @@ App\Exceptions\TrainingException (Base)
     'current_turn' => 'required|integer|min:1|max:78',
 ]
 ```text
+
+### 10.4 Additional Recoverable States
+
+- No active run exists in the current storage mode.
+- Advisory routing is unavailable, but deterministic prediction remains available.
+- Authenticated persistence is unavailable while local planning remains possible.
 
 ---
 
@@ -1814,6 +1861,10 @@ Cache::tags(['training', "career:{$career_id}"])->remember(
 ### 11.2 Query Optimization
 
 **Eager Loading**:
+
+Prediction generation must eager load `career.character`, `career.supportDeck`, and
+`career.supportDeck.cards` including relevant pivot fields before any facility loop or
+recommendation calculation.
 
 ```php
 $career = CareerRun::with([
@@ -1886,20 +1937,20 @@ test('calculates base gains correctly', function () {
     $character = Character::factory()->make([
         'growth_rates' => ['speed' => 20, 'power' => 10],
     ]);
-    
+
     $calculator = app(StatGainCalculator::class);
     $gains = $calculator->calculateBase(TrainingType::Speed, $character, 1);
-    
+
     expect($gains->get('speed'))->toBe(12) // 10 * 1.2 (20% growth)
         ->and($gains->get('power'))->toBe(6); // 5 * 1.1 (10% growth) rounded
 });
 
 test('risk increases exponentially below 30 energy', function () {
     $character = Character::factory()->make(['energy_level' => 20]);
-    
+
     $calculator = app(RiskCalculator::class);
     $result = $calculator->calculate($character, TrainingType::Speed);
-    
+
     expect($result['risk'])->toBeGreaterThan(30);
 });
 ```text
@@ -1912,27 +1963,27 @@ test('risk increases exponentially below 30 energy', function () {
 test('successful training updates character stats', function () {
     $user = User::factory()->create();
     $career = CareerRun::factory()->for($user)->create();
-    
+
     $response = $this->actingAs($user)
         ->postJson('/api/v1/training/execute', [
             'career_run_id' => $career->id,
             'facility' => 'speed',
         ]);
-    
+
     $response->assertStatus(200)
         ->assertJsonStructure([
             'result' => ['outcome', 'stat_deltas', 'turn']
         ]);
-    
+
     $career->refresh();
     expect($career->current_turn)->toBe(2);
 });
 
 test('training creates session record', function () {
     $career = CareerRun::factory()->create();
-    
-    app(TrainingService::class)->executeTraining($career, 'speed');
-    
+
+    app(TrainingExecutionService::class)->executeTraining($career, 'speed');
+
     $this->assertDatabaseHas('ucp_training_sessions', [
         'career_id' => $career->id,
         'training_type' => 'speed',
@@ -1948,10 +1999,10 @@ test('training creates session record', function () {
 
 test('predictions include all training types', function () {
     $career = CareerRun::factory()->create();
-    
+
     $service = app(TrainingPredictionService::class);
     $predictions = $service->getPredictions($career);
-    
+
     expect($predictions)->toHaveCount(6) // 5 facilities + rest
         ->and($predictions[0])->toHaveKeys(['type', 'gains', 'risk', 'score']);
 });
@@ -1961,7 +2012,16 @@ test('predictions include all training types', function () {
 
 ## 14. Appendices
 
+Appendix formulas are explanatory summaries only. The authoritative training formula for this
+specification is the game-accurate multiplier chain defined in PRD-002 and the main calculator
+section. Use current filenames and titles for the Training Selection Interface, Training Day Flow,
+and sequence references.
+
 ### Appendix A: Calculation Formulas
+
+Where current route registration, domain naming, or storage-mode branching differs from these
+examples, the route files and updated storage-aware technical flow documents take precedence. The
+examples in this SPEC describe the account-backed contract conceptually.
 
 **Stat Gain Formula**:
 
@@ -1970,9 +2030,9 @@ Final Gain = Base Gain × Level Multiplier × Growth Rate × Mood × Support Mul
 
 Where:
 - Base Gain: Facility constant (10 for primary, 5 for secondary)
-- Level Multiplier: 1.0 + (Level - 1) × 0.1
+- Level Multiplier: 1.0 / 1.25 / 1.5 / 1.75 / 2.0 for facility levels 1-5
 - Growth Rate: 1.0 + (Rate / 100)
-- Mood: 0.90 - 1.10
+- Mood: 0.80 - 1.20 depending on current training mood state
 - Support Multiplier: 1.0 + (Bonus / 100) × 1.2 (if friendship)
 ```
 
@@ -2023,10 +2083,10 @@ Base Risk (Energy):
 
 ---
 
-**Document Control**  
-**Maintained By**: Backend Development Team  
-**Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Document Control**
+**Maintained By**: Backend Development Team
+**Review Frequency**: Bi-weekly during active development
+**Next Review Date**: 2026-02-07
 **Distribution**: Development Team, QA Team, Product Management
 
 ---

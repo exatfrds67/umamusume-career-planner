@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0  
+**Document Version**: 2.2.1
+**Date**: March 11, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Current - Aligned with codebase v2.2.0
 **Related Documents**: [SRS-FR-05], [SDS-4.4], [DBD-4.3], [SPEC-004]
 
 **Source Specs**:
@@ -17,11 +17,12 @@
 
 **Related Artifacts**:
 
-- SPEC: [SPEC-004](../specs/SPEC-004_Skill_Management_Technical.md)
-- Flow: [FLOW-004](../flows/FLOW-004_Skill_Management_System.md)
-- Wireframes: [WF-008](../wireframes/WF-008_Skill_Shop_Interface.md), [WF-009](../wireframes/WF-009_Skill_Loadout_Manager.md)
-- Sequences: [SEQ-003](../sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
-- User Flows: [UF-005](../user-flows/UF-005_Skill_Management_Flow.md)
+- SPEC: [SPEC-004](../02-specs/SPEC-004_Skill_Management_Technical.md)
+- Flow: [FLOW-004](../01-flows/FLOW-004_Skill_Management_System.md)
+- Wireframes: [WF-008](../01-wireframes/WF-008_Skill_Shop_Interface.md),
+[WF-009](../01-wireframes/WF-009_Skill_Loadout_Manager.md)
+- Sequences: [SEQ-003](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- User Flows: [UF-005](../01-user-flows/UF-005_Skill_Management_Flow.md)
 
 ---
 
@@ -46,11 +47,13 @@
 
 ### 1.1 Purpose
 
-Provide a comprehensive system for browsing, planning, and acquiring skills, managing Skill Points (SP) budgets, and tracking skill evolution paths.
+Provide a comprehensive system for browsing, planning, and acquiring skills, managing Skill Points
+(SP) budgets, and tracking skill evolution paths.
 
 ### 1.2 Problem Statement
 
-The vast number of skills, complex prerequisite chains, and varying costs based on hint levels make manual planning error-prone.
+The vast number of skills, complex prerequisite chains, and varying costs based on hint levels make
+manual planning error-prone.
 
 ### 1.3 Solution Overview
 
@@ -86,13 +89,17 @@ The vast number of skills, complex prerequisite chains, and varying costs based 
 | US-4.2 | Player | See SP savings at each hint level | UI shows cost at all 5 hint levels |
 | US-4.3 | Player | Evolve Gold skill | Evolve button active when requirements met |
 | US-4.4 | Player | AI skill suggestions | AI returns optimized skill list |
-| US-4.5 | Coach | Save skill loadout | Ability to save and recall skill sets |
+| US-4.5 | Coach | Save skill loadout | Users can save and recall skill loadouts in the active storage mode. In `StorageMode::LOCAL`, loadouts are stored in browser-local state. In `StorageMode::ACCOUNT`, loadouts are stored in authenticated account-backed persistence. If loadouts are unavailable in the current mode or context, the UI must show an explicit unavailable state. |
 
 ---
 
 ## 4. Functional Requirements
 
 ### 4.1 Skill Catalog & Discovery [FR-05.1]
+
+The catalog must display skill acquisition state explicitly as one of: `available`, `owned`,
+`evolvable`, or `not eligible`. If prerequisite data is missing or unresolved, the skill must be
+shown as unresolved rather than falsely marked available.
 
 - Database with Name, Rarity, Base Cost, Cooldown, Duration, Effect Logic.
 - Filtering by Name, Strategy, Distance, Surface, Effect Type.
@@ -119,6 +126,14 @@ The vast number of skills, complex prerequisite chains, and varying costs based 
 - Skill Sparks (Inheritance): Bonus discount based on star rating
 - Hint Books: Green (white skills), Gold (rare skills)
 
+**Hint Lifecycle**: Hint levels are tracked per skill context for the current trainee and discount
+the next valid purchase of that skill acquisition. Once the purchase is confirmed, the hint discount
+is treated as consumed for that acquisition and must not be presented as reusable state.
+
+**Unique Skill Handling**: Character unique skills are typically granted by character state or
+inheritance rather than purchased from the normal SP shop flow. The planner must model them as non-
+standard acquisitions unless a scenario-specific rule explicitly exposes an SP purchase path.
+
 ### 4.3 Skill Evolution [FR-05.4]
 
 - Upgrade paths from Normal to Rare/Evolved.
@@ -129,6 +144,9 @@ The vast number of skills, complex prerequisite chains, and varying costs based 
 - SkillAdvisorAgent provides optimized skill lists.
 
 ### 4.5 Loadout Management [FR-05.7]
+
+Users may toggle equipped status and save loadouts only when the resulting configuration is valid.
+Invalid combinations must show validation feedback and must not appear saved or confirmed.
 
 - Toggle equipped status, validate conflicts.
 
@@ -192,7 +210,6 @@ The vast number of skills, complex prerequisite chains, and varying costs based 
 
 ## 10. Open Questions and Assumptions
 
-- Unique skills treated as Normal rarity for cost.
 - Scenario event skills as 0-cost acquisitions.
 
 ---
@@ -201,6 +218,7 @@ The vast number of skills, complex prerequisite chains, and varying costs based 
 
 | Version | Date | Changes |
 | --- | --- | --- |
+| 2.2.1 | March 11, 2026 | Clarified hint lifecycle/consumption semantics and documented unique skills as non-standard acquisitions rather than normal shop purchases. |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: corrected hint system to 5 levels (10%/10%/10%/5%/5% = 40% max), added additional discount sources. |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0. |
 | 2.0.0 | January 2026 | Initial v2 release. |

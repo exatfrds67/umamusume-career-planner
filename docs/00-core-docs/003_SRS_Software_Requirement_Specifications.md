@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.0  
-**Date**: February 22, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
+**Document Version**: 2.4.1
+**Date**: March 10, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Current - Aligned with codebase v2.4.0 and Global English server gameplay scope
 
 ---
 
@@ -25,11 +25,14 @@
 
 ## 1. Introduction
 
-This document lists the current functional and non-functional requirements reflected in the implemented Laravel 12 system. It serves as the authoritative reference for system capabilities and technical constraints.
+This document lists the current functional and non-functional requirements reflected in the
+implemented Laravel 12 system. It serves as the authoritative reference for system capabilities and
+technical constraints.
 
 ### 1.1 Purpose
 
-Define the complete set of software requirements for the Umamusume Pretty Derby Career Planner application, translating business requirements into specific, testable technical requirements.
+Define the complete set of software requirements for the Umamusume Pretty Derby Career Planner
+application, translating business requirements into specific, testable technical requirements.
 
 ### 1.2 Scope
 
@@ -73,7 +76,7 @@ mindmap
     Interface
       User Interface
       API Endpoints
-      WebSocket
+            Status Refresh Endpoints
     Data
       Entities
       Validation
@@ -133,7 +136,7 @@ flowchart TD
 | FR-02.2 | Track five core stats: Speed, Stamina, Power, Guts, Wit (soft cap 1200, practical max ~1600) | P0 | Complete |
 | FR-02.3 | Track energy, mood, goals, and progression | P0 | Complete |
 | FR-02.4 | Manage character deck assignments (6-card support deck) | P0 | Complete |
-| FR-02.5 | Support scenario selection (URA Championship, Grand Masters, etc.) | P0 | Complete |
+| FR-02.5 | Support scenario selection for the currently supported Global English server scenarios (URA Finals and Unity Cup) | P0 | Complete |
 | FR-02.6 | Track aptitude grades (S through G, S is maximum) for distance/surface/style | P0 | Complete |
 | FR-02.7 | Manage factor inheritance from parent characters | P0 | Complete |
 | FR-02.8 | Support character snapshots for versioning | P1 | Complete |
@@ -147,7 +150,7 @@ erDiagram
     Character ||--o{ Condition : has
     Character ||--o{ Skill : acquires
     Character ||--o{ Snapshot : captures
-    
+
     Character {
         int id PK
         string name
@@ -224,13 +227,13 @@ flowchart LR
         Readiness[Calculate Readiness]
         Strategy[Recommend Strategy]
     end
-    
+
     subgraph RaceExec[Race Execution]
         Register[Register Entry]
         Execute[Execute Race]
         Result[Record Result]
     end
-    
+
     Analyze --> Readiness --> Strategy
     Strategy --> Register --> Execute --> Result
 ```text
@@ -325,8 +328,8 @@ flowchart TD
 | FR-08.1 | Integrate with umapyoi.net API for game data | P0 | Complete |
 | FR-08.2 | Implement circuit breaker pattern for API resilience | P0 | Complete |
 | FR-08.3 | Support fallback to UmamusumeDB.com | P1 | Complete |
-| FR-08.4 | Process screenshots via OCR (Tesseract + OpenCV) | P1 | Complete |
-| FR-08.5 | Provide WebSocket real-time updates via Laravel Reverb | P1 | Complete |
+| FR-08.4 | Process screenshots via OCR (Tesseract + GD Library) | P1 | Complete |
+| FR-08.5 | Provide background status updates for sync and advisory workflows | P1 | Complete |
 | FR-08.6 | Cache external API responses (24-hour TTL) | P1 | Complete |
 
 ### 2.9 Data Import/Export [FR-09]
@@ -392,6 +395,18 @@ stateDiagram-v2
 | FR-12.3 | Track training efficiency metrics | P1 | Complete |
 | FR-12.4 | Provide race history analysis | P1 | Complete |
 | FR-12.5 | Support stat progression visualization | P0 | Complete |
+
+### 2.13 Admin Panel [FR-13]
+
+**Description:** System management and monitoring capabilities for administrators.
+
+| ID | Requirement | Priority | Status |
+| --- | --- | --- | --- |
+| FR-13.1 | Database management interface | P1 | Complete |
+| FR-13.2 | Application log viewer | P1 | Complete |
+| FR-13.3 | Queue monitor dashboard | P1 | Complete |
+| FR-13.4 | User management | P1 | Complete |
+| FR-13.5 | System settings configuration | P2 | Complete |
 
 ---
 
@@ -519,7 +534,7 @@ flowchart TD
         ToastContainer[Toast Container]
         ModalContainer[Modal Container]
     end
-    
+
     subgraph Pages[Page Components]
         Dashboard
         PlanEditor[Plan Editor]
@@ -527,14 +542,14 @@ flowchart TD
         SkillShop[Skill Shop]
         AIAdvisor[AI Advisor]
     end
-    
+
     subgraph Shared[Shared Components]
         StatBar[Stat Bar]
         AptitudeBadge[Aptitude Badge]
         StorageBadge[Storage Badge]
         SkillCard[Skill Card]
     end
-    
+
     Layout --> Pages
     Pages --> Shared
 ```
@@ -581,17 +596,17 @@ flowchart LR
         Characters["/characters"]
         Import["/import"]
     end
-    
+
     subgraph API[API Routes]
         SkillSearch["/internal/skills/search"]
         TrainingPredict["/api/training/predict"]
         AIAdvice["/api/ai/advice"]
         Export["/api/plans/export"]
     end
-    
-    subgraph WebSocket[WebSocket]
-        CharacterChannel["character.{id}"]
-        NotificationChannel["user.{id}"]
+
+    subgraph StatusRefresh["Status Refresh"]
+        CharacterState["Character state refresh"]
+        NotificationState["Notification unread refresh"]
     end
 ```text
 
@@ -642,14 +657,14 @@ erDiagram
     CareerRun ||--o{ SupportDeck : uses
     Skill ||--o{ SkillCareerRun : referenced_by
     SupportCard ||--o{ SupportDeck : includes
-    
+
     User {
         bigint id PK
         string name
         string email UK
         timestamp created_at
     }
-    
+
     CareerRun {
         bigint id PK
         uuid uuid UK
@@ -661,7 +676,7 @@ erDiagram
         int current_turn
         int total_sp_available
     }
-    
+
     Skill {
         bigint id PK
         string name UK
@@ -669,7 +684,7 @@ erDiagram
         enum tier
         enum type
     }
-    
+
     SupportCard {
         bigint id PK
         string name
@@ -722,7 +737,8 @@ erDiagram
 
 1. **localStorage limit**: Approximately 5-10MB per domain
 2. **Livewire requirements**: PHP server required for Account operations
-3. **Real-time limitations**: WebSocket via Laravel Reverb (no third-party)
+3. **Real-time limitations**: no dedicated push channel is implemented; workflows rely on jobs,
+cache state, and request/poll refresh patterns
 4. **AI model constraints**: Ollama local models have hardware requirements
 5. **AWS Bedrock**: Requires AWS account and API keys for cloud AI
 
@@ -755,7 +771,7 @@ flowchart LR
         BR6[BR-6: AI Advisory]
         BR7[BR-7: Integration]
     end
-    
+
     subgraph Functional[Functional Requirements]
         FR2[FR-02]
         FR3[FR-03]
@@ -765,7 +781,7 @@ flowchart LR
         FR7[FR-07]
         FR8[FR-08]
     end
-    
+
     subgraph Specs[Technical Specs]
         SPEC1[SPEC-001]
         SPEC2[SPEC-002]
@@ -775,7 +791,7 @@ flowchart LR
         SPEC6[SPEC-006]
         SPEC7[SPEC-007]
     end
-    
+
     BR1 --> FR2 --> SPEC1
     BR2 --> FR3 --> SPEC2
     BR3 --> FR4 --> SPEC3
@@ -856,7 +872,8 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.4.0 | 2026-02-22 | Development Team | Updated metrics (3,316+ tests, 11,563+ assertions, 585 routes, 166 services, 52 migrations); added admin panel and MCP monitoring observability requirements; added AI/MCP test data requirements; added MCP to tech stack |
+| 2.4.1 | 2026-03-10 | Development Team | Clarified FR-02.5 to match the current Global English server scenario scope (URA Finals and Unity Cup); added note that future scenario additions will be documented when they release globally |
+| 2.4.0 | 2026-02-22 | Development Team | Updated metrics (3,316+ tests, 11,563+ assertions, 585 routes, 166 services, 67 migrations); added admin panel and MCP monitoring observability requirements; added AI/MCP test data requirements; added MCP to tech stack |
 | 2.3.0 | 2026-02-21 | Development Team | Updated tech stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI, Playwright, Larastan, Pint, Laravel Boost references |
 | 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to align with current implementation, added AI and integration requirements |
@@ -865,4 +882,6 @@ flowchart LR
 
 ---
 
-*This SRS reflects the current implementation status as of February 22, 2026 and serves as the authoritative reference for system requirements.*
+*This SRS reflects the current implementation status as of March 10, 2026 and serves as the
+authoritative reference for system requirements. Future scenario additions should be documented here
+when they become available on the Global English server.*

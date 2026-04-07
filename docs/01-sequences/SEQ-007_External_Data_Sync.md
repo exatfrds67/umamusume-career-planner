@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -25,27 +25,33 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the external data synchronization workflow in the Umamusume Career Planner application, covering API integration with umapyoi.net and UmamusumeDB.com, circuit breaker resilience patterns, and cache management strategies.
+This sequence diagram documents the external data synchronization workflow in the Umamusume Career
+Planner application, centered on `umapyoi.net` with optional secondary or fallback sources where
+configured, alongside circuit breaker resilience patterns and cache management strategies.
 
 ### 1.2 Scope
 
 **Covers:**
 
-- External API data synchronization (umapyoi.net, UmamusumeDB.com)
+- External API synchronization centered on `umapyoi.net`
+- Optional secondary or fallback source handling where configured
 - Circuit breaker pattern for fault tolerance
 - Response caching with 24-hour TTL
-- Fallback API mechanisms
+- Shared reference-data synchronization and polling-friendly status refresh
 - Cache invalidation strategies
-- WebSocket real-time update broadcasting
 - OCR screenshot processing integration
+
+**Storage-mode note:** `StorageMode::LOCAL` state may remain browser-managed and UUID-oriented until
+converted through the storage transition flow documented in
+[SEQ-017](SEQ-017_Storage_Mode_Transition.md).
 
 **Related Artifacts:**
 
-- PRD: [PRD-007](../prds/PRD-007_External_Integration.md)
-- SPEC: [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
-- Flow: [FLOW-007](../flows/FLOW-007_External_Integration_System.md)
-- Tech Flow: [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
-- User Flow: [UF-008](../user-flows/UF-008_OCR_and_Data_Import_Flow.md)
+- PRD: [PRD-007](../02-prds/PRD-007_External_Integration.md)
+- SPEC: [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md)
+- Flow: [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md)
+- Tech Flow: [TECH-FLOW-007](../01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
+- User Flow: [UF-008](../01-user-flows/UF-008_OCR_and_Data_Import_Flow.md)
 
 ### 1.3 Business Context
 
@@ -81,7 +87,7 @@ External data synchronization enables the application to:
 | **CircuitBreaker** | Infrastructure | Fault tolerance and state management |
 | **CacheManager** | Infrastructure | Redis-based response caching |
 | **Database** | Infrastructure | MySQL/MariaDB persistence layer |
-| **WebSocketService** | Infrastructure | Laravel Reverb real-time updates |
+| **Status Refresh Flow** | Infrastructure | Queue/cache-backed sync status updates |
 | **EventDispatcher** | Infrastructure | Laravel event broadcasting |
 
 ### 2.2 Component Locations
@@ -126,20 +132,20 @@ sequenceDiagram
     participant Cache as Redis Cache
     participant DB as Database
     participant Events as EventDispatcher
-    participant WS as WebSocket (Reverb)
+    participant WS as Status Refresh
 
     Note over Scheduler,WS: SCHEDULED SYNC TRIGGER
     Scheduler->>Service: Trigger daily sync job
     Service->>Service: Load sync configuration
-    
+
     Note over Service,WS: SYNC EXECUTION LOOP
     loop For each sync target (characters, skills, support_cards)
         Service->>Circuit: Check circuit state
-        
+
         alt Circuit CLOSED (Normal Operation)
             Circuit-->>Service: Allow request
             Service->>Primary: GET /api/{resource}
-            
+
             alt Primary Success
                 Primary-->>Service: 200 OK + data
                 Service->>Service: Parse and validate response
@@ -153,14 +159,14 @@ sequenceDiagram
                 Primary-->>Service: Timeout/500 Error
                 Service->>Circuit: Record failure
                 Circuit->>Circuit: Increment failure count
-                
+
                 alt Failure Threshold Exceeded
                     Circuit->>Circuit: OPEN circuit
                     Service->>Cache: Check cached data
                     Cache-->>Service: Return stale cache
                 else Retry Available
                     Service->>Fallback: GET /api/{resource}
-                    
+
                     alt Fallback Success
                         Fallback-->>Service: 200 OK + data
                         Service->>Cache: Store response
@@ -174,11 +180,11 @@ sequenceDiagram
             Circuit-->>Service: Block request
             Service->>Cache: Retrieve cached data
             Cache-->>Service: Return cached (stale)
-            
+
             Note over Circuit: After timeout period
             Circuit->>Circuit: Transition to HALF-OPEN
             Circuit->>Primary: Probe request
-            
+
             alt Probe Success
                 Primary-->>Circuit: 200 OK
                 Circuit->>Circuit: CLOSE circuit
@@ -187,11 +193,11 @@ sequenceDiagram
             end
         end
     end
-    
+
     Service->>Events: Dispatch DataSynced event
     Events->>WS: Broadcast data.updated
     Events->>Events: Log sync results
-    
+
     Service-->>Scheduler: Sync complete
 
     Note over Admin,WS: MANUAL SYNC TRIGGER
@@ -215,7 +221,7 @@ sequenceDiagram
 | **Cache Update** | ~50ms | Write to Redis cache |
 | **Database Sync** | ~200-500ms | Bulk update local records |
 | **Event Dispatch** | ~30ms | Queue event listeners |
-| **WebSocket Broadcast** | ~50ms | Real-time update to clients |
+| **Status Refresh** | Request-dependent | Updated sync state visible to clients |
 | **Total (Success)** | ~2-3s | Complete sync cycle |
 | **Total (Cached)** | ~200ms | Cache hit scenario |
 
@@ -243,86 +249,86 @@ class ExternalAPIService
         private CircuitBreaker $circuitBreaker,
         private CacheManager $cache,
     ) {}
-    
+
     public function syncResource(string $resource): SyncResult
     {
         $cacheKey = "external_api:{$resource}";
-        
+
         // Check circuit breaker state
         if ($this->circuitBreaker->isOpen()) {
             Log::warning("Circuit breaker OPEN for {$resource}, using cache");
             return $this->fromCache($cacheKey);
         }
-        
+
         try {
             // Attempt primary API
             $response = $this->primary->fetch($resource);
-            
+
             // Validate response
             $validated = $this->validateResponse($response, $resource);
-            
+
             // Cache successful response
             $this->cache->put($cacheKey, $validated, 86400); // 24 hours
-            
+
             // Update local database
             $this->updateLocalData($resource, $validated);
-            
+
             // Record success
             $this->circuitBreaker->recordSuccess();
-            
+
             return SyncResult::success($validated);
-            
+
         } catch (ApiTimeoutException $e) {
             Log::error("Primary API timeout for {$resource}", ['error' => $e->getMessage()]);
-            
+
             // Record failure
             $this->circuitBreaker->recordFailure();
-            
+
             // Attempt fallback
             return $this->tryFallback($resource, $cacheKey);
-            
+
         } catch (ApiException $e) {
             Log::error("Primary API error for {$resource}", ['error' => $e->getMessage()]);
-            
+
             $this->circuitBreaker->recordFailure();
-            
+
             return $this->tryFallback($resource, $cacheKey);
         }
     }
-    
+
     private function tryFallback(string $resource, string $cacheKey): SyncResult
     {
         try {
             $response = $this->fallback->fetch($resource);
             $validated = $this->validateResponse($response, $resource);
-            
+
             $this->cache->put($cacheKey, $validated, 86400);
             $this->updateLocalData($resource, $validated);
-            
+
             return SyncResult::success($validated, 'fallback');
-            
+
         } catch (ApiException $e) {
             Log::error("Fallback API also failed for {$resource}");
-            
+
             // Return stale cache if available
             $cached = $this->cache->get($cacheKey);
-            
+
             if ($cached) {
                 return SyncResult::cached($cached, stale: true);
             }
-            
+
             return SyncResult::failed($e->getMessage());
         }
     }
-    
+
     private function fromCache(string $cacheKey): SyncResult
     {
         $cached = $this->cache->get($cacheKey);
-        
+
         if ($cached) {
             return SyncResult::cached($cached);
         }
-        
+
         return SyncResult::failed('No cached data available');
     }
 }
@@ -347,15 +353,15 @@ class CircuitBreaker
     private const FAILURE_THRESHOLD = 5;
     private const RECOVERY_TIMEOUT = 60; // seconds
     private const HALF_OPEN_LIMIT = 3; // test requests
-    
+
     public function __construct(
         private CacheManager $cache,
     ) {}
-    
+
     public function isOpen(): bool
     {
         $state = $this->getState();
-        
+
         if ($state === 'open') {
             // Check if recovery timeout has elapsed
             if ($this->shouldAttemptRecovery()) {
@@ -364,14 +370,14 @@ class CircuitBreaker
             }
             return true;
         }
-        
+
         return false;
     }
-    
+
     public function recordSuccess(): void
     {
         $state = $this->getState();
-        
+
         if ($state === 'half_open') {
             // Successful probe, close circuit
             $this->setState('closed');
@@ -382,13 +388,13 @@ class CircuitBreaker
             $this->resetFailureCount();
         }
     }
-    
+
     public function recordFailure(): void
     {
         $state = $this->getState();
-        
+
         $failures = $this->incrementFailureCount();
-        
+
         if ($failures >= self::FAILURE_THRESHOLD) {
             $this->setState('open');
             $this->setRecoveryTimeout();
@@ -397,40 +403,40 @@ class CircuitBreaker
             ]);
         }
     }
-    
+
     private function getState(): string
     {
         return $this->cache->get('circuit_breaker:state', 'closed');
     }
-    
+
     private function setState(string $state): void
     {
         $this->cache->put('circuit_breaker:state', $state, 3600);
     }
-    
+
     private function incrementFailureCount(): int
     {
         $count = $this->cache->increment('circuit_breaker:failures');
         $this->cache->expire('circuit_breaker:failures', 3600);
         return $count;
     }
-    
+
     private function resetFailureCount(): void
     {
         $this->cache->forget('circuit_breaker:failures');
     }
-    
+
     private function shouldAttemptRecovery(): bool
     {
         $timeout = $this->cache->get('circuit_breaker:recovery_timeout');
-        
+
         if (!$timeout) {
             return true;
         }
-        
+
         return now()->greaterThan($timeout);
     }
-    
+
     private function setRecoveryTimeout(): void
     {
         $timeout = now()->addSeconds(self::RECOVERY_TIMEOUT);
@@ -449,17 +455,17 @@ class UmapyoiApiClient
 {
     private string $baseUrl;
     private int $timeout;
-    
+
     public function __construct()
     {
         $this->baseUrl = config('external-apis.umapyoi.base_url');
         $this->timeout = config('external-apis.umapyoi.timeout', 10);
     }
-    
+
     public function fetch(string $resource): array
     {
         $url = "{$this->baseUrl}/api/{$resource}";
-        
+
         try {
             $response = Http::timeout($this->timeout)
                 ->withHeaders([
@@ -467,30 +473,30 @@ class UmapyoiApiClient
                     'User-Agent' => 'UmamusumeCareerPlanner/2.0',
                 ])
                 ->get($url);
-            
+
             if (!$response->successful()) {
                 throw new ApiException("API returned {$response->status()}");
             }
-            
+
             return $response->json();
-            
+
         } catch (ConnectionException $e) {
             throw new ApiTimeoutException("Connection timeout: {$e->getMessage()}");
         } catch (RequestException $e) {
             throw new ApiException("Request failed: {$e->getMessage()}");
         }
     }
-    
+
     public function fetchCharacters(): array
     {
         return $this->fetch('characters');
     }
-    
+
     public function fetchSkills(): array
     {
         return $this->fetch('skills');
     }
-    
+
     public function fetchSupportCards(): array
     {
         return $this->fetch('support-cards');
@@ -506,32 +512,32 @@ class UmamusumeDBApiClient
 {
     private string $baseUrl;
     private int $timeout;
-    
+
     public function __construct()
     {
         $this->baseUrl = config('external-apis.umamusumedb.base_url');
         $this->timeout = config('external-apis.umamusumedb.timeout', 10);
     }
-    
+
     public function fetch(string $resource): array
     {
         // Different endpoint structure from primary
         $url = "{$this->baseUrl}/v1/{$resource}";
-        
+
         $response = Http::timeout($this->timeout)
             ->withHeaders([
                 'Accept' => 'application/json',
             ])
             ->get($url);
-        
+
         if (!$response->successful()) {
             throw new ApiException("Fallback API returned {$response->status()}");
         }
-        
+
         // Transform response to match primary API format
         return $this->transformResponse($response->json(), $resource);
     }
-    
+
     private function transformResponse(array $data, string $resource): array
     {
         // Normalize different API schema to internal format
@@ -557,11 +563,11 @@ private function validateResponse(array $response, string $resource): array
         'support-cards' => $this->validateSupportCards($response),
         default => throw new \InvalidArgumentException("Unknown resource: {$resource}"),
     };
-    
+
     if ($validator->fails()) {
         throw new ValidationException($validator);
     }
-    
+
     return $validator->validated();
 }
 
@@ -585,7 +591,7 @@ private function updateLocalData(string $resource, array $data): void
 {
     DB::transaction(function () use ($resource, $data) {
         $model = $this->getModelForResource($resource);
-        
+
         foreach ($data as $record) {
             $model::updateOrCreate(
                 ['external_id' => $record['id']],
@@ -596,32 +602,32 @@ private function updateLocalData(string $resource, array $data): void
 }
 ```
 
-### 4.5 WebSocket Real-Time Updates
+### 4.5 Background Status Updates
 
 ```php
 // ExternalDataSynced Event
 class ExternalDataSynced implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    
+
     public function __construct(
         public string $resource,
         public int $recordsUpdated,
         public string $source,
     ) {}
-    
+
     public function broadcastOn(): array
     {
         return [
             new Channel('external-data'),
         ];
     }
-    
+
     public function broadcastAs(): string
     {
         return 'data.synced';
     }
-    
+
     public function broadcastWith(): array
     {
         return [
@@ -770,7 +776,7 @@ sequenceDiagram
     participant Circuit as CircuitBreaker
 
     Service->>Primary: Fetch data
-    
+
     alt Primary Success
         Primary-->>Service: 200 OK
         Service->>Cache: Update cache
@@ -779,14 +785,14 @@ sequenceDiagram
         Primary-->>Service: Timeout
         Service->>Circuit: Record failure
         Service->>Fallback: Fetch data
-        
+
         alt Fallback Success
             Fallback-->>Service: 200 OK
             Service->>Cache: Update cache
         else Fallback Failure
             Fallback-->>Service: Error
             Service->>Cache: Get stale cache
-            
+
             alt Cache Available
                 Cache-->>Service: Return stale
             else No Cache
@@ -804,25 +810,25 @@ private function fetchWithRetry(callable $fetcher, int $maxRetries = 3): array
 {
     $attempt = 0;
     $backoff = 1; // seconds
-    
+
     while ($attempt < $maxRetries) {
         try {
             return $fetcher();
         } catch (ApiTimeoutException $e) {
             $attempt++;
-            
+
             if ($attempt >= $maxRetries) {
                 throw $e;
             }
-            
+
             // Exponential backoff
             sleep($backoff);
             $backoff *= 2;
-            
+
             Log::info("Retrying API request, attempt {$attempt}/{$maxRetries}");
         }
     }
-    
+
     throw new ApiException("Max retries exceeded");
 }
 ```text
@@ -839,7 +845,7 @@ private function fetchWithRetry(callable $fetcher, int $maxRetries = 3): array
 | Fallback API response | <3s | ~2.2s | ✅ Met |
 | Cache retrieval | <50ms | ~30ms | ✅ Met |
 | Database sync | <1s | ~800ms | ✅ Met |
-| WebSocket broadcast | <100ms | ~50ms | ✅ Met |
+| Status refresh propagation | request-dependent | request-dependent | ✅ Implemented |
 | Total sync (cached) | <200ms | ~150ms | ✅ Met |
 
 ### 7.2 Optimization Strategies
@@ -909,10 +915,10 @@ CREATE INDEX idx_external_api_cache ON ucp_cache(key, expires_at);
 
 | Document | Description |
 | --- | --- |
-| [PRD-007](../prds/PRD-007_External_Integration.md) | Product requirements for external integration |
-| [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
-| [FLOW-007](../flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
-| [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md) | Technical flow diagrams |
+| [PRD-007](../02-prds/PRD-007_External_Integration.md) | Product requirements for external integration |
+| [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
+| [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
+| [TECH-FLOW-007](../01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md) | Technical flow diagrams |
 
 ### 8.2 Related Sequences
 
@@ -926,7 +932,7 @@ CREATE INDEX idx_external_api_cache ON ucp_cache(key, expires_at);
 
 | Document | Description |
 | --- | --- |
-| [UF-008](../user-flows/UF-008_OCR_and_Data_Import_Flow.md) | User flow for OCR and data import |
+| [UF-008](../01-user-flows/UF-008_OCR_and_Data_Import_Flow.md) | User flow for OCR and data import |
 
 ### 8.4 Configuration Documentation
 
@@ -934,7 +940,7 @@ CREATE INDEX idx_external_api_cache ON ucp_cache(key, expires_at);
 | --- | --- |
 | `config/external-apis.php` | External API configuration |
 | `config/cache.php` | Cache driver configuration |
-| `config/broadcasting.php` | WebSocket configuration |
+| Queue and cache configuration | Status delivery configuration |
 
 ---
 
@@ -971,4 +977,7 @@ CREATE INDEX idx_external_api_cache ON ucp_cache(key, expires_at);
 
 ---
 
-*This sequence diagram reflects the current implementation of the external data synchronization workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/ExternalAPI/ExternalAPIService.php`, `app/Services/ExternalAPI/CircuitBreaker.php`, and related files.*
+*This sequence diagram reflects the current implementation of the external data synchronization
+workflow as of v2.0.0. For the most up-to-date information, refer to the source code in
+`app/Services/ExternalAPI/ExternalAPIService.php`, `app/Services/ExternalAPI/CircuitBreaker.php`,
+and related files.*

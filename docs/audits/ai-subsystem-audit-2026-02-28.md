@@ -60,14 +60,17 @@ Controllers/Livewire
 - **File**: `.env` line 87
 - **Value**: `AWS_BEDROCK_ENABLED==true`
 - **Impact**: PHP `env()` reads this as `=true` (string with leading `=`), not boolean `true`
-- **Additionally**: Config reads `BEDROCK_ENABLED` (see `config/ai.php` line 83) but `.env` sets `AWS_BEDROCK_ENABLED` — these are **different env var names**. Bedrock `enabled` flag always falls back to the config default (`true`), ignoring the .env entirely.
+- **Additionally**: Config reads `BEDROCK_ENABLED` (see `config/ai.php` line 83) but `.env` sets
+`AWS_BEDROCK_ENABLED` — these are **different env var names**. Bedrock `enabled` flag always falls
+back to the config default (`true`), ignoring the .env entirely.
 
 #### BUG-002: Ollama default model mismatch
 
 - **File**: `.env` line 113 sets `OLLAMA_DEFAULT_MODEL=llama3`
 - **Config**: `config/ai.php` line 33 defaults to `llama3.3`
 - **Config neuron.php** defaults to `llama3.3`
-- **Impact**: The `.env` value `llama3` is used (overrides config default). If `llama3` is not installed locally but `llama3.3` is, every Ollama request will fail with "model not found".
+- **Impact**: The `.env` value `llama3` is used (overrides config default). If `llama3` is not
+installed locally but `llama3.3` is, every Ollama request will fail with "model not found".
 
 #### BUG-003: BEDROCK_MODEL_PREFERENCES references nonexistent model
 
@@ -93,7 +96,8 @@ Controllers/Livewire
 #### SEC-003: `set_time_limit(0)` in AIChatController
 
 - **File**: `app/Http/Controllers/AIChatController.php` lines 51, 123
-- **Risk**: No execution time limit on AI chat requests — potential DoS vector. A single slow/hung Ollama request ties up a PHP worker indefinitely.
+- **Risk**: No execution time limit on AI chat requests — potential DoS vector. A single slow/hung
+Ollama request ties up a PHP worker indefinitely.
 - **Recommendation**: Set `set_time_limit(120)` maximum, matching the Ollama timeout.
 
 #### SEC-004: Error message exposure in AdvisoryController
@@ -107,7 +111,8 @@ Controllers/Livewire
 #### ARCH-001: Fake streaming in AIChatController
 
 - **File**: `app/Http/Controllers/AIChatController.php` `sendMessageStreaming()`
-- **Issue**: Not true SSE/streaming. The full AI response is generated first, then chunked into 160-character pieces for display.
+- **Issue**: Not true SSE/streaming. The full AI response is generated first, then chunked into
+160-character pieces for display.
 - **Impact**: User sees no output until the entire response is generated (defeats the purpose of streaming).
 
 #### ARCH-002: VectorStoreService missing HTTP timeout
@@ -120,7 +125,8 @@ Controllers/Livewire
 
 - **File**: `app/Neuron/Agents/TrainingAdvisorAgent.php` line ~25
 - **Issue**: `AIProvider::driver('anthropic')` is hardcoded. No fallback to Ollama or Bedrock.
-- **Impact**: Agent fails entirely if Anthropic key is missing or invalid. Should use `config('neuron.provider.default')` like `BaseAgent` does.
+- **Impact**: Agent fails entirely if Anthropic key is missing or invalid. Should use
+`config('neuron.provider.default')` like `BaseAgent` does.
 
 #### ARCH-004: AIPerformanceMonitor uses volatile cache only
 
@@ -131,7 +137,8 @@ Controllers/Livewire
 #### ARCH-005: CostTrackingService budget is advisory-only
 
 - **File**: `app/Services/AI/CostTrackingService.php`
-- **Issue**: Budget status returns "exceeded"/"critical"/"warning" labels but no code path actually blocks requests when budget is exceeded.
+- **Issue**: Budget status returns "exceeded"/"critical"/"warning" labels but no code path actually
+blocks requests when budget is exceeded.
 - **Impact**: Runaway costs possible if Bedrock is heavily used.
 
 #### ARCH-006: ConversationManagementService storeAgentLearning is a stub
@@ -151,7 +158,8 @@ Controllers/Livewire
 #### CODE-001: CostTrackingService uses raw DB queries
 
 - **File**: `app/Services/AI/CostTrackingService.php`
-- **Issue**: Uses `DB::table('ucp_ai_costs')` instead of Eloquent model — violates project AGENTS.md guidelines ("Avoid `DB::`, prefer `Model::query()`").
+- **Issue**: Uses `DB::table('ucp_ai_costs')` instead of Eloquent model — violates project AGENTS.md
+guidelines ("Avoid `DB::`, prefer `Model::query()`").
 
 #### CODE-002: HybridAIService `storeConversation` hardcodes user_id
 
@@ -162,7 +170,8 @@ Controllers/Livewire
 #### CODE-003: Duplicate Neuron API routes
 
 - **File**: `routes/api.php`
-- **Issue**: Neuron routes are defined twice — once under `/neuron/` prefix and once as standalone routes (`/training-advisor/`, `/race-strategy/`, etc.).
+- **Issue**: Neuron routes are defined twice — once under `/neuron/` prefix and once as standalone
+routes (`/training-advisor/`, `/race-strategy/`, etc.).
 - **Impact**: Redundant endpoints, potential confusion, double the attack surface.
 
 #### CODE-004: VectorStoreService logs full stack trace
@@ -265,13 +274,17 @@ Controllers/Livewire
 
 #### SHOULD-HAVE (Important Gaps)
 
-1. **Budget enforcement test** — Verify that `AgentRoutingService` actually blocks requests when budget is exceeded (current code checks but may not enforce)
+1. **Budget enforcement test** — Verify that `AgentRoutingService` actually blocks requests when
+budget is exceeded (current code checks but may not enforce)
 
-2. **Timeout integration test** — End-to-end test verifying that Ollama timeout actually fires and triggers Bedrock fallback
+2. **Timeout integration test** — End-to-end test verifying that Ollama timeout actually fires and
+triggers Bedrock fallback
 
-3. **RAG integration test** — Test that `VectorStoreService.getRelevantContext()` properly enriches prompts through `HybridAIService`
+3. **RAG integration test** — Test that `VectorStoreService.getRelevantContext()` properly enriches
+prompts through `HybridAIService`
 
-4. **Duplicate route test** — Verify both `/neuron/training-advisor/advice` and `/training-advisor/advice` hit the same controller
+4. **Duplicate route test** — Verify both `/neuron/training-advisor/advice` and `/training-
+advisor/advice` hit the same controller
 
 ---
 
@@ -313,8 +326,11 @@ Controllers/Livewire
 
 ### 5.3 Documentation Improvements
 
-- **`docs/neuron/ai-providers.md`** lists providers not wired into HybridAIService (OpenAI, Gemini, Mistral, etc.). Should clarify which providers are available through the app vs. directly through Neuron.
-- **Implementation summary** should be updated — it shows 52% completion but the test suite suggests more features are implemented.
+- **`docs/neuron/ai-providers.md`** lists providers not wired into HybridAIService (OpenAI, Gemini,
+Mistral, etc.). Should clarify which providers are available through the app vs. directly through
+Neuron.
+- **Implementation summary** should be updated — it shows 52% completion but the test suite suggests
+more features are implemented.
 
 ---
 

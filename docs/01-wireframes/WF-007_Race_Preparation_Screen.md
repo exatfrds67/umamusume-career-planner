@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.4.0
+**Date**: March 8, 2026
 **Related Documents**: [PRD-003], [SPEC-003], [FLOW-003], [SEQ-004]
 
 **Source Specs**:
@@ -13,13 +13,20 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-003](../prds/PRD-003_Race_Strategy.md)
-- SPEC: [SPEC-003](../specs/SPEC-003_Race_Strategy_Technical.md)
-- Flow: [FLOW-003](../flows/FLOW-003_Race_Strategy_System.md)
-- Tech Flow: [TECH-FLOW-003](../tech-flow/TECH-FLOW-003_Race_Strategy_Flow.md)
-- Sequences: [SEQ-004](../sequences/SEQ-004_Race_Registration_and_Outcome.md)
-- User Flows: [UF-004](../user-flows/UF-004_Race_Day_Flow.md)
+- PRD: [PRD-003](../02-prds/PRD-003_Race_Strategy.md)
+- SPEC: [SPEC-003](../02-specs/SPEC-003_Race_Strategy_Technical.md)
+- Flow: [FLOW-003](../01-flows/FLOW-003_Race_Strategy_System.md)
+- Tech Flow: [TECH-FLOW-003](../01-tech-flow/TECH-FLOW-003_Race_Strategy_Flow.md)
+- Sequences: [SEQ-004](../01-sequences/SEQ-004_Race_Registration_and_Outcome.md)
+- User Flows: [UF-004](../01-user-flows/UF-004_Race_Day_Flow.md), [UF-011](../01-user-
+flows/UF-011_Target_Race_Planning_Flow.md), [UF-010](../01-user-
+flows/UF-010_Career_Reporting_and_Export_Flow.md)
 - Related WF: [WF-006](WF-006_Race_Calendar_View.md), [WF-001](WF-001_Dashboard_Overview.md)
+
+**Alignment Note**: This wireframe defines the intended readiness and strategy-review experience
+around a selected race. Exact routes, controllers, provider behavior, and mutation boundaries should
+be verified against the aligned race planning, race execution, and reporting docs before being
+treated as implementation-exact.
 
 ---
 
@@ -27,7 +34,9 @@
 
 ### 1.1 Purpose
 
-The Race Preparation Screen provides comprehensive analysis and recommendations for upcoming races, enabling players to assess readiness, optimize running style strategy, and receive AI-powered tactical advice for competitive performance.
+The Race Preparation Screen provides comprehensive analysis and recommendations for upcoming races,
+enabling players to assess readiness, optimize running style strategy, and receive AI-powered
+tactical advice for competitive performance.
 
 ### 1.2 Key Objectives
 
@@ -48,6 +57,28 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
 | US-003 | As a player, I want running style recommendations with reasoning | P0 |
 | US-004 | As a player, I want AI-powered race strategy advice | P1 |
 | US-005 | As a player, I want a preparation checklist before race day | P1 |
+
+### 1.4 Storage Mode Support
+
+- `StorageMode::ACCOUNT`: supports authenticated race browsing, race-entry mutation, recorded
+results, and reporting paths.
+- `StorageMode::LOCAL`: should be treated as planning, readiness, and advisory-only unless a
+verified local persistence path exists for the specific action.
+
+### 1.5 Navigation Surface
+
+This wireframe uses conceptual labels such as Race Preparation, Readiness Assessment, and Entry
+Flow. Where implementation-backed navigation matters, the aligned race strategy and target-planning
+docs describe the current route surface.
+
+### 1.6 Planning, Readiness, and Entry Boundary
+
+This screen should separate:
+
+- readiness and strategy review
+- target planning or deferral
+- authenticated entry mutation
+- reporting and export follow-up after account-backed results
 
 ---
 
@@ -155,18 +186,20 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
 │ │            │ │                                               ││  │
 │ │            │ │ Win probability with this strategy: 38%       ││  │
 │ │            │ │ Confidence: 87%                               ││  │
-│ │            │ │ Provider: Ollama (Local)                      ││  │
+│ │            │ │ Provider: Environment-configured              ││  │
 │ │            │ │                                               ││  │
 │ │            │ │ [ASK FOLLOW-UP] [VIEW DETAILED ANALYSIS]      ││  │
 │ │            │ └───────────────────────────────────────────────┘│  │
 │ │            │                                                   │  │
 │ │            │ ┌───────────────────────────────────────────────┐│  │
 │ │            │ │ Quick Actions                                 ││  │
-│ │            │ │ [ENTER RACE] [RUN SIMULATION] [ASK AI]        ││  │
-│ │            │ │ [SAVE STRATEGY] [BACK TO CALENDAR]            ││  │
+│ │            │ │ [PLAN TARGET] [OPEN ENTRY*] [ASK AI]          ││  │
+│ │            │ │ [VIEW REPORTS*] [BACK TO CALENDAR]            ││  │
 │ │            │ └───────────────────────────────────────────────┘│  │
 │ └────────────┴───────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────┘
+
+`*` Account-mode authenticated action only. In Local mode, the equivalent CTA should remain planning or advisory-only.
 
 ```
 
@@ -215,7 +248,7 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
 │ │ [View Recommendation ▼]                       │  │
 │ └──────────────────────────────────────────────┘  │
 │                                                    │
-│ [ENTER RACE] [SIMULATE] [ASK AI]                  │
+│ [PLAN TARGET] [OPEN ENTRY*] [ASK AI]              │
 └────────────────────────────────────────────────────┘
 
 ```
@@ -276,19 +309,31 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
 │                              │
 │ ─────────────────────────────│
 │                              │
-│ [ENTER RACE]                 │
-│ [SIMULATE]                   │
+│ [PLAN TARGET]                │
+│ [OPEN ENTRY*]                │
 │ [ASK AI]                     │
 └──────────────────────────────┘
 │  Bottom Navigation Bar       │
 │ [🏠][👤][⚡][🏆][🤖]\[⚙️]   │
 └──────────────────────────────┘
 
+### 2.4 Screen Variants
+
+- planning-only review in Local mode
+- authenticated entry-ready review in Account mode
+- reduced-detail advisory when provider or strategy enrichment is unavailable
+- no active run or blocked entry state
+- post-race reporting path visible only when account-backed results exist
+
 ```
 
 ---
 
 ## 3. Component Specifications
+
+The component names and snippets in this section are illustrative UI contracts. They should not be
+treated as a verified inventory of current file names or final class boundaries unless the aligned
+implementation docs confirm them.
 
 ### 3.1 Race Information Header
 
@@ -300,7 +345,7 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
         <h1 class="text-2xl font-bold">{{ $race->name }}</h1>
         <span class="badge badge-{{ strtolower($race->grade) }}">{{ $race->grade }}</span>
     </div>
-    
+
     <div class="race-header__details">
         <div class="detail-item">
             <span class="detail-label">Track:</span>
@@ -347,19 +392,19 @@ class ReadinessAssessment extends Component
 {
     public Race $race;
     public Character $character;
-    
+
     public function mount(Race $race, Character $character)
     {
         $this->race = $race;
         $this->character = $character;
     }
-    
+
     public function getReadinessProperty()
     {
         return app(RaceReadinessService::class)
             ->calculateReadiness($this->character, $this->race);
     }
-    
+
     public function render()
     {
         return view('livewire.race.readiness-assessment', [
@@ -405,19 +450,19 @@ class WinProbability extends Component
 {
     public Race $race;
     public Character $character;
-    
+
     public function mount(Race $race, Character $character)
     {
         $this->race = $race;
         $this->character = $character;
     }
-    
+
     public function getProbabilityProperty()
     {
         return app(RaceStrategyService::class)
             ->calculateWinProbability($this->character, $this->race);
     }
-    
+
     public function render()
     {
         return view('livewire.race.win-probability', [
@@ -454,7 +499,7 @@ class WinProbability extends Component
 ```blade
 <div class="stat-requirements" data-testid="stat-requirements">
     <h3 class="text-lg font-semibold mb-4">Stat Requirements</h3>
-    
+
     @foreach(['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
         <div class="stat-requirement-row" data-testid="stat-req-{{ $stat }}">
             <div class="stat-info">
@@ -500,19 +545,19 @@ class RunningStyleRecommendation extends Component
 {
     public Race $race;
     public Character $character;
-    
+
     public function mount(Race $race, Character $character)
     {
         $this->race = $race;
         $this->character = $character;
     }
-    
+
     public function getRecommendationProperty()
     {
         return app(RunningStyleOptimizer::class)
             ->recommend($this->character, $this->race);
     }
-    
+
     public function render()
     {
         return view('livewire.race.running-style-recommendation', [
@@ -590,19 +635,19 @@ class PreparationChecklist extends Component
 {
     public Race $race;
     public Character $character;
-    
+
     public function mount(Race $race, Character $character)
     {
         $this->race = $race;
         $this->character = $character;
     }
-    
+
     public function getChecklistProperty()
     {
         return app(RacePreparationService::class)
             ->generateChecklist($this->character, $this->race);
     }
-    
+
     public function render()
     {
         return view('livewire.race.preparation-checklist', [
@@ -653,19 +698,19 @@ class AIStrategyAnalysis extends Component
 {
     public Race $race;
     public Character $character;
-    
+
     public function mount(Race $race, Character $character)
     {
         $this->race = $race;
         $this->character = $character;
     }
-    
+
     public function getStrategyProperty()
     {
-        return app(AIAdvisoryService::class)
+        return app(HybridAIService::class)
             ->getRaceStrategy($this->character, $this->race);
     }
-    
+
     public function askFollowUp()
     {
         return redirect()->route('ai-advisor', [
@@ -673,7 +718,7 @@ class AIStrategyAnalysis extends Component
             'race_id' => $this->race->id,
         ]);
     }
-    
+
     public function render()
     {
         return view('livewire.race.ai-strategy-analysis', [
@@ -705,7 +750,7 @@ class AIStrategyAnalysis extends Component
 │                                                    │
 │ Win probability with this strategy: 38%            │
 │ Confidence: 87%                                    │
-│ Provider: Ollama (Local)                           │
+│ Provider: Environment-configured                   │
 │                                                    │
 │ [ASK FOLLOW-UP] [VIEW DETAILED ANALYSIS]           │
 └────────────────────────────────────────────────────┘
@@ -714,6 +759,9 @@ class AIStrategyAnalysis extends Component
 ---
 
 ## 4. State Management
+
+This screen should distinguish advisory-only planning from authenticated entry mutation. It should
+not imply that every action shown here persists through the same DB-backed path.
 
 ### 4.1 Livewire Component State
 
@@ -725,7 +773,7 @@ class RacePreparation extends Component
     public Race $race;
     public Character $character;
     public CareerRun $careerRun;
-    
+
     public $expandedSections = [
         'readiness' => true,
         'stats' => true,
@@ -733,28 +781,27 @@ class RacePreparation extends Component
         'checklist' => false,
         'ai_strategy' => false,
     ];
-    
+
     protected $listeners = [
         'stats-updated' => '$refresh',
         'energy-changed' => '$refresh',
     ];
-    
+
     public function toggleSection(string $section)
     {
         $this->expandedSections[$section] = !$this->expandedSections[$section];
     }
-    
-    public function enterRace()
+
+    public function openEntryFlow()
     {
-        // Confirmation modal, then register
         $this->dispatch('open-modal', 'confirm-race-entry');
     }
-    
+
     public function runSimulation()
     {
         return redirect()->route('race.simulation', ['race' => $this->race]);
     }
-    
+
     public function askAI()
     {
         return redirect()->route('ai-advisor', [
@@ -762,7 +809,7 @@ class RacePreparation extends Component
             'race_id' => $this->race->id,
         ]);
     }
-    
+
     public function render()
     {
         return view('livewire.race.race-preparation');
@@ -780,27 +827,27 @@ sequenceDiagram
     participant StrategyService as Strategy Service
     participant AIService as AI Advisory Service
     participant Database
-    
+
     User->>PrepScreen: View race preparation
     PrepScreen->>ReadinessService: Calculate readiness
     ReadinessService->>Database: Load character stats/aptitudes
     Database-->>ReadinessService: Character data
     ReadinessService->>ReadinessService: Calculate factors
     ReadinessService-->>PrepScreen: Readiness score
-    
+
     PrepScreen->>StrategyService: Get running style rec
     StrategyService->>StrategyService: Analyze aptitudes
     StrategyService-->>PrepScreen: Style recommendation
-    
+
     PrepScreen->>StrategyService: Calculate win probability
     StrategyService->>StrategyService: Compare to competitors
     StrategyService-->>PrepScreen: Probability forecast
-    
+
     PrepScreen->>AIService: Get race strategy
     AIService->>AIService: Build context
     AIService->>AIService: Generate strategy
     AIService-->>PrepScreen: AI recommendation
-    
+
     PrepScreen->>User: Display all analysis
 ```text
 
@@ -817,11 +864,11 @@ sequenceDiagram
 
 ## 5. Interaction Patterns
 
-### 5.1 Race Entry Flow
+### 5.1 Authenticated Entry Flow
 
 ```mermaid
 flowchart TD
-    Start([User Clicks Enter Race]) --> CheckReq{Minimum Reqs Met?}
+    Start([User Opens Entry Flow]) --> CheckReq{Minimum Reqs Met?}
     CheckReq -->|No| ShowWarning[Show Warning Modal]
     ShowWarning --> UserDecision{Proceed Anyway?}
     UserDecision -->|No| Cancel([Cancel])
@@ -843,7 +890,7 @@ sequenceDiagram
     participant PrepScreen as Preparation Screen
     participant SimService as Simulation Service
     participant ResultModal as Result Modal
-    
+
     User->>PrepScreen: Click "Run Simulation"
     PrepScreen->>SimService: simulateRace(character, race)
     SimService->>SimService: Load competitors
@@ -861,21 +908,14 @@ sequenceDiagram
     participant User
     participant PrepScreen as Preparation Screen
     participant AIService as AI Advisory Service
-    participant Ollama as Ollama (Local)
-    participant Bedrock as AWS Bedrock
-    
+    participant AdvisoryRouting as Configured provider routing
+
     User->>PrepScreen: Click "Ask AI"
     PrepScreen->>AIService: getRaceStrategy(character, race)
     AIService->>AIService: Build context
-    AIService->>Ollama: Try local model
-    
-    alt Ollama Available
-        Ollama-->>AIService: Strategy response
-    else Ollama Unavailable
-        AIService->>Bedrock: Fallback to cloud
-        Bedrock-->>AIService: Strategy response
-    end
-    
+    AIService->>AdvisoryRouting: Resolve configured provider path
+    AdvisoryRouting-->>AIService: Strategy response or degraded fallback
+
     AIService->>AIService: Score confidence
     AIService-->>PrepScreen: AI recommendation
     PrepScreen->>User: Display strategy
@@ -895,18 +935,31 @@ sequenceDiagram
 | **2.4.3 Focus Order** | Logical tab order through sections | Tab key traversal |
 | **2.4.7 Focus Visible** | Clear focus indicators on controls | Visual inspection |
 | **3.2.4 Consistent Identification** | Consistent status icons and badges | Manual review |
+| **1.4.1 Use of Color** | Readiness, warning, and grade states include icon or text redundancy | Visual + screen reader |
 | **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
 
 ### 6.2 Keyboard Navigation
 
 | Action | Shortcut | Context |
 | --- | --- | --- |
-| Enter Race | `Enter` or `E` | When preparation screen loaded |
+| Open entry flow | `Enter` or `E` | When authenticated entry is available |
 | Run Simulation | `S` | Preparation screen |
 | Ask AI | `A` | Preparation screen |
 | Expand/Collapse Section | `Space` | When section focused |
 | Navigate Sections | `Tab` / `Shift+Tab` | Preparation screen |
 | Return to Calendar | `Esc` or `C` | Preparation screen |
+
+### 6.4 Accessibility Interaction Requirements
+
+- On initial screen load, focus moves to the page heading, first actionable planning control, or readiness summary.
+- After closing a confirmation dialog, strategy drawer, or blocked-entry message, focus returns to
+the triggering control.
+- After validation or authorization failure, focus moves to an error summary or inline alert and
+then to the blocked action.
+- Primary mobile and tablet actions must provide a minimum interactive target size of `44x44` CSS pixels.
+- Planning, entry, risk, and readiness states must not rely on color alone.
+- If entry is unavailable in the current storage mode, the blocked entry control should announce why
+and point the user toward planning or preparation alternatives.
 
 ### 6.3 Screen Reader Announcements
 
@@ -986,7 +1039,7 @@ test('calculates readiness score correctly', function () {
         'guts' => 460,
         'wit' => 450,
     ]);
-    
+
     $race = Race::factory()->create([
         'required_speed' => 520,
         'required_stamina' => 480,
@@ -994,10 +1047,10 @@ test('calculates readiness score correctly', function () {
         'required_guts' => 400,
         'required_wit' => 380,
     ]);
-    
+
     $service = app(RaceReadinessService::class);
     $readiness = $service->calculateReadiness($character, $race);
-    
+
     expect($readiness->overall_percentage)->toBeGreaterThanOrEqual(80)
         ->and($readiness->tier)->toBe('good')
         ->and($readiness->factors)->toHaveKeys([
@@ -1011,7 +1064,7 @@ test('calculates readiness score correctly', function () {
 
 test('classifies readiness tiers correctly', function () {
     $service = app(RaceReadinessService::class);
-    
+
     expect($service->getTier(90))->toBe('excellent')
         ->and($service->getTier(75))->toBe('good')
         ->and($service->getTier(60))->toBe('fair')
@@ -1028,7 +1081,7 @@ test('user can view race preparation screen', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
     $race = Race::factory()->create();
-    
+
     $this->actingAs($user)
         ->get(route('races.prepare', ['race' => $race, 'character' => $character]))
         ->assertOk()
@@ -1036,14 +1089,14 @@ test('user can view race preparation screen', function () {
         ->assertSee($race->name);
 });
 
-test('user can enter race from preparation screen', function () {
+test('user can open the authenticated entry flow from preparation screen', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
     $race = Race::factory()->create();
-    
+
     Livewire::actingAs($user)
         ->test(RacePreparation::class, ['race' => $race, 'character' => $character])
-        ->call('enterRace')
+        ->call('openEntryFlow')
         ->assertDispatched('open-modal', 'confirm-race-entry');
 });
 
@@ -1051,7 +1104,7 @@ test('user can run race simulation', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
     $race = Race::factory()->create();
-    
+
     Livewire::actingAs($user)
         ->test(RacePreparation::class, ['race' => $race, 'character' => $character])
         ->call('runSimulation')
@@ -1067,90 +1120,90 @@ test('user can run race simulation', function () {
 test.describe('WF-007: Race Preparation Screen', () => {
     test('displays race preparation correctly', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         // Check race header
         await expect(page.getByTestId('race-header')).toBeVisible();
         await expect(page.getByRole('heading', { name: /Kanto Okami Cup/ })).toBeVisible();
-        
+
         // Check readiness assessment
         const readiness = page.getByTestId('readiness-assessment');
         await expect(readiness).toBeVisible();
         await expect(readiness).toContainText(/Overall Score:/);
-        
+
         // Check win probability
         const winProb = page.getByTestId('win-probability');
         await expect(winProb).toBeVisible();
         await expect(winProb).toContainText(/1st Place:/);
     });
-    
+
     test('displays stat requirements with status', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         const statReqs = page.getByTestId('stat-requirements');
         await expect(statReqs).toBeVisible();
-        
+
         // Check for status icons
         await expect(statReqs.getByTestId('stat-req-speed')).toContainText('✅');
         await expect(statReqs.getByTestId('stat-req-stamina')).toContainText('⚠️');
     });
-    
+
     test('displays running style recommendation', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         const styleRec = page.getByTestId('running-style-recommendation');
         await expect(styleRec).toBeVisible();
         await expect(styleRec).toContainText(/Late Surger/);
         await expect(styleRec).toContainText(/Match Score:/);
     });
-    
+
     test('displays preparation checklist', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         const checklist = page.getByTestId('preparation-checklist');
         await expect(checklist).toBeVisible();
-        
+
         // Check for checklist items
         await expect(checklist).toContainText(/Stats meet minimum requirements/);
         await expect(checklist).toContainText(/Stamina.*below recommended/);
     });
-    
+
     test('displays AI strategy analysis', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         const aiStrategy = page.getByTestId('ai-strategy-analysis');
         await expect(aiStrategy).toBeVisible();
         await expect(aiStrategy).toContainText(/AI Recommendation/);
         await expect(aiStrategy).toContainText(/Confidence:/);
     });
-    
+
     test('allows entering race', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         await page.getByTestId('enter-race-button').click();
-        
+
         // Verify confirmation modal
         await expect(page.getByRole('dialog')).toBeVisible();
         await expect(page.getByText(/Confirm race entry/)).toBeVisible();
     });
-    
+
     test('supports keyboard navigation', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         // Tab through sections
         await page.keyboard.press('Tab');
         await page.keyboard.press('Tab');
-        
+
         // Expand section with Space
         await page.keyboard.press('Space');
-        
-        // Navigate to enter race button
+
+        // Navigate to open entry flow button
         for (let i = 0; i < 5; i++) {
             await page.keyboard.press('Tab');
         }
-        
-        // Enter race with Enter key
+
+        // Open entry flow with Enter key
         await page.keyboard.press('Enter');
-        
+
         await expect(page.getByRole('dialog')).toBeVisible();
     });
 });
@@ -1167,42 +1220,42 @@ import AxeBuilder from '@axe-core/playwright';
 test.describe('WF-007: Accessibility', () => {
     test('has no automatically detectable accessibility issues', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         const accessibilityScanResults = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
             .analyze();
-        
+
         expect(accessibilityScanResults.violations).toEqual([]);
     });
-    
+
     test('announces readiness score to screen readers', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         const liveRegion = page.locator('[aria-live="polite"]');
-        
+
         await expect(liveRegion).toContainText(/Race readiness calculated/);
     });
-    
+
     test('announces stat warnings to screen readers', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         const liveRegion = page.locator('[aria-live="assertive"]');
-        
+
         await expect(liveRegion).toContainText(/Warning.*Stamina/);
     });
-    
+
     test('stat requirements have proper ARIA attributes', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         const statReqs = page.getByTestId('stat-requirements');
-        
+
         const speedReq = statReqs.getByTestId('stat-req-speed');
         await expect(speedReq).toHaveAttribute('aria-label');
     });
-    
+
     test('supports keyboard-only workflow', async ({ page }) => {
         await page.goto('/races/1/prepare');
-        
+
         // Navigate using keyboard only
         await page.keyboard.press('Tab'); // Race header
         await page.keyboard.press('Tab'); // Readiness section
@@ -1211,14 +1264,14 @@ test.describe('WF-007: Accessibility', () => {
         await page.keyboard.press('Tab'); // Running style
         await page.keyboard.press('Tab'); // Checklist
         await page.keyboard.press('Tab'); // AI strategy
-        await page.keyboard.press('Tab'); // Enter race button
-        
-        // Verify focus on enter race button
-        await expect(page.getByTestId('enter-race-button')).toBeFocused();
-        
+        await page.keyboard.press('Tab'); // Open entry flow button
+
+        // Verify focus on open entry flow button
+        await expect(page.getByTestId('open-entry-button')).toBeFocused();
+
         // Execute with Enter
         await page.keyboard.press('Enter');
-        
+
         await expect(page.getByRole('dialog')).toBeVisible();
     });
 });
@@ -1230,24 +1283,28 @@ test.describe('WF-007: Accessibility', () => {
 
 ### 9.1 Product Requirements
 
-- [PRD-003: Race Strategy](../prds/PRD-003_Race_Strategy.md)
+- [PRD-003: Race Strategy](../02-prds/PRD-003_Race_Strategy.md)
 
 ### 9.2 Technical Specifications
 
-- [SPEC-003: Race Strategy Technical](../specs/SPEC-003_Race_Strategy_Technical.md)
+- [SPEC-003: Race Strategy Technical](../02-specs/SPEC-003_Race_Strategy_Technical.md)
 
 ### 9.3 Flow Documentation
 
-- [FLOW-003: Race Strategy System](../flows/FLOW-003_Race_Strategy_System.md)
-- [TECH-FLOW-003: Race Strategy Flow](../tech-flow/TECH-FLOW-003_Race_Strategy_Flow.md)
+- [FLOW-003: Race Strategy System](../01-flows/FLOW-003_Race_Strategy_System.md)
+- [TECH-FLOW-003: Race Strategy Flow](../01-tech-flow/TECH-FLOW-003_Race_Strategy_Flow.md)
+- [TECH-FLOW-009: Target Race Planning Flow](../01-tech-flow/TECH-FLOW-009_Target_Race_Planning_Flow.md)
+- [TECH-FLOW-010: Career Reporting Flow](../01-tech-flow/TECH-FLOW-010_Career_Reporting_Flow.md)
 
 ### 9.4 Sequence Diagrams
 
-- [SEQ-004: Race Registration and Outcome](../sequences/SEQ-004_Race_Registration_and_Outcome.md)
+- [SEQ-004: Race Registration and Outcome](../01-sequences/SEQ-004_Race_Registration_and_Outcome.md)
 
 ### 9.5 User Flows
 
-- [UF-004: Race Day Flow](../user-flows/UF-004_Race_Day_Flow.md)
+- [UF-004: Race Day Flow](../01-user-flows/UF-004_Race_Day_Flow.md)
+- [UF-011: Target Race Planning Flow](../01-user-flows/UF-011_Target_Race_Planning_Flow.md)
+- [UF-010: Career Reporting and Export Flow](../01-user-flows/UF-010_Career_Reporting_and_Export_Flow.md)
 
 ### 9.6 Related Wireframes
 
@@ -1260,6 +1317,7 @@ test.describe('WF-007: Accessibility', () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.0 | 2026-03-08 | Development Team | Separated planning from authenticated entry assumptions, replaced provider-specific wording with configuration-aware guidance, added storage-aware screen variants, and expanded accessibility focus and touch-target requirements |
 | 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: track condition effects (Firm/Good/Soft/Heavy with Power/Speed/Stamina penalties), S-max aptitude grades (G→F→E→D→C→B→A→S), class pyramid |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added readiness assessment, win probability, AI strategy integration, preparation checklist, accessibility specifications, and testing requirements |
@@ -1269,7 +1327,8 @@ test.describe('WF-007: Accessibility', () => {
 
 ## 11. Notes
 
-**Implementation Status**: ✅ Complete
+**Implementation Status**: Alignment-reviewed concept; exact race preparation routes, provider
+behavior, and mutation boundaries should be verified against the current race docs
 
 **Known Issues**: None
 
@@ -1284,6 +1343,8 @@ test.describe('WF-007: Accessibility', () => {
 
 ---
 
-*This wireframe specification reflects the current implementation of the Race Preparation Screen and serves as the authoritative reference for UI/UX development and testing.*
+*This wireframe specification reflects the intended readiness and strategy-review experience and
+should be read with the aligned race planning, race execution, and reporting docs before being
+treated as implementation-exact.*
 
 ```

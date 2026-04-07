@@ -388,10 +388,10 @@ aws s3 sync /backups/storage/ s3://ucp-backups/storage/
    ```bash
    # Download latest backup
    aws s3 cp s3://ucp-backups/database/latest.sql.gz.gpg /tmp/
-   
+
    # Decrypt and decompress
    gpg --decrypt /tmp/latest.sql.gz.gpg | gunzip > /tmp/restore.sql
-   
+
    # Restore database
    mysql -u $DB_USER -p$DB_PASS $DB_NAME < /tmp/restore.sql
    ```
@@ -440,7 +440,7 @@ groups:
           severity: critical
         annotations:
           summary: High error rate detected
-          
+
       - alert: SlowResponseTime
         expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
         for: 10m
@@ -448,7 +448,7 @@ groups:
           severity: warning
         annotations:
           summary: Response time exceeding 2 seconds
-          
+
       - alert: QueueBacklog
         expr: horizon_pending_jobs > 1000
         for: 15m

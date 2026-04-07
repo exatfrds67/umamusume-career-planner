@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.0  
-**Date**: March 4, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.4.0  
+**Document Version**: 2.4.1
+**Date**: March 11, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Current - Aligned with codebase v2.4.0
 **Related Documents**: [SRS-FR-04], [SDS-4.3], [DBD-4.2], [SPEC-003]
 
 **Source Specs**:
@@ -17,11 +17,12 @@
 
 **Related Artifacts**:
 
-- SPEC: [SPEC-003](../specs/SPEC-003_Race_Strategy_Technical.md)
-- Flow: [FLOW-003](../flows/FLOW-003_Race_Strategy_System.md)
-- Wireframes: [WF-006](../wireframes/WF-006_Race_Calendar_View.md), [WF-007](../wireframes/WF-007_Race_Preparation_Screen.md)
-- Sequences: [SEQ-004](../sequences/SEQ-004_Race_Registration_and_Outcome.md)
-- User Flows: [UF-004](../user-flows/UF-004_Race_Day_Flow.md)
+- SPEC: [SPEC-003](../02-specs/SPEC-003_Race_Strategy_Technical.md)
+- Flow: [FLOW-003](../01-flows/FLOW-003_Race_Strategy_System.md)
+- Wireframes: [WF-006](../01-wireframes/WF-006_Race_Calendar_View.md),
+[WF-007](../01-wireframes/WF-007_Race_Preparation_Screen.md)
+- Sequences: [SEQ-004](../01-sequences/SEQ-004_Race_Registration_and_Outcome.md)
+- User Flows: [UF-004](../01-user-flows/UF-004_Race_Day_Flow.md)
 
 ---
 
@@ -46,17 +47,21 @@
 
 ### 1.1 Purpose
 
-Provide a strategic command center for race management, enabling players to select the optimal race rotation, assess pre-race readiness, and determine the best running style (Strategy) to maximize victory probability.
+Provide a strategic command center for race management, enabling players to select the optimal race
+rotation, assess pre-race readiness, and determine the best running style (Strategy) to maximize
+victory probability.
 
 ### 1.2 Problem Statement
 
-Players often enter races underprepared or with the wrong strategy, leading to unexpected losses, missed alarm clock usage, and failed scenario objectives.
+Players often enter races underprepared or with the wrong strategy, leading to unexpected losses,
+missed alarm clock usage, and failed scenario objectives.
 
 ### 1.3 Solution Overview
 
 - **Race Calendar**: A filtered view of eligible races based on current turn and character aptitudes.
 - **Readiness Engine**: A scoring algorithm that compares current stats against race difficulty and rival strength.
-- **Strategy Advisor**: AI-driven recommendation for the optimal Running Style based on stats, skills, and track conditions.
+- **Strategy Advisor**: AI-driven recommendation for the optimal Running Style based on stats,
+skills, and track conditions.
 
 ---
 
@@ -88,7 +93,7 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 
 | ID | Actor | Story | Acceptance Criteria |
 | --- | --- | --- | --- |
-| US-3.1 | Player | I want to see which races are available on the current turn. | Calendar view shows G1/G2/G3/OP races eligible for entry. |
+| US-3.1 | Player | I want to see which races are available on the current turn. | The calendar must show available races for the current turn and storage context. If no races are available, the UI must show an explicit empty state rather than an empty grid. In Local mode, planning-only race views must not imply account-backed entry persistence. |
 | US-3.2 | Player | I want to know if my stats are high enough to win a G1 race. | "Readiness" score displayed with specific warnings. |
 | US-3.3 | Player | I want the system to tell me which running style gives the highest win chance. | Recommended strategy highlighted with reasoning. |
 | US-3.4 | Player | I want to track my race history to analyze my win rate. | "Race Results" tab lists past placements and rewards. |
@@ -100,8 +105,12 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 
 ### 4.1 Race Calendar & Selection [FR-04.1]
 
+The race calendar must distinguish among `available`, `not eligible`, and `future target` race
+states. Filtering must not silently hide eligibility failures without explanation. A race hidden by
+a user-selected filter and a race unavailable due to eligibility must remain distinguishable in the
+user experience.
+
 - **Filtering**: Filter races by Grade (G1-Pre-OP), Distance (Sprint-Long), and Surface (Turf/Dirt).
-- **Eligibility**: Automatically hide races where the character does not meet baseline requirements.
 - **Goal Alignment**: Highlight races that satisfy specific Scenario Objectives.
 
 ### 4.2 Readiness Assessment [FR-04.5]
@@ -158,6 +167,10 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 
 **Classification**: Good, Soft, and Heavy are all classified as "Wet" conditions.
 
+**Planner Display Note**: These penalties are planner-facing approximations used to communicate
+likely performance impact. The game resolves track-condition effects through race simulation
+variables rather than literal permanent stat subtraction.
+
 **Weather Impact**:
 
 - Weather determines track condition probability
@@ -167,9 +180,10 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 
 ### 4.5 Strategy Optimization [FR-04.7]
 
-- **Style Analysis**: Evaluate all 4 running styles against character Aptitudes and Stats.
-- **Recommendations**: Suggest the style with the highest win probability.
-- **AI Integration**: Use **Race Strategy Agent** to explain *why* a strategy is preferred.
+The system must return: (1) a recommended running style, (2) ranked alternatives when available, and
+(3) explainable contributing factors such as stats, aptitudes, mood, track conditions, and skill
+fit. Recommendations must be derived from concrete current inputs and must not rely on opaque,
+unverifiable reasoning.
 
 ### 4.6 Outcome Simulation [FR-04.6]
 
@@ -179,9 +193,12 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 
 ### 4.7 Result Management [FR-04.2]
 
-- **Input**: User records actual placement (1st-18th).
+When a race result is recorded, the system must either persist the full result and rewards or return
+a recoverable error state. The UI must not imply a successful save if the result could not be
+persisted.
+
 - **Rewards**: Auto-calculate fan/SP gains based on placement and race modifiers.
-- **History**: Persist result to race log linked to `CareerRun`.
+- **History**: Persist result to race log linked to `CareerRun` in Account Mode.
 
 ---
 
@@ -195,7 +212,8 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 - **Phase Filter**: Filter strip for Junior / Classic / Senior / All career phases.
 - **Surface Filter**: Separate filter for Turf / Dirt (must not be combined with distance).
 - **Distance Filter**: Separate filter for Sprint / Mile / Medium / Long / Super Long.
-- **Month Display**: Month labels must use `month_label` strings from game data (e.g. "April", "Early Summer"), grouped by `year_in_scenario`; not raw calendar month numbers.
+- **Month Display**: Month labels must use `month_label` strings from game data (e.g. "April",
+"Early Summer"), grouped by `year_in_scenario`; not raw calendar month numbers.
 - **Fan Requirement**: Each race card must display the minimum fan count required to enter.
 - **SP Reward**: Each race card must display the SP points awarded upon winning.
 - **URA Finale Badge**: Races with `is_ura_finale = true` must receive a distinct visual badge labelled "URA Finale".
@@ -218,12 +236,16 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 
 ### 5.4 Race Targets Interface
 
-- **Grade Filter**: Filter buttons must use actual game grades in priority order: G1 / G2 / G3 / OP / Pre-OP / Debut. Legacy values "Listed" and "Open" are incorrect and must not appear.
+- **Grade Filter**: Filter buttons must use actual game grades in priority order: G1 / G2 / G3 / OP
+/ Pre-OP / Debut. Legacy values "Listed" and "Open" are incorrect and must not appear.
 - **Phase Filter**: Filter strip for Junior / Classic / Senior / All career phases.
 - **Fan Requirement Per Race**: Each race row must display the minimum fans required to enter that race.
 - **SP Reward Per Race**: Each race row must display the SP reward alongside the fans reward.
 - **URA Finale Flag**: Races with `is_ura_finale = true` must be highlighted with a distinct badge.
-- **Save Plan**: The save-plan action must persist the selected race list to `localStorage` (client-only), with a server POST fallback when an authenticated account session is active.
+- **Save Plan**: The save-plan action must preserve selected race targets in browser-local state
+when only local planning is available. If an authenticated account persistence path exists, the UI
+may offer a server-backed save action. If only browser-local planning is available, the interface
+must state that clearly and must not imply account-backed synchronization.
 
 ---
 
@@ -284,15 +306,20 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 - **v2.3.0**:
   - Race catalog expanded to **49 races** across Junior / Classic / Senior / All phases.
   - Removed 4 duplicate entries; added 22 new G1/G2/G3/Pre-Open races.
-  - Game character catalog links each character to their target races via `ucp_game_character_target_races` with `is_goal` and `is_required` flags.
+  - Game character catalog links each character to their target races via
+  `ucp_game_character_target_races` with `is_goal` and `is_required` flags.
   - `GameRace` model updated with `gameCharacters()` reverse BelongsToMany relationship.
 - **v2.4.0 (Current)**:
-  - Calendar page: split combined race-type filter into separate Surface (Turf/Dirt) and Distance Category (Sprint/Mile/Medium/Long/Super Long) filters.
-  - Calendar page: add Phase filter (Junior/Classic/Senior/All), URA Finale badge, fan-requirement and SP-reward display on each race card.
-  - Calendar page: fix month display to use `month_label` string values grouped by `year_in_scenario` instead of raw numeric calendar months.
+  - Calendar page: split combined race-type filter into separate Surface (Turf/Dirt) and Distance
+  Category (Sprint/Mile/Medium/Long/Super Long) filters.
+  - Calendar page: add Phase filter (Junior/Classic/Senior/All), URA Finale badge, fan-requirement and
+  SP-reward display on each race card.
+  - Calendar page: fix month display to use `month_label` string values grouped by `year_in_scenario`
+  instead of raw numeric calendar months.
   - Targets page: correct grade filter values from incorrect `Listed/Open` to actual game grades `OP/Pre-OP/Debut`.
   - Targets page: add Phase filter, fan-requirement per race, SP-reward per race, URA Finale badge.
-  - Both pages: `RaceController` enriched with `spReward`, `fanRequirement`, `statRequirements`, `distanceCategory`, and `surface` fields for targets.
+  - Both pages: `RaceController` enriched with `spReward`, `fanRequirement`, `statRequirements`,
+  `distanceCategory`, and `surface` fields for targets.
 
 ---
 
@@ -308,6 +335,7 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 
 | Version | Date | Changes |
 | --- | --- | --- |
+| 2.4.1 | March 11, 2026 | Clarified that displayed track-condition penalties are planner-readable approximations of race impact, not literal permanent stat subtraction in the game engine. |
 | 2.4.0 | March 4, 2026 | Calendar page: separate surface/distance filters, phase filter, URA Finale badge, fan-requirement and SP-reward display, corrected month-label display. Targets page: corrected grade filter values (OP/Pre-OP/Debut), phase filter, per-race fan-requirement and SP-reward, URA Finale badge. RaceController data contract enriched. |
 | 2.3.0 | February 27, 2026 | Race catalog expanded to 49 races (22 new races added, 4 duplicates removed). Added `ucp_game_character_target_races` pivot linking characters to their canonical race targets. `GameRace` model updated with `gameCharacters()` reverse relationship. |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: corrected aptitude scale (G-S, no SS), added aptitude modifier table, added track condition system with stat penalties (Firm/Good/Soft/Heavy), weather impact on track conditions. |

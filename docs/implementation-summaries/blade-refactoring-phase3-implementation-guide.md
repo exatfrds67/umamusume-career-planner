@@ -381,7 +381,7 @@ You may need to update controllers to pass required data:
 public function create()
 {
     $trainees = Character::where('is_seeded', true)->get();
-    
+
     return view('characters.create', [
         'trainees' => $trainees,
         'externalPrefill' => session('external_character_prefill')
@@ -408,12 +408,12 @@ Ensure these routes exist:
 
 ## Success Criteria
 
-✅ All 4 Blade files updated  
-✅ `npm run build` completes without errors  
-✅ All pages load without console errors  
-✅ All functionality works as before  
-✅ Assets are properly cached  
-✅ File sizes are reasonable  
+✅ All 4 Blade files updated
+✅ `npm run build` completes without errors
+✅ All pages load without console errors
+✅ All functionality works as before
+✅ Assets are properly cached
+✅ File sizes are reasonable
 
 ---
 
@@ -425,4 +425,3 @@ If you encounter issues:
 2. Verify network tab for 404s
 3. Review the Phase 3 summary document
 4. Check the quick reference guide from Phase 1 & 2
-

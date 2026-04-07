@@ -234,7 +234,7 @@
 Message: "fix: Add semantic HTML and accessibility to character wizard
 
 - Add role='region' and aria-labelledby to step containers
-- Fix form label associations with for/id attributes  
+- Fix form label associations with for/id attributes
 - Add focus-visible states with 3:1 contrast
 - Add aria-required/aria-invalid to required fields
 - Replace .glass-card with .card for form sections
@@ -327,17 +327,17 @@ cp resources/views/characters/create.blade.php resources/views/characters/create
 
 ---
 
-**Status**: Ready for Implementation  
-**Priority**: Critical (Accessibility + Spec Compliance)  
-**Assigned To**: [Developer Name]  
-**Deadline**: [Date]  
+**Status**: Ready for Implementation
+**Priority**: Critical (Accessibility + Spec Compliance)
+**Assigned To**: [Developer Name]
+**Deadline**: [Date]
 
 ---
 
 ## Sign-Off
 
 - [ ] Code changes reviewed by: ________________
-- [ ] Tests passed by: ________________  
+- [ ] Tests passed by: ________________
 - [ ] Accessibility verified by: ________________
 - [ ] Design approved by: ________________
 - [ ] Merged to main by: ________________
@@ -345,5 +345,5 @@ cp resources/views/characters/create.blade.php resources/views/characters/create
 
 ---
 
-✅ **All phases planned and documented**  
+✅ **All phases planned and documented**
 🚀 **Ready to begin implementation**

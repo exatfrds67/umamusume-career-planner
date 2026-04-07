@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0
+**Date**: March 8, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [SEQ-015]
 
 **Source Specs**:
@@ -13,12 +13,22 @@
 
 **Related Artifacts**:
 
-- PRDs: [PRD-001](../prds/PRD-001_Character_Management.md), [PRD-006](../prds/PRD-006_AI_Advisory.md)
-- SPECs: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md), [SPEC-006](../specs/SPEC-006_AI_Advisory_Technical.md)
-- Flows: [FLOW-001](../flows/FLOW-001_Character_Management_System.md), [FLOW-006](../flows/FLOW-006_AI_Advisory_System.md)
-- Tech Flows: [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
-- Sequences: [SEQ-015](../sequences/SEQ-015_Data_Migration_Snapshot_to_Live.md)
-- User Flows: [UF-001](../user-flows/UF-001_Dashboard_Navigation_Flow.md)
+- PRDs: [PRD-001](../02-prds/PRD-001_Character_Management.md), [PRD-006](../02-prds/PRD-006_AI_Advisory.md)
+- SPECs: [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md),
+[SPEC-006](../02-specs/SPEC-006_AI_Advisory_Technical.md)
+- Flows: [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md),
+[FLOW-006](../01-flows/FLOW-006_AI_Advisory_System.md)
+- Tech Flows: [TECH-FLOW-001](../01-tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
+- Sequences: [SEQ-015](../01-sequences/SEQ-015_Data_Migration_Snapshot_to_Live.md)
+- User Flows: [UF-001](../01-user-flows/UF-001_Onboarding_Flow.md), [UF-002](../01-user-
+flows/UF-002_Career_Setup_Flow.md), [UF-010](../01-user-
+flows/UF-010_Career_Reporting_and_Export_Flow.md), [UF-011](../01-user-
+flows/UF-011_Target_Race_Planning_Flow.md)
+
+**Alignment Note**: This wireframe defines the intended dashboard command-center experience. Exact
+controllers, Livewire classes, provider badges, and route entry points should be verified against
+the aligned character, race, reporting, and advisory docs before being treated as implementation-
+exact.
 
 ---
 
@@ -26,7 +36,9 @@
 
 ### 1.1 Purpose
 
-The Dashboard serves as the primary landing page and command center for the Umamusume Career Planner application. It provides users with an at-a-glance overview of their active career runs, recent activity, performance metrics, and quick access to core features.
+The Dashboard serves as the primary landing page and command center for the Umamusume Career Planner
+application. It provides users with an at-a-glance overview of their active career runs, recent
+activity, performance metrics, and quick access to core features.
 
 ### 1.2 Key Objectives
 
@@ -47,6 +59,30 @@ The Dashboard serves as the primary landing page and command center for the Umam
 | US-003 | As a player, I want to see upcoming races and training suggestions | P0 |
 | US-004 | As a player, I want AI recommendations visible on the dashboard | P1 |
 | US-005 | As a player, I want to see my goal progress without drilling down | P1 |
+
+### 1.4 Storage Mode Support
+
+- `StorageMode::ACCOUNT`: can surface authenticated character context, race planning, and account-
+backed reporting links.
+- `StorageMode::LOCAL`: should surface browser-local run context and advisory or planning
+affordances without implying account-backed reports, history, or server-side mutation parity.
+
+### 1.5 Navigation Surface
+
+This dashboard uses conceptual labels such as Command Grid, AI Advisor Card, and Upcoming Race
+Panel. Where implementation-backed navigation matters, current route families should be verified
+through the aligned character, training, race, and reporting docs rather than inferred from this
+wireframe alone.
+
+### 1.6 Screen Variants
+
+The dashboard should explicitly support:
+
+- authenticated dashboard with active account-backed run
+- browser-local dashboard with active local run context
+- no active run guidance
+- reduced-detail advisory state when AI is unavailable
+- account-mode refresh or reporting failure without losing current context
 
 ---
 
@@ -72,8 +108,8 @@ The Dashboard serves as the primary landing page and command center for the Umam
 │ │   [Speed] A     │  │    [Character Art]      │  │  JAN 2 (G2)    │ │
 │ │   980 / 1200▼   │  │                         │  │  Nikkei Cup    │ │
 │ │                 │  │    [Speech Bubble]      │  │  2400m Turf    │ │
-│ │   [Stamina] B   │  │    "AI: Focus on Speed  │  │                │ │
-│ │   820 / 1200▼   │  │     training for G1"    │  │  Readiness:    │ │
+│ │   [Stamina] B   │  │    "Advice: Focus on    │  │                │ │
+│ │   820 / 1200▼   │  │     Speed planning"     │  │  Readiness:    │ │
 │ │                 │  │                         │  │  [|||||||] 85% │ │
 │ │   [Power] B     │  │                         │  │                │ │
 │ │   780 / 1200▼   │  │                         │  │  [View Info]   │ │
@@ -87,7 +123,7 @@ The Dashboard serves as the primary landing page and command center for the Umam
 │ │   [Skill Pt]    │  │                         │  │ 2. Win G1      │ │
 │ │   450           │  │                         │  │    (Upcoming)  │ │
 │ └─────────────────┘  └─────────────────────────┘  └────────────────┘ │
-│ ▼ = Soft cap indicator (50% gains above 1200)                        │
+│ ▼ = Soft-cap guidance only; display should not imply a universal hard cap │
 │                                                                      │
 │ ┌──────────────────────────────────────────────────────────────────┐ │
 │ │ Command Grid                                                     │ │
@@ -122,7 +158,7 @@ The Dashboard serves as the primary landing page and command center for the Umam
 │ │    [Character Art Centered]                          │ │
 │ │                                                      │ │
 │ │    [Speech Bubble]                                   │ │
-│ │    "AI: Focus on Speed for G1"                       │ │
+│ │    "Advice: Focus on Speed planning"                │ │
 │ │                                                      │ │
 │ └──────────────────────────────────────────────────────┘ │
 │                                                          │
@@ -160,7 +196,7 @@ The Dashboard serves as the primary landing page and command center for the Umam
 │  [Character Art Centered]  │
 │                            │
 │  [Speech Bubble]           │
-│  "AI: Focus Speed..."      │
+│  "Advice: Focus Speed..."  │
 │                            │
 ├────────────────────────────┤
 │ Stats (Collapsible) ▼      │
@@ -222,16 +258,16 @@ The Dashboard serves as the primary landing page and command center for the Umam
 
 **Component**: `resources/views/components/sidebar.blade.php`
 
-| Item | Icon | Route | Active Indicator |
+| Item | Icon | Conceptual Surface | Active Indicator |
 | --- | --- | --- | --- |
-| Dashboard | 🏠 | `/dashboard` | Left border + background |
-| Character | 👤 | `/characters` | Left border + background |
-| Training | ⚡ | `/training` | Left border + background |
-| Races | 🏆 | `/races` | Left border + background |
-| Skills | ✨ | `/skills` | Left border + background |
-| Support Cards | 🎴 | `/support-cards` | Left border + background |
-| AI Advisor | 🤖 | `/ai-advisor` | Left border + background |
-| Settings | ⚙️ | `/settings` | Left border + background |
+| Dashboard | 🏠 | Dashboard entry surface | Left border + background |
+| Character | 👤 | Character and career surfaces | Left border + background |
+| Training | ⚡ | Training planning or execution surface | Left border + background |
+| Races | 🏆 | Race calendar and target-planning surfaces | Left border + background |
+| Skills | ✨ | Skill management surfaces | Left border + background |
+| Support Cards | 🎴 | Support card and deck surfaces | Left border + background |
+| AI Advisor | 🤖 | Advisory and chat surfaces | Left border + background |
+| Settings | ⚙️ | Settings surface | Left border + background |
 
 **Responsive Behavior**:
 
@@ -456,9 +492,13 @@ Wit      A  (890)  █████████████████░░░ 
 
 ### 3.8 AI Advisor Card
 
+Provider badges, model selection, and fallback behavior should be treated as configuration-driven
+and environment-dependent unless the current advisory route and controller surface guarantees a
+specific provider.
+
 **Component**: `app/Livewire/Dashboard/AIAdvisorCard.php`
 
-**Data Source**: `AIAdvisoryService` (last recommendation or contextual insight)
+**Data Source**: `HybridAIService` / advisory outcome APIs (last recommendation or contextual insight)
 
 **Display Format**:
 
@@ -466,13 +506,13 @@ Wit      A  (890)  █████████████████░░░ 
 ┌────────────────────────────────────┐
 │ 💡 AI Recommendation               │
 │                                    │
-│ Focus on Speed training for the    │
+│ Focus on Speed planning for the    │
 │ next 3 turns to prepare for the    │
 │ upcoming G1 race. Your stamina is  │
 │ adequate, but speed needs +150.    │
 │                                    │
 │ Confidence: 85%                    │
-│ Provider: Ollama Local             │
+│ Provider: Environment-configured   │
 │                                    │
 │ [ASK AI] [VIEW DETAILS] [DISMISS]  │
 └────────────────────────────────────┘
@@ -538,6 +578,10 @@ Wit      A  (890)  █████████████████░░░ 
 
 ## 4. State Management
 
+The component and naming examples in this document are illustrative UI contracts. Where they use
+older run-oriented naming, treat them as conceptual unless the aligned implementation docs verify
+the exact class or file path.
+
 ### 4.1 Livewire Component State
 
 **Dashboard Controller**: `app/Livewire/Dashboard.php`
@@ -562,7 +606,7 @@ public function getStatsProperty()
 
 public function getUpcomingRacesProperty()
 {
-    return $this->raceService->getUpcomingRaces($this->selectedCharacterRun, 3);
+    return $this->raceConditionService->getUpcomingRaces($this->selectedCharacterRun, 3);
 }
 
 public function getTrainingSuggestionsProperty()
@@ -581,7 +625,10 @@ public function getTrainingSuggestionsProperty()
 | Stat snapshot | `stats:{run_id}` | 1 minute | On stat update |
 | Activity timeline | `activity:{run_id}` | 30 seconds | On new activity |
 
-### 4.3 Real-time Updates (WebSocket)
+### 4.3 Status Refresh and Polling Updates
+
+Dashboard freshness should be documented as request-refresh or polling behavior where implemented.
+Do not imply full realtime websocket parity unless the current route and event surface verifies it.
 
 **Channels**:
 
@@ -637,15 +684,14 @@ sequenceDiagram
     participant Database
     participant AI
 
-    User->>Dashboard: Click [TRAIN] on suggestion
-    Dashboard->>TrainingService: executeTraining(runId, type)
-    TrainingService->>Database: Update character stats
-    TrainingService->>Database: Log training session
-    TrainingService->>AI: Request new recommendations
-    AI-->>TrainingService: Return recommendations
-    TrainingService-->>Dashboard: Training result
-    Dashboard->>User: Show success toast
-    Dashboard->>Dashboard: Refresh panels
+    User->>Dashboard: Click training suggestion
+    Dashboard->>TrainingService: Open training context or next-step action
+    TrainingService->>Database: Use account-backed mutation only when supported
+    TrainingService->>AI: Request updated guidance when available
+    AI-->>TrainingService: Return updated guidance or degraded fallback
+    TrainingService-->>Dashboard: Updated context or redirect target
+    Dashboard->>User: Show confirmation or next-step guidance
+    Dashboard->>Dashboard: Refresh panels using request refresh or polling
 ```text
 
 ### 5.3 AI Advisor Interaction Flow
@@ -655,19 +701,13 @@ sequenceDiagram
     participant User
     participant Dashboard
     participant AIService
-    participant Ollama
-    participant Bedrock
+    participant AdvisoryRouting
 
     User->>Dashboard: Click [ASK AI]
-    Dashboard->>AIService: getAdvice(runId, 'dashboard')
-    AIService->>Ollama: Try local model
-    alt Ollama available
-        Ollama-->>AIService: Return recommendation
-    else Ollama unavailable
-        AIService->>Bedrock: Fallback to cloud
-        Bedrock-->>AIService: Return recommendation
-    end
-    AIService-->>Dashboard: Recommendation with provider info
+    Dashboard->>AIService: getAdvice(context)
+    AIService->>AdvisoryRouting: Resolve configured provider path
+    AdvisoryRouting-->>AIService: Recommendation or degraded-state response
+    AIService-->>Dashboard: Recommendation with optional provider metadata
     Dashboard->>User: Display in AI card
 ```
 
@@ -684,6 +724,7 @@ sequenceDiagram
 | **2.1.1 Keyboard** | All interactive elements focusable | Keyboard-only navigation |
 | **2.4.3 Focus Order** | Logical focus sequence | Tab key traversal |
 | **2.4.7 Focus Visible** | Clear focus indicators | Visual inspection |
+| **1.4.1 Use of Color** | Status panels include icon or text redundancy beyond color | Visual + screen reader |
 | **4.1.2 Name, Role, Value** | Proper ARIA attributes | axe-core automated scan |
 
 ### 6.2 Keyboard Navigation
@@ -696,6 +737,18 @@ sequenceDiagram
 | Focus sidebar | `Alt+S` | Global |
 | Refresh dashboard | `F5` or `Ctrl+R` | Dashboard |
 | Open AI advisor | `Alt+A` | Dashboard |
+
+### 6.4 Accessibility Interaction Requirements
+
+- On initial screen load, focus moves to the page heading, run selector, or first actionable dashboard control.
+- After modal dismissal, filter drawer close, or cancellation, focus returns to the triggering control.
+- After validation or blocked-action feedback, focus moves to an error summary or inline alert and
+then to the affected control.
+- Primary mobile and tablet actions must provide a minimum interactive target size of `44x44` CSS pixels.
+- Dashboard badges for readiness, risk, mood, and recommendation state must include text or icon
+redundancy in addition to color.
+- If a quick action opens a training, race, or advisory surface rather than mutating state directly,
+the focus order for the destination screen should begin at that surface heading.
 
 ### 6.3 Screen Reader Announcements
 
@@ -879,24 +932,24 @@ test.describe("Dashboard Accessibility", () => {
 
 | Document | Reference |
 | --- | --- |
-| System Requirements | [003_SRS](../003_SRS_Software_Requirement_Specifications.md) |
-| System Design | [004_SDS](../004_SDS_Software_Design_Specifications.md) |
-| Source Code Documentation | [010_SCD](../010_SCD_Source_Code_Documentation.md) |
-| Database Documentation | [009_DBD](../009_DBD_Database_Documentation.md) |
+| System Requirements | [003_SRS](../00-core-docs/003_SRS_Software_Requirement_Specifications.md) |
+| System Design | [004_SDS](../00-core-docs/004_SDS_Software_Design_Specifications.md) |
+| Source Code Documentation | [010_SCD](../00-core-docs/010_SCD_Source_Code_Documentation.md) |
+| Database Documentation | [009_DBD](../00-core-docs/009_DBD_Database_Documentation.md) |
 
 ### 9.2 User Documentation
 
 | Document | Reference |
 | --- | --- |
-| User Manual | [017_SUM](../017_SUM_Software_User_Manual.md) |
-| User Flow Diagrams | [UF-001](../user-flows/UF-001_Dashboard_Navigation_Flow.md) |
+| User Manual | [017_SUM](../00-core-docs/017_SUM_Software_User_Manual.md) |
+| User Flow Diagrams | [UF-001](../01-user-flows/UF-001_Onboarding_Flow.md), [UF-002](../01-user-flows/UF-002_Career_Setup_Flow.md), [UF-010](../01-user-flows/UF-010_Career_Reporting_and_Export_Flow.md) |
 
 ### 9.3 Development Planning
 
 | Document | Reference |
 | --- | --- |
-| Software Development Plan | [001_SDP](../001_SDP_Software_Development_Plan.md) |
-| Integration Plan | [007_SIP](../007_SIP_Software_Integration_Plan.md) |
+| Software Development Plan | [001_SDP](../00-core-docs/001_SDP_Software_Development_Plan.md) |
+| Integration Plan | [007_SIP](../00-core-docs/007_SIP_Software_Integration_Plan.md) |
 
 ---
 
@@ -904,6 +957,7 @@ test.describe("Dashboard Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-08 | Development Team | Added storage-aware dashboard states, updated user-flow links, replaced provider-specific assumptions with configuration-aware wording, clarified request-refresh behavior, and expanded accessibility interaction requirements |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected stat grade scale (S is max, no SS), mood system (+20%/-20% range), soft cap at 1200, career structure ~70-78 turns |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added AI integration, real-time updates, accessibility specifications, performance targets, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
@@ -912,7 +966,8 @@ test.describe("Dashboard Accessibility", () => {
 
 ## 11. Notes
 
-**Implementation Status**: ✅ Complete
+**Implementation Status**: Alignment-reviewed concept; exact dashboard routes, component classes,
+and provider metadata should be verified against the current implementation docs
 
 **Known Issues**: None
 
@@ -925,4 +980,5 @@ test.describe("Dashboard Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the Dashboard Overview and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe specification reflects the intended dashboard experience and should be read with the
+aligned character, race, reporting, and advisory docs before being treated as implementation-exact._

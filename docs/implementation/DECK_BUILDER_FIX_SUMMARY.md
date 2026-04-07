@@ -7,7 +7,8 @@ The deck builder page had **conflicting Alpine.js component definitions**:
 1. **Inline component** defined in the Blade view (`resources/views/support-cards/deck-builder.blade.php`)
 2. **External component** defined in `resources/js/deck-builder.js` and registered in `resources/js/app.js`
 
-The external component was overriding the inline one, but the data structure passed from PHP didn't match what the external component expected.
+The external component was overriding the inline one, but the data structure passed from PHP didn't
+match what the external component expected.
 
 ## Issues Found
 
@@ -45,7 +46,8 @@ The external component was overriding the inline one, but the data structure pas
 
 ### 1. Removed Inline Component
 
-Removed the entire inline `window.deckBuilder` function from the Blade view since the external component in `deck-builder.js` is more complete and feature-rich.
+Removed the entire inline `window.deckBuilder` function from the Blade view since the external
+component in `deck-builder.js` is more complete and feature-rich.
 
 ### 2. Fixed Data Structure
 
@@ -151,11 +153,16 @@ If the page still doesn't load:
 
 ### ⚠️ Known Issues
 
-1. **Statistics Display**: The deck statistics section shows labels but no values. This is likely due to the HTML still using old Alpine expression syntax that needs to be updated to match the component's property names.
+1. **Statistics Display**: The deck statistics section shows labels but no values. This is likely
+due to the HTML still using old Alpine expression syntax that needs to be updated to match the
+component's property names.
 
-2. **Available Cards**: Cards may not be visible due to the component fetching them via API (`fetchAvailableCards()` in `init()`). The API endpoint `/api/support-cards?is_active=1` needs to be verified.
+2. **Available Cards**: Cards may not be visible due to the component fetching them via API
+(`fetchAvailableCards()` in `init()`). The API endpoint `/api/support-cards?is_active=1` needs to be
+verified.
 
-3. **Console Errors**: Still seeing `dragOverSlot is not defined` errors, which suggests some HTML elements are trying to access properties before Alpine has fully initialized them.
+3. **Console Errors**: Still seeing `dragOverSlot is not defined` errors, which suggests some HTML
+elements are trying to access properties before Alpine has fully initialized them.
 
 ## Files Modified (Detailed Changes)
 
@@ -176,7 +183,8 @@ If the page still doesn't load:
    - The component calls this in `fetchAvailableCards()`
    - If missing, cards won't show in the "Available Cards" section
 
-2. **Update HTML Expressions**: Review the Blade template to ensure all Alpine expressions use the correct property names from the component:
+2. **Update HTML Expressions**: Review the Blade template to ensure all Alpine expressions use the
+correct property names from the component:
    - Use `currentDeck` instead of `deck`
    - Use `filteredCards` for the card list
    - Verify all getters are accessible
@@ -198,7 +206,8 @@ If the page still doesn't load:
 ### Low Priority
 
 1. **Code Cleanup**: Consider removing unused code from the Blade template
-2. **Performance**: The component fetches cards on every search query change with a 300ms debounce - verify this performs well with 456 cards
+2. **Performance**: The component fetches cards on every search query change with a 300ms debounce -
+verify this performs well with 456 cards
 
 ## API Endpoints Used
 
@@ -214,7 +223,9 @@ The component uses these API endpoints (all should exist):
 
 ## Conclusion
 
-The core issue has been resolved - the Alpine.js component is now properly initialized and receiving the correct data structure. The deck builder page loads successfully and the component state is correct.
+The core issue has been resolved - the Alpine.js component is now properly initialized and receiving
+the correct data structure. The deck builder page loads successfully and the component state is
+correct.
 
 Remaining work involves:
 

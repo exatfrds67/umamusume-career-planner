@@ -44,14 +44,16 @@ A career run typically unlocks skills through:
 | Condition | Boosts via race conditions (weather, track, distance) | Wet Track Expert, Long Distance Ace |
 | Recovery | Restores stamina mid-race | Second Wind, Guts Recovery |
 
-Stacking multiple skills from the same category typically has diminishing returns; aim for a balanced set that covers acceleration,
+Stacking multiple skills from the same category typically has diminishing returns; aim for a
+balanced set that covers acceleration,
 position, and at least one condition or recovery skill.
 
 ---
 
 ## Wit Stat and Activation Probability
 
-The Wit stat governs the **probability** that a skill fires during a race. Without sufficient Wit, skills are unreliable regardless of build quality.
+The Wit stat governs the **probability** that a skill fires during a race. Without sufficient Wit,
+skills are unreliable regardless of build quality.
 
 ### Activation Formula
 
@@ -98,18 +100,21 @@ Skills are assigned a **trigger location** within a race, divided into four phas
 
 ### Phase Strategy Notes
 
-- **Front runners** benefit most from Start and Middle phase acceleration — they need to reach the front early and hold pace
+- **Front runners** benefit most from Start and Middle phase acceleration — they need to reach the
+front early and hold pace
 - **Pace setters** want Middle phase pace control to prevent over-exerting stamina
 - **Position changers** (stalkers) need Final Corner position skills to move around opponents at the turn
 - **End closers** need Final Straight acceleration so the burst fires at the right moment
 
-Skills with a "random trigger" roll their activation RNG at a set point in the race; Wit affects the result of that roll.
+Skills with a "random trigger" roll their activation RNG at a set point in the race; Wit affects the
+result of that roll.
 
 ---
 
 ## Skill Duration and Distance Scaling
 
-Skill duration scales directly with race distance, so the same skill lasts longer in a 3200 m race than in a 1600 m sprint.
+Skill duration scales directly with race distance, so the same skill lasts longer in a 3200 m race
+than in a 1600 m sprint.
 
 ### Duration Formula
 
@@ -160,8 +165,10 @@ Match skills to your character's running style to maximise race impact.
 
 - **Goal**: Last position until final straight; one decisive burst to pass everyone
 - **Priority phases**: Final Straight (exclusively)
-- **Recommended skill types**: Final straight acceleration, overtaking power, stamina recovery (to survive the middle phase drain)
-- **Risk**: If the field separates too far, even a perfect burst cannot close the gap; pair with a stamina recovery skill
+- **Recommended skill types**: Final straight acceleration, overtaking power, stamina recovery (to
+survive the middle phase drain)
+- **Risk**: If the field separates too far, even a perfect burst cannot close the gap; pair with a
+stamina recovery skill
 
 ---
 
@@ -183,7 +190,8 @@ Support card events sometimes trigger **hints** — these reduce the SP cost of 
 - A skill with no hints costs its full listed SP value
 - Each hint level typically reduces cost by 20-25%
 - A fully-hinted skill (3 hints) can cost roughly 50% of its base price
-- **Strategy**: If a key skill has gone hint-discounted via training events, prioritise buying it over a cheaper un-hinted alternative
+- **Strategy**: If a key skill has gone hint-discounted via training events, prioritise buying it
+over a cheaper un-hinted alternative
 
 ### Priority Buying Order
 

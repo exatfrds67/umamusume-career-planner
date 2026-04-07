@@ -1,7 +1,7 @@
 # Skills Page Icon and Label Updates
 
-**Date**: January 31, 2026  
-**Task**: Update skills page to use official stat icons and abbreviated labels  
+**Date**: January 31, 2026
+**Task**: Update skills page to use official stat icons and abbreviated labels
 **Status**: ✅ Complete
 
 ## Overview

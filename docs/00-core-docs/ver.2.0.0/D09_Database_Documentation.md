@@ -21,7 +21,9 @@
 
 ## 1. Overview
 
-This document details the database schema for the Uma Musume Career Planner. The schema is designed to be canonical, meaning it standardizes naming conventions across all legacy sources. It supports the "Account Mode" of the application.
+This document details the database schema for the Uma Musume Career Planner. The schema is designed
+to be canonical, meaning it standardizes naming conventions across all legacy sources. It supports
+the "Account Mode" of the application.
 
 ### 1.1 Database Configuration
 
@@ -172,7 +174,8 @@ classDiagram
 - **Column**: `name`; **Type**: String(255); **Constraints**: Not Null; **Description**: User display name
 - **Column**: `email`; **Type**: String(255); **Constraints**: Unique, Not Null; **Description**: Login email
 - **Column**: `password`; **Type**: String(255); **Constraints**: Not Null; **Description**: Hashed password
-- **Column**: `email_verified_at`; **Type**: Timestamp; **Constraints**: Nullable; **Description**: Verification timestamp
+- **Column**: `email_verified_at`; **Type**: Timestamp; **Constraints**: Nullable; **Description**:
+Verification timestamp
 - **Column**: `remember_token`; **Type**: String(100); **Constraints**: Nullable; **Description**: Session token
 - **Column**: `created_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Creation timestamp
 - **Column**: `updated_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Last update timestamp
@@ -208,7 +211,8 @@ classDiagram
 ```text
 
 - **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
-- **Column**: `name`; **Type**: String(255); **Constraints**: Not Null; **Description**: English name (e.g., "Special Week")
+- **Column**: `name`; **Type**: String(255); **Constraints**: Not Null; **Description**: English
+name (e.g., "Special Week")
 - **Column**: `name_jp`; **Type**: String(255); **Constraints**: Nullable; **Description**: Japanese name
 - **Column**: `image_path`; **Type**: String(255); **Constraints**: Nullable; **Description**: Path to full artwork
 - **Column**: `thumbnail_path`; **Type**: String(255); **Constraints**: Nullable; **Description**: Path to icon
@@ -252,7 +256,8 @@ classDiagram
 
 **Type Enum:** `speed`, `stamina`, `power`, `guts`, `wit`, `debuff`
 
-**Tier Enum:** `G-`, `G`, `G+`, `F-`, `F`, `F+`, `E-`, `E`, `E+`, `D-`, `D`, `D+`, `C-`, `C`, `C+`, `B-`, `B`, `B+`, `A-`, `A`, `A+`, `S-`, `S`, `S+`, `SS`
+**Tier Enum:** `G-`, `G`, `G+`, `F-`, `F`, `F+`, `E-`, `E`, `E+`, `D-`, `D`, `D+`, `C-`, `C`, `C+`,
+`B-`, `B`, `B+`, `A-`, `A`, `A+`, `S-`, `S`, `S+`, `SS`
 
 ### 3.4 `career_runs` (Core Transactional)
 
@@ -285,7 +290,8 @@ classDiagram
 ```text
 
 - **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
-- **Column**: `uuid`; **Type**: UUID; **Constraints**: Unique; **Description**: Global identifier (aligns with localStorage)
+- **Column**: `uuid`; **Type**: UUID; **Constraints**: Unique; **Description**: Global identifier
+(aligns with localStorage)
 - **Column**: `user_id`; **Type**: BigInt; **Constraints**: FK → users, Nullable; **Description**: Owner user
 - **Column**: `uma_musume_id`; **Type**: BigInt; **Constraints**: FK → uma_musumes; **Description**: Selected character
 - **Column**: `storage_mode`; **Type**: Enum; **Constraints**: Default 'account'; **Description**: Storage type
@@ -300,7 +306,8 @@ classDiagram
 - **Column**: `wit`; **Type**: Int; **Constraints**: Default 0; **Description**: Current wit stat
 - **Column**: `energy`; **Type**: Int; **Constraints**: 0-100; **Description**: Current energy level
 - **Column**: `mood`; **Type**: Enum; **Constraints**: Default 'normal'; **Description**: Current mood
-- **Column**: `total_sp_available`; **Type**: Int; **Constraints**: Default 0; **Description**: **Canonical:** Available SP
+- **Column**: `total_sp_available`; **Type**: Int; **Constraints**: Default 0; **Description**:
+**Canonical:** Available SP
 - **Column**: `stamina_percentage`; **Type**: Int; **Constraints**: 0-100; **Description**: **Canonical:** Stamina %
 - **Column**: `notes`; **Type**: Text; **Constraints**: Nullable; **Description**: User notes
 - **Column**: `deleted_at`; **Type**: Timestamp; **Constraints**: Nullable; **Description**: Soft delete timestamp
@@ -364,7 +371,8 @@ classDiagram
 - **Column**: `career_run_id`; **Type**: BigInt; **Constraints**: FK → career_runs; **Description**: Parent plan
 - **Column**: `skill_id`; **Type**: BigInt; **Constraints**: FK → skills; **Description**: Referenced skill
 - **Column**: `status`; **Type**: Enum; **Constraints**: Not Null; **Description**: Skill status
-- **Column**: `turn_acquired`; **Type**: Int; **Constraints**: Nullable; **Description**: Turn when acquired (required if status='acquired')
+- **Column**: `turn_acquired`; **Type**: Int; **Constraints**: Nullable; **Description**: Turn when
+acquired (required if status='acquired')
 - **Column**: `notes`; **Type**: String(255); **Constraints**: Nullable; **Description**: User notes
 
 **Status Enum:** `acquired`, `skipped`, `suggested`
@@ -436,7 +444,8 @@ classDiagram
 
 - **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
 - **Column**: `user_id`; **Type**: BigInt; **Constraints**: FK → users, Nullable; **Description**: Acting user
-- **Column**: `action`; **Type**: String(50); **Constraints**: Not Null; **Description**: Action type (create, update, delete)
+- **Column**: `action`; **Type**: String(50); **Constraints**: Not Null; **Description**: Action
+type (create, update, delete)
 - **Column**: `model_type`; **Type**: String(100); **Constraints**: Not Null; **Description**: Model class name
 - **Column**: `model_id`; **Type**: BigInt; **Constraints**: Not Null; **Description**: Affected model ID
 - **Column**: `metadata`; **Type**: JSON; **Constraints**: Nullable; **Description**: Change details
@@ -479,11 +488,14 @@ flowchart TD
 - **Table**: `career_runs`; **Index**: `idx_user_id`; **Columns**: `user_id`; **Purpose**: Filtering plans by user
 - **Table**: `career_runs`; **Index**: `idx_status`; **Columns**: `status`; **Purpose**: Dashboard filtering
 - **Table**: `career_runs`; **Index**: `idx_uuid`; **Columns**: `uuid`; **Purpose**: UUID lookups
-- **Table**: `stat_progress`; **Index**: `idx_run_turn`; **Columns**: `career_run_id`, `turn_number`; **Purpose**: Chart data retrieval
-- **Table**: `skill_career_runs`; **Index**: `idx_career_run`; **Columns**: `career_run_id`; **Purpose**: Skill list retrieval
+- **Table**: `stat_progress`; **Index**: `idx_run_turn`; **Columns**: `career_run_id`,
+`turn_number`; **Purpose**: Chart data retrieval
+- **Table**: `skill_career_runs`; **Index**: `idx_career_run`; **Columns**: `career_run_id`;
+**Purpose**: Skill list retrieval
 - **Table**: `skills`; **Index**: `idx_name`; **Columns**: `name`; **Purpose**: Autocomplete performance
 - **Table**: `skills`; **Index**: `idx_type`; **Columns**: `type`; **Purpose**: Type filtering
-- **Table**: `activity_logs`; **Index**: `idx_model`; **Columns**: `model_type`, `model_id`; **Purpose**: Audit trail lookup
+- **Table**: `activity_logs`; **Index**: `idx_model`; **Columns**: `model_type`, `model_id`;
+**Purpose**: Audit trail lookup
 
 ### 4.3 Query Performance Targets
 
@@ -630,4 +642,5 @@ flowchart TD
 ## Document History
 
 - **Version**: 1.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial draft
-- **Version**: 2.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Added Mermaid diagrams, expanded documentation
+- **Version**: 2.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Added Mermaid
+diagrams, expanded documentation

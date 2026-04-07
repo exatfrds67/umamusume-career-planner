@@ -1,8 +1,8 @@
 # External Data Browser - Manual Testing Guide
 
-**Feature**: External API Frontend Fix  
-**Version**: 1.0.0  
-**Date**: January 29, 2026  
+**Feature**: External API Frontend Fix
+**Version**: 1.0.0
+**Date**: January 29, 2026
 **Test Phase**: 4.1 Manual Testing
 
 ## Prerequisites
@@ -32,7 +32,7 @@ Before beginning testing, ensure:
 
 ## Test URL
 
-Navigate to: **<http://localhost:8000/external-data/browse>**  
+Navigate to: **<http://localhost:8000/external-data/browse>**
 (Or your configured application URL + `/external-data/browse`)
 
 ---
@@ -290,9 +290,9 @@ If you want to test error handling:
 
 ### Test Execution Summary
 
-**Date**: _____________  
-**Tester**: _____________  
-**Browser**: _____________  
+**Date**: _____________
+**Tester**: _____________
+**Browser**: _____________
 **Environment**: _____________
 
 ### Task 4.1.1: Successful Data Loading

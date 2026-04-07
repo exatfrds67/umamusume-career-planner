@@ -1,6 +1,7 @@
 # OCR Infrastructure Installation Guide
 
-This guide covers the installation and configuration of Tesseract OCR with Japanese language support for the Umamusume Career Planner application.
+This guide covers the installation and configuration of Tesseract OCR with Japanese language support
+for the Umamusume Career Planner application.
 
 ## Table of Contents
 

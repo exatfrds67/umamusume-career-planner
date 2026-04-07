@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0  
+**Document Version**: 2.2.1
+**Date**: March 11, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Current - Aligned with codebase v2.2.0
 **Related Documents**: [SRS-FR-06], [SDS-4.5], [DBD-4.5], [SPEC-005]
 
 **Source Specs**:
@@ -17,11 +17,12 @@
 
 **Related Artifacts**:
 
-- SPEC: [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md)
-- Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
-- Wireframes: [WF-010](../wireframes/WF-010_Support_Card_Collection.md), [WF-011](../wireframes/WF-011_Support_Deck_Builder.md)
-- Sequences: [SEQ-005](../sequences/SEQ-005_Support_Card_Upgrade.md)
-- User Flows: [UF-006](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+- SPEC: [SPEC-005](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](../01-flows/FLOW-005_Support_Card_Management_System.md)
+- Wireframes: [WF-010](../01-wireframes/WF-010_Support_Card_Collection.md),
+[WF-011](../01-wireframes/WF-011_Support_Deck_Builder.md)
+- Sequences: [SEQ-005](../01-sequences/SEQ-005_Support_Card_Upgrade.md)
+- User Flows: [UF-006](../01-user-flows/UF-006_Support_Deck_Building_Flow.md)
 
 ---
 
@@ -46,11 +47,14 @@
 
 ### 1.1 Purpose
 
-Provide a centralized system for managing support card inventories, constructing optimal decks, and tracking meta-relevance to maximize training efficiency and skill acquisition.
+Provide a centralized system for managing support card inventories, constructing optimal decks, and
+tracking meta-relevance to maximize training efficiency and skill acquisition.
 
 ### 1.2 Problem Statement
 
-Players struggle to select the best combination of 6 cards from hundreds of options. Without tools to calculate synergy or track bond milestones, players often build suboptimal decks that fail to support their training goals or provide necessary skill hints.
+Players struggle to select the best combination of 6 cards from hundreds of options. Without tools
+to calculate synergy or track bond milestones, players often build suboptimal decks that fail to
+support their training goals or provide necessary skill hints.
 
 ### 1.3 Solution Overview
 
@@ -89,7 +93,7 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 | --- | --- | --- | --- |
 | US-5.1 | Player | I want to register which SSR cards I own and their limit break level. | Inventory view allows adding cards and setting LB (0-4). |
 | US-5.2 | Player | I want to build a deck with 3 Speed and 2 Intelligence cards. | Deck builder validates types and counts; warns if unbalanced. |
-| US-5.3 | Player | I want to borrow a "Friend" card that I don't own. | The 6th slot allows selection from the global database. |
+| US-5.3 | Player | I want to borrow a "Friend" card that I don't own. | The 6th slot must clearly distinguish among `borrowable`, `owned`, `ineligible`, and `unavailable` card states. If borrowing is not currently available in the active mode or context, the slot must show an unavailable state rather than appearing selectable. |
 | US-5.4 | Player | I want to see which cards are currently "S-Tier" in the meta. | Cards display a "Meta Tier" badge synced from external sources. |
 | US-5.5 | Coach | I want to know total "Race Bonus" provided by my deck. | Summary panel sums up specific effect values across all 6 cards. |
 
@@ -105,11 +109,12 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 
 ### 4.2 Deck Building Logic [FR-06.2]
 
-- **Composition Rules**:
-  - Max 6 cards total.
-  - Max 5 cards from User Inventory.
-  - Max 1 card from Friend/Global pool.
-  - No duplicate character names allowed.
+Deck validation must enforce: maximum 6 cards total, maximum 5 owned cards, maximum 1 friend/global
+card when that capability is available, and no duplicate character names. The system must
+distinguish advisory warnings from hard validation failures. In `StorageMode::LOCAL`, deck planning
+may remain browser-local. In `StorageMode::ACCOUNT`, deck persistence must be owner-scoped and
+authenticated.
+
 - **Synergy Scoring**: Calculate a score (0-100) based on:
   - Alignment with Character Growth Rates.
   - Coverage of needed Skills.
@@ -136,6 +141,9 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 - **Trigger**: Random event when support card at 80%+ bond
 - **Visual indicator**: Rainbow aura on training facility
 - **Bonus range**: 10% (unupgraded) to 35% (fully uncapped)
+- **Planner Interpretation**: This range is a planner-facing shorthand for card-rarity and limit-
+break-dependent friendship effects; the UI must not imply a single fixed universal bonus formula for
+every support card.
 - **Target timing**: All cards should reach 80% by first Summer Camp or second goal race
 
 **Event Lookup**: Provide quick access to event choices and outcomes.
@@ -190,7 +198,9 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 
 - **Training (PRD-002)**: Deck bonuses directly modify training gain formulas.
 - **Skills (PRD-004)**: Cards determine the pool of available skill hints.
-- **Character (PRD-001)**: Decks are assigned during the creation wizard.
+
+**Character Integration**: Support decks may be assigned during creation or updated later through
+deck-management workflows. Documentation must not imply that deck assignment is creation-only.
 
 ---
 
@@ -241,6 +251,7 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 
 | Version | Date | Changes |
 | --- | --- | --- |
+| 2.2.1 | March 11, 2026 | Clarified the Friendship Training bonus range as a planner-facing summary that varies by card rarity and limit break. |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: game-accurate bond system (+7 base, +9 with Charming, +5 exclamation), Friendship Training mechanics (80% threshold, 10-35% bonus range), support card presence bonus (+5% per card, max +30%). |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
 | 2.0.0 | January 2026 | Initial v2 release with inventory and deck builder. |

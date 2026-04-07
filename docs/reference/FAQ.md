@@ -4,19 +4,24 @@
 
 ### What is Umamusume Career Planner?
 
-Umamusume Career Planner is a comprehensive tool for planning and optimizing your Uma Musume Pretty Derby training runs. It helps you track characters, plan training strategies, manage support card decks, and make data-driven decisions with AI-powered recommendations.
+Umamusume Career Planner is a comprehensive tool for planning and optimizing your Uma Musume Pretty
+Derby training runs. It helps you track characters, plan training strategies, manage support card
+decks, and make data-driven decisions with AI-powered recommendations.
 
 ### Is this an official Cygames product?
 
-No, this is a fan-made tool created to help players optimize their gameplay. It is not affiliated with or endorsed by Cygames.
+No, this is a fan-made tool created to help players optimize their gameplay. It is not affiliated
+with or endorsed by Cygames.
 
 ### Is my data safe?
 
-Yes, your data is stored securely and is only accessible to you. We use industry-standard encryption and security practices. You can export your data at any time.
+Yes, your data is stored securely and is only accessible to you. We use industry-standard encryption
+and security practices. You can export your data at any time.
 
 ### Can I use this on mobile devices?
 
-Yes! The application is fully responsive and works on smartphones and tablets. It's also a Progressive Web App (PWA), so you can install it on your device for offline access.
+Yes! The application is fully responsive and works on smartphones and tablets. It's also a
+Progressive Web App (PWA), so you can install it on your device for offline access.
 
 ---
 
@@ -55,7 +60,8 @@ Yes, you can edit character stats at any time from the character detail page.
 
 ### What happens when I delete a character?
 
-Deleting a character removes all associated data including careers, training sessions, and race history. This cannot be undone.
+Deleting a character removes all associated data including careers, training sessions, and race
+history. This cannot be undone.
 
 ### Can I duplicate a character?
 
@@ -190,7 +196,8 @@ Race performance depends on:
 
 ### How does the AI Advisor work?
 
-The AI Advisor analyzes your character's stats, goals, and current situation to provide personalized recommendations for training, races, and skills.
+The AI Advisor analyzes your character's stats, goals, and current situation to provide personalized
+recommendations for training, races, and skills.
 
 ### Is the AI always right?
 

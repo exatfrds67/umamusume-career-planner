@@ -27,7 +27,7 @@ Redis without proper error handling:
 // Before
 Route::middleware(['web', 'auth', 'throttle:api'])->prefix('external')
 
-// After  
+// After
 Route::middleware(['throttle:api'])->prefix('external')
 ```text
 
@@ -37,7 +37,7 @@ Route::middleware(['throttle:api'])->prefix('external')
 **Changes**: Added try-catch blocks to all Redis operations:
 
 - `getFailureCount()` - Returns 0 when Redis unavailable
-- `incrementFailureCount()` - Silently fails when Redis unavailable  
+- `incrementFailureCount()` - Silently fails when Redis unavailable
 - `resetFailureCount()` - Silently fails when Redis unavailable
 - `isCircuitBreakerOpen()` - Returns false (allow requests) when Redis unavailable
 
@@ -66,7 +66,7 @@ The fix implements a **graceful degradation** approach:
 Created comprehensive test suite in `tests/Feature/ExternalDataBrowserTest.php`:
 
 - ✅ External characters endpoint works
-- ✅ External support cards endpoint works  
+- ✅ External support cards endpoint works
 - ✅ External skills endpoint works
 - ✅ External status endpoint works
 - ✅ External data browser page loads
@@ -99,4 +99,3 @@ All tests pass, confirming the fix works correctly.
 
 This fix resolves the external data browser issue and improves overall application stability when Redis is unavailable,
 which is common in development environments.
-

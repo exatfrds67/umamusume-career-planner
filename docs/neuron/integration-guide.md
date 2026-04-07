@@ -17,7 +17,9 @@
 
 ## Introduction
 
-Neuron AI is a PHP framework for creating and orchestrating AI Agents that power intelligent features in the Uma Musume Career Planner. This guide covers everything you need to know to work with Neuron AI in this Laravel application.
+Neuron AI is a PHP framework for creating and orchestrating AI Agents that power intelligent
+features in the Uma Musume Career Planner. This guide covers everything you need to know to work
+with Neuron AI in this Laravel application.
 
 ### What is Neuron AI?
 
@@ -177,10 +179,10 @@ protected function provider(): AIProviderInterface
 {
     // Use Anthropic for this agent
     return AIProvider::driver('anthropic');
-    
+
     // Or use OpenAI
     return AIProvider::driver('openai');
-    
+
     // Or use Ollama for local development
     return AIProvider::driver('ollama');
 }
@@ -728,7 +730,7 @@ public function streamAdvice(Request $request)
                     'content' => $chunk->content,
                     'done' => false,
                 ]) . "\n\n";
-                
+
                 if (ob_get_level() > 0) {
                     ob_flush();
                 }
@@ -740,7 +742,7 @@ public function streamAdvice(Request $request)
                 'content' => '',
                 'done' => true,
             ]) . "\n\n";
-            
+
             if (ob_get_level() > 0) {
                 ob_flush();
             }
@@ -750,7 +752,7 @@ public function streamAdvice(Request $request)
                 'error' => 'Streaming failed',
                 'done' => true,
             ]) . "\n\n";
-            
+
             if (ob_get_level() > 0) {
                 ob_flush();
             }
@@ -773,19 +775,19 @@ const eventSource = new EventSource('/api/training-advisor/stream?character_id=1
 
 eventSource.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    
+
     if (data.error) {
         console.error('Streaming error:', data.error);
         eventSource.close();
         return;
     }
-    
+
     if (data.done) {
         console.log('Streaming complete');
         eventSource.close();
         return;
     }
-    
+
     // Append chunk to UI
     document.getElementById('response').textContent += data.content;
 };
@@ -971,7 +973,7 @@ Tool::make('get_character_stats', 'Retrieve character statistics')
             Log::warning('Tool Error: Character not found', [
                 'character_id' => $character_id,
             ]);
-            
+
             // Return error message to agent
             return "Error: Character with ID {$character_id} not found.";
         }
@@ -1000,7 +1002,7 @@ it('generates training advice', function () {
         userId: 1,
         sessionId: 123
     );
-    
+
     // Inject mock (implementation depends on your setup)
     $agent->setProvider($mockProvider);
 
@@ -1027,7 +1029,7 @@ it('retrieves character stats correctly', function () {
 
     $tool = CharacterStatsTool::make();
     $callable = $tool->getCallable();
-    
+
     $result = $callable($character->id);
 
     expect($result)->toBeArray()
@@ -1052,12 +1054,12 @@ it('formats training context correctly', function () {
     ]);
 
     $service = new TrainingAdvisorService(new Character());
-    
+
     // Use reflection to test private method
     $reflection = new ReflectionClass($service);
     $method = $reflection->getMethod('formatTrainingContext');
     $method->setAccessible(true);
-    
+
     $context = $method->invoke($service, $character->id);
 
     expect($context)->toContain('Special Week')
@@ -1092,7 +1094,7 @@ it('persists and retrieves chat history', function () {
 
     // Second interaction with same session
     $agent2 = new TrainingAdvisorAgent($userId, $sessionId);
-    
+
     // History should be loaded automatically
     // (Verify through agent behavior or database queries)
 });
@@ -1183,7 +1185,7 @@ class TrainingAdviceResponse
     public function __construct(
         #[SchemaProperty(description: 'Recommendation', required: true)]
         public string $recommendation,
-        
+
         // Make this optional if agent struggles
         #[SchemaProperty(description: 'Details', required: false)]
         public ?string $details = null,
@@ -1272,7 +1274,7 @@ Route::get('/test-neuron', function () {
         $response = $provider->chat([
             new UserMessage('Say hello')
         ]);
-        
+
         return response()->json([
             'success' => true,
             'response' => $response->content,
@@ -1295,7 +1297,7 @@ Route::get('/debug/chat-history/{sessionId}', function ($sessionId) {
         ->where('session_id', $sessionId)
         ->orderBy('created_at')
         ->get();
-    
+
     return response()->json($messages);
 });
 ```
@@ -1310,14 +1312,14 @@ Tool::make('get_character_stats', 'description')
             'tool' => 'get_character_stats',
             'character_id' => $character_id,
         ]);
-        
+
         $result = Character::find($character_id);
-        
+
         Log::info('Tool Result', [
             'tool' => 'get_character_stats',
             'found' => $result !== null,
         ]);
-        
+
         return $result;
     });
 ```text
@@ -1499,7 +1501,7 @@ class AdaptiveAgent extends BaseAgent
     public function instructions(): string
     {
         $user = auth()->user();
-        
+
         $background = [
             "You are an expert in Uma Musume training mechanics.",
         ];
@@ -1552,7 +1554,9 @@ class CachedTrainingAdvisorService
 
 ### Monitoring with Inspector
 
-Inspector is a real-time monitoring and debugging service that provides deep insights into your AI agent execution. It's particularly valuable for production environments where you need to track performance, debug issues, and optimize agent behavior.
+Inspector is a real-time monitoring and debugging service that provides deep insights into your AI
+agent execution. It's particularly valuable for production environments where you need to track
+performance, debug issues, and optimize agent behavior.
 
 #### What Inspector Monitors
 
@@ -1587,7 +1591,8 @@ Inspector automatically tracks:
 
 4. **Verify Configuration**
 
-   Inspector will automatically start tracking agent executions once the key is configured. No additional code changes are required.
+   Inspector will automatically start tracking agent executions once the key is configured. No
+   additional code changes are required.
 
 #### Accessing Inspector Dashboard
 
@@ -1710,7 +1715,8 @@ If Inspector doesn't fit your needs, consider:
 - **New Relic**: Full application performance monitoring
 - **Custom Logging**: Use Laravel's logging with log aggregation services
 
-However, Inspector is specifically designed for AI agent monitoring and provides the most relevant insights for Neuron AI applications.
+However, Inspector is specifically designed for AI agent monitoring and provides the most relevant
+insights for Neuron AI applications.
 
 ### MCP Connector Integration (Reference)
 
@@ -1926,10 +1932,11 @@ Found an issue or have a suggestion? Please open an issue or submit a pull reque
 
 ## License
 
-This documentation is part of the Uma Musume Career Planner project and is licensed under the same terms as the main application.
+This documentation is part of the Uma Musume Career Planner project and is licensed under the same
+terms as the main application.
 
 ---
 
-**Last Updated**: January 12, 2026  
-**Neuron AI Version**: Latest  
+**Last Updated**: January 12, 2026
+**Neuron AI Version**: Latest
 **Laravel Version**: 12.x

@@ -26,7 +26,8 @@
 
 ### 1.1 Purpose
 
-This document provides detailed system requirements for the Uma Musume Career Planner application. It translates business requirements into specific, testable technical requirements.
+This document provides detailed system requirements for the Uma Musume Career Planner application.
+It translates business requirements into specific, testable technical requirements.
 
 ### 1.2 Scope
 
@@ -661,14 +662,14 @@ erDiagram
     CareerRun ||--o{ Goal : sets
     CareerRun ||--o{ RaceSnapshot : captures
     Skill ||--o{ SkillCareerRun : referenced_by
-    
+
     UmaMusume {
         int id PK
         string name
         string name_jp
         string image_path
     }
-    
+
     CareerRun {
         int id PK
         uuid uuid
@@ -678,7 +679,7 @@ erDiagram
         string title
         enum status
     }
-    
+
     StatProgress {
         int id PK
         int career_run_id FK
@@ -689,7 +690,7 @@ erDiagram
         int guts
         int wit
     }
-    
+
     Skill {
         int id PK
         string name
@@ -806,7 +807,7 @@ flowchart LR
         BR9[BR-9: Storage Modes]
         BR10[BR-10: Accessibility]
     end
-    
+
     subgraph System Requirements
         SR1[REQ-1,3,4]
         SR2[REQ-2,5]
@@ -819,7 +820,7 @@ flowchart LR
         SR9[REQ-56,57,78]
         SR10[NFR-3,6]
     end
-    
+
     BR1 --> SR1
     BR2 --> SR2
     BR3 --> SR3

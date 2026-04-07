@@ -104,7 +104,7 @@ private function loadAptitudeData(): void
     $this->aptitudeData = [
         // Existing characters...
         'Special Week' => [...],
-        
+
         // Add new characters here
     ];
 }
@@ -125,7 +125,7 @@ private function loadAptitudeData(): void
     'dirt_mile' => 'G',
     'dirt_medium' => 'G',
     'dirt_long' => 'G',
-    
+
     // Running styles
     'runner' => 'G',
     'leader' => 'A',
@@ -205,12 +205,15 @@ php artisan tinker --execute="
        ['Biwa Hayahide', 'B', 'A', 'S', 'A', 'G', 'G', 'G', 'G', 'G', 'A', 'S', 'A'],
        // ... more characters
    ];
-   
+
    foreach ($spreadsheetData as $row) {
        echo "'{$row[0]}' => [\n";
-       echo "    'turf_short' => '{$row[1]}', 'turf_mile' => '{$row[2]}', 'turf_medium' => '{$row[3]}', 'turf_long' => '{$row[4]}',\n";
-       echo "    'dirt_short' => '{$row[5]}', 'dirt_mile' => '{$row[6]}', 'dirt_medium' => '{$row[7]}', 'dirt_long' => '{$row[8]}',\n";
-       echo "    'runner' => '{$row[9]}', 'leader' => '{$row[10]}', 'betweener' => '{$row[11]}', 'chaser' => '{$row[12]}',\n";
+       echo "    'turf_short' => '{$row[1]}', 'turf_mile' => '{$row[2]}', 'turf_medium' => '{$row[3]}',
+       'turf_long' => '{$row[4]}',\n";
+       echo "    'dirt_short' => '{$row[5]}', 'dirt_mile' => '{$row[6]}', 'dirt_medium' => '{$row[7]}',
+       'dirt_long' => '{$row[8]}',\n";
+       echo "    'runner' => '{$row[9]}', 'leader' => '{$row[10]}', 'betweener' => '{$row[11]}', 'chaser'
+       => '{$row[12]}',\n";
        echo "],\n";
    }
    ```text
@@ -337,7 +340,6 @@ feat: add aptitude data for 20 characters
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: January 26, 2026  
+**Document Version**: 1.0
+**Last Updated**: January 26, 2026
 **Related**: [Task 4 Implementation Summary](./TASK-4-ENHANCED-CHARACTER-BASELINE-DATA.md)
-

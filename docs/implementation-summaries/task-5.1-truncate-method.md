@@ -118,9 +118,9 @@ php artisan db:seed --class=UcpSkillsSeeder
 
 ## Requirements Validated
 
-✅ **Requirement 6.1**: Provides fresh seeding option via `fresh()` method  
-✅ **Requirement 6.2**: Disables/re-enables foreign key checks properly  
-✅ **Requirement 6.3**: Handles both MySQL and SQLite drivers  
+✅ **Requirement 6.1**: Provides fresh seeding option via `fresh()` method
+✅ **Requirement 6.2**: Disables/re-enables foreign key checks properly
+✅ **Requirement 6.3**: Handles both MySQL and SQLite drivers
 ✅ **Requirement 6.4**: Defaults to upsert behavior (non-destructive)
 
 ## Database Driver Compatibility

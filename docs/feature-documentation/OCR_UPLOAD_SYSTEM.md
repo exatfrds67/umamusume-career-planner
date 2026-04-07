@@ -6,7 +6,7 @@ The OCR Upload System provides secure screenshot upload and management capabilit
 application. It implements comprehensive validation, image preprocessing, duplicate detection, and automatic cleanup of
 temporary files.
 
-**Task**: 5.1.2 - Create screenshot upload and management system  
+**Task**: 5.1.2 - Create screenshot upload and management system
 **Requirements**: Requirement 23.2
 
 ## Features
@@ -243,7 +243,7 @@ CREATE TABLE ucp_ocr_extractions (
     processing_metadata JSON NULL,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     INDEX idx_image_hash (image_hash),
     INDEX idx_user_status (user_id, status),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

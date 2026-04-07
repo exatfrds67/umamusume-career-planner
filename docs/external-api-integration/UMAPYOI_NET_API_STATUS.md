@@ -1,8 +1,8 @@
 # Umapyoi.net API Integration Report
 
-**Report Date:** 2026-01-25  
-**Project:** Uma Musume Career Planner  
-**API Version:** v1 (Expected)  
+**Report Date:** 2026-01-25
+**Project:** Uma Musume Career Planner
+**API Version:** v1 (Expected)
 **Status:** Integration Configured, Live API Status Pending
 
 ---
@@ -278,7 +278,7 @@ $result = $client->getCharacters();
 if ($result['success']) {
     $characters = $result['data'];
     $source = $result['source']; // 'api', 'cache', or 'error'
-    
+
     foreach ($characters as $character) {
         echo $character['name'] . "\n";
     }
@@ -401,13 +401,13 @@ Until live API access is confirmed, the application will:
 
 ## Contact & Support
 
-**API Provider:** umapyoi.net  
-**Discord:** <https://discord.gg/wvGHW65C6A>  
-**Website:** <https://umapyoi.net>  
+**API Provider:** umapyoi.net
+**Discord:** <https://discord.gg/wvGHW65C6A>
+**Website:** <https://umapyoi.net>
 **Developer:** KevinVG207 ([@kevinvg207](https://www.twitter.com/kevinvg207))
 
 ---
 
-**Report Generated:** 2026-01-25  
-**Last Updated:** 2026-01-25  
+**Report Generated:** 2026-01-25
+**Last Updated:** 2026-01-25
 **Next Review:** After API provider contact

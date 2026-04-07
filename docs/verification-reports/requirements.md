@@ -25,7 +25,9 @@
 
 ### 1.1 Purpose
 
-This document consolidates all 59 requirements from the comprehensive Software Requirements Specification (SRS) into a single reference document with implementation status, priority levels, dependencies, and traceability to design components.
+This document consolidates all 59 requirements from the comprehensive Software Requirements
+Specification (SRS) into a single reference document with implementation status, priority levels,
+dependencies, and traceability to design components.
 
 ### 1.2 Scope
 
@@ -56,7 +58,8 @@ The requirements cover all aspects of the Umamusume Career Planner system:
 
 #### REQ-3.1.1: Character Creation and Configuration (★★★★★)
 
-- **Description**: System SHALL allow users to create character profiles with trainee name, career stage, class, and scenario type
+- **Description**: System SHALL allow users to create character profiles with trainee name, career
+stage, class, and scenario type
 - **Acceptance Criteria**:
   - Character creation form with validation
   - Support for URA Finale and Unity Cup scenarios
@@ -67,7 +70,8 @@ The requirements cover all aspects of the Umamusume Career Planner system:
 
 #### REQ-3.1.2: Aptitude Management (★★★★★)
 
-- **Description**: System SHALL record aptitude ratings (G through S, S is maximum) for all distance categories and surfaces
+- **Description**: System SHALL record aptitude ratings (G through S, S is maximum) for all distance
+categories and surfaces
 - **Acceptance Criteria**:
   - Fixed aptitude ratings that cannot be changed through training
   - Visual indicators for aptitude strengths/weaknesses
@@ -211,7 +215,8 @@ The requirements cover all aspects of the Umamusume Career Planner system:
 
 #### REQ-3.4.2: Hint System and Cost Reduction (★★★★★)
 
-- **Description**: System SHALL track hint sources and calculate progressive SP cost reduction (5 levels: 10%/20%/30%/35%/40% max)
+- **Description**: System SHALL track hint sources and calculate progressive SP cost reduction (5
+levels: 10%/20%/30%/35%/40% max)
 - **Acceptance Criteria**:
   - Hint source tracking (support cards, events, inheritance)
   - Cost reduction calculation (5 levels: 10%/20%/30%/35%/40% max)
@@ -732,4 +737,5 @@ All 59 requirements have been implemented and tested:
 
 ---
 
-*This document provides a comprehensive reference for all requirements in the Umamusume Career Planner system, with full traceability to design components and implementation status.*
+*This document provides a comprehensive reference for all requirements in the Umamusume Career
+Planner system, with full traceability to design components and implementation status.*

@@ -1,8 +1,8 @@
 # Top Bar Enhancement Implementation Summary
 
-**Date**: 2026-02-09  
-**Version**: 2.0.0  
-**Status**: Completed  
+**Date**: 2026-02-09
+**Version**: 2.0.0
+**Status**: Completed
 **Related Documents**: WF-001, PRD-001, SPEC-001
 
 ---
@@ -173,7 +173,7 @@ class RunSelector extends Component
 {
     public $currentRun;
     public $availableRuns;
-    
+
     public function mount()
     {
         $this->availableRuns = Auth::user()->careerRuns()
@@ -182,7 +182,7 @@ class RunSelector extends Component
             ->get();
         $this->currentRun = session('current_run_id');
     }
-    
+
     public function selectRun($runId)
     {
         session(['current_run_id' => $runId]);

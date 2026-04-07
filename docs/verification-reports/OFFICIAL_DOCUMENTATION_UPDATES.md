@@ -2,7 +2,9 @@
 
 ## Overview
 
-This document consolidates official documentation findings for all major technology components used in the Umamusume Career Planner. All information sourced from official vendor documentation and verified as current as of February 22, 2026.
+This document consolidates official documentation findings for all major technology components used
+in the Umamusume Career Planner. All information sourced from official vendor documentation and
+verified as current as of February 22, 2026.
 
 ---
 
@@ -116,7 +118,7 @@ This document consolidates official documentation findings for all major technol
    // vite.config.js
    import { defineConfig } from 'vite'
    import tailwindcss from '@tailwindcss/vite'
-   
+
    export default defineConfig({
      plugins: [tailwindcss()],
    })
@@ -126,7 +128,7 @@ This document consolidates official documentation findings for all major technol
 
    ```css
    @import "tailwindcss";
-   
+
    @theme {
      --color-primary: oklch(0.72 0.11 178);
    }

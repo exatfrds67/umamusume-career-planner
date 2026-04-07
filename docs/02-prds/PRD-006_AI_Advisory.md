@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0  
+**Document Version**: 2.2.1
+**Date**: March 11, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Current - Aligned with codebase v2.2.0
 **Related Documents**: [SRS-FR-07], [SDS-4.6], [DBD-4.5], [SPEC-006]
 
 **Source Specs**:
@@ -17,11 +17,11 @@
 
 **Related Artifacts**:
 
-- SPEC: [SPEC-006](../specs/SPEC-006_AI_Advisory_Technical.md)
-- Flow: [FLOW-006](../flows/FLOW-006_AI_Advisory_System.md)
-- Wireframes: [WF-012](../wireframes/WF-012_AI_Advisor_Interface.md)
-- Sequences: [SEQ-006](../sequences/SEQ-006_AI_Advice_Generation.md)
-- User Flows: [UF-007](../user-flows/UF-007_AI_Advisor_Journey.md)
+- SPEC: [SPEC-006](../02-specs/SPEC-006_AI_Advisory_Technical.md)
+- Flow: [FLOW-006](../01-flows/FLOW-006_AI_Advisory_System.md)
+- Wireframes: [WF-012](../01-wireframes/WF-012_AI_Advisor_Interface.md)
+- Sequences: [SEQ-006](../01-sequences/SEQ-006_AI_Advice_Generation.md)
+- User Flows: [UF-007](../01-user-flows/UF-007_AI_Advisor_Journey.md)
 
 ---
 
@@ -46,17 +46,21 @@
 
 ### 1.1 Purpose
 
-Empower players with intelligent, context-aware decision support through a **Hybrid AI Advisory System**. This system utilizes local LLMs for speed/privacy and cloud LLMs for complex reasoning, orchestrated by **Neuron AI Agents**.
+Empower players with intelligent, context-aware decision support through a **Hybrid AI Advisory
+System**. This system utilizes local LLMs for speed/privacy and cloud LLMs for complex reasoning,
+orchestrated by **Neuron AI Agents**.
 
 ### 1.2 Problem Statement
 
-Game mechanics in *Uma Musume* are opaque and highly mathematical. Players struggle to balance short-term turn efficiency with long-term build goals, often needing "coach-like" advice that generic wikis cannot provide.
+Game mechanics in *Uma Musume* are opaque and highly mathematical. Players struggle to balance
+short-term turn efficiency with long-term build goals, often needing "coach-like" advice that
+generic wikis cannot provide.
 
 ### 1.3 Solution Overview
 
-- **Hybrid Architecture**: **Ollama** (Llama 3.2) handles routine queries locally; **AWS Bedrock** (Claude 3.5/4.5) handles complex strategy.
-- **Neuron Agents**: Specialized agents (`TrainingAdvisor`, `RaceStrategy`, `SkillAdvisor`) use tools to analyze game state.
-- **MCP Integration**: Uses Model Context Protocol to persist conversation memory and access external tools securely.
+- **Hybrid Architecture**: local and cloud providers are environment-configurable rather than hardcoded.
+- **Agent Workflows**: topic-specific advisory workflows provide contextual recommendations.
+- **MCP Integration**: optional capability layer for memory and tool access where enabled.
 
 ---
 
@@ -75,7 +79,12 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
   - *Reactive*: Contextual tips on dashboard.
   - *Interactive*: Chat interface for specific questions.
 - **Agent Framework**: Implementation of Neuron AI agents with specific toolsets.
-- **Context Management**: Persistence of conversation history via database and MCP Memory server.
+- **Context Management**: Context persistence only within the boundaries implemented by the active
+storage mode and environment configuration.
+- **Storage-Aware Context**: The advisory system must support both authenticated account-backed
+context and normalized local-mode payloads. In `StorageMode::LOCAL`, advisory requests must not
+assume DB-backed entity identifiers. In `StorageMode::ACCOUNT`, saved conversations and
+recommendation history must remain owner-scoped.
 - **Cost Control**: Token tracking and budget limits for cloud provider usage.
 
 ### 2.3 Scope (Out)
@@ -92,7 +101,7 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 | US-6.1 | Player | I want to ask "What should I train next?" and get an answer based on my current stats. | AI analyzes stats/goals and suggests specific facility. |
 | US-6.2 | Player | I want to know why the AI recommends resting when I have 60% energy. | Response includes reasoning. |
 | US-6.3 | Player | I want to use a local model to avoid data leaving my network. | System allows selecting "Local Only" or prioritizing Ollama. |
-| US-6.4 | Player | I want the AI to remember that I'm building a "Betweener" strategy. | Context persists across the chat session via Memory MCP. |
+| US-6.4 | Player | I want the AI to remember that I'm building a "Betweener" strategy. | The AI should preserve user strategy preferences across a chat session when memory capability is available. If memory or MCP is unavailable, the core advisory interaction must still succeed without failing the request. |
 | US-6.5 | Admin | I want to set a daily spending limit for AWS Bedrock. | System stops Cloud routing when budget is exceeded. |
 
 ---
@@ -101,21 +110,26 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 
 ### 4.1 Hybrid Routing Engine [FR-07.6]
 
-- **Complexity Analyzer**: Heuristic analysis of user prompt to determine routing.
-  - Low Complexity -> Ollama (Llama 3.2).
-  - High Complexity -> AWS Bedrock (Claude 3.5 Sonnet).
-- **Fallback Logic**: Automatically retry with Cloud if Local fails or times out.
+The routing engine must: (1) classify requests into local-capable, cloud-preferred, or degraded-
+response paths using current configuration and availability; (2) provide a recoverable degraded
+state if neither provider is available; (3) avoid blocking the user when nonessential provider
+features are unavailable; and (4) expose the selected path or degraded state to the UI.
 
 ### 4.2 Neuron Agent Orchestration [FR-07.1]
 
 - **Training Agent**: Uses `GetTrainingPredictionsTool` to evaluate options.
 - **Race Agent**: Uses `GetRaceCalendarTool` and `WinProbCalculator`.
 - **Skill Agent**: Uses `SkillCatalogTool` and `SPBudgetTool`.
-- **Orchestrator**: Single entry point (`AIAdvisoryService`) that dispatches to specific agents based on topic.
+- **Orchestrator**: `HybridAIService` selects the appropriate provider path and coordinates topic-
+specific advisory workflows.
 
 ### 4.3 Game Mechanics Knowledge Base [FR-07.2]
 
 The AI system must be trained on accurate game mechanics including:
+
+The knowledge base must distinguish between exact game rules and planner-side approximations used
+for UX/readability. Advisory responses must not present simplified planner abstractions as
+guaranteed internal engine behavior.
 
 **Skill Hint System**:
 
@@ -131,7 +145,8 @@ The AI system must be trained on accurate game mechanics including:
 
 - Soft cap at 1200 with diminishing returns above
 - Important breakpoints: 901, 1200, 1600
-- Stamina 1200+ activates "Stamina Contest" buff
+- 1200+ Stamina may inform advanced final-spurt advisory guidance, but must not be described as a
+guaranteed standalone named buff without source-backed justification
 
 **Track Conditions**:
 
@@ -147,9 +162,9 @@ The AI system must be trained on accurate game mechanics including:
 
 ### 4.4 Model Context Protocol (MCP) [FR-07.4]
 
-- **Memory Server**: Store long-term user preferences and run strategy.
-- **Filesystem Server**: (Internal) Access to static game data files for RAG.
-- **Fetch Server**: Retrieve latest meta updates from web if configured.
+If enabled, MCP may provide memory, tool access, or retrieval capabilities to advisory workflows. If
+MCP is disabled or unavailable, the advisory system must continue with core non-MCP behavior and
+must not fail the primary interaction solely because MCP is unavailable.
 
 ### 4.5 Cost & Usage Tracking [FR-07.5]
 
@@ -192,13 +207,14 @@ The AI system must be trained on accurate game mechanics including:
 
 ### 6.2 Service Integration
 
-- **Neuron Framework**: Core dependency for agent logic.
-- **AWS SDK**: Integration for Bedrock Runtime.
-- **Ollama API**: Local HTTP integration (`http://localhost:11434`).
+The advisory layer must support a local provider path, a cloud provider path, and configurable
+routing between them. Provider configuration, availability, and credentials must remain environment-
+driven and must not be hardcoded in the product requirement.
 
 ### 6.3 Context Injection
 
-- **Strategy**: RAG (Retrieval-Augmented Generation) using current Character JSON state + recent Training History + Goal definitions.
+- **Strategy**: RAG (Retrieval-Augmented Generation) using current Character JSON state + recent
+Training History + Goal definitions.
 
 ---
 
@@ -242,7 +258,8 @@ The AI system must be trained on accurate game mechanics including:
 
 - **Assumption**: User hosting the app locally has hardware capable of running Ollama (8GB+ RAM recommended).
 - **Assumption**: Cloud API keys are managed securely via `.env`.
-- **Open Question**: How much history should be injected into the prompt context window? *Current: Last 5 turns + Current State.*
+- **Open Question**: How much history should be injected into the prompt context window? *Current:
+Last 5 turns + Current State.*
 
 ---
 
@@ -250,6 +267,7 @@ The AI system must be trained on accurate game mechanics including:
 
 | Version | Date | Changes |
 | --- | --- | --- |
+| 2.2.1 | March 11, 2026 | Clarified planner-vs-game knowledge-base boundaries and softened the 1200+ Stamina note to avoid overstating a named buff mechanic. |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: added game mechanics knowledge base section with accurate skill hint system (5 levels, 40% max), aptitude system (G-S, no SS), stat system (1200+ diminishing returns), track conditions, and career structure (~70-78 turns). |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
 | 2.0.0 | January 2026 | Initial v2 release with hybrid AI architecture. |

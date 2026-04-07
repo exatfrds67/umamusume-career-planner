@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.4.1
+**Date**: March 10, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [SEQ-001]
 
 **Source Specs**:
@@ -13,13 +13,15 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
-- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
-- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
-- Tech Flow: [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
-- Sequences: [SEQ-001](../sequences/SEQ-001_Character_Creation_Sequence.md)
-- User Flows: [UF-002](../user-flows/UF-002_Career_Setup_Flow.md)
+- PRD: [PRD-001](../02-prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md)
+- Tech Flow: [TECH-FLOW-001](../01-tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
+- Sequences: [SEQ-001](../01-sequences/SEQ-001_Character_Creation_Sequence.md)
+- User Flows: [UF-002](../01-user-flows/UF-002_Career_Setup_Flow.md)
 - Related WF: [WF-003](WF-003_Character_Detail_Management.md), [WF-001](WF-001_Dashboard_Overview.md)
+
+> **Alignment Note (March 2026)**: This wireframe has been reviewed for storage-mode consistency, navigation-surface accuracy, and accessibility contract completeness. Component class names, route paths, and service calls shown in code blocks are **illustrative contracts**; verify against the current implementation before use.
 
 ---
 
@@ -27,7 +29,9 @@
 
 ### 1.1 Purpose
 
-The Character Creation Wizard guides users through a multi-step process to create a new career run, configuring character selection, parent inheritance, support deck composition, and initial settings. This wizard implements the complete character initialization workflow as defined in SPEC-001.
+The Character Creation Wizard guides users through a multi-step process to create a new career run,
+configuring character selection, parent inheritance, support deck composition, and initial settings.
+This wizard implements the complete character initialization workflow as defined in SPEC-001.
 
 ### 1.2 Key Objectives
 
@@ -48,6 +52,33 @@ The Character Creation Wizard guides users through a multi-step process to creat
 | US-003 | As a player, I want to build my support deck with validation feedback | P0 |
 | US-004 | As a player, I want to review all my selections before finalizing the character | P0 |
 | US-005 | As a player, I want scenario-specific configuration options | P1 |
+
+---
+
+### 1.4 Storage Mode Support
+
+| Mode | Behavior |
+| --- | --- |
+| **Local Mode** | Wizard steps held in browser; character persisted as local UUID-keyed record on confirmation |
+| **Account Mode** | Wizard state backed by server session; character persisted to database on confirmation |
+
+Both modes redirect to the character detail view on success. Step validation runs identically in both modes.
+
+### 1.5 Navigation Surface
+
+| Surface | Description |
+| --- | --- |
+| **Entry point** | Conceptual: character creation route (authenticated account mode or local guest flow) |
+| **Success redirect** | Character detail view |
+| **Cancel / Exit** | Returns to dashboard or character list |
+
+### 1.6 Screen Variants
+
+| Variant | Trigger | Notes |
+| --- | --- | --- |
+| **Standard (Account)** | Authenticated user | Full persistence on confirmation |
+| **Local (Guest)** | Unauthenticated user | Browser-backed; no server call on each step |
+| **Mid-Session Recovery** | Page refresh during wizard | Draft state restoration from local store |
 
 ---
 
@@ -83,9 +114,9 @@ sequenceDiagram
     participant User
     participant Wizard
     participant Validation
-    participant CharacterService
+    participant CharacterStateService
     participant Database
-    
+
     User->>Wizard: Start wizard
     Wizard->>User: Show Step 1
     User->>Wizard: Select trainee
@@ -101,10 +132,10 @@ sequenceDiagram
     Validation-->>Wizard: Deck valid
     Wizard->>User: Show Step 4 (Review)
     User->>Wizard: Confirm creation
-    Wizard->>CharacterService: createCharacter()
-    CharacterService->>Database: Save character
-    Database-->>CharacterService: Character ID
-    CharacterService-->>Wizard: Success
+    Wizard->>CharacterStateService: createCharacter()
+    CharacterStateService->>Database: Save character
+    Database-->>CharacterStateService: Character ID
+    CharacterStateService-->>Wizard: Success
     Wizard->>User: Redirect to dashboard
 ```
 
@@ -114,7 +145,7 @@ sequenceDiagram
 | --- | --- | --- |
 | `currentStep` | `int` | Current wizard step (1-4) |
 | `traineeId` | `int` | Selected trainee character ID |
-| `scenarioType` | `enum` | Scenario type (URA, Grand Masters, etc.) |
+| `scenarioType` | `enum` | Scenario type (URA Finals or Unity Cup) |
 | `parentA` | `object` | Parent A character data |
 | `parentB` | `object` | Parent B character data |
 | `supportDeck` | `array` | Array of 6 support card objects |
@@ -170,20 +201,17 @@ sequenceDiagram
 │ ┌──────────────────────────────────────────────────────────────┐   │
 │ │ Select Scenario                                               │   │
 │ │ ┌────────────────────────────────────────────────────────┐   │   │
-│ │ │ [○ URA Championship Finals]                            │   │   │
-│ │ │    Classic training scenario with balanced stats       │   │   │
+│ │ │ [○ URA Finals]                                         │   │   │
+│ │ │    Standard training scenario with balanced planning   │   │   │
 │ │ │                                                        │   │   │
-│ │ │ [○ Grand Masters]                                      │   │   │
-│ │ │    Advanced scenario with enhanced training options   │   │   │
-│ │ │                                                        │   │   │
-│ │ │ [○ Make a New Track]                                   │   │   │
-│ │ │    Story-focused scenario with unique events          │   │   │
+│ │ │ [○ Unity Cup]                                          │   │   │
+│ │ │    Team-based scenario with Unity Cup events          │   │   │
 │ │ └────────────────────────────────────────────────────────┘   │   │
 │ └───────────────────────────────────────────────────────────────┘   │
 │                                                                      │
 │ ┌──────────────────────────────────────────────────────────────┐   │
 │ │ Selected: Mejiro Ardan (SSR)                                  │   │
-│ │ Scenario: URA Championship Finals                             │   │
+│ │ Scenario: URA Finals                                           │   │
 │ └───────────────────────────────────────────────────────────────┘   │
 │                                                                      │
 │                                         [Cancel] [Next: Parents →] │
@@ -289,7 +317,7 @@ sequenceDiagram
     <div class="trainee-card__portrait">
         <img src="{{ $trainee->image_path }}" alt="{{ $trainee->name }}" />
     </div>
-    
+
     <div class="trainee-card__header">
         <h3 class="trainee-card__name">{{ $trainee->name }}</h3>
         <span class="trainee-card__rarity badge-{{ strtolower($trainee->rarity) }}">
@@ -297,7 +325,7 @@ sequenceDiagram
         </span>
         <span class="trainee-card__specialization">{{ $trainee->specialization }}</span>
     </div>
-    
+
     <div class="trainee-card__stats">
         <div class="stat-row">
             <span class="stat-label">Speed:</span>
@@ -312,7 +340,7 @@ sequenceDiagram
             <span class="stat-value">{{ $trainee->base_power }}</span>
         </div>
     </div>
-    
+
     <div class="trainee-card__growth">
         <h4>Growth Rates</h4>
         @foreach(['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
@@ -324,8 +352,8 @@ sequenceDiagram
             @endif
         @endforeach
     </div>
-    
-    <button 
+
+    <button
         class="btn btn-primary trainee-card__select"
         wire:click="selectTrainee({{ $trainee->id }})"
         data-testid="select-trainee-{{ $trainee->id }}"
@@ -346,26 +374,26 @@ class TraineeSelector extends Component
     public $rarityFilters = ['SSR' => true, 'SR' => true, 'R' => false];
     public $distanceFilter = 'all';
     public $surfaceFilter = 'all';
-    
+
     public $selectedTraineeId = null;
-    
+
     public function updatedSearch()
     {
         $this->resetPage();
     }
-    
+
     public function toggleRarity($rarity)
     {
         $this->rarityFilters[$rarity] = !$this->rarityFilters[$rarity];
         $this->resetPage();
     }
-    
+
     public function selectTrainee($traineeId)
     {
         $this->selectedTraineeId = $traineeId;
         $this->emit('traineeSelected', $traineeId);
     }
-    
+
     public function getTraineesProperty()
     {
         return Character::query()
@@ -386,7 +414,7 @@ class TraineeSelector extends Component
             ->orderBy('name')
             ->paginate(12);
     }
-    
+
     public function render()
     {
         return view('livewire.character-creation.trainee-selector', [
@@ -574,10 +602,10 @@ class TraineeSelector extends Component
 
 ### 4.4 Factor Calculation Logic
 
-**Service**: `app/Services/FactorInheritanceService.php`
+**Service**: `app/Services/FactorService.php`
 
 ```php
-class FactorInheritanceService
+class FactorService
 {
     public function calculateInheritance(Character $trainee, Character $parentA, Character $parentB): array
     {
@@ -587,29 +615,29 @@ class FactorInheritanceService
             'aptitude_upgrades' => $this->calculateAptitudeUpgrades($trainee, $parentA, $parentB),
         ];
     }
-    
+
     private function calculateStatFactors(Character $trainee, Character $parentA, Character $parentB): array
     {
         $factors = [];
-        
+
         foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
             $parentAFactor = $this->getParentFactor($parentA, $stat);
             $parentBFactor = $this->getParentFactor($parentB, $stat);
-            
+
             // Take the higher factor from both parents
             $bestFactor = max($parentAFactor, $parentBFactor);
             $source = $parentAFactor > $parentBFactor ? 'parentA' : 'parentB';
-            
+
             $factors[$stat] = [
                 'stars' => $bestFactor,
                 'bonus' => $this->factorToBonus($bestFactor),
                 'source' => $source,
             ];
         }
-        
+
         return $factors;
     }
-    
+
     private function factorToBonus(int $stars): int
     {
         return match($stars) {
@@ -619,19 +647,19 @@ class FactorInheritanceService
             default => 0,
         };
     }
-    
+
     private function calculateGrowthBonuses(Character $parentA, Character $parentB): array
     {
         $bonuses = [];
-        
+
         foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
             $parentAGrowth = $parentA->{"growth_{$stat}"} ?? 0;
             $parentBGrowth = $parentB->{"growth_{$stat}"} ?? 0;
-            
+
             // Average growth bonuses from both parents, divided by 2
             $bonuses[$stat] = round(($parentAGrowth + $parentBGrowth) / 2);
         }
-        
+
         return $bonuses;
     }
 }
@@ -778,22 +806,22 @@ class DeckBuilder extends Component
 {
     public $deck = [];
     public $deckErrors = [];
-    
+
     public function validateDeck(): bool
     {
         $this->deckErrors = [];
-        
+
         // Rule 1: Must have exactly 6 cards
         if (count($this->deck) !== 6) {
             $this->deckErrors[] = 'Deck must contain exactly 6 cards';
             return false;
         }
-        
+
         // Rule 2: Count card types
         $typeCounts = collect($this->deck)
             ->countBy(fn($card) => $card['type'])
             ->all();
-        
+
         // Rule 3: No more than 3 of the same type (excluding Friend)
         foreach ($typeCounts as $type => $count) {
             if ($type !== 'friend' && $count > 3) {
@@ -801,19 +829,19 @@ class DeckBuilder extends Component
                 return false;
             }
         }
-        
+
         // Rule 4: Recommend at least 1 Friend card
         if (!isset($typeCounts['friend']) || $typeCounts['friend'] === 0) {
             $this->deckErrors[] = 'Recommended: Add at least 1 Friend card for friendship training bonuses';
         }
-        
+
         return count($this->deckErrors) === 0;
     }
-    
+
     public function calculateSynergyScore(): int
     {
         $score = 0;
-        
+
         // Meta tier scoring
         $metaScores = collect($this->deck)->map(function ($card) {
             return match($card['meta_tier']) {
@@ -824,17 +852,17 @@ class DeckBuilder extends Component
                 default => 5,
             };
         })->sum();
-        
+
         $score += $metaScores;
-        
+
         // Limit break scoring
         $lbScore = collect($this->deck)->sum('limit_break_level') * 2;
         $score += $lbScore;
-        
+
         // Type diversity scoring
         $uniqueTypes = collect($this->deck)->pluck('type')->unique()->count();
         $score += $uniqueTypes * 5;
-        
+
         return min(100, $score);
     }
 }
@@ -944,31 +972,31 @@ class DeckBuilder extends Component
 sequenceDiagram
     participant User
     participant Wizard
-    participant CharacterService
+    participant CharacterStateService
     participant FactorService
     participant Database
     participant Cache
-    
+
     User->>Wizard: Click "Create Character"
     Wizard->>Wizard: Validate all steps
-    Wizard->>CharacterService: createCharacter(data)
-    
-    CharacterService->>FactorService: calculateInheritance()
-    FactorService-->>CharacterService: Factor bonuses
-    
-    CharacterService->>Database: Begin transaction
-    CharacterService->>Database: Create character record
-    CharacterService->>Database: Create aptitude records
-    CharacterService->>Database: Create factor records
-    CharacterService->>Database: Create support_deck record
-    CharacterService->>Database: Create initial stat_progress
-    CharacterService->>Database: Commit transaction
-    
-    Database-->>CharacterService: Character ID
-    
-    CharacterService->>Cache: Clear user character cache
-    CharacterService-->>Wizard: Success (character_id)
-    
+    Wizard->>CharacterStateService: createCharacter(data)
+
+    CharacterStateService->>FactorService: calculateInheritance()
+    FactorService-->>CharacterStateService: Factor bonuses
+
+    CharacterStateService->>Database: Begin transaction
+    CharacterStateService->>Database: Create character record
+    CharacterStateService->>Database: Create aptitude records
+    CharacterStateService->>Database: Create factor records
+    CharacterStateService->>Database: Create support_deck record
+    CharacterStateService->>Database: Create initial stat_progress
+    CharacterStateService->>Database: Commit transaction
+
+    Database-->>CharacterStateService: Character ID
+
+    CharacterStateService->>Cache: Clear user character cache
+    CharacterStateService-->>Wizard: Success (character_id)
+
     Wizard->>User: Redirect to /characters/{id}
 ```text
 
@@ -984,29 +1012,29 @@ class CreateCharacterRequest extends FormRequest
         return [
             // Step 1
             'trainee_id' => 'required|exists:characters,id',
-            'scenario_type' => 'required|in:ura_finale,grand_masters,make_a_new_track',
-            
+            'scenario_type' => 'required|in:ura_finale,unity_cup',
+
             // Step 2
             'parent_a_id' => 'required|exists:characters,id|different:parent_b_id',
             'parent_b_id' => 'required|exists:characters,id|different:parent_a_id',
-            
+
             // Step 3
             'support_deck' => 'required|array|size:6',
             'support_deck.*.id' => 'required|exists:support_cards,id',
             'support_deck.*.slot' => 'required|integer|between:1,6|distinct',
-            
+
             // Step 4
             'storage_mode' => 'required|in:local,account',
         ];
     }
-    
+
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
             // Validate deck type distribution
             $deck = $this->input('support_deck', []);
             $typeCounts = collect($deck)->countBy('type');
-            
+
             foreach ($typeCounts as $type => $count) {
                 if ($type !== 'friend' && $count > 3) {
                     $validator->errors()->add(
@@ -1046,18 +1074,18 @@ flowchart TD
         Step3[DeckBuilder]
         Step4[ReviewConfirm]
     end
-    
+
     subgraph SharedComponents[Shared Components]
         CardGrid[SupportCardGrid]
         StatPreview[StatPreviewPanel]
         FactorCalc[FactorCalculator]
     end
-    
+
     Main --> Step1
     Main --> Step2
     Main --> Step3
     Main --> Step4
-    
+
     Step2 --> FactorCalc
     Step3 --> CardGrid
     Step4 --> StatPreview
@@ -1096,13 +1124,13 @@ flowchart LR
         Cards[Support Cards<br/>TTL: 5 minutes]
         Factors[Factor Calculations<br/>TTL: Session]
     end
-    
+
     subgraph Database[Database]
         CharTable[(characters)]
         CardTable[(support_cards)]
         FactorTable[(factors)]
     end
-    
+
     Characters --> CharTable
     Cards --> CardTable
     Factors --> FactorTable
@@ -1124,6 +1152,7 @@ flowchart LR
 | **3.3.1 Error Identification** | Validation errors clearly identified | Screen reader + visual |
 | **3.3.2 Labels or Instructions** | All inputs have associated labels | Automated scan |
 | **4.1.2 Name, Role, Value** | Proper ARIA attributes on custom controls | axe-core scan |
+| **1.4.1 Use of Color** | Step progress and validation state conveyed by text and icon, not color alone | Visual + screen reader |
 
 ### 9.2 Keyboard Navigation
 
@@ -1155,23 +1184,40 @@ flowchart LR
 </div>
 ```text
 
+### 9.4 Accessibility Interaction Requirements
+
+The following rules MUST be satisfied, independent of visual design or component implementation:
+
+1. **Focus lock in wizard**: When the wizard is open, keyboard focus must be constrained within the
+wizard and not reach content behind it.
+2. **Focus advance on step change**: On proceeding to the next step, focus moves to the step heading
+or the first interactive element in the new step content.
+3. **Focus return on cancel**: Closing or cancelling the wizard returns focus to the element that
+triggered it (typically the "Create Character" button).
+4. **Focus on validation error**: On failed step validation, focus moves to the first field with an
+error, and all errors are announced via `aria-live="assertive"`.
+5. **Touch targets**: All interactive controls (Select, Next, Back, Cancel, filter checkboxes) must
+have a minimum touch area of 44×44 CSS pixels.
+6. **Step progress non-color**: The step progress indicator must convey current step by text label
+and position, not color alone.
+
 ---
 
 ## 10. Testing Specifications
 
 ### 10.1 Unit Tests
 
-**Test File**: `tests/Unit/Services/FactorInheritanceServiceTest.php`
+**Test File**: `tests/Unit/Services/FactorServiceTest.php`
 
 ```php
 test('calculates stat factors correctly', function () {
     $trainee = Character::factory()->create();
     $parentA = Character::factory()->withFactors(['speed' => 2, 'power' => 1])->create();
     $parentB = Character::factory()->withFactors(['stamina' => 3, 'wit' => 2])->create();
-    
-    $service = app(FactorInheritanceService::class);
+
+    $service = app(FactorService::class);
     $result = $service->calculateInheritance($trainee, $parentA, $parentB);
-    
+
     expect($result['stat_factors']['speed']['bonus'])->toBe(12)
         ->and($result['stat_factors']['stamina']['bonus'])->toBe(21)
         ->and($result['stat_factors']['power']['bonus'])->toBe(5);
@@ -1186,23 +1232,23 @@ test('validates deck type distribution', function () {
         ['type' => 'stamina', 'id' => 5],
         ['type' => 'friend', 'id' => 6],
     ];
-    
+
     $service = app(DeckValidationService::class);
     $result = $service->validateDeck($deck);
-    
+
     expect($result->isValid())->toBeFalse()
         ->and($result->errors)->toContain('Too many speed cards (max 3 allowed)');
 });
 
 test('parent selection prevents same character', function () {
     $trainee = Character::factory()->create();
-    
+
     $request = CreateCharacterRequest::factory()->create([
         'trainee_id' => $trainee->id,
         'parent_a_id' => 1,
         'parent_b_id' => 1, // Same as parent A
     ]);
-    
+
     expect($request->validate())->toThrow(ValidationException::class);
 });
 ```
@@ -1214,36 +1260,36 @@ test('parent selection prevents same character', function () {
 ```php
 test('complete character creation wizard flow', function () {
     $user = User::factory()->create();
-    
+
     $this->actingAs($user)
         ->get('/characters/create')
         ->assertOk()
         ->assertSee('Step 1 of 4');
-    
+
     // Step 1: Select trainee
     $trainee = Character::factory()->create(['rarity' => 'SSR']);
-    
+
     Livewire::actingAs($user)
         ->test(TraineeSelector::class)
         ->set('selectedTraineeId', $trainee->id)
         ->set('scenarioType', 'ura_finale')
         ->call('nextStep')
         ->assertEmitted('stepCompleted', 1);
-    
+
     // Step 2: Select parents
     $parentA = Character::factory()->create();
     $parentB = Character::factory()->create();
-    
+
     Livewire::actingAs($user)
         ->test(ParentSelector::class)
         ->set('parentAId', $parentA->id)
         ->set('parentBId', $parentB->id)
         ->call('nextStep')
         ->assertEmitted('stepCompleted', 2);
-    
+
     // Step 3: Build support deck
     $cards = SupportCard::factory()->count(6)->create();
-    
+
     Livewire::actingAs($user)
         ->test(DeckBuilder::class)
         ->set('supportDeck', $cards->pluck('id')->toArray())
@@ -1251,13 +1297,13 @@ test('complete character creation wizard flow', function () {
         ->assertHasNoErrors()
         ->call('nextStep')
         ->assertEmitted('stepCompleted', 3);
-    
+
     // Step 4: Review and confirm
     Livewire::actingAs($user)
         ->test(ReviewConfirm::class)
         ->call('createCharacter')
         ->assertRedirect('/characters');
-    
+
     $this->assertDatabaseHas('ucp_characters', [
         'user_id' => $user->id,
         'scenario_type' => 'ura_finale',
@@ -1266,11 +1312,11 @@ test('complete character creation wizard flow', function () {
 
 test('wizard validates deck composition', function () {
     $user = User::factory()->create();
-    
+
     // Create deck with too many of same type
     $speedCards = SupportCard::factory()->count(4)->create(['type' => 'speed']);
     $otherCards = SupportCard::factory()->count(2)->create(['type' => 'stamina']);
-    
+
     Livewire::actingAs($user)
         ->test(DeckBuilder::class)
         ->set('supportDeck', [
@@ -1286,26 +1332,26 @@ test('wizard calculates factor preview correctly', function () {
         'base_speed' => 90,
         'base_stamina' => 70,
     ]);
-    
+
     $parentA = Character::factory()->create();
     $parentB = Character::factory()->create();
-    
+
     // Add factors to parents
     Factor::factory()->create([
         'character_id' => $parentA->id,
         'stat_type' => 'speed',
         'star_level' => 2, // ★★☆ = +12
     ]);
-    
+
     Factor::factory()->create([
         'character_id' => $parentB->id,
         'stat_type' => 'stamina',
         'star_level' => 3, // ★★★ = +21
     ]);
-    
-    $service = app(FactorInheritanceService::class);
+
+    $service = app(FactorService::class);
     $preview = $service->calculateInheritance($trainee, $parentA, $parentB);
-    
+
     expect($preview['stat_factors']['speed']['bonus'])->toBe(12)
         ->and($preview['stat_factors']['stamina']['bonus'])->toBe(21)
         ->and($preview['projected_stats']['speed'])->toBe(102) // 90 + 12
@@ -1324,121 +1370,121 @@ test.describe('WF-002: Character Creation Wizard', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/characters/create');
     });
-    
+
     test('displays step 1 with trainee selection', async ({ page }) => {
         await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 1 of 4');
         await expect(page.getByTestId('trainee-grid')).toBeVisible();
         await expect(page.getByTestId('scenario-selector')).toBeVisible();
     });
-    
+
     test('allows searching and filtering trainees', async ({ page }) => {
         // Search by name
         await page.getByTestId('trainee-search').fill('Mejiro Ardan');
         await expect(page.getByTestId('trainee-card-mejiro-ardan')).toBeVisible();
-        
+
         // Filter by rarity
         await page.getByTestId('filter-rarity-ssr').click();
         const cards = page.getByTestId(/^trainee-card-/);
         const count = await cards.count();
-        
+
         for (let i = 0; i < count; i++) {
             await expect(cards.nth(i)).toContainText('SSR');
         }
     });
-    
+
     test('completes full wizard flow', async ({ page }) => {
         // Step 1: Select trainee
         await page.getByTestId('trainee-card-mejiro-ardan').click();
         await page.getByTestId('select-trainee-mejiro-ardan').click();
         await page.getByTestId('scenario-selector').selectOption('ura_finale');
         await page.getByTestId('next-button').click();
-        
+
         // Step 2: Select parents
         await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 2 of 4');
         await page.getByTestId('choose-parent-a-button').click();
         await page.getByTestId('parent-option-kitasan-black').click();
         await page.getByTestId('choose-parent-b-button').click();
         await page.getByTestId('parent-option-mejiro-mcqueen').click();
-        
+
         // Verify factor preview
         await expect(page.getByTestId('factor-preview-speed')).toContainText('★★☆');
         await expect(page.getByTestId('factor-preview-stamina')).toContainText('★★★');
-        
+
         await page.getByTestId('next-button').click();
-        
+
         // Step 3: Build support deck
         await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 3 of 4');
-        
+
         for (let i = 1; i <= 6; i++) {
             await page.getByTestId(`deck-slot-${i}`).click();
             await page.getByTestId(`card-select-${i}`).first().click();
         }
-        
+
         // Verify deck validation
         await expect(page.getByTestId('deck-score')).toBeVisible();
         await expect(page.getByTestId('deck-validation-success')).toBeVisible();
-        
+
         await page.getByTestId('next-button').click();
-        
+
         // Step 4: Review and confirm
         await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 4 of 4');
         await expect(page.getByTestId('review-trainee-name')).toContainText('Mejiro Ardan');
         await expect(page.getByTestId('review-scenario')).toContainText('URA Finals');
-        
+
         await page.getByTestId('create-character-button').click();
-        
+
         // Verify redirect to character page
         await expect(page).toHaveURL(/\/characters\/\d+/);
         await expect(page.getByRole('heading')).toContainText('Mejiro Ardan');
     });
-    
+
     test('validates deck type distribution', async ({ page }) => {
         // Navigate to step 3
         await page.getByTestId('trainee-card-mejiro-ardan').click();
         await page.getByTestId('select-trainee-mejiro-ardan').click();
         await page.getByTestId('next-button').click();
-        
+
         await page.getByTestId('choose-parent-a-button').click();
         await page.getByTestId('parent-option-kitasan-black').click();
         await page.getByTestId('choose-parent-b-button').click();
         await page.getByTestId('parent-option-mejiro-mcqueen').click();
         await page.getByTestId('next-button').click();
-        
+
         // Try to select 4 speed cards
         const speedCards = await page.getByTestId(/^card-select-speed-/).count();
         for (let i = 0; i < Math.min(4, speedCards); i++) {
             await page.getByTestId(`deck-slot-${i + 1}`).click();
             await page.getByTestId(/^card-select-speed-/).nth(i).click();
         }
-        
+
         // Verify validation error
         await expect(page.getByTestId('deck-validation-error')).toContainText('Too many speed cards');
         await expect(page.getByTestId('next-button')).toBeDisabled();
     });
-    
+
     test('supports keyboard navigation', async ({ page }) => {
         await page.keyboard.press('Tab');
         await expect(page.getByTestId('trainee-search')).toBeFocused();
-        
+
         await page.keyboard.press('Tab');
         await expect(page.getByTestId('trainee-card-mejiro-ardan')).toBeFocused();
-        
+
         await page.keyboard.press('Enter');
         await expect(page.getByTestId('trainee-card-mejiro-ardan')).toHaveAttribute('aria-selected', 'true');
     });
-    
+
     test('allows navigation back through wizard steps', async ({ page }) => {
         // Complete step 1
         await page.getByTestId('trainee-card-mejiro-ardan').click();
         await page.getByTestId('select-trainee-mejiro-ardan').click();
         await page.getByTestId('next-button').click();
-        
+
         // Go to step 2
         await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 2 of 4');
-        
+
         // Click back
         await page.getByTestId('back-button').click();
-        
+
         // Verify back at step 1 with selections preserved
         await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 1 of 4');
         await expect(page.getByTestId('trainee-card-mejiro-ardan')).toHaveAttribute('aria-selected', 'true');
@@ -1457,90 +1503,90 @@ import AxeBuilder from '@axe-core/playwright';
 test.describe('WF-002: Accessibility', () => {
     test('step 1 has no accessibility violations', async ({ page }) => {
         await page.goto('/characters/create');
-        
+
         const accessibilityScanResults = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
             .analyze();
-        
+
         expect(accessibilityScanResults.violations).toEqual([]);
     });
-    
+
     test('step 2 parent selection is accessible', async ({ page }) => {
         await page.goto('/characters/create');
-        
+
         // Navigate to step 2
         await page.getByTestId('trainee-card-mejiro-ardan').click();
         await page.getByTestId('select-trainee-mejiro-ardan').click();
         await page.getByTestId('next-button').click();
-        
+
         const accessibilityScanResults = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa'])
             .analyze();
-        
+
         expect(accessibilityScanResults.violations).toEqual([]);
     });
-    
+
     test('supports screen reader announcements', async ({ page }) => {
         await page.goto('/characters/create');
-        
+
         // Check for live region
         const liveRegion = page.locator('[aria-live="polite"]');
         await expect(liveRegion).toBeAttached();
-        
+
         // Select trainee
         await page.getByTestId('trainee-card-mejiro-ardan').click();
         await page.getByTestId('select-trainee-mejiro-ardan').click();
-        
+
         // Verify announcement
         await expect(liveRegion).toContainText('Mejiro Ardan selected');
-        
+
         // Proceed to next step
         await page.getByTestId('next-button').click();
-        
+
         // Verify step announcement
         await expect(liveRegion).toContainText('Step 2 of 4');
     });
-    
+
     test('all interactive elements have accessible names', async ({ page }) => {
         await page.goto('/characters/create');
-        
+
         const buttons = page.getByRole('button');
         const count = await buttons.count();
-        
+
         for (let i = 0; i < count; i++) {
             const name = await buttons.nth(i).getAttribute('aria-label');
             const text = await buttons.nth(i).textContent();
-            
+
             expect(name || text).toBeTruthy();
         }
     });
-    
+
     test('form inputs have associated labels', async ({ page }) => {
         await page.goto('/characters/create');
-        
+
         const searchInput = page.getByTestId('trainee-search');
         const labelledBy = await searchInput.getAttribute('aria-label');
-        
+
         expect(labelledBy).toBe('Search trainee characters');
     });
-    
+
     test('error messages are announced', async ({ page }) => {
         await page.goto('/characters/create');
-        
+
         // Navigate to step 3
         await page.getByTestId('trainee-card-mejiro-ardan').click();
         await page.getByTestId('select-trainee-mejiro-ardan').click();
         await page.getByTestId('next-button').click();
-        
+
         await page.getByTestId('choose-parent-a-button').click();
         await page.getByTestId('parent-option-kitasan-black').click();
         await page.getByTestId('choose-parent-b-button').click();
         await page.getByTestId('parent-option-mejiro-mcqueen').click();
         await page.getByTestId('next-button').click();
-        
+
         // Try to proceed without full deck
         await page.getByTestId('next-button').click();
-        
+
         // Verify error announcement
         const errorRegion = page.locator('[aria-live="assertive"]');
         await expect(errorRegion).toContainText('Deck must contain exactly 6 cards');
@@ -1560,69 +1606,69 @@ test.describe('WF-002: Visual Regression', () => {
         await page.goto('/characters/create');
         await expect(page).toHaveScreenshot('step-1-trainee-selection.png');
     });
-    
+
     test('step 2 factor preview matches snapshot', async ({ page }) => {
         await page.goto('/characters/create');
-        
+
         // Navigate to step 2
         await page.getByTestId('trainee-card-mejiro-ardan').click();
         await page.getByTestId('select-trainee-mejiro-ardan').click();
         await page.getByTestId('next-button').click();
-        
+
         await page.getByTestId('choose-parent-a-button').click();
         await page.getByTestId('parent-option-kitasan-black').click();
         await page.getByTestId('choose-parent-b-button').click();
         await page.getByTestId('parent-option-mejiro-mcqueen').click();
-        
+
         // Take snapshot of factor preview
         const preview = page.getByTestId('factor-preview-panel');
         await expect(preview).toHaveScreenshot('factor-preview.png');
     });
-    
+
     test('step 3 deck builder matches snapshot', async ({ page }) => {
         await page.goto('/characters/create');
-        
+
         // Navigate to step 3
         await page.getByTestId('trainee-card-mejiro-ardan').click();
         await page.getByTestId('select-trainee-mejiro-ardan').click();
         await page.getByTestId('next-button').click();
-        
+
         await page.getByTestId('choose-parent-a-button').click();
         await page.getByTestId('parent-option-kitasan-black').click();
         await page.getByTestId('choose-parent-b-button').click();
         await page.getByTestId('parent-option-mejiro-mcqueen').click();
         await page.getByTestId('next-button').click();
-        
+
         await expect(page).toHaveScreenshot('step-3-deck-builder.png');
     });
-    
+
     test('step 4 review matches snapshot', async ({ page }) => {
         await page.goto('/characters/create');
-        
+
         // Complete all steps
         await page.getByTestId('trainee-card-mejiro-ardan').click();
         await page.getByTestId('select-trainee-mejiro-ardan').click();
         await page.getByTestId('next-button').click();
-        
+
         await page.getByTestId('choose-parent-a-button').click();
         await page.getByTestId('parent-option-kitasan-black').click();
         await page.getByTestId('choose-parent-b-button').click();
         await page.getByTestId('parent-option-mejiro-mcqueen').click();
         await page.getByTestId('next-button').click();
-        
+
         for (let i = 1; i <= 6; i++) {
             await page.getByTestId(`deck-slot-${i}`).click();
             await page.getByTestId(`card-select-${i}`).first().click();
         }
         await page.getByTestId('next-button').click();
-        
+
         await expect(page).toHaveScreenshot('step-4-review.png');
     });
-    
+
     test('mobile layout matches snapshot', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 667 });
         await page.goto('/characters/create');
-        
+
         await expect(page).toHaveScreenshot('step-1-mobile.png');
     });
 });
@@ -1634,28 +1680,28 @@ test.describe('WF-002: Visual Regression', () => {
 
 ### 11.1 Product Requirements
 
-- [PRD-001: Character Management](../prds/PRD-001_Character_Management.md)
-- [PRD-005: Support Card Management](../prds/PRD-005_Support_Card_Management.md)
+- [PRD-001: Character Management](../02-prds/PRD-001_Character_Management.md)
+- [PRD-005: Support Card Management](../02-prds/PRD-005_Support_Card_Management.md)
 
 ### 11.2 Technical Specifications
 
-- [SPEC-001: Character Management Technical](../specs/SPEC-001_Character_Management_Technical.md)
-- [SPEC-005: Support Card Management Technical](../specs/SPEC-005_Support_Card_Management_Technical.md)
+- [SPEC-001: Character Management Technical](../02-specs/SPEC-001_Character_Management_Technical.md)
+- [SPEC-005: Support Card Management Technical](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
 
 ### 11.3 Flow Documentation
 
-- [FLOW-001: Character Management System](../flows/FLOW-001_Character_Management_System.md)
-- [TECH-FLOW-001: Character Management Flow](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
+- [FLOW-001: Character Management System](../01-flows/FLOW-001_Character_Management_System.md)
+- [TECH-FLOW-001: Character Management Flow](../01-tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
 
 ### 11.4 Sequence Diagrams
 
-- [SEQ-001: Character Creation Sequence](../sequences/SEQ-001_Character_Creation_Sequence.md)
-- [SEQ-005: Support Card Upgrade](../sequences/SEQ-005_Support_Card_Upgrade.md)
+- [SEQ-001: Character Creation Sequence](../01-sequences/SEQ-001_Character_Creation_Sequence.md)
+- [SEQ-005: Support Card Upgrade](../01-sequences/SEQ-005_Support_Card_Upgrade.md)
 
 ### 11.5 User Flow Diagrams
 
-- [UF-002: Career Setup Flow](../user-flows/UF-002_Career_Setup_Flow.md)
-- [UF-006: Support Deck Building Flow](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+- [UF-002: Career Setup Flow](../01-user-flows/UF-002_Career_Setup_Flow.md)
+- [UF-006: Support Deck Building Flow](../01-user-flows/UF-006_Support_Deck_Building_Flow.md)
 
 ---
 
@@ -1663,6 +1709,7 @@ test.describe('WF-002: Visual Regression', () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.0 | 2026-03-09 | Development Team | Alignment review: added storage-mode framing (§1.4–1.6), accessibility interaction requirements (§9.4), conceptual component disclaimer, softened implementation status |
 | 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected aptitude grade scale (S is max, no SS), added aptitude categories documentation |
 | 2.0.0 | 2026-01-24 | Development Team | Complete wireframe specification with testing requirements, accessibility guidelines, and performance targets aligned with v2.0.0 implementation |
@@ -1672,7 +1719,8 @@ test.describe('WF-002: Visual Regression', () => {
 
 ## 13. Notes
 
-**Implementation Status**: ✅ Complete
+**Implementation Status**: Alignment-reviewed concept; specific component classes and route paths in
+this document are illustrative and should be verified against the current implementation.
 
 **Known Issues**: None
 
@@ -1685,4 +1733,5 @@ test.describe('WF-002: Visual Regression', () => {
 
 ---
 
-*This wireframe specification reflects the current implementation of the Character Creation Wizard and serves as the authoritative reference for UI/UX development and testing.*
+_This wireframe describes the intended experience for the Character Creation Wizard. Details should
+be verified against current implementation documentation before treating as authoritative._

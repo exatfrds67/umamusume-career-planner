@@ -137,7 +137,7 @@ only.
 
    ```php
    use Illuminate\Foundation\Testing\RefreshDatabase;
-   
+
    uses(RefreshDatabase::class);
    ```text
 
@@ -229,4 +229,3 @@ test:browser:
 ## Date
 
 Installed: February 5, 2026
-

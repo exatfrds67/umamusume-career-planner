@@ -23,14 +23,16 @@
 ## Overview
 
 The Inheritance (Legacy) System allows stats and skills acquired during one career run to carry forward to future runs
-through a lineage of parent and grandparent characters. Understanding this system is essential for long-term account progression,
+through a lineage of parent and grandparent characters. Understanding this system is essential for
+long-term account progression,
 since each generation builds on the improvements of the previous one.
 
 ### Core Concepts
 
 - You can inherit stat bonuses and skills from up to **6 sources** across **3 generations**
 - Inheritance is applied at the **Inspiration Events** during a career run
-- The quality of inheritance depends on **spark type**, **star level**, and **affinity** between parent and child characters
+- The quality of inheritance depends on **spark type**, **star level**, and **affinity** between
+parent and child characters
 - A well-structured inheritance chain can dramatically accelerate stat growth over multiple runs
 
 ---
@@ -102,8 +104,10 @@ Inspiration Events produce one of four spark types. Each spark type delivers a d
 
 The most common spark type. Provides a direct flat stat bonus applied immediately at the Inspiration Event.
 
-- The number of stat points granted scales with the **star level** of the spark (see [Star Level Probabilities](#star-level-probabilities))
-- A 3★ Blue spark from a parent with 1100+ in a stat provides the largest single-event stat jump available through inheritance
+- The number of stat points granted scales with the **star level** of the spark (see [Star Level
+Probabilities](#star-level-probabilities))
+- A 3★ Blue spark from a parent with 1100+ in a stat provides the largest single-event stat jump
+available through inheritance
 - Best used when targetting a specific stat to reach a tier threshold
 
 #### Pink Spark — Skill Inheritance
@@ -167,7 +171,8 @@ Green sparks are less common overall; each star level represents a larger growth
 | 2★ | ~3–10% |
 | 3★ | ~1–5% |
 
-Pink sparks are the rarest type. When they occur at 3★, they can inherit an extra skill or a higher-tier skill evolution.
+Pink sparks are the rarest type. When they occur at 3★, they can inherit an extra skill or a higher-
+tier skill evolution.
 
 ### White Spark Star Probabilities
 
@@ -195,7 +200,8 @@ Affinity is influenced by:
 
 - **Race distance match**: Parent and child trained for the same optimal distance → higher affinity
 - **Running style match**: Same running style preference → affinity bonus
-- **Character lore relationship**: Certain character pairs have lore-based high affinity (e.g., trainer connections, senpai/kouhai relationships)
+- **Character lore relationship**: Certain character pairs have lore-based high affinity (e.g.,
+trainer connections, senpai/kouhai relationships)
 - **Scenario match**: Both characters completed the same scenario mode (URA Finale, Unity Cup, etc.)
 
 ### Affinity Planning
@@ -213,7 +219,8 @@ Affinity is influenced by:
 1. **Affinity rating** — ◎ parents should be strongly preferred over ○ or △ parents
 2. **Stat level in target stat** — push beyond 1100 for 3★ Blue spark eligibility
 3. **Skill library quality** — does the parent have hint-discounted or unique skills worth inheriting via Pink spark?
-4. **Growth rate bonus availability** — if the parent had Green sparks in their own career, their child may pass those growth rates forward
+4. **Growth rate bonus availability** — if the parent had Green sparks in their own career, their
+child may pass those growth rates forward
 5. **Scenario alignment** — matching career scenario increases spark quality modestly
 
 ### Common Mistakes to Avoid

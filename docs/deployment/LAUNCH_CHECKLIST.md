@@ -358,4 +358,3 @@ For non-critical issues that require investigation:
 | Version | Date       | Author | Changes           |
 | ------- | ---------- | ------ | ----------------- |
 | 1.0     | 2026-01-20 | System | Initial checklist |
-

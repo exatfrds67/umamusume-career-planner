@@ -231,7 +231,9 @@ These remaining issues are primarily related to:
 All files were formatted with Laravel Pint after fixes:
 
 ```bash
-vendor/bin/pint app/Services/TrainingCalculationService.php app/Services/SkillEvolutionService.php app/Services/AI/BedrockService.php app/Services/AI/OllamaService.php app/Services/AI/HybridAIService.php
+vendor/bin/pint app/Services/TrainingCalculationService.php app/Services/SkillEvolutionService.php
+app/Services/AI/BedrockService.php app/Services/AI/OllamaService.php
+app/Services/AI/HybridAIService.php
 ```text
 
 Result: **5 files, 5 style issues fixed**
@@ -252,4 +254,3 @@ To achieve full Larastan level 9 compliance:
 2. Create type stubs for third-party packages
 3. Refactor complex array structures to use DTOs
 4. Add more granular type specifications for nested arrays
-

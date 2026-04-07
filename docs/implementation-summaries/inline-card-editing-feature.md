@@ -1,7 +1,7 @@
 # Inline Card Details Editing Feature
 
-**Date**: January 27, 2026  
-**Status**: ✅ Completed and Tested  
+**Date**: January 27, 2026
+**Status**: ✅ Completed and Tested
 **Feature**: Support Card Deck Builder - Inline Card Details Editing
 
 ---
@@ -16,8 +16,8 @@ as different card progression levels significantly impact training effectiveness
 
 ## User Story
 
-**As a** player building my support card deck  
-**I want to** edit the limit break and friendship levels of cards in my deck slots  
+**As a** player building my support card deck
+**I want to** edit the limit break and friendship levels of cards in my deck slots
 **So that** I can accurately track my actual card progression and get precise deck recommendations
 
 ---
@@ -168,8 +168,8 @@ No schema changes required - feature uses existing columns.
 
 ### API Endpoint
 
-**Method:** `PUT`  
-**Path:** `/api/v1/characters/{character}/deck/cards/{position}/details`  
+**Method:** `PUT`
+**Path:** `/api/v1/characters/{character}/deck/cards/{position}/details`
 **Authentication:** Required (CSRF token)
 
 **Request Body:**
@@ -412,8 +412,7 @@ user experience with clear visual feedback.
 
 ---
 
-**Implementation Status**: ✅ Complete  
-**Testing Status**: ✅ Verified  
-**Documentation Status**: ✅ Complete  
+**Implementation Status**: ✅ Complete
+**Testing Status**: ✅ Verified
+**Documentation Status**: ✅ Complete
 **Ready for Production**: ✅ Yes
-

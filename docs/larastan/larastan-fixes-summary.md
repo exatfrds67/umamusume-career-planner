@@ -338,6 +338,9 @@ $count = ($count ?? 0) + 1;
 
 ## Conclusion
 
-Successfully reduced Larastan level 9 errors by approximately **70-80%** through systematic pattern-based fixes. The remaining errors are primarily edge cases and complex type specifications that may require manual review or PHPStan baseline configuration.
+Successfully reduced Larastan level 9 errors by approximately **70-80%** through systematic pattern-
+based fixes. The remaining errors are primarily edge cases and complex type specifications that may
+require manual review or PHPStan baseline configuration.
 
-All fixes maintain backward compatibility and follow Laravel best practices. Code formatting with Pint is recommended as the final step.
+All fixes maintain backward compatibility and follow Laravel best practices. Code formatting with
+Pint is recommended as the final step.

@@ -1,16 +1,18 @@
 # Support Deck Setup Guide: Post-Character Creation Workflow
 
-**Document Version**: 1.0.0  
-**Date**: 2026-02-23  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Complete  
+**Document Version**: 1.0.0
+**Date**: 2026-02-23
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Complete
 **Audience**: Career Planners (All Levels)
 
 ---
 
 ## Overview
 
-After creating your character, the next critical step is **selecting and optimizing your support deck**. A well-chosen deck provides 15–30% stat bonuses and unlocks friendship training for additional power spikes during your career.
+After creating your character, the next critical step is **selecting and optimizing your support
+deck**. A well-chosen deck provides 15–30% stat bonuses and unlocks friendship training for
+additional power spikes during your career.
 
 This guide walks you through the deck selection workflow and best practices for different scenarios.
 

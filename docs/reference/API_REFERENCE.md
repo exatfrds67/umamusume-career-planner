@@ -450,7 +450,9 @@ POST /api/characters/{characterId}/skill-recommendations
 
 **Authentication:** Required (`auth:sanctum`)
 
-**Description:** Get AI-powered skill recommendations for a specific character based on their current stats, aptitudes, acquired skills, available hints, and build strategy. This endpoint uses the Neuron AI service to provide intelligent skill acquisition suggestions.
+**Description:** Get AI-powered skill recommendations for a specific character based on their
+current stats, aptitudes, acquired skills, available hints, and build strategy. This endpoint uses
+the Neuron AI service to provide intelligent skill acquisition suggestions.
 
 **Path Parameters:**
 
@@ -606,7 +608,8 @@ POST /api/characters/{characterId}/skill-recommendations
     "message": "Invalid skill context structure.",
     "errors": {
         "skill_context.available_sp": ["Available SP cannot be negative."],
-        "skill_context.race_preferences.preferred_distance": ["Preferred distance must be one of: short, mile, medium, long."]
+        "skill_context.race_preferences.preferred_distance": ["Preferred distance must be one of: short,
+        mile, medium, long."]
     }
 }
 ```
@@ -676,7 +679,8 @@ curl -X POST "https://api.example.com/api/characters/123/skill-recommendations" 
 
 **Notes:**
 
-- The `skill_context` parameter is optional. If not provided, recommendations will be based solely on character stats and aptitudes.
+- The `skill_context` parameter is optional. If not provided, recommendations will be based solely
+on character stats and aptitudes.
 - AI recommendations are generated in real-time and may take 1-3 seconds to process.
 - The endpoint requires the character to belong to the authenticated user (authorization check).
 - Recommendations consider the character's current skills, available hints, and SP budget.

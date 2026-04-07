@@ -1,16 +1,20 @@
 # Technical Specifications Index
 
-**Document Version**: 2.3.0  
-**Last Updated**: 2026-02-22  
-**Status**: Complete  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Architecture Version**: v2.3.0 (Game-Aligned)
+**Document Version**: 2.4.0
+**Last Updated**: 2026-03-08
+**Status**: This index reflects the current specification set, but individual SPEC documents may
+still contain module-specific drift. Treat file-level status and latest architecture notes as
+authoritative over the index summary.
+**Project**: Umamusume Pretty Derby Career Planner
+**Architecture Version**: v2.4.0 (Repository-aligned)
 
 ---
 
 ## 1. Document Purpose
 
-This index provides a comprehensive catalog of all Technical Specifications (SPEC) for the Umamusume Career Planner system. Each SPEC document translates Product Requirements Documents (PRDs) into detailed technical implementations aligned with Laravel 12 and the Hybrid AI architecture.
+This index provides a comprehensive catalog of all Technical Specifications (SPEC) for the Umamusume
+Career Planner system. Each SPEC document translates Product Requirements Documents (PRDs) into
+detailed technical implementations aligned with Laravel 12 and the Hybrid AI architecture.
 
 ---
 
@@ -18,14 +22,14 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 | SPEC ID | Module | Status | PRD Reference | Last Updated |
 | --- | --- | --- | --- | --- |
-| [SPEC-001](#spec-001-character-management-system) | Character Management | Complete | PRD-001 | 2026-02-22 |
-| [SPEC-002](#spec-002-training-optimization-system) | Training Optimization | Complete | PRD-002 | 2026-02-22 |
-| [SPEC-003](#spec-003-race-strategy-system) | Race Strategy | Complete | PRD-003 | 2026-02-22 |
-| [SPEC-004](#spec-004-skill-management-system) | Skill Management | Complete | PRD-004 | 2026-02-22 |
-| [SPEC-005](#spec-005-support-card-management-system) | Support Card Management | Complete | PRD-005 | 2026-02-22 |
-| [SPEC-006](#spec-006-ai-advisory-system) | AI Advisory System | Complete | PRD-006 | 2026-02-22 |
-| [SPEC-007](#spec-007-external-integration-system) | External Integration | Complete | PRD-007 | 2026-02-22 |
-| [SPEC-008](#spec-008-performance-monitoring--apm-system) | Performance Monitoring & APM | Complete | SRS §3.9 | 2026-02-22 |
+| [SPEC-001](#spec-001-character-management-system) | Character Management | Current | PRD-001 | 2026-03-08 |
+| [SPEC-002](#spec-002-training-optimization-system) | Training Optimization | Current | PRD-002 | 2026-03-08 |
+| [SPEC-003](#spec-003-race-strategy-system) | Race Strategy | Current | PRD-003 | 2026-03-08 |
+| [SPEC-004](#spec-004-skill-management-system) | Skill Management | Current | PRD-004 | 2026-03-08 |
+| [SPEC-005](#spec-005-support-card-management-system) | Support Card Management | Current | PRD-005 | 2026-03-08 |
+| [SPEC-006](#spec-006-ai-advisory-system) | AI Advisory System | Current | PRD-006 | 2026-03-08 |
+| [SPEC-007](#spec-007-external-integration-system) | External Integration | Current | PRD-007 | 2026-03-08 |
+| [SPEC-008](#spec-008-performance-monitoring--apm-system) | Performance Monitoring & APM | Current | SRS §3.9 | 2026-03-08 |
 
 ---
 
@@ -33,8 +37,8 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 ### SPEC-001: Character Management System
 
-**File**: [SPEC-001_Character_Management_Technical.md](SPEC-001_Character_Management_Technical.md)  
-**Covers**: PRD-001  
+**File**: [SPEC-001_Character_Management_Technical.md](SPEC-001_Character_Management_Technical.md)
+**Covers**: PRD-001
 **Focus**: Character lifecycle, stat tracking, aptitude management, inheritance optimization
 
 **Key Components**:
@@ -56,8 +60,8 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 ### SPEC-002: Training Optimization System
 
-**File**: [SPEC-002_Training_Optimization_Technical.md](SPEC-002_Training_Optimization_Technical.md)  
-**Covers**: PRD-002  
+**File**: [SPEC-002_Training_Optimization_Technical.md](SPEC-002_Training_Optimization_Technical.md)
+**Covers**: PRD-002
 **Focus**: Training predictions, support card integration, failure risk assessment
 
 **Key Components**:
@@ -66,44 +70,46 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 - Support card bonus system with friendship training multipliers
 - Risk calculator for failure probability based on energy/mood
 - Recommendation engine for training option ranking
-- Neuron AI integration for intelligent training advisories
+- Deterministic prediction with storage-aware execution boundaries and degraded advisory behavior
 
 **Technology Stack**:
 
-- Service Layer: `TrainingService`, `TrainingPredictionService`
-- AI: `NeuronAIService` with `TrainingAdvisorAgent`
-- Cache: Redis predictions with 5-minute TTL
+- Service-layer training execution and prediction services
+- Redis-backed prediction caching
+- Advisory integration via config-driven AI routing and `HybridAIService` where applicable
 - Database: `ucp_training_sessions` for execution history
+
+Local-mode planning may remain browser-backed where implemented and must not imply equivalent server persistence.
 
 ---
 
 ### SPEC-003: Race Strategy System
 
-**File**: [SPEC-003_Race_Strategy_Technical.md](SPEC-003_Race_Strategy_Technical.md)  
-**Covers**: PRD-003  
+**File**: [SPEC-003_Race_Strategy_Technical.md](SPEC-003_Race_Strategy_Technical.md)
+**Covers**: PRD-003
 **Focus**: Race preparation, strategy optimization, performance prediction
 
 **Key Components**:
 
-- Race analysis engine for stat requirement validation
-- Weather impact system with track condition modifiers
-- Running style optimizer based on character aptitudes
-- Win probability calculator using weighted scoring
+- Race catalog, readiness, and schedule services
+- Deterministic strategy and readiness evaluation
+- Account-backed race entry and result handling
+- Reporting and report-export integration
 - Race calendar with scheduling and conflict detection
 
 **Technology Stack**:
 
-- Service Layer: `RaceConditionService`, `Neuron\RaceStrategyService`
-- AI: `RaceStrategyAgent` via Neuron AI v2.11
-- External: API integration with `umapyoi.net`
+- Service Layer: readiness, schedule, and race execution services
+- Advisory integration where applicable
+- External: API integration with configured game-data sources
 - Database: `ucp_race_definitions`, `ucp_race_results`
 
 ---
 
 ### SPEC-004: Skill Management System
 
-**File**: [SPEC-004_Skill_Management_Technical.md](SPEC-004_Skill_Management_Technical.md)  
-**Covers**: PRD-004  
+**File**: [SPEC-004_Skill_Management_Technical.md](SPEC-004_Skill_Management_Technical.md)
+**Covers**: PRD-004
 **Focus**: Skill acquisition, hint tracking, evolution mechanics, SP optimization
 
 **Key Components**:
@@ -125,8 +131,8 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 ### SPEC-005: Support Card Management System
 
-**File**: [SPEC-005_Support_Card_Management_Technical.md](SPEC-005_Support_Card_Management_Technical.md)  
-**Covers**: PRD-005  
+**File**: [SPEC-005_Support_Card_Management_Technical.md](SPEC-005_Support_Card_Management_Technical.md)
+**Covers**: PRD-005
 **Focus**: Deck composition, card bonuses, bond tracking, meta rankings
 
 **Key Components**:
@@ -139,7 +145,7 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 **Technology Stack**:
 
-- Service Layer: `SupportCardDeckService`, `DeckManagementService`
+- Service Layer: `DeckManagementService`, `SupportDeckService`, and support-card inventory/deck validation services
 - External: Sync from community databases
 - Database: `ucp_support_cards`, `ucp_support_decks`
 - Cache: Card metadata and deck analysis results
@@ -148,8 +154,8 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 ### SPEC-006: AI Advisory System
 
-**File**: [SPEC-006_AI_Advisory_Technical.md](SPEC-006_AI_Advisory_Technical.md)  
-**Covers**: PRD-006  
+**File**: [SPEC-006_AI_Advisory_Technical.md](SPEC-006_AI_Advisory_Technical.md)
+**Covers**: PRD-006
 **Focus**: Intelligent recommendations using hybrid local/cloud AI
 
 **Key Components**:
@@ -162,18 +168,19 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 **Technology Stack**:
 
-- AI Services: `NeuronAIService`, `OllamaService`, `BedrockService`
-- MCP Servers: Database query, file system, calculation tools
+- AI Services: config-driven local/cloud provider routing and advisory services
+- MCP Servers: optional memory, retrieval, and tool integrations where enabled
 - Database: `ucp_ai_conversations`, `ucp_ai_recommendations`
-- Models: Claude 4.5, Mistral Large 2, Ollama local models
+- AI provider selection, model identifiers, and MCP capability are configuration-driven. Summaries
+in this index are descriptive of current supported paths, not guaranteed runtime selections.
 
 ---
 
 ### SPEC-007: External Integration System
 
-**File**: [SPEC-007_External_Integration_Technical.md](SPEC-007_External_Integration_Technical.md)  
-**Covers**: PRD-007  
-**Focus**: API integration, OCR processing, WebSocket updates
+**File**: [SPEC-007_External_Integration_Technical.md](SPEC-007_External_Integration_Technical.md)
+**Covers**: PRD-007
+**Focus**: API integration, OCR processing, cache-backed sync, and operational monitoring
 
 **Key Components**:
 
@@ -181,21 +188,21 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 - Fallback strategy across multiple data sources
 - OCR pipeline using Tesseract + OpenCV for screenshot processing
 - Data sync scheduler for daily game data updates
-- Real-time updates via Laravel Reverb WebSocket broadcasting
+- Background sync jobs, polling-driven dashboards, and cache-backed status monitoring
 
 **Technology Stack**:
 
 - Service Layer: `ExternalDataService`, `GameToraScraperService`
 - OCR: Tesseract 5.x, OpenCV 4.x
-- WebSocket: Laravel Reverb
+- Delivery Pattern: HTTP endpoints, queued jobs, and polling-based dashboards
 - Database: `ucp_external_api_cache`, `ucp_ocr_extractions`
 
 ---
 
 ### SPEC-008: Performance Monitoring & APM System
 
-**File**: [SPEC-008_Performance_Monitoring_Technical.md](SPEC-008_Performance_Monitoring_Technical.md)  
-**Covers**: SRS §3.9 (Performance Requirements)  
+**File**: [SPEC-008_Performance_Monitoring_Technical.md](SPEC-008_Performance_Monitoring_Technical.md)
+**Covers**: SRS §3.9 (Performance Requirements)
 **Focus**: Application performance monitoring, query optimization, alerting
 
 **Key Components**:
@@ -311,29 +318,29 @@ All specifications adhere to the **v2.3.0 Architecture** defined in the Software
 
 ### Planning Documents
 
-- [001_SDP_Software_Development_Plan.md](../001_SDP_Software_Development_Plan.md)
-- [002_PMP_Project_Management_Plan.md](../002_PMP_Project_Management_Plan.md)
+- [001_SDP_Software_Development_Plan.md](../00-core-docs/001_SDP_Software_Development_Plan.md)
+- [002_PMP_Project_Management_Plan.md](../00-core-docs/002_PMP_Project_Management_Plan.md)
 
 ### Requirements & Design
 
-- [003_SRS_Software_Requirement_Specifications.md](../003_SRS_Software_Requirement_Specifications.md)
-- [004_SDS_Software_Design_Specifications.md](../004_SDS_Software_Design_Specifications.md)
+- [003_SRS_Software_Requirement_Specifications.md](../00-core-docs/003_SRS_Software_Requirement_Specifications.md)
+- [004_SDS_Software_Design_Specifications.md](../00-core-docs/004_SDS_Software_Design_Specifications.md)
 
 ### Database & API
 
-- [009_DBD_Database_Documentation.md](../009_DBD_Database_Documentation.md)
-- [010_API_API_Documentation.md](../010_API_API_Documentation.md)
+- [009_DBD_Database_Documentation.md](../00-core-docs/009_DBD_Database_Documentation.md)
+- [010_API_API_Documentation.md](../00-core-docs/010_API_API_Documentation.md)
 
 ### Product Requirements
 
-- [PRD Index](../prds/000_PRDS_INDEX.md)
+- [PRD Index](../02-prds/000_PRDS_INDEX.md)
 - Individual PRD documents (PRD-001 through PRD-007)
 
 ### Visual Documentation
 
-- [Wireframes Index](../wireframes/000_WIREFRAMES_INDEX.md)
-- [Sequence Diagrams Index](../sequences/000_SEQUENCES_INDEX.md)
-- [User Flow Index](../user-flows/000_USER_FLOWS_INDEX.md)
+- [Wireframes Index](../01-wireframes/000_WIREFRAMES_INDEX.md)
+- [Sequence Diagrams Index](../01-sequences/000_SEQUENCE_DIAGRAMS_INDEX.md)
+- [User Flow Index](../01-user-flows/000_USER_FLOW_DIAGRAMS_INDEX.md)
 
 ---
 
@@ -351,9 +358,9 @@ All specifications adhere to the **v2.3.0 Architecture** defined in the Software
 
 ---
 
-**Document Control**  
-**Maintained By**: Technical Architecture Team  
-**Next Review**: 2026-03-07  
+**Document Control**
+**Maintained By**: Technical Architecture Team
+**Next Review**: 2026-03-07
 **Distribution**: Development Team, Product Managers, QA Team
 
 ---

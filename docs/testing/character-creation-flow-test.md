@@ -1,8 +1,8 @@
 # Character Creation Flow Test Documentation
 
-**Test Date**: January 18, 2026  
-**Test Type**: Manual End-to-End Flow Test  
-**Test Tool**: Chrome DevTools MCP  
+**Test Date**: January 18, 2026
+**Test Type**: Manual End-to-End Flow Test
+**Test Tool**: Chrome DevTools MCP
 **Tester**: AI Agent (Kiro)
 
 ## Test Objective
@@ -153,7 +153,7 @@ actual data input to ensure all form fields work correctly and data is properly 
 
 #### 1. Missing `title` Field in Database
 
-**Severity**: Medium  
+**Severity**: Medium
 **Description**: The character title/variant field is captured in the form but not saved to the database.
 
 **Evidence:**
@@ -169,7 +169,7 @@ actual data input to ensure all form fields work correctly and data is properly 
 
 #### 2. Missing `skills` Relationship
 
-**Severity**: High  
+**Severity**: High
 **Description**: `CharacterController@show` attempts to eager load a `skills` relationship that doesn't exist.
 
 **Error Message:**
@@ -201,7 +201,7 @@ $character->load([
 
 #### 3. Missing `careers` Table
 
-**Severity**: High  
+**Severity**: High
 **Description**: The `careers` table referenced in relationships doesn't exist in the database.
 
 **Error Message:**
@@ -221,7 +221,7 @@ Table 'umamusume-career-planner.careers' doesn't exist
 
 #### 4. Avatar URL Not Saved
 
-**Severity**: Low  
+**Severity**: Low
 **Description**: Avatar URL selected from gallery is not saved to the database.
 
 **Evidence:**
@@ -286,7 +286,7 @@ All aptitude records were successfully created with the correct character_id and
    ```php
    // Migration
    $table->string('title', 100)->nullable()->after('name');
-   
+
    // Model
    protected $fillable = [..., 'title'];
    ```text
@@ -299,7 +299,7 @@ All aptitude records were successfully created with the correct character_id and
    {
        return $this->hasMany(Skill::class);
    }
-   
+
    // Option B: Remove from eager loading
    $character->load([
        'aptitudes',

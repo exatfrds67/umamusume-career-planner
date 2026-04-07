@@ -1,6 +1,6 @@
 # Umapyoi.net API Integration - Documentation Index
 
-**Last Updated:** 2026-01-25  
+**Last Updated:** 2026-01-25
 **Status:** Integration Complete, Production Ready
 
 ---
@@ -87,7 +87,7 @@ $client = app(UmapyoiApiClient::class);
 if ($client->isAvailable()) {
     // Fetch characters
     $result = $client->getCharacters();
-    
+
     if ($result['success']) {
         $characters = $result['data'];
         // Process characters...
@@ -182,5 +182,5 @@ php artisan test tests/Feature/ExternalAPI/UmapyoiLiveApiTest.php
 
 ---
 
-**Status:** ✅ Integration Complete & Production Ready  
+**Status:** ✅ Integration Complete & Production Ready
 **Next Review:** After live API endpoint verification

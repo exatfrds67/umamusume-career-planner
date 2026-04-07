@@ -70,7 +70,7 @@ use NeuronAI\Chat\Messages\UserMessage;
 $response = MyAgent::make()->chat(
     new UserMessage("Hi, Who are you?")
 );
-    
+
 echo $response->getContent();
 
 // I'm a friendly AI Agent built with Neuron, how can I help you today?

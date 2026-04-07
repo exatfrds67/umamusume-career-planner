@@ -26,7 +26,8 @@
 
 ### 1.1 Purpose
 
-This document provides detailed system design specifications for the Uma Musume Career Planner application. It describes the architecture, components, data models, and implementation patterns.
+This document provides detailed system design specifications for the Uma Musume Career Planner
+application. It describes the architecture, components, data models, and implementation patterns.
 
 ### 1.2 Scope
 
@@ -57,17 +58,17 @@ flowchart TB
         LWClient["Livewire Client<br/>PlanList, PlanEditor"]
         LocalStorage["localStorage<br/>Local_Runs, Drafts, Prefs"]
     end
-    
+
     subgraph Server["Laravel Backend"]
         LWServer["Livewire Server"]
         Services["Services Layer"]
         Models["Eloquent Models"]
     end
-    
+
     subgraph Data["Data Layer"]
         DB[(MySQL/MariaDB/SQLite)]
     end
-    
+
     Alpine <--> LWClient
     LWClient <--> LocalStorage
     LWClient <-->|Wire Protocol| LWServer
@@ -165,7 +166,7 @@ sequenceDiagram
     participant L as Livewire Component
     participant S as Service Layer
     participant D as Database/Store
-    
+
     U->>L: User Action
     L->>S: Call Service
     S->>D: Query/Persist
@@ -251,7 +252,7 @@ flowchart TD
         ToastContainer["Toast Container"]
         ModalContainer["Modal Container"]
     end
-    
+
     subgraph NavbarComponents["Navbar"]
         Logo
         NavLinks["Navigation Links"]
@@ -259,21 +260,21 @@ flowchart TD
         DarkModeToggle["Dark Mode Toggle"]
         UserMenu["User Menu"]
     end
-    
+
     subgraph DashboardPage["Dashboard"]
         StatsPanel["Stats Panel"]
         PlanList["Plan List"]
         ActivityLog["Activity Log"]
         QuickCreateModal["Quick Create Modal"]
     end
-    
+
     subgraph PlanEditorPage["Plan Editor"]
         Header["Header"]
         FormTabs["Form Tabs"]
         ActionBar["Action Bar"]
         UnsavedIndicator["Unsaved Changes"]
     end
-    
+
     Navbar --> NavbarComponents
     MainContent --> DashboardPage
     MainContent --> PlanEditorPage
@@ -374,7 +375,7 @@ erDiagram
     CareerRun ||--o{ CareerSnapshot : captures
     Skill ||--o{ SkillCareerRun : referenced_by
     RacePrediction ||--o| CareerSnapshot : triggers
-    
+
     UmaMusume {
         int id PK
         string name
@@ -386,7 +387,7 @@ erDiagram
         int growth_speed
         int growth_stamina
     }
-    
+
     CareerRun {
         int id PK
         uuid uuid
@@ -400,7 +401,7 @@ erDiagram
         int total_sp_available
         int stamina_percentage
     }
-    
+
     StatProgress {
         int id PK
         int career_run_id FK
@@ -411,7 +412,7 @@ erDiagram
         int guts
         int wit
     }
-    
+
     Skill {
         int id PK
         string name
@@ -420,7 +421,7 @@ erDiagram
         enum tier
         enum type
     }
-    
+
     SkillCareerRun {
         int id PK
         int career_run_id FK
@@ -428,14 +429,14 @@ erDiagram
         enum status
         int turn_acquired
     }
-    
+
     Goal {
         int id PK
         int career_run_id FK
         string description
         bool completed
     }
-    
+
     RacePrediction {
         int id PK
         int career_run_id FK
@@ -443,7 +444,7 @@ erDiagram
         enum distance_category
         enum track_type
     }
-    
+
     CareerSnapshot {
         int id PK
         int career_run_id FK
@@ -509,7 +510,7 @@ erDiagram
 class UmaMusume extends Model
 {
     use SoftDeletes;
-    
+
     protected $fillable = [
         'name', 'name_jp', 'image_path', 'thumbnail_path',
         'turf_aptitude', 'dirt_aptitude',
@@ -517,7 +518,7 @@ class UmaMusume extends Model
         'nige_aptitude', 'senkou_aptitude', 'sashi_aptitude', 'oikomi_aptitude',
         'speed_growth', 'stamina_growth', 'power_growth', 'guts_growth', 'wit_growth',
     ];
-    
+
     protected $casts = [
         'turf_aptitude' => AptitudeGrade::class,
         'dirt_aptitude' => AptitudeGrade::class,
@@ -528,7 +529,7 @@ class UmaMusume extends Model
         'guts_growth' => 'integer',
         'wit_growth' => 'integer',
     ];
-    
+
     public function careerRuns(): HasMany
     {
         return $this->hasMany(CareerRun::class);
@@ -542,7 +543,7 @@ class UmaMusume extends Model
 class CareerRun extends Model
 {
     use SoftDeletes;
-    
+
     protected $fillable = [
         'uuid', 'uma_musume_id', 'user_id', 'storage_mode',
         'title', 'status', 'career_stage', 'current_turn',
@@ -551,7 +552,7 @@ class CareerRun extends Model
         'total_sp_available', 'stamina_percentage',
         'strategy', 'notes', 'image_path',
     ];
-    
+
     protected $casts = [
         'storage_mode' => StorageMode::class,
         'status' => RunStatus::class,
@@ -562,14 +563,14 @@ class CareerRun extends Model
         'total_sp_available' => 'integer',
         'stamina_percentage' => 'integer',
     ];
-    
+
     public function getRunKey(): string
     {
         return $this->storage_mode === StorageMode::Local
             ? "local:{$this->uuid}"
             : "account:{$this->id}";
     }
-    
+
     public function getRunRoute(string $action = 'view'): string
     {
         $suffix = $action === 'edit' ? '/edit' : '';
@@ -586,16 +587,16 @@ class CareerRun extends Model
 class SkillCareerRun extends Pivot
 {
     protected $table = 'skill_career_runs';
-    
+
     protected $fillable = [
         'career_run_id', 'skill_id', 'status', 'turn_acquired', 'notes',
     ];
-    
+
     protected $casts = [
         'status' => SkillStatus::class,
         'turn_acquired' => 'integer',
     ];
-    
+
     // Validation: turn_acquired required when status=acquired
     public static function rules(): array
     {
@@ -603,7 +604,7 @@ class SkillCareerRun extends Pivot
             'status' => ['required', Rule::enum(SkillStatus::class)],
             'turn_acquired' => [
                 'nullable', 'integer', 'min:1', 'max:78',
-                Rule::requiredIf(fn($input) => 
+                Rule::requiredIf(fn($input) =>
                     $input->status === SkillStatus::Acquired->value
                 ),
             ],
@@ -621,28 +622,28 @@ classDiagram
         Local
         Account
     }
-    
+
     class RunStatus {
         <<enumeration>>
         InProgress
         Completed
         Archived
     }
-    
+
     class CareerStage {
         <<enumeration>>
         Junior
         Classic
         Senior
     }
-    
+
     class SkillStatus {
         <<enumeration>>
         Acquired
         Skipped
         Suggested
     }
-    
+
     class AptitudeGrade {
         <<enumeration>>
         SS : 120%
@@ -657,7 +658,7 @@ classDiagram
         G : 40%
         +effectiveness() int
     }
-    
+
     class Mood {
         <<enumeration>>
         Great : +4%
@@ -703,7 +704,7 @@ enum AptitudeGrade: string {
     case E = 'E';  // 60%
     case F = 'F';  // 50%
     case G = 'G';  // 40%
-    
+
     public function effectiveness(): int {
         return match($this) {
             self::SS => 120, self::S => 110, self::A => 100, self::B => 90, self::C => 80,
@@ -718,7 +719,7 @@ enum Mood: string {
     case Normal = 'normal';  // 0%
     case Bad = 'bad';        // -2%
     case Awful = 'awful';    // -4%
-    
+
     public function modifier(): int {
         return match($this) {
             self::Great => 4, self::Good => 2, self::Normal => 0,
@@ -741,40 +742,40 @@ interface CareerRun {
   status: 'in_progress' | 'completed' | 'archived';
   career_stage: 'junior' | 'classic' | 'senior';
   current_turn: number;
-  
+
   // Stats
   speed: number;
   stamina: number;
   power: number;
   guts: number;
   wit: number;
-  
+
   // Growth rates
   speed_growth: number;
   stamina_growth: number;
   power_growth: number;
   guts_growth: number;
   wit_growth: number;
-  
+
   // Aptitudes
   turf_aptitude: AptitudeGrade;
   dirt_aptitude: AptitudeGrade;
   // ... other aptitudes
-  
+
   // Status
   mood: Mood;
   conditions: Condition[];
   energy: number;
   total_sp_available: number;
   stamina_percentage: number;
-  
+
   // Relations
   skills: SkillEntry[];
   turns: TurnEntry[];
   goals: Goal[];
   race_predictions: RacePrediction[];
   snapshots: RaceSnapshot[];
-  
+
   // Metadata
   strategy: Strategy | null;
   notes: string;
@@ -788,7 +789,8 @@ interface SkillEntry {
   name: string;
   name_jp: string | null;
   sp_cost: number;
-  tier: 'G-' | 'G' | 'G+' | 'F-' | 'F' | 'F+' | 'E-' | 'E' | 'E+' | 'D-' | 'D' | 'D+' | 'C-' | 'C' | 'C+' | 'B-' | 'B' | 'B+' | 'A-' | 'A' | 'A+' | 'S-' | 'S' | 'S+' | 'SS';
+  tier: 'G-' | 'G' | 'G+' | 'F-' | 'F' | 'F+' | 'E-' | 'E' | 'E+' | 'D-' | 'D' | 'D+' | 'C-' | 'C' |
+  'C+' | 'B-' | 'B' | 'B+' | 'A-' | 'A' | 'A+' | 'S-' | 'S' | 'S+' | 'SS';
   type: 'speed' | 'stamina' | 'power' | 'guts' | 'wit' | 'debuff';
   status: 'acquired' | 'skipped' | 'suggested';
   turn_acquired: number | null;
@@ -843,7 +845,7 @@ flowchart TD
         IPS[ImageProcessingService]
         CDS[ChartDataService]
     end
-    
+
     CRS --> SPS
     CRS --> SS
     IS --> DDS
@@ -882,7 +884,7 @@ class CareerRunService
         $data['uuid'] = Str::uuid()->toString();
         return CareerRun::create($data);
     }
-    
+
     public function updateStats(CareerRun $run, array $stats): CareerRun
     {
         $run->update([
@@ -894,24 +896,24 @@ class CareerRunService
         ]);
         return $run->fresh();
     }
-    
+
     public function calculateEffectiveStats(CareerRun $run): array
     {
         $softCap = 1200;
         $stats = ['speed', 'stamina', 'power', 'guts', 'wit'];
         $effective = [];
-        
+
         foreach ($stats as $stat) {
             $raw = $run->$stat;
-            $effective[$stat] = $raw <= $softCap 
-                ? $raw 
+            $effective[$stat] = $raw <= $softCap
+                ? $raw
                 : $softCap + floor(($raw - $softCap) * 0.5);
         }
-        
+
         $effective['total'] = array_sum($effective);
         return $effective;
     }
-    
+
     public function calculateAcquiredSP(CareerRun $run): int
     {
         return $run->skills()
@@ -928,7 +930,7 @@ class LocalRunStorageService
 {
     private const STORAGE_KEY = 'uma_local_runs';
     private const SCHEMA_VERSION = '1.0';
-    
+
     public function serialize(CareerRun $run): array
     {
         return [
@@ -949,7 +951,7 @@ class LocalRunStorageService
             'snapshots' => $run->snapshots->toArray(),
         ];
     }
-    
+
     public function deserialize(array $data): CareerRun
     {
         $data = $this->migrateSchema($data);
@@ -958,7 +960,7 @@ class LocalRunStorageService
         $run->storage_mode = StorageMode::Local;
         return $run;
     }
-    
+
     private function migrateSchema(array $data): array
     {
         $version = $data['schema_version'] ?? '1.0';
@@ -977,38 +979,38 @@ class ImportService
         private FormatDetector $formatDetector,
         private DuplicateDetectionService $duplicateDetector,
     ) {}
-    
+
     public function import(
-        UploadedFile $file, 
+        UploadedFile $file,
         ImportTarget $target,
         ?User $user = null
     ): ImportResult {
         $format = $this->formatDetector->detect($file);
         $adapter = $this->getAdapter($format);
-        
+
         $plans = $adapter->parse($file);
         $result = new ImportResult();
-        
+
         foreach ($plans as $planData) {
             try {
                 $duplicate = $this->duplicateDetector->find($planData, $user);
-                
+
                 if ($duplicate) {
                     $result->addDuplicate($planData, $duplicate);
                     continue;
                 }
-                
+
                 $plan = $this->createPlan($planData, $target, $user);
                 $result->addCreated($plan);
-                
+
             } catch (ValidationException $e) {
                 $result->addError($planData, $e->errors());
             }
         }
-        
+
         return $result;
     }
-    
+
     private function getAdapter(ImportFormat $format): ImportAdapterInterface
     {
         return match($format) {
@@ -1146,7 +1148,7 @@ module.exports = {
 
 ```html
 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-       {{ $mode === 'local' ? 'bg-storage-local/20 text-storage-local' : 
+       {{ $mode === 'local' ? 'bg-storage-local/20 text-storage-local' :
           'bg-storage-account/20 text-storage-account' }}"
   data-testid="storage-badge-{{ $mode }}">
   @if($mode === 'local')
@@ -1212,7 +1214,7 @@ User clicks "Create Plan"
 User enters: Title, Character, Storage Mode
          │
          ▼
-    Authenticated? 
+    Authenticated?
     ┌────┴────┐
    No        Yes
     │         │
@@ -1300,7 +1302,7 @@ sequenceDiagram
     participant S as SkillService
     participant C as Cache
     participant D as Database
-    
+
     U->>A: Types in skill field
     A->>A: Debounce 300ms
     A->>L: wire:model.live

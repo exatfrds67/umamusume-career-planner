@@ -1,7 +1,7 @@
 # Umapyoi.net API Check - Complete Summary
 
-**Date:** 2026-01-25  
-**Status:** ✅ Configuration Complete, ⚠️ Live API Verification Pending  
+**Date:** 2026-01-25
+**Status:** ✅ Configuration Complete, ⚠️ Live API Verification Pending
 **Tested By:** Claudette AI Agent
 
 ---
@@ -208,11 +208,11 @@ $client = app(UmapyoiApiClient::class);
 if ($client->isAvailable()) {
     // Fetch all characters (from cache if available)
     $result = $client->getCharacters();
-    
+
     if ($result['success']) {
         $characters = $result['data'];
         $source = $result['source']; // 'api' or 'cache'
-        
+
         foreach ($characters as $character) {
             // Process character data
             echo $character['name'] . "\n";
@@ -223,7 +223,7 @@ if ($client->isAvailable()) {
             'error' => $result['error']
         ]);
     }
-    
+
     // Force fresh data (bypass cache)
     $freshData = $client->getCharacters(true);
 } else {
@@ -357,17 +357,17 @@ the integration can be used in production immediately.
 
 ## Support & Contact
 
-**API Provider:** umapyoi.net  
-**Discord:** <https://discord.gg/wvGHW65C6A>  
-**Website:** <https://umapyoi.net>  
+**API Provider:** umapyoi.net
+**Discord:** <https://discord.gg/wvGHW65C6A>
+**Website:** <https://umapyoi.net>
 **Developer:** KevinVG207 ([@kevinvg207](https://www.twitter.com/kevinvg207))
 
-**Project Repository:** Uma Musume Career Planner  
-**Integration Code:** `app/Services/ExternalAPI/UmapyoiApiClient.php`  
+**Project Repository:** Uma Musume Career Planner
+**Integration Code:** `app/Services/ExternalAPI/UmapyoiApiClient.php`
 **Test Suite:** `tests/Feature/ExternalAPI/UmapyoiApiClientTest.php`
 
 ---
 
-**Report Generated:** 2026-01-25  
-**Agent:** Claudette  
+**Report Generated:** 2026-01-25
+**Agent:** Claudette
 **Status:** Integration Complete, Awaiting Live API Verification

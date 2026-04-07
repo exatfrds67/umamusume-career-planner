@@ -110,7 +110,7 @@ Starting from top and going clockwise:
                          \/
                           •
                     Guts (350)
-                          
+
                           •
                     Power (400)
 ```
@@ -252,7 +252,6 @@ In dark mode:
 
 ---
 
-**Reference Date**: January 31, 2026  
-**Test URL**: <http://127.0.0.1:8000/characters/162>  
+**Reference Date**: January 31, 2026
+**Test URL**: <http://127.0.0.1:8000/characters/162>
 **Test Character**: ID 162 (Speed=500, Stamina=450, Power=400, Guts=350, Wit=300)
-

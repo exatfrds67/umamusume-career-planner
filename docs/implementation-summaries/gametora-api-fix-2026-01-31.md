@@ -1,7 +1,7 @@
 # Gametora API 404 Error Fix
 
-**Date**: January 31, 2026  
-**Issue**: HTTP 404 error when fetching skills from gametora.com API  
+**Date**: January 31, 2026
+**Issue**: HTTP 404 error when fetching skills from gametora.com API
 **Status**: ✅ Resolved
 
 ## Problem
@@ -104,4 +104,3 @@ Result: ✅ No errors, 61 skills seeded successfully with 20 evolution pairs.
 The error has been resolved by disabling the unavailable gametora API fetch. The application continues to function
 normally with the comprehensive curated skills dataset. The seeder is designed to easily re-enable external API fetching
 if a valid endpoint becomes available in the future.
-

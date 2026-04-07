@@ -1,9 +1,9 @@
 # SPEC-007: External Integration System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate data validation  
+**Document Version**: 2.3.0
+**Date**: 2026-03-11
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Active - Updated with polling-based status delivery and corrected OCR validation
 **Classification**: Internal - Development Team
 
 ---
@@ -13,317 +13,21 @@
 | Attribute | Value |
 | --- | --- |
 | **Document ID** | SPEC-007 |
-| **Related PRD** | [PRD-007: External Integration](../prds/PRD-007_External_Integration.md) |
-| **Architecture Version** | v2.2.0 |
+| **Related PRD** | [PRD-007: External Integration](../02-prds/PRD-007_External_Integration.md) |
+| **Architecture Version** | v2.3.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-03-11 |
 
 ### Related Documents
 
 **Requirements & Design**:
 
-- [SRS Section 3.8: External Integration](../003_SRS_Software_Requirement_Specifications.md#28-external-integration-fr-08)
-- [SDS Section 4.7: External Integration Architecture](../004_SDS_Software_Design_Specifications.md#7-ocr-pipeline)
+- [SRS Section 3.8: External Integration](../00-core-
+docs/003_SRS_Software_Requirement_Specifications.md#28-external-integration-fr-08)
+- [SDS Section 4.7: External Integration Architecture](../00-core-
+docs/004_SDS_Software_Design_Specifications.md#7-ocr-pipeline)
 
 **Data & Integration**:
-
-- [DBD Section 5.7: External Integration Tables](../009_DBD_Database_Documentation.md#2-schema-catalog)
-- [SIP Section 5: Integration Points](../007_SIP_Software_Integration_Plan.md#5-integration-points)
-- [SIS Section 4: External API Integration](../008_SIS_Software_Integration_Specifications.md#4-external-api-integration)
-
-**Visual Documentation**:
-
-- [FLOW-007: External Integration System](../flows/FLOW-007_External_Integration_System.md)
-- [SEQ-007: External Data Sync](../sequences/SEQ-007_External_Data_Sync.md)
-- [SEQ-015: Data Migration Snapshot to Live](../sequences/SEQ-015_Data_Migration_Snapshot_to_Live.md)
-- [UF-008: OCR and Data Import Flow](../user-flows/UF-008_OCR_and_Data_Import_Flow.md)
-- [TECH-FLOW-007: External Integration Flow](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
-
----
-
-## Table of Contents
-
-1. [Technical Overview](#1-technical-overview)
-2. [Architecture Design](#2-architecture-design)
-3. [External API Integration](#3-external-api-integration)
-4. [Circuit Breaker Pattern](#4-circuit-breaker-pattern)
-5. [OCR Processing Pipeline](#5-ocr-processing-pipeline)
-6. [WebSocket Real-time Updates](#6-websocket-real-time-updates)
-7. [Community Tool Integration](#7-community-tool-integration)
-8. [Service Layer](#8-service-layer)
-9. [API Specification](#9-api-specification)
-10. [Database Schema](#10-database-schema)
-11. [Caching Strategy](#11-caching-strategy)
-12. [Error Handling](#12-error-handling)
-13. [Security Considerations](#13-security-considerations)
-14. [Performance Optimization](#14-performance-optimization)
-15. [Testing Strategy](#15-testing-strategy)
-16. [Appendices](#16-appendices)
-
----
-
-## 1. Technical Overview
-
-### 1.1 Module Purpose
-
-The External Integration System manages synchronization with game APIs, community databases, OCR processing, and WebSocket real-time updates. This module serves as the bridge between the application and external data sources, ensuring accurate and up-to-date game information while providing resilient fallback mechanisms.
-
-**Core Responsibilities**:
-
-- External API client management with circuit breaker pattern
-- Game data synchronization from umapyoi.net and UmamusumeDB
-- OCR screenshot processing for data extraction
-- WebSocket real-time updates via Laravel Reverb
-- Community tool integration and data sharing
-- Response caching with configurable TTL
-- Fallback and degradation strategies
-
-### 1.2 Business Context
-
-External integration is critical for maintaining accurate game data:
-
-- **Character Data**: Base stats, growth rates, aptitudes from external sources
-- **Support Cards**: Card definitions, bonuses, meta tier rankings
-- **Skills**: Skill catalog, effects, evolution paths
-- **Race Data**: Race definitions, requirements, schedules
-- **Meta Information**: Community tier lists, strategy guides
-
-The system must handle API unavailability gracefully while ensuring users always have access to functional data.
-
-### 1.3 Technical Scope
-
-**In Scope**:
-
-- External API clients (umapyoi.net, UmamusumeDB)
-- Circuit breaker pattern implementation
-- Response caching and invalidation
-- OCR processing with Tesseract and GD
-- WebSocket broadcasting via Laravel Reverb
-- Community data sharing endpoints
-- Data validation and transformation
-- Rate limiting and quota management
-
-**Out of Scope**:
-
-- Game server direct integration
-- Real-time game state tracking
-- User-generated content moderation
-- Machine learning model training
-
-### 1.4 Technology Stack
-
-| Component | Technology | Version | Purpose |
-| --- | --- | --- | --- |
-| **Framework** | Laravel | 12.x | Application foundation |
-| **Language** | PHP | 8.3+ | Server-side logic |
-| **HTTP Client** | Guzzle/Laravel HTTP | Latest | API requests |
-| **OCR Engine** | Tesseract | 5.x | Text extraction |
-| **Image Processing** | GD Library | 2.x | Image preprocessing |
-| **WebSocket** | Laravel Reverb | 1.x | Real-time updates |
-| **Cache** | Redis | 7.x | Response caching |
-| **Queue** | Laravel Queue | 12.x | Background jobs |
-
----
-
-## 2. Architecture Design
-
-### 2.1 Component Architecture
-
-```mermaid
-graph TB
-    subgraph "Presentation Layer"
-        API[ExternalIntegrationController]
-        OCRController[OCRUploadController]
-        WebSocketHandler[WebSocketHandler]
-    end
-
-    subgraph "Application Layer"
-        ExternalSvc[ExternalAPIService]
-        OCRSvc[OCRProcessingService]
-        SyncSvc[DataSyncService]
-        BroadcastSvc[BroadcastService]
-    end
-
-    subgraph "Integration Layer"
-        UmapyoiClient[UmapyoiApiClient]
-        UmaDBClient[UmamusumeDBApiClient]
-        CircuitBreaker[CircuitBreaker]
-        RateLimiter[RateLimiter]
-    end
-
-    subgraph "Processing Layer"
-        ImageProcessor[ImageProcessingService]
-        TesseractSvc[TesseractService]
-        DataParser[OCRParserService]
-        Validator[OCRValidationService]
-    end
-
-    subgraph "Infrastructure Layer"
-        DB[(MySQL)]
-        Cache[(Redis)]
-        FileStorage[File Storage]
-        Reverb[Laravel Reverb]
-    end
-
-    API --> ExternalSvc
-    OCRController --> OCRSvc
-    WebSocketHandler --> BroadcastSvc
-    
-    ExternalSvc --> UmapyoiClient
-    ExternalSvc --> UmaDBClient
-    ExternalSvc --> CircuitBreaker
-    ExternalSvc --> RateLimiter
-    
-    OCRSvc --> ImageProcessor
-    OCRSvc --> TesseractSvc
-    OCRSvc --> DataParser
-    DataParser --> Validator
-    
-    UmapyoiClient --> Cache
-    UmaDBClient --> Cache
-    CircuitBreaker --> DB
-    
-    BroadcastSvc --> Reverb
-    ImageProcessor --> FileStorage
-```text
-
-### 2.2 Layer Responsibilities
-
-**Presentation Layer**:
-
-- HTTP request/response handling
-- File upload management
-- WebSocket connection management
-
-**Application Layer**:
-
-- Business logic orchestration
-- Data transformation coordination
-- Event dispatching
-
-**Integration Layer**:
-
-- External API communication
-- Circuit breaker state management
-- Rate limit enforcement
-
-**Processing Layer**:
-
-- Image preprocessing operations
-- OCR text extraction
-- Data parsing and validation
-
-**Infrastructure Layer**:
-
-- Data persistence
-- Cache management
-- Real-time broadcasting
-- File storage
-
-### 2.3 Design Patterns
-
-| Pattern | Implementation | Purpose |
-| --- | --- | --- |
-| **Circuit Breaker** | `CircuitBreaker` class | Prevent cascade failures |
-| **Adapter** | API client classes | Abstract external APIs |
-| **Strategy** | Parser implementations | Pluggable parsing logic |
-| **Observer** | Event listeners | React to sync events |
-| **Cache-Aside** | Response caching | Performance optimization |
-| **Retry** | HTTP client config | Transient failure handling |
-| **Factory** | Client factory | API client instantiation |
-
----
-
-## 3. External API Integration
-
-### 3.1 API Client Interface
-
-```php
-<?php
-
-namespace App\Contracts;
-
-/**
- * External API Client Interface
- * 
- * Defines the contract for all external API clients.
- */
-interface ExternalApiClientInterface
-{
-    /**
-     * Get characters/trainees data
-     * 
-     * @param array $filters Optional filters
-     * @return array
-     */
-    public function getCharacters(array $filters = []): array;
-
-    /**
-     * Get single character by ID
-     * 
-     * @param int $traineeId External trainee ID
-     * @return array
-     */
-    public function getCharacter(int $traineeId): array;
-
-    /**
-     * Get support cards data
-     * 
-     * @param array $filters Optional filters
-     * @return array
-     */
-    public function getSupportCards(array $filters = []): array;
-
-    /**
-     * Get skills data
-     * 
-     * @param array $filters Optional filters
-     * @return array
-     */
-    public function getSkills(array $filters = []): array;
-
-    /**
-     * Get races data
-     * 
-     * @param array $filters Optional filters
-     * @return array
-     */
-    public function getRaces(array $filters = []): array;
-
-    /**
-     * Check API health status
-     * 
-     * @return bool
-     */
-    public function isHealthy(): bool;
-
-    /**
-     * Get API source identifier
-     * 
-     * @return string
-     */
-    public function getSourceIdentifier(): string;
-}
-```
-
-### 3.2 Umapyoi API Client
-
-```php
-<?php
-
-namespace App\Services\ExternalAPI\Clients;
-
-use App\Contracts\ExternalApiClientInterface;
-use App\Services\ExternalAPI\CircuitBreaker;
-use Illuminate\Support\Facades\{Http, Cache, Log};
-use App\Exceptions\ExternalAPIException;
-
-/**
- * Umapyoi.net API Client
- * 
- * Primary external data source for game information.
- */
-class UmapyoiApiClient implements ExternalApiClientInterface
 {
     private const BASE_URL = 'https://umapyoi.net/api/v1';
     private const CACHE_PREFIX = 'umapyoi';
@@ -339,7 +43,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get characters/trainees data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -355,7 +59,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get single character by ID
-     * 
+     *
      * @param int $traineeId External trainee ID
      * @return array
      */
@@ -370,7 +74,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get support cards data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -386,7 +90,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get skills data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -402,7 +106,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get races data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -418,14 +122,14 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get meta tier rankings
-     * 
+     *
      * @param string|null $type Card type filter
      * @return array
      */
     public function getMetaTiers(?string $type = null): array
     {
         $params = $type ? ['type' => $type] : [];
-        
+
         return $this->cachedRequest(
             endpoint: '/meta/tiers',
             cacheKey: $this->buildCacheKey('meta-tiers', $params),
@@ -436,7 +140,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Check API health status
-     * 
+     *
      * @return bool
      */
     public function isHealthy(): bool
@@ -444,7 +148,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
         try {
             $response = Http::timeout(5)
                 ->get(self::BASE_URL . '/health');
-            
+
             return $response->successful();
         } catch (\Exception $e) {
             Log::warning('Umapyoi health check failed', [
@@ -456,7 +160,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get API source identifier
-     * 
+     *
      * @return string
      */
     public function getSourceIdentifier(): string
@@ -466,7 +170,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Execute cached API request
-     * 
+     *
      * @param string $endpoint API endpoint
      * @param string $cacheKey Cache key
      * @param int $cacheTtl Cache TTL in seconds
@@ -502,7 +206,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Execute HTTP request
-     * 
+     *
      * @param string $endpoint API endpoint
      * @param array $params Query parameters
      * @return array
@@ -527,7 +231,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Build request headers
-     * 
+     *
      * @return array
      */
     private function buildHeaders(): array
@@ -546,7 +250,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Build cache key
-     * 
+     *
      * @param string $type Data type
      * @param array $params Parameters
      * @return string
@@ -559,7 +263,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get fallback data when API unavailable
-     * 
+     *
      * @param string $endpoint Requested endpoint
      * @return array
      */
@@ -567,7 +271,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
     {
         // Try to return stale cached data
         $staleKey = self::CACHE_PREFIX . ":stale:{$endpoint}";
-        
+
         if ($stale = Cache::get($staleKey)) {
             Log::info('Returning stale data for endpoint', [
                 'endpoint' => $endpoint,
@@ -578,7 +282,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
         Log::warning('No fallback data available', [
             'endpoint' => $endpoint,
         ]);
-        
+
         return [];
     }
 }
@@ -597,7 +301,7 @@ use Illuminate\Support\Facades\{Http, Cache, Log};
 
 /**
  * UmamusumeDB API Client
- * 
+ *
  * Fallback external data source for game information.
  */
 class UmamusumeDBApiClient implements ExternalApiClientInterface
@@ -606,12 +310,17 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
     private const CACHE_PREFIX = 'umadb';
 
     public function __construct(
+
+`GameTora` is used elsewhere in the project as a supplementary scraper/CDN-backed enrichment source
+for support-card metadata and artwork, but it is not modeled in this SPEC as a first-class API
+client because it does not provide the same stable direct API contract as `Umapyoi` and
+`UmamusumeDB`.
         private CircuitBreaker $circuitBreaker
     ) {}
 
     /**
      * Get characters/trainees data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -622,7 +331,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get single character by ID
-     * 
+     *
      * @param int $traineeId External trainee ID
      * @return array
      */
@@ -633,7 +342,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get support cards data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -644,7 +353,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get skills data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -655,7 +364,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get races data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -666,7 +375,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Check API health status
-     * 
+     *
      * @return bool
      */
     public function isHealthy(): bool
@@ -681,7 +390,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get API source identifier
-     * 
+     *
      * @return string
      */
     public function getSourceIdentifier(): string
@@ -691,7 +400,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Execute cached API request
-     * 
+     *
      * @param string $endpoint API endpoint
      * @param array $params Query parameters
      * @return array
@@ -699,7 +408,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
     private function cachedRequest(string $endpoint, array $params = []): array
     {
         $cacheKey = $this->buildCacheKey($endpoint, $params);
-        
+
         return Cache::remember($cacheKey, 86400, function () use ($endpoint, $params) {
             return $this->circuitBreaker->call(
                 key: 'umamusumedb',
@@ -711,7 +420,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Execute HTTP request
-     * 
+     *
      * @param string $endpoint API endpoint
      * @param array $params Query parameters
      * @return array
@@ -727,7 +436,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Build cache key
-     * 
+     *
      * @param string $endpoint Endpoint
      * @param array $params Parameters
      * @return string
@@ -753,15 +462,15 @@ stateDiagram-v2
     Open --> HalfOpen: Recovery Timeout Elapsed
     HalfOpen --> Closed: Probe Success
     HalfOpen --> Open: Probe Failure
-    
+
     Closed: Normal Operation
     Closed: Requests pass through
     Closed: Track failures
-    
+
     Open: Circuit Tripped
     Open: Return fallback immediately
     Open: Wait for recovery timeout
-    
+
     HalfOpen: Testing Recovery
     HalfOpen: Allow limited probe requests
     HalfOpen: Evaluate success/failure
@@ -779,13 +488,13 @@ use App\Enums\CircuitState;
 
 /**
  * Circuit Breaker Implementation
- * 
+ *
  * Prevents cascade failures by tracking external service health.
  */
 class CircuitBreaker
 {
     private const CACHE_PREFIX = 'circuit_breaker';
-    
+
     private int $failureThreshold;
     private int $recoveryTimeout;
     private int $sampleWindow;
@@ -799,7 +508,7 @@ class CircuitBreaker
 
     /**
      * Execute callback through circuit breaker
-     * 
+     *
      * @param string $key Circuit identifier
      * @param callable $callback Main operation
      * @param callable $fallback Fallback operation
@@ -818,7 +527,7 @@ class CircuitBreaker
 
     /**
      * Get current circuit state
-     * 
+     *
      * @param string $key Circuit identifier
      * @return CircuitState
      */
@@ -839,7 +548,7 @@ class CircuitBreaker
 
     /**
      * Handle closed state (normal operation)
-     * 
+     *
      * @param string $key Circuit identifier
      * @param callable $callback Main operation
      * @param callable $fallback Fallback operation
@@ -853,7 +562,7 @@ class CircuitBreaker
             return $result;
         } catch (\Exception $e) {
             $this->recordFailure($key);
-            
+
             if ($this->shouldTrip($key)) {
                 $this->trip($key);
             }
@@ -869,7 +578,7 @@ class CircuitBreaker
 
     /**
      * Handle open state (circuit tripped)
-     * 
+     *
      * @param string $key Circuit identifier
      * @param callable $fallback Fallback operation
      * @return mixed
@@ -885,7 +594,7 @@ class CircuitBreaker
 
     /**
      * Handle half-open state (testing recovery)
-     * 
+     *
      * @param string $key Circuit identifier
      * @param callable $callback Main operation
      * @param callable $fallback Fallback operation
@@ -896,15 +605,15 @@ class CircuitBreaker
         try {
             $result = $callback();
             $this->reset($key);
-            
+
             Log::info('Circuit breaker recovered', [
                 'key' => $key,
             ]);
-            
+
             return $result;
         } catch (\Exception $e) {
             $this->trip($key);
-            
+
             Log::warning('Circuit breaker probe failed', [
                 'key' => $key,
                 'error' => $e->getMessage(),
@@ -916,7 +625,7 @@ class CircuitBreaker
 
     /**
      * Record successful operation
-     * 
+     *
      * @param string $key Circuit identifier
      * @return void
      */
@@ -929,7 +638,7 @@ class CircuitBreaker
 
     /**
      * Record failed operation
-     * 
+     *
      * @param string $key Circuit identifier
      * @return void
      */
@@ -943,24 +652,24 @@ class CircuitBreaker
 
     /**
      * Check if circuit should trip
-     * 
+     *
      * @param string $key Circuit identifier
      * @return bool
      */
     private function shouldTrip(string $key): bool
     {
         $data = $this->getCircuitData($key);
-        
+
         // Check if failures within sample window exceed threshold
         $windowStart = time() - $this->sampleWindow;
-        
+
         return $data['failures'] >= $this->failureThreshold
             && $data['last_failure'] >= $windowStart;
     }
 
     /**
      * Trip the circuit (open it)
-     * 
+     *
      * @param string $key Circuit identifier
      * @return void
      */
@@ -981,7 +690,7 @@ class CircuitBreaker
 
     /**
      * Reset circuit to closed state
-     * 
+     *
      * @param string $key Circuit identifier
      * @return void
      */
@@ -994,7 +703,7 @@ class CircuitBreaker
 
     /**
      * Get circuit data from cache
-     * 
+     *
      * @param string $key Circuit identifier
      * @return array
      */
@@ -1008,7 +717,7 @@ class CircuitBreaker
 
     /**
      * Save circuit data to cache
-     * 
+     *
      * @param string $key Circuit identifier
      * @param array $data Circuit data
      * @return void
@@ -1024,7 +733,7 @@ class CircuitBreaker
 
     /**
      * Get default circuit data
-     * 
+     *
      * @return array
      */
     private function getDefaultData(): array
@@ -1040,14 +749,14 @@ class CircuitBreaker
 
     /**
      * Force reset circuit (admin operation)
-     * 
+     *
      * @param string $key Circuit identifier
      * @return void
      */
     public function forceReset(string $key): void
     {
         $this->reset($key);
-        
+
         Log::info('Circuit breaker force reset', [
             'key' => $key,
         ]);
@@ -1055,7 +764,7 @@ class CircuitBreaker
 
     /**
      * Get all circuit states
-     * 
+     *
      * @return array
      */
     public function getAllStates(): array
@@ -1090,7 +799,7 @@ enum CircuitState: string
 
     /**
      * Check if requests should pass through
-     * 
+     *
      * @return bool
      */
     public function allowsRequests(): bool
@@ -1104,7 +813,7 @@ enum CircuitState: string
 
     /**
      * Get display label
-     * 
+     *
      * @return string
      */
     public function label(): string
@@ -1118,7 +827,7 @@ enum CircuitState: string
 
     /**
      * Get status color
-     * 
+     *
      * @return string
      */
     public function color(): string
@@ -1193,7 +902,7 @@ use App\Exceptions\OCRProcessingException;
 
 /**
  * Image Processing Service
- * 
+ *
  * Preprocesses images for optimal OCR extraction using GD library.
  */
 class ImageProcessingService
@@ -1204,7 +913,7 @@ class ImageProcessingService
 
     /**
      * Preprocess image for OCR
-     * 
+     *
      * @param UploadedFile $file Uploaded image file
      * @return string Path to processed image
      * @throws OCRProcessingException
@@ -1224,7 +933,7 @@ class ImageProcessingService
 
         // Save processed image
         $outputPath = $this->saveProcessedImage($image);
-        
+
         imagedestroy($image);
 
         return $outputPath;
@@ -1232,7 +941,7 @@ class ImageProcessingService
 
     /**
      * Validate uploaded image
-     * 
+     *
      * @param UploadedFile $file Uploaded file
      * @return void
      * @throws OCRProcessingException
@@ -1240,7 +949,7 @@ class ImageProcessingService
     private function validateImage(UploadedFile $file): void
     {
         $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        
+
         if (!in_array($file->getMimeType(), $allowedMimes)) {
             throw new OCRProcessingException(
                 'Invalid image format. Allowed: JPEG, PNG, GIF, WebP'
@@ -1248,7 +957,7 @@ class ImageProcessingService
         }
 
         $maxSize = config('ocr.max_file_size', 10 * 1024 * 1024); // 10MB
-        
+
         if ($file->getSize() > $maxSize) {
             throw new OCRProcessingException(
                 'Image file too large. Maximum size: ' . ($maxSize / 1024 / 1024) . 'MB'
@@ -1258,7 +967,7 @@ class ImageProcessingService
 
     /**
      * Load image from file
-     * 
+     *
      * @param string $path File path
      * @param string $mimeType MIME type
      * @return \GdImage
@@ -1283,7 +992,7 @@ class ImageProcessingService
 
     /**
      * Resize image to standard dimensions
-     * 
+     *
      * @param \GdImage $image Source image
      * @return \GdImage
      */
@@ -1294,7 +1003,7 @@ class ImageProcessingService
 
         // Calculate new dimensions maintaining aspect ratio
         $ratio = min(self::MAX_WIDTH / $width, self::MAX_HEIGHT / $height, 1);
-        
+
         if ($ratio >= 1) {
             return $image; // No resize needed
         }
@@ -1310,13 +1019,13 @@ class ImageProcessingService
         );
 
         imagedestroy($image);
-        
+
         return $resized;
     }
 
     /**
      * Convert image to grayscale
-     * 
+     *
      * @param \GdImage $image Source image
      * @return \GdImage
      */
@@ -1328,7 +1037,7 @@ class ImageProcessingService
 
     /**
      * Apply binary threshold
-     * 
+     *
      * @param \GdImage $image Source image
      * @return \GdImage
      */
@@ -1341,7 +1050,7 @@ class ImageProcessingService
             for ($y = 0; $y < $height; $y++) {
                 $rgb = imagecolorat($image, $x, $y);
                 $gray = ($rgb >> 16) & 0xFF; // Get red channel (grayscale)
-                
+
                 $newColor = $gray > self::THRESHOLD_VALUE ? 255 : 0;
                 $color = imagecolorallocate($image, $newColor, $newColor, $newColor);
                 imagesetpixel($image, $x, $y, $color);
@@ -1353,7 +1062,7 @@ class ImageProcessingService
 
     /**
      * Apply denoise filter
-     * 
+     *
      * @param \GdImage $image Source image
      * @return \GdImage
      */
@@ -1361,16 +1070,16 @@ class ImageProcessingService
     {
         // Apply median filter effect using smooth filter
         imagefilter($image, IMG_FILTER_SMOOTH, 1);
-        
+
         // Increase contrast to sharpen text
         imagefilter($image, IMG_FILTER_CONTRAST, -10);
-        
+
         return $image;
     }
 
     /**
      * Save processed image
-     * 
+     *
      * @param \GdImage $image Processed image
      * @return string Output path
      */
@@ -1378,14 +1087,14 @@ class ImageProcessingService
     {
         $filename = 'ocr_processed_' . uniqid() . '.png';
         $path = storage_path("app/temp/{$filename}");
-        
+
         // Ensure directory exists
         if (!is_dir(dirname($path))) {
             mkdir(dirname($path), 0755, true);
         }
 
         imagepng($image, $path);
-        
+
         return $path;
     }
 }
@@ -1403,7 +1112,7 @@ use App\Exceptions\OCRProcessingException;
 
 /**
  * Tesseract OCR Service
- * 
+ *
  * Extracts text from preprocessed images using Tesseract OCR engine.
  */
 class TesseractService
@@ -1421,7 +1130,7 @@ class TesseractService
 
     /**
      * Extract text from image
-     * 
+     *
      * @param string $imagePath Path to preprocessed image
      * @return string Extracted text
      * @throws OCRProcessingException
@@ -1455,7 +1164,7 @@ class TesseractService
             }
 
             $text = file_get_contents($outputFile);
-            
+
             return $this->cleanText($text);
         } finally {
             // Cleanup temporary files
@@ -1466,7 +1175,7 @@ class TesseractService
 
     /**
      * Extract text with confidence scores
-     * 
+     *
      * @param string $imagePath Path to preprocessed image
      * @return array{text: string, confidence: float, words: array}
      * @throws OCRProcessingException
@@ -1505,7 +1214,7 @@ class TesseractService
 
     /**
      * Validate Tesseract installation
-     * 
+     *
      * @return void
      * @throws OCRProcessingException
      */
@@ -1520,7 +1229,7 @@ class TesseractService
 
     /**
      * Validate image path exists
-     * 
+     *
      * @param string $imagePath Image path
      * @return void
      * @throws OCRProcessingException
@@ -1536,7 +1245,7 @@ class TesseractService
 
     /**
      * Clean extracted text
-     * 
+     *
      * @param string $text Raw text
      * @return string Cleaned text
      */
@@ -1544,16 +1253,16 @@ class TesseractService
     {
         // Remove excessive whitespace
         $text = preg_replace('/\s+/', ' ', $text);
-        
+
         // Trim leading/trailing whitespace
         $text = trim($text);
-        
+
         return $text;
     }
 
     /**
      * Parse TSV output with confidence scores
-     * 
+     *
      * @param string $tsvPath TSV file path
      * @return array
      */
@@ -1565,7 +1274,7 @@ class TesseractService
 
         $content = file_get_contents($tsvPath);
         $lines = explode("\n", trim($content));
-        
+
         $words = [];
         $totalConfidence = 0;
         $wordCount = 0;
@@ -1573,11 +1282,11 @@ class TesseractService
 
         foreach (array_slice($lines, 1) as $line) { // Skip header
             $parts = explode("\t", $line);
-            
+
             if (count($parts) >= 12 && !empty(trim($parts[11]))) {
                 $word = trim($parts[11]);
                 $confidence = (float) ($parts[10] ?? 0);
-                
+
                 $words[] = [
                     'text' => $word,
                     'confidence' => $confidence,
@@ -1586,7 +1295,7 @@ class TesseractService
                     'width' => (int) $parts[8],
                     'height' => (int) $parts[9],
                 ];
-                
+
                 $fullText .= $word . ' ';
                 $totalConfidence += $confidence;
                 $wordCount++;
@@ -1602,7 +1311,7 @@ class TesseractService
 
     /**
      * Check if Tesseract is available
-     * 
+     *
      * @return bool
      */
     public function isAvailable(): bool
@@ -1612,7 +1321,7 @@ class TesseractService
                 $this->tesseractPath,
                 '--version',
             ]);
-            
+
             return $result->successful();
         } catch (\Exception $e) {
             return false;
@@ -1621,7 +1330,7 @@ class TesseractService
 
     /**
      * Get available languages
-     * 
+     *
      * @return array
      */
     public function getAvailableLanguages(): array
@@ -1631,7 +1340,7 @@ class TesseractService
                 $this->tesseractPath,
                 '--list-langs',
             ]);
-            
+
             if ($result->successful()) {
                 $lines = explode("\n", $result->output());
                 return array_filter(array_slice($lines, 1)); // Skip header
@@ -1658,13 +1367,17 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * OCR Parser Service
- * 
+ *
  * Parses raw OCR text into structured game data.
  */
 class OCRParserService
 {
     /**
      * Stat extraction patterns
+     *
+     * These regexes are indicative rather than exhaustive. OCR output may still
+     * require manual review for split tokens or spacing artifacts such as
+     * "Spee d", and the validation layer is expected to catch unrealistic values.
      */
     private const STAT_PATTERNS = [
         'speed' => '/(?:Speed|スピード)[:\s]*(\d{1,4})/i',
@@ -1679,20 +1392,20 @@ class OCRParserService
      */
     private const APTITUDE_PATTERNS = [
         'distance' => [
-            'sprint' => '/(?:Sprint|短距離)[:\s]*([A-G]|S{1,2})/i',
-            'mile' => '/(?:Mile|マイル)[:\s]*([A-G]|S{1,2})/i',
-            'medium' => '/(?:Medium|中距離)[:\s]*([A-G]|S{1,2})/i',
-            'long' => '/(?:Long|長距離)[:\s]*([A-G]|S{1,2})/i',
+            'sprint' => '/(?:Sprint|短距離)[:\s]*([A-GS])/i',
+            'mile' => '/(?:Mile|マイル)[:\s]*([A-GS])/i',
+            'medium' => '/(?:Medium|中距離)[:\s]*([A-GS])/i',
+            'long' => '/(?:Long|長距離)[:\s]*([A-GS])/i',
         ],
         'surface' => [
-            'turf' => '/(?:Turf|芝)[:\s]*([A-G]|S{1,2})/i',
-            'dirt' => '/(?:Dirt|ダート)[:\s]*([A-G]|S{1,2})/i',
+            'turf' => '/(?:Turf|芝)[:\s]*([A-GS])/i',
+            'dirt' => '/(?:Dirt|ダート)[:\s]*([A-GS])/i',
         ],
         'style' => [
-            'nige' => '/(?:Nige|逃げ)[:\s]*([A-G]|S{1,2})/i',
-            'senkou' => '/(?:Senkou|先行)[:\s]*([A-G]|S{1,2})/i',
-            'sashi' => '/(?:Sashi|差し)[:\s]*([A-G]|S{1,2})/i',
-            'oikomi' => '/(?:Oikomi|追込)[:\s]*([A-G]|S{1,2})/i',
+            'nige' => '/(?:Nige|逃げ)[:\s]*([A-GS])/i',
+            'senkou' => '/(?:Senkou|先行)[:\s]*([A-GS])/i',
+            'sashi' => '/(?:Sashi|差し)[:\s]*([A-GS])/i',
+            'oikomi' => '/(?:Oikomi|追込)[:\s]*([A-GS])/i',
         ],
     ];
 
@@ -1708,7 +1421,7 @@ class OCRParserService
 
     /**
      * Parse OCR text into structured data
-     * 
+     *
      * @param string $text Raw OCR text
      * @return array Parsed data
      */
@@ -1725,7 +1438,7 @@ class OCRParserService
 
     /**
      * Parse with confidence scoring
-     * 
+     *
      * @param array $ocrResult OCR result with confidence
      * @return array{data: array, confidence: float, fields: array}
      */
@@ -1751,7 +1464,7 @@ class OCRParserService
 
     /**
      * Extract stats from text
-     * 
+     *
      * @param string $text Raw text
      * @return array
      */
@@ -1762,9 +1475,9 @@ class OCRParserService
         foreach (self::STAT_PATTERNS as $stat => $pattern) {
             if (preg_match($pattern, $text, $matches)) {
                 $value = (int) $matches[1];
-                
-                // Validate range (0-1200)
-                if ($value >= 0 && $value <= 1200) {
+
+                // Accept practical planner range; validation will warn above 1200.
+                if ($value >= 0 && $value <= 1600) {
                     $stats[$stat] = $value;
                 }
             }
@@ -1775,7 +1488,7 @@ class OCRParserService
 
     /**
      * Extract aptitudes from text
-     * 
+     *
      * @param string $text Raw text
      * @return array
      */
@@ -1785,11 +1498,11 @@ class OCRParserService
 
         foreach (self::APTITUDE_PATTERNS as $category => $patterns) {
             $aptitudes[$category] = [];
-            
+
             foreach ($patterns as $type => $pattern) {
                 if (preg_match($pattern, $text, $matches)) {
                     $grade = strtoupper($matches[1]);
-                    
+
                     // Validate grade
                     if ($this->isValidGrade($grade)) {
                         $aptitudes[$category][$type] = $grade;
@@ -1803,7 +1516,7 @@ class OCRParserService
 
     /**
      * Extract mood from text
-     * 
+     *
      * @param string $text Raw text
      * @return string|null
      */
@@ -1818,7 +1531,7 @@ class OCRParserService
 
     /**
      * Extract energy from text
-     * 
+     *
      * @param string $text Raw text
      * @return int|null
      */
@@ -1826,7 +1539,7 @@ class OCRParserService
     {
         if (preg_match(self::ENERGY_PATTERN, $text, $matches)) {
             $value = (int) $matches[1];
-            
+
             // Validate range (0-100)
             if ($value >= 0 && $value <= 100) {
                 return $value;
@@ -1838,18 +1551,18 @@ class OCRParserService
 
     /**
      * Validate aptitude grade
-     * 
+     *
      * @param string $grade Grade string
      * @return bool
      */
     private function isValidGrade(string $grade): bool
     {
-        return in_array($grade, ['SS', 'S', 'A', 'B', 'C', 'D', 'E', 'F', 'G']);
+        return in_array($grade, ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G']);
     }
 
     /**
      * Normalize mood string
-     * 
+     *
      * @param string $mood Raw mood string
      * @return string
      */
@@ -1873,7 +1586,7 @@ class OCRParserService
 
     /**
      * Calculate field-level confidences
-     * 
+     *
      * @param array $data Parsed data
      * @return array
      */
@@ -1901,7 +1614,7 @@ class OCRParserService
 
     /**
      * Calculate overall confidence score
-     * 
+     *
      * @param float $baseConfidence OCR base confidence
      * @param array $fieldConfidences Field-level confidences
      * @return float
@@ -1912,7 +1625,7 @@ class OCRParserService
     ): float {
         // Weight OCR confidence at 60%, field extraction at 40%
         $fieldAvg = array_sum($fieldConfidences) / count($fieldConfidences);
-        
+
         return ($baseConfidence * 0.6) + ($fieldAvg * 0.4);
     }
 }
@@ -1929,7 +1642,7 @@ use Illuminate\Support\Facades\Validator;
 
 /**
  * OCR Validation Service
- * 
+ *
  * Validates extracted OCR data against business rules.
  */
 class OCRValidationService
@@ -1938,7 +1651,7 @@ class OCRValidationService
 
     /**
      * Validate extracted data
-     * 
+     *
      * @param array $data Parsed OCR data
      * @param float $confidence Confidence score
      * @return array{valid: bool, errors: array, warnings: array, requires_review: bool}
@@ -1972,7 +1685,7 @@ class OCRValidationService
 
         // Check confidence threshold
         $requiresReview = $confidence < self::CONFIDENCE_THRESHOLD;
-        
+
         if ($requiresReview) {
             $warnings[] = "Confidence score ({$confidence}%) below threshold. Manual review recommended.";
         }
@@ -1987,7 +1700,7 @@ class OCRValidationService
 
     /**
      * Validate stats
-     * 
+     *
      * @param array $stats Stats array
      * @return array{errors: array, warnings: array}
      */
@@ -2005,8 +1718,14 @@ class OCRValidationService
         }
 
         foreach ($stats as $stat => $value) {
-            if ($value < 0 || $value > 1200) {
-                $errors[] = "{$stat} value {$value} is out of valid range (0-1200)";
+            if ($value < 0 || $value > 1600) {
+                $errors[] = "{$stat} value {$value} is out of valid range (0-1600)";
+                continue;
+            }
+
+            if ($value > 1200) {
+                $warnings[] = "{$stat} value {$value} is above 1200. Verify OCR accuracy; planner rules apply
+                reduced gains above the soft cap.";
             }
         }
 
@@ -2021,7 +1740,7 @@ class OCRValidationService
 
     /**
      * Validate aptitudes
-     * 
+     *
      * @param array $aptitudes Aptitudes array
      * @return array{errors: array, warnings: array}
      */
@@ -2030,7 +1749,7 @@ class OCRValidationService
         $errors = [];
         $warnings = [];
 
-        $validGrades = ['SS', 'S', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
+        $validGrades = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
         foreach ($aptitudes as $category => $types) {
             foreach ($types as $type => $grade) {
@@ -2053,7 +1772,7 @@ class OCRValidationService
 
     /**
      * Validate mood value
-     * 
+     *
      * @param string $mood Mood string
      * @return array{errors: array}
      */
@@ -2071,7 +1790,7 @@ class OCRValidationService
 
     /**
      * Validate energy value
-     * 
+     *
      * @param int $energy Energy value
      * @return array{errors: array}
      */
@@ -2102,7 +1821,7 @@ use App\Exceptions\OCRProcessingException;
 
 /**
  * OCR Processing Service
- * 
+ *
  * Orchestrates the complete OCR processing pipeline.
  */
 class OCRProcessingService
@@ -2116,7 +1835,7 @@ class OCRProcessingService
 
     /**
      * Process screenshot and extract game data
-     * 
+     *
      * @param UploadedFile $file Uploaded screenshot
      * @param string|null $userId User ID for tracking
      * @return OCRResult
@@ -2185,7 +1904,7 @@ class OCRProcessingService
 
     /**
      * Store extraction record
-     * 
+     *
      * @param string|null $userId User ID
      * @param string $filename Original filename
      * @param array $parsedResult Parsed OCR result
@@ -2211,7 +1930,7 @@ class OCRProcessingService
 
     /**
      * Verify and update extraction
-     * 
+     *
      * @param int $extractionId Extraction ID
      * @param array $correctedData User-corrected data
      * @return OCRExtraction
@@ -2253,7 +1972,7 @@ readonly class OCRResult
 
     /**
      * Check if result requires manual review
-     * 
+     *
      * @return bool
      */
     public function requiresReview(): bool
@@ -2263,7 +1982,7 @@ readonly class OCRResult
 
     /**
      * Check if result is valid
-     * 
+     *
      * @return bool
      */
     public function isValid(): bool
@@ -2273,7 +1992,7 @@ readonly class OCRResult
 
     /**
      * Get validation errors
-     * 
+     *
      * @return array
      */
     public function getErrors(): array
@@ -2283,7 +2002,7 @@ readonly class OCRResult
 
     /**
      * Get validation warnings
-     * 
+     *
      * @return array
      */
     public function getWarnings(): array
@@ -2293,7 +2012,7 @@ readonly class OCRResult
 
     /**
      * Convert to array
-     * 
+     *
      * @return array
      */
     public function toArray(): array
@@ -2312,310 +2031,112 @@ readonly class OCRResult
 
 ---
 
-## 6. WebSocket Real-time Updates
+## 6. Sync Status and Refresh Updates
 
-### 6.1 Broadcasting Architecture
+### 6.1 Status Propagation Architecture
 
 ```mermaid
 flowchart TD
     subgraph Server["Laravel Application"]
-        Event[Event Dispatched]
-        Broadcaster[Broadcasting Service]
-        Reverb[Laravel Reverb]
+        Job[Queued Sync / OCR Job]
+        StatusSvc[Status Tracking]
+        Cache[Redis / Cache]
+        DB[(MySQL)]
     end
 
-    subgraph Channels["Broadcast Channels"]
-        CharChannel["character.{id}"]
-        UserChannel["user.{id}"]
-        GlobalChannel["global.updates"]
+    subgraph Clients["Browser / Admin Clients"]
+        Dashboard[Admin Dashboard]
+        Planner[Planner UI]
     end
 
-    subgraph Clients["Connected Clients"]
-        Client1[Browser Client 1]
-        Client2[Browser Client 2]
-        Client3[Browser Client 3]
-    end
-
-    Event --> Broadcaster
-    Broadcaster --> Reverb
-    Reverb --> CharChannel
-    Reverb --> UserChannel
-    Reverb --> GlobalChannel
-    
-    CharChannel --> Client1
-    UserChannel --> Client2
-    GlobalChannel --> Client1
-    GlobalChannel --> Client2
-    GlobalChannel --> Client3
-```text
-
-### 6.2 Broadcast Events
-
-```php
-<?php
-
-namespace App\Events;
-
-use App\Models\Character;
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
-
-/**
- * Character Updated Event
- * 
- * Broadcasts when character data changes.
- */
-class CharacterUpdated implements ShouldBroadcast
-{
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    public function __construct(
-        public Character $character,
-        public string $updateType = 'general'
-    ) {}
-
-    /**
-     * Get broadcast channels
-     * 
-     * @return array<int, Channel>
-     */
-    public function broadcastOn(): array
-    {
-        return [
-            new PrivateChannel("character.{$this->character->id}"),
-            new PrivateChannel("user.{$this->character->user_id}"),
-        ];
-    }
-
-    /**
-     * Get broadcast event name
-     * 
-     * @return string
-     */
-    public function broadcastAs(): string
-    {
-        return 'character.updated';
-    }
-
-    /**
-     * Get broadcast data
-     * 
-     * @return array
-     */
-    public function broadcastWith(): array
-    {
-        return [
-            'character_id' => $this->character->id,
-            'update_type' => $this->updateType,
-            'stats' => $this->character->current_stats,
-            'mood' => $this->character->mood_status,
-            'energy' => $this->character->energy_level,
-            'timestamp' => now()->toIso8601String(),
-        ];
-    }
-}
+    Job --> StatusSvc
+    StatusSvc --> Cache
+    StatusSvc --> DB
+    Dashboard -->|HTTP refresh / poll| StatusSvc
+    Planner -->|HTTP refresh / poll| StatusSvc
+    Cache --> StatusSvc
+    DB --> StatusSvc
 ```
 
+### 6.2 Status Signals
+
+| Signal | Source | Consumer |
+| --- | --- | --- |
+| Sync completed timestamp | Scheduled jobs / manual sync actions | Admin sync dashboards |
+| OCR extraction result | OCR controllers and services | OCR review UI |
+| Notification unread count | `NotificationService` + database notifications | Header bell and notification center |
+| External API health | Monitoring and circuit-breaker services | Admin diagnostics and logs |
+
+### 6.3 Current Implementation Pattern
+
+The current `develop` branch does not ship `laravel/reverb` or WebSocket channel authorization.
+External integration status is exposed through persisted records, cache state, queue results, and
+polling-friendly HTTP endpoints.
+
+Representative implementation artifacts:
+
+- `app/Services/ExternalAPI/ExternalAPIService.php`
+- `app/Services/MCP/MCPHealthDashboardService.php`
+- `app/Services/MCPMonitoringService.php`
+- `app/Http/Controllers/Api/NotificationController.php`
+
 ```php
-<?php
-
-namespace App\Events;
-
-use App\Models\TrainingSession;
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
-
-/**
- * Training Completed Event
- * 
- * Broadcasts when a training session completes.
- */
-class TrainingCompleted implements ShouldBroadcast
+class NotificationController extends Controller
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
     public function __construct(
-        public TrainingSession $session
+        private NotificationService $notificationService,
     ) {}
 
-    /**
-     * Get broadcast channels
-     * 
-     * @return array<int, Channel>
-     */
-    public function broadcastOn(): array
+    public function unread(Request $request): JsonResponse
     {
-        return [
-            new PrivateChannel("character.{$this->session->character_id}"),
-        ];
-    }
+        $user = $request->user();
 
-    /**
-     * Get broadcast event name
-     * 
-     * @return string
-     */
-    public function broadcastAs(): string
-    {
-        return 'training.completed';
-    }
-
-    /**
-     * Get broadcast data
-     * 
-     * @return array
-     */
-    public function broadcastWith(): array
-    {
-        return [
-            'session_id' => $this->session->id,
-            'training_type' => $this->session->training_type,
-            'stat_gains' => $this->session->stat_gains,
-            'skill_hints' => $this->session->skill_hints_gained,
-            'energy_delta' => $this->session->energy_delta,
-            'timestamp' => now()->toIso8601String(),
-        ];
-    }
-}
-```text
-
-### 6.3 WebSocket Service
-
-```php
-<?php
-
-namespace App\Services\WebSocket;
-
-use Illuminate\Support\Facades\{Broadcast, Log};
-
-/**
- * WebSocket Broadcasting Service
- * 
- * Manages real-time updates via Laravel Reverb.
- */
-class WebSocketBroadcastingService
-{
-    /**
-     * Broadcast character update
-     * 
-     * @param int $characterId Character ID
-     * @param array $data Update data
-     * @return void
-     */
-    public function broadcastCharacterUpdate(int $characterId, array $data): void
-    {
-        $this->broadcast(
-            channel: "character.{$characterId}",
-            event: 'character.updated',
-            data: array_merge($data, [
-                'timestamp' => now()->toIso8601String(),
-            ])
-        );
-    }
-
-    /**
-     * Broadcast training completion
-     * 
-     * @param int $characterId Character ID
-     * @param array $sessionData Session data
-     * @return void
-     */
-    public function broadcastTrainingComplete(int $characterId, array $sessionData): void
-    {
-        $this->broadcast(
-            channel: "character.{$characterId}",
-            event: 'training.completed',
-            data: $sessionData
-        );
-    }
-
-    /**
-     * Broadcast external data sync
-     * 
-     * @param string $dataType Data type synced
-     * @param int $recordCount Number of records
-     * @return void
-     */
-    public function broadcastDataSync(string $dataType, int $recordCount): void
-    {
-        $this->broadcast(
-            channel: 'global.updates',
-            event: 'data.synced',
-            data: [
-                'data_type' => $dataType,
-                'record_count' => $recordCount,
-                'timestamp' => now()->toIso8601String(),
-            ]
-        );
-    }
-
-    /**
-     * Generic broadcast method
-     * 
-     * @param string $channel Channel name
-     * @param string $event Event name
-     * @param array $data Event data
-     * @return void
-     */
-    private function broadcast(string $channel, string $event, array $data): void
-    {
-        try {
-            Broadcast::channel($channel)->broadcast($event, $data);
-            
-            Log::debug('WebSocket broadcast sent', [
-                'channel' => $channel,
-                'event' => $event,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('WebSocket broadcast failed', [
-                'channel' => $channel,
-                'event' => $event,
-                'error' => $e->getMessage(),
-            ]);
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
         }
+
+        return response()->json(
+            $this->notificationService->getUnreadForBell($user, limit: 10)
+        );
     }
 }
 ```
 
-### 6.4 Channel Authorization
+### 6.4 UX Expectations
+
+- Admin sync pages show last run time, current health, and stale/fresh state.
+- OCR flows return persisted extraction results for review rather than pushing them over a socket.
+- Notification badges update on the next bell refresh, page load, or polling interval.
+- External-data changes surface through refreshed status indicators and logs.
+
+### 6.5 Polling Endpoint Example
 
 ```php
 <?php
 
-// routes/channels.php
+namespace App\Http\Controllers\Api;
 
-use App\Models\{Character, User};
-use Illuminate\Support\Facades\Broadcast;
-
-/**
- * Character private channel
- */
-Broadcast::channel('character.{characterId}', function (User $user, int $characterId) {
-    $character = Character::find($characterId);
-    return $character && $character->user_id === $user->id;
-});
+use App\Http\Controllers\Controller;
+use App\Services\MCPMonitoringService;
+use Illuminate\Http\JsonResponse;
 
 /**
- * User private channel
+ * Sync status endpoint used by polling clients.
  */
-Broadcast::channel('user.{userId}', function (User $user, string $userId) {
-    return $user->id === $userId;
-});
+class SyncStatusController extends Controller
+{
+    public function __construct(
+        private MCPMonitoringService $monitoringService,
+    ) {}
 
-/**
- * Global updates channel (public)
- */
-Broadcast::channel('global.updates', function () {
-    return true;
-});
+    public function show(): JsonResponse
+    {
+        return response()->json([
+            'health' => $this->monitoringService->getSystemHealthSummary(),
+            'refreshed_at' => now()->toIso8601String(),
+        ]);
+    }
+}
 ```text
 
 ---
@@ -2635,7 +2156,7 @@ use Illuminate\Support\Str;
 
 /**
  * Community Integration Service
- * 
+ *
  * Handles integration with community tools and data sharing.
  */
 class CommunityIntegrationService
@@ -2646,9 +2167,12 @@ class CommunityIntegrationService
         'Uel' => 'https://uel.ink',
     ];
 
+    // `Uel` is treated here as a community-facing sharing destination, not as a
+    // source in the primary external API client fallback stack.
+
     /**
      * Share career results to community
-     * 
+     *
      * @param Career $career Career to share
      * @return ShareResult
      */
@@ -2656,7 +2180,7 @@ class CommunityIntegrationService
     {
         $shareData = $this->buildShareData($career);
         $shareToken = $this->generateShareToken();
-        
+
         // Store share data
         $share = $career->shares()->create([
             'share_token' => $shareToken,
@@ -2673,7 +2197,7 @@ class CommunityIntegrationService
 
     /**
      * Build share data from career
-     * 
+     *
      * @param Career $career Career instance
      * @return array
      */
@@ -2693,7 +2217,7 @@ class CommunityIntegrationService
 
     /**
      * Generate unique share token
-     * 
+     *
      * @return string
      */
     private function generateShareToken(): string
@@ -2703,7 +2227,7 @@ class CommunityIntegrationService
 
     /**
      * Build shareable URL
-     * 
+     *
      * @param string $token Share token
      * @return string
      */
@@ -2714,14 +2238,14 @@ class CommunityIntegrationService
 
     /**
      * Calculate final grade from stats
-     * 
+     *
      * @param array $stats Final stats
      * @return string
      */
     private function calculateFinalGrade(array $stats): string
     {
         $total = array_sum($stats);
-        
+
         return match (true) {
             $total >= 5500 => 'SS',
             $total >= 5000 => 'S',
@@ -2735,7 +2259,7 @@ class CommunityIntegrationService
 
     /**
      * Import community tips for character
-     * 
+     *
      * @param Character $character Character instance
      * @return array
      */
@@ -2764,7 +2288,7 @@ class CommunityIntegrationService
 
     /**
      * Get community meta rankings
-     * 
+     *
      * @param string $type Ranking type (characters, support_cards)
      * @return array
      */
@@ -2813,7 +2337,7 @@ readonly class ShareResult
 
     /**
      * Convert to array
-     * 
+     *
      * @return array
      */
     public function toArray(): array
@@ -2844,7 +2368,7 @@ use Illuminate\Support\Facades\{Cache, Log};
 
 /**
  * External API Service
- * 
+ *
  * Orchestrates external API calls with fallback support.
  */
 class ExternalAPIService
@@ -2864,7 +2388,7 @@ class ExternalAPIService
 
     /**
      * Fetch character data with fallback
-     * 
+     *
      * @param int $traineeId Trainee ID
      * @return array
      */
@@ -2878,7 +2402,7 @@ class ExternalAPIService
 
     /**
      * Fetch support cards with fallback
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -2892,7 +2416,7 @@ class ExternalAPIService
 
     /**
      * Fetch skills with fallback
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -2906,7 +2430,7 @@ class ExternalAPIService
 
     /**
      * Fetch races with fallback
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -2920,7 +2444,7 @@ class ExternalAPIService
 
     /**
      * Execute API call with fallback support
-     * 
+     *
      * @param callable $operation Operation to execute
      * @param string $cacheKey Cache key for stale data
      * @return array
@@ -2929,7 +2453,7 @@ class ExternalAPIService
     {
         // Try primary client
         $primaryState = $this->circuitBreaker->getState('umapyoi');
-        
+
         if ($primaryState->allowsRequests()) {
             try {
                 $result = $operation($this->primaryClient);
@@ -2944,7 +2468,7 @@ class ExternalAPIService
 
         // Try fallback client
         $fallbackState = $this->circuitBreaker->getState('umamusumedb');
-        
+
         if ($fallbackState->allowsRequests()) {
             try {
                 $result = $operation($this->fallbackClient);
@@ -2963,7 +2487,7 @@ class ExternalAPIService
 
     /**
      * Cache data for stale fallback
-     * 
+     *
      * @param string $key Cache key
      * @param array $data Data to cache
      * @return void
@@ -2975,7 +2499,7 @@ class ExternalAPIService
 
     /**
      * Get stale cached data
-     * 
+     *
      * @param string $key Cache key
      * @return array
      */
@@ -2992,7 +2516,7 @@ class ExternalAPIService
 
     /**
      * Get health status of all APIs
-     * 
+     *
      * @return array
      */
     public function getHealthStatus(): array
@@ -3013,7 +2537,7 @@ class ExternalAPIService
 
     /**
      * Force sync all external data
-     * 
+     *
      * @return array Sync results
      */
     public function syncAll(): array
@@ -3051,24 +2575,23 @@ class ExternalAPIService
 namespace App\Services\ExternalAPI;
 
 use App\Models\{SupportCard, Skill, Character};
-use App\Services\WebSocket\WebSocketBroadcastingService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\{DB, Log};
 
 /**
  * Data Sync Service
- * 
+ *
  * Synchronizes external API data with local database.
  */
 class DataSyncService
 {
     public function __construct(
         private ExternalAPIService $externalApi,
-        private WebSocketBroadcastingService $broadcaster
     ) {}
 
     /**
      * Sync support cards from external API
-     * 
+     *
      * @return SyncResult
      */
     public function syncSupportCards(): SyncResult
@@ -3091,7 +2614,11 @@ class DataSyncService
             }
         });
 
-        $this->broadcaster->broadcastDataSync('support_cards', $syncedCount);
+        Cache::put('sync_status:support_cards', [
+            'synced' => $syncedCount,
+            'completed_at' => now()->toIso8601String(),
+            'errors' => count($errors),
+        ], now()->addHour());
 
         Log::info('Support cards synced', [
             'synced' => $syncedCount,
@@ -3107,7 +2634,7 @@ class DataSyncService
 
     /**
      * Sync skills from external API
-     * 
+     *
      * @return SyncResult
      */
     public function syncSkills(): SyncResult
@@ -3130,7 +2657,11 @@ class DataSyncService
             }
         });
 
-        $this->broadcaster->broadcastDataSync('skills', $syncedCount);
+        Cache::put('sync_status:skills', [
+            'synced' => $syncedCount,
+            'completed_at' => now()->toIso8601String(),
+            'errors' => count($errors),
+        ], now()->addHour());
 
         Log::info('Skills synced', [
             'synced' => $syncedCount,
@@ -3146,7 +2677,7 @@ class DataSyncService
 
     /**
      * Map external support card data to model
-     * 
+     *
      * @param array $data External data
      * @return array
      */
@@ -3170,7 +2701,7 @@ class DataSyncService
 
     /**
      * Map external skill data to model
-     * 
+     *
      * @param array $data External data
      * @return array
      */
@@ -3518,7 +3049,7 @@ CREATE TABLE ucp_external_api_cache (
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     UNIQUE KEY unique_cache_key (cache_key),
     INDEX idx_api_source (api_source),
     INDEX idx_resource_type (resource_type),
@@ -3543,7 +3074,7 @@ CREATE TABLE ucp_ocr_extractions (
     verified_at TIMESTAMP NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE SET NULL,
     FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE SET NULL,
     INDEX idx_user_id (user_id),
@@ -3569,7 +3100,7 @@ CREATE TABLE ucp_community_shares (
     shared_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (career_id) REFERENCES ucp_careers(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     UNIQUE KEY unique_share_token (share_token),
@@ -3593,7 +3124,7 @@ CREATE TABLE ucp_circuit_breaker_states (
     last_checked_at TIMESTAMP NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     UNIQUE KEY unique_service (service_key),
     INDEX idx_state (state)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -3652,7 +3183,7 @@ class CacheInvalidationService
 {
     /**
      * Invalidate all external API cache
-     * 
+     *
      * @return void
      */
     public function invalidateAll(): void
@@ -3662,7 +3193,7 @@ class CacheInvalidationService
 
     /**
      * Invalidate specific resource type
-     * 
+     *
      * @param string $type Resource type
      * @return void
      */
@@ -3673,7 +3204,7 @@ class CacheInvalidationService
 
     /**
      * Invalidate specific character
-     * 
+     *
      * @param int $traineeId Trainee ID
      * @return void
      */
@@ -3784,7 +3315,7 @@ return [
         'api_key' => env('UMAPYOI_API_KEY'),  // Never commit actual keys
         'base_url' => env('UMAPYOI_BASE_URL', 'https://umapyoi.net/api/v1'),
     ],
-    
+
     'umamusumedb' => [
         'api_key' => env('UMAMUSUMEDB_API_KEY'),
         'base_url' => env('UMAMUSUMEDB_BASE_URL', 'https://umamusumedb.com/api'),
@@ -3804,7 +3335,7 @@ return [
 | External API call (fresh) | < 2s | p95 |
 | OCR processing | < 5s | p95 |
 | Circuit breaker check | < 5ms | p95 |
-| WebSocket broadcast | < 100ms | p95 |
+| Sync status refresh | Within next poll cycle | p95 |
 | Community share creation | < 500ms | p95 |
 
 ### 14.2 Optimization Strategies
@@ -3823,12 +3354,12 @@ return [
 - Caching of common patterns
 - Parallel region extraction
 
-**WebSocket Optimization**:
+**Status Refresh Optimization**:
 
-- Batched broadcasts for bulk updates
-- Selective channel broadcasting
-- Message compression
-- Connection keep-alive
+- Cache latest sync summaries for dashboard reads
+- Avoid reprocessing large payloads on every refresh
+- Use queue workers for long-running sync and OCR jobs
+- Keep UI refresh endpoints small and read-focused
 
 ### 14.3 Monitoring
 
@@ -3846,7 +3377,7 @@ class PerformanceMonitoringService
 {
     /**
      * Log API performance metrics
-     * 
+     *
      * @param string $api API identifier
      * @param float $responseTime Response time in ms
      * @param bool $cached Whether response was cached
@@ -3864,7 +3395,7 @@ class PerformanceMonitoringService
 
     /**
      * Log OCR performance metrics
-     * 
+     *
      * @param float $processingTime Processing time in ms
      * @param float $confidence Confidence score
      * @param int $imageSize Image size in bytes
@@ -3896,13 +3427,13 @@ use App\Enums\CircuitState;
 
 test('circuit breaker starts in closed state', function () {
     $breaker = app(CircuitBreaker::class);
-    
+
     expect($breaker->getState('test-api'))->toBe(CircuitState::Closed);
 });
 
 test('circuit opens after failure threshold exceeded', function () {
     $breaker = app(CircuitBreaker::class);
-    
+
     // Simulate failures
     for ($i = 0; $i < 5; $i++) {
         $breaker->call(
@@ -3911,23 +3442,23 @@ test('circuit opens after failure threshold exceeded', function () {
             fallback: fn() => []
         );
     }
-    
+
     expect($breaker->getState('test-api'))->toBe(CircuitState::Open);
 });
 
 test('circuit transitions to half-open after recovery timeout', function () {
     $breaker = app(CircuitBreaker::class);
-    
+
     // Trip the circuit
     $breaker->forceReset('test-api');
-    
+
     // Simulate passing of recovery timeout
     Cache::put('circuit_breaker:test-api', [
         'state' => CircuitState::Open->value,
         'opened_at' => time() - 120, // 2 minutes ago
         'failures' => 5,
     ], 86400);
-    
+
     expect($breaker->getState('test-api'))->toBe(CircuitState::HalfOpen);
 });
 ```
@@ -3949,10 +3480,10 @@ test('fetches character data from primary API', function () {
             ]
         ], 200),
     ]);
-    
+
     $service = app(ExternalAPIService::class);
     $result = $service->fetchCharacterData(1001);
-    
+
     expect($result)->toHaveKey('name', 'Special Week');
 });
 
@@ -3966,10 +3497,10 @@ test('falls back to secondary API when primary fails', function () {
             ]
         ], 200),
     ]);
-    
+
     $service = app(ExternalAPIService::class);
     $result = $service->fetchCharacterData(1001);
-    
+
     expect($result)->toHaveKey('name', 'Special Week');
 });
 
@@ -3979,14 +3510,14 @@ test('returns cached data when all APIs fail', function () {
         'id' => 1001,
         'name' => 'Special Week (Cached)',
     ], now()->addDays(7));
-    
+
     Http::fake([
         '*' => Http::response([], 500),
     ]);
-    
+
     $service = app(ExternalAPIService::class);
     $result = $service->fetchCharacterData(1001);
-    
+
     expect($result)->toHaveKey('name', 'Special Week (Cached)');
 });
 ```text
@@ -4001,7 +3532,7 @@ use Illuminate\Http\UploadedFile;
 
 test('processes screenshot and extracts stats', function () {
     $file = UploadedFile::fake()->image('screenshot.png', 1920, 1080);
-    
+
     // Mock Tesseract output
     $this->mock(\App\Services\OCR\TesseractService::class, function ($mock) {
         $mock->shouldReceive('extractWithConfidence')
@@ -4011,17 +3542,17 @@ test('processes screenshot and extracts stats', function () {
                 'words' => [],
             ]);
     });
-    
+
     $service = app(OCRProcessingService::class);
     $result = $service->process($file);
-    
+
     expect($result->confidence)->toBeGreaterThan(80)
         ->and($result->data['stats'])->toHaveKey('speed', 850);
 });
 
 test('flags low confidence extractions for review', function () {
     $file = UploadedFile::fake()->image('blurry.png', 800, 600);
-    
+
     $this->mock(\App\Services\OCR\TesseractService::class, function ($mock) {
         $mock->shouldReceive('extractWithConfidence')
             ->andReturn([
@@ -4030,10 +3561,10 @@ test('flags low confidence extractions for review', function () {
                 'words' => [],
             ]);
     });
-    
+
     $service = app(OCRProcessingService::class);
     $result = $service->process($file);
-    
+
     expect($result->requiresReview())->toBeTrue();
 });
 ```
@@ -4052,29 +3583,29 @@ test('full external data sync workflow', function () {
             ]
         ], 200),
     ]);
-    
+
     $syncService = app(\App\Services\ExternalAPI\DataSyncService::class);
     $result = $syncService->syncSupportCards();
-    
+
     expect($result->syncedCount)->toBe(2)
         ->and($result->hasErrors())->toBeFalse();
-    
+
     $this->assertDatabaseHas('ucp_support_cards', [
         'external_id' => 1,
         'name' => 'Card 1',
     ]);
 });
 
-test('WebSocket broadcasts on data sync', function () {
+test('sync status is persisted on data sync', function () {
     Event::fake();
-    
+
     Http::fake([
         'umapyoi.net/*' => Http::response(['data' => []], 200),
     ]);
-    
+
     $syncService = app(\App\Services\ExternalAPI\DataSyncService::class);
     $syncService->syncSupportCards();
-    
+
     Event::assertDispatched(\App\Events\DataSynced::class);
 });
 ```text
@@ -4331,8 +3862,12 @@ class ExternalApiCacheFactory extends Factory
 | `/パワー[:\s]*(\d{1,4})/` | Japanese | "パワー: 680" |
 | `/Guts[:\s]*(\d{1,4})/i` | English | "Guts: 550" |
 | `/根性[:\s]*(\d{1,4})/` | Japanese | "根性: 550" |
-| `/[?:Wit\ | Wisdom](:\s)*(\d{1,4})/i` | English |
+| <code>/(?:Wit&#124;Wisdom):?\s*(\d{1,4})/i</code> | English | "Wit: 620" / "Wisdom: 620" |
 | `/賢さ[:\s]*(\d{1,4})/` | Japanese | "賢さ: 620" |
+
+These OCR patterns are best-effort heuristics. Spacing artifacts, split words, and mixed-language
+captures should still be surfaced for manual review when confidence drops or extracted values look
+implausible.
 
 **Mood Patterns**:
 
@@ -4348,7 +3883,7 @@ class ExternalApiCacheFactory extends Factory
 
 | Pattern | Valid Values |
 | --- | --- |
-| `/([A-G]\ | S{1,2})/i` |
+| `/([A-GS])/i` | `G, F, E, D, C, B, A, S` |
 
 ### Appendix C: Circuit Breaker Configuration
 
@@ -4359,7 +3894,6 @@ class ExternalApiCacheFactory extends Factory
 | `failure_threshold` | 5 | Failures before opening circuit |
 | `recovery_timeout` | 60 seconds | Time before testing recovery |
 | `sample_window` | 120 seconds | Window for counting failures |
-| `half_open_requests` | 1 | Probe requests in half-open state |
 
 **State Transitions**:
 
@@ -4370,41 +3904,19 @@ class ExternalApiCacheFactory extends Factory
 | Half-Open | Probe succeeds | Closed |
 | Half-Open | Probe fails | Open |
 
-### Appendix D: WebSocket Channel Reference
+### Appendix D: Status Payload Reference
 
-**Private Channels**:
+**Cache Keys / Read Models**:
 
-| Channel Pattern | Authorization | Events |
+| Key / Source | Purpose | Example Fields |
 | --- | --- | --- |
-| `character.{id}` | Owner only | `character.updated`, `training.completed` |
-| `user.{id}` | User only | `notification`, `sync.complete` |
+| `sync_status:support_cards` | Latest support-card sync summary | `synced`, `completed_at`, `errors` |
+| `sync_status:skills` | Latest skill sync summary | `synced`, `completed_at`, `errors` |
+| Notification unread response | Header bell refresh payload | `notifications`, `unread_count` |
 
-**Public Channels**:
-
-| Channel | Events |
-| --- | --- |
-| `global.updates` | `data.synced`, `maintenance.scheduled` |
-
-**Event Payloads**:
+**Payload Examples**:
 
 ```json
-// character.updated
-{
-    "character_id": 123,
-    "update_type": "stats",
-    "stats": { "speed": 850, "stamina": 720 },
-    "timestamp": "2026-01-24T10:00:00Z"
-}
-
-// training.completed
-{
-    "session_id": 456,
-    "training_type": "speed",
-    "stat_gains": { "speed": 45, "power": 5 },
-    "timestamp": "2026-01-24T10:05:00Z"
-}
-
-// data.synced
 {
     "data_type": "support_cards",
     "record_count": 247,
@@ -4486,6 +3998,7 @@ return [
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-11 | Development Team | Corrected OCR aptitude validation to G-S only, relaxed OCR stat validation to warn above the 1200 soft cap up to 1600, replaced stale channel-authorization docs with polling-based status delivery, documented GameTora as a supplementary scraper/CDN source, and removed the undocumented `half_open_requests` appendix parameter. |
 | 2.2.0 | 2026-01-28 | Development Team | Updated to align with game-accurate mechanics (v2.2.0 architecture), data validation for aptitude grades (G-S) |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete technical specification with all services, API endpoints, database schema, testing strategy, and comprehensive appendices |
 | 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
@@ -4503,10 +4016,10 @@ return [
 
 ---
 
-**Document Control**  
-**Maintained By**: Backend Development Team  
-**Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Document Control**
+**Maintained By**: Backend Development Team
+**Review Frequency**: Bi-weekly during active development
+**Next Review Date**: 2026-02-07
 **Distribution**: Development Team, QA Team, DevOps Team, Product Management
 
 ---

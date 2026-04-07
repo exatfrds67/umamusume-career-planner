@@ -164,7 +164,8 @@ To automatically configure port forwarding on Windows startup:
 1. Create a scheduled task:
 
 ```powershell
-$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File C:\XAMPP\htdocs\umamusume-career-planner\scripts\setup-redis-portforward.ps1"
+$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File
+C:\XAMPP\htdocs\umamusume-career-planner\scripts\setup-redis-portforward.ps1"
 $trigger = New-ScheduledTaskTrigger -AtStartup
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 Register-ScheduledTask -TaskName "WSL Redis Port Forward" -Action $action -Trigger $trigger -Principal $principal

@@ -6,7 +6,9 @@
 
 ## Summary
 
-Expanded character-exclusive unique skills from 12 to 67, covering all trainable cards on the Global server. This includes 48 card 01 primary unique skills and 19 card 02 alternate unique skills. Fixed 12 naming errors in existing skills. All data sourced from [uma.guide](https://uma.guide/skills/).
+Expanded character-exclusive unique skills from 12 to 67, covering all trainable cards on the Global
+server. This includes 48 card 01 primary unique skills and 19 card 02 alternate unique skills. Fixed
+12 naming errors in existing skills. All data sourced from [uma.guide](https://uma.guide/skills/).
 
 ## Changes
 
@@ -20,7 +22,9 @@ Expanded character-exclusive unique skills from 12 to 67, covering all trainable
 
 ### Card Variant Architecture
 
-48 unique Global characters exist. 19 of those characters have a second training card (card 02) with a different unique skill. This gives 48 + 19 = 67 total cards, matching uma.guide's "67 of 67" count exactly.
+48 unique Global characters exist. 19 of those characters have a second training card (card 02) with
+a different unique skill. This gives 48 + 19 = 67 total cards, matching uma.guide's "67 of 67" count
+exactly.
 
 ### Naming Corrections (12 fixes)
 
@@ -129,7 +133,8 @@ Researched and implemented the star level upgrade system for all 67 character-ex
 | Star 3+ | Full-power version — `effects` (starts at level 1) |
 | Star 6 | Full-power version starts at level 3 instead of 1 |
 
-Every unique skill appears twice on uma.guide: a full-power entry and a weaker **200 SP** base entry. The 200 SP version is the star 1–2 skill.
+Every unique skill appears twice on uma.guide: a full-power entry and a weaker **200 SP** base
+entry. The 200 SP version is the star 1–2 skill.
 
 #### Effect Reduction Pattern (base vs full-power)
 
@@ -150,7 +155,9 @@ Every unique skill appears twice on uma.guide: a full-power entry and a weaker *
 
 ### Phase 4 — Star Level on Career Plans (2026-03-01)
 
-Added `star_level` (1★–5★) to `ucp_careers` so users can record which star level their character is trained at during planning. Affects which unique skill version is active (base at 1–2★, full-power at 3–5★).
+Added `star_level` (1★–5★) to `ucp_careers` so users can record which star level their character is
+trained at during planning. Affects which unique skill version is active (base at 1–2★, full-power
+at 3–5★).
 
 #### Star Level Mechanics — Career Planning (sourced from uma.guide)
 

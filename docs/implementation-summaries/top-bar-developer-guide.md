@@ -18,7 +18,7 @@ public function index()
         'spAvailable' => 450,
         'storageMode' => 'account', // or 'local'
     ];
-    
+
     return view('your.view', compact('topStatus'));
 }
 ```text
@@ -30,7 +30,7 @@ public function index()
 public function index()
 {
     $careerRun = CareerRun::findOrFail($id);
-    
+
     $topStatus = [
         'currentTurn' => $careerRun->current_turn,
         'maxTurns' => $careerRun->max_turns,
@@ -40,7 +40,7 @@ public function index()
         'mood' => $careerRun->mood,                  // 'great', 'good', 'normal', 'bad', 'very bad'
         'careerStage' => $careerRun->career_stage,   // 'junior', 'classic', 'senior'
     ];
-    
+
     return view('your.view', compact('topStatus'));
 }
 ```
@@ -87,11 +87,11 @@ public function index()
 public function index()
 {
     $currentRun = Auth::user()->currentCareerRun();
-    
+
     if (!$currentRun) {
         return view('dashboard.empty');
     }
-    
+
     $topStatus = [
         'currentTurn' => $currentRun->current_turn,
         'maxTurns' => $currentRun->max_turns,
@@ -101,7 +101,7 @@ public function index()
         'mood' => $currentRun->mood,
         'careerStage' => $currentRun->career_stage,
     ];
-    
+
     return view('dashboard.index', compact('topStatus', 'currentRun'));
 }
 ```text
@@ -113,7 +113,7 @@ public function index()
 public function index()
 {
     $run = session('current_run');
-    
+
     $topStatus = [
         'currentTurn' => $run->current_turn,
         'maxTurns' => $run->max_turns,
@@ -123,7 +123,7 @@ public function index()
         'mood' => $run->mood,     // Affects training effectiveness
         'careerStage' => $run->career_stage,
     ];
-    
+
     return view('training.index', compact('topStatus'));
 }
 ```
@@ -139,12 +139,12 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public $careerRun;
-    
+
     public function mount($id)
     {
         $this->careerRun = CareerRun::findOrFail($id);
     }
-    
+
     public function render()
     {
         $topStatus = [
@@ -156,7 +156,7 @@ class Dashboard extends Component
             'mood' => $this->careerRun->mood,
             'careerStage' => $this->careerRun->career_stage,
         ];
-        
+
         return view('livewire.career-run.dashboard', compact('topStatus'));
     }
 }
@@ -169,7 +169,7 @@ class Dashboard extends Component
 public function show($id)
 {
     $run = CareerRun::findOrFail($id);
-    
+
     $topStatus = [
         'currentTurn' => $run->current_turn,
         'maxTurns' => $run->max_turns,
@@ -177,7 +177,7 @@ public function show($id)
         'storageMode' => $run->storage_mode,
         // energy, mood, careerStage will show as "—" if not provided
     ];
-    
+
     return view('runs.show', compact('topStatus'));
 }
 ```
@@ -260,13 +260,13 @@ class RunSelector extends Component
 {
     public $currentRunId;
     public $availableRuns;
-    
+
     public function mount()
     {
         $this->currentRunId = session('current_run_id');
         $this->loadRuns();
     }
-    
+
     public function loadRuns()
     {
         $this->availableRuns = Auth::user()
@@ -282,7 +282,7 @@ class RunSelector extends Component
                 'maxTurn' => $run->max_turns,
             ]);
     }
-    
+
     public function selectRun($runId)
     {
         session(['current_run_id' => $runId]);
@@ -290,7 +290,7 @@ class RunSelector extends Component
         $this->dispatch('run-changed', runId: $runId);
         return redirect()->route('dashboard');
     }
-    
+
     public function render()
     {
         return view('livewire.dashboard.run-selector');
@@ -329,7 +329,7 @@ public function index(StatusService $statusService)
 {
     $run = Auth::user()->currentCareerRun();
     $topStatus = $statusService->getTopStatus($run);
-    
+
     return view('dashboard.index', compact('topStatus'));
 }
 ```
@@ -344,7 +344,7 @@ public function boot()
 {
     View::composer('*', function ($view) {
         $currentRun = Auth::user()?->currentCareerRun();
-        
+
         if ($currentRun) {
             $topStatus = [
                 'currentTurn' => $currentRun->current_turn,
@@ -355,7 +355,7 @@ public function boot()
                 'mood' => $currentRun->mood,
                 'careerStage' => $currentRun->career_stage,
             ];
-            
+
             $view->with('topStatus', $topStatus);
         }
     });
@@ -374,7 +374,7 @@ class InjectTopStatus
     {
         if (Auth::check()) {
             $run = Auth::user()->currentCareerRun();
-            
+
             if ($run) {
                 view()->share('topStatus', [
                     'currentTurn' => $run->current_turn,
@@ -387,7 +387,7 @@ class InjectTopStatus
                 ]);
             }
         }
-        
+
         return $next($request);
     }
 }
@@ -418,10 +418,10 @@ class TopBarTest extends TestCase
             'mood' => 'good',
             'career_stage' => 'senior',
         ]);
-        
+
         $response = $this->actingAs($user)
             ->get(route('dashboard'));
-        
+
         $response->assertSee('15');
         $response->assertSee('70');
         $response->assertSee('450');
@@ -430,25 +430,25 @@ class TopBarTest extends TestCase
         $response->assertSee('Good');
         $response->assertSee('Senior');
     }
-    
+
     public function test_energy_color_coding()
     {
         $user = User::factory()->create();
-        
+
         // Test green (high energy)
         $run = CareerRun::factory()->create([
             'user_id' => $user->id,
             'energy' => 85,
         ]);
-        
+
         $response = $this->actingAs($user)->get(route('dashboard'));
         $response->assertSee('text-green-600');
-        
+
         // Test yellow (moderate energy)
         $run->update(['energy' => 55]);
         $response = $this->actingAs($user)->get(route('dashboard'));
         $response->assertSee('text-yellow-600');
-        
+
         // Test red (low energy)
         $run->update(['energy' => 25]);
         $response = $this->actingAs($user)->get(route('dashboard'));

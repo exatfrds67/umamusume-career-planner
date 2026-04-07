@@ -1,8 +1,14 @@
 # TECH-FLOW-005: Support Card Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Document Version**: 2.4.0
+**Date**: March 8, 2026
+**Status**: Directionally aligned; active deck-management naming and storage-mode guidance added
+
+Historical implementation-task sections below are retained for design history only. Where any task
+list, API endpoint, class name, migration, or code block below conflicts with Sections 1, 2, or the
+current flow and sequence documents, treat the lower section as archived and non-authoritative.
+
+> **Reader note:** Sections below "System Architecture" may contain historical implementation-task examples retained for traceability. Unless a lower section explicitly states that it matches the current route surface and active repository classes, prefer Sections 1-2 and the linked storage-aware flow and sequence documents.
 
 **Source Specifications**:
 
@@ -12,14 +18,15 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-005](../prds/PRD-005_Support_Card_Management.md)
-- SPEC: [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md)
-- Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
-- Wireframes: [WF-010](../wireframes/WF-010_Support_Card_Collection.md), [WF-011](../wireframes/WF-011_Support_Deck_Builder.md)
-- Sequences: [SEQ-005](../sequences/SEQ-005_Support_Card_Upgrade.md)
-- User Flows: [UF-006](../user-flows/UF-006_Support_Deck_Building_Flow.md)
-- BRS: [002_BRS](../002_BRS_Business_Requirements_Specifications.md) (BR-5)
-- SRS: [003_SRS](../003_SRS_Software_Requirement_Specifications.md) (FR-06)
+- PRD: [PRD-005](../02-prds/PRD-005_Support_Card_Management.md)
+- SPEC: [SPEC-005](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](../01-flows/FLOW-005_Support_Card_Management_System.md)
+- Wireframes: [WF-010](../01-wireframes/WF-010_Support_Card_Collection.md),
+[WF-011](../01-wireframes/WF-011_Support_Deck_Builder.md)
+- Sequences: [SEQ-005](../01-sequences/SEQ-005_Support_Card_Upgrade.md)
+- User Flows: [UF-006](../01-user-flows/UF-006_Support_Deck_Building_Flow.md)
+- BRS: [002_BRS](../00-core-docs/002_BRS_Business_Requirements_Specifications.md) (BR-5)
+- SRS: [003_SRS](../00-core-docs/003_SRS_Software_Requirement_Specifications.md) (FR-06)
 
 ---
 
@@ -40,46 +47,68 @@
 
 ## 1. System Architecture
 
+### 1.0 Storage Mode Support
+
+- `StorageMode::ACCOUNT`: implemented for support-card collection browsing, deck-builder access,
+deck validation, and character-backed deck persistence.
+- `StorageMode::LOCAL`: documented architecture path for browser-backed deck composition and
+analysis inside the local run payload; where server-side persistence is not implemented, the flow
+must be described as client-managed and conversion-aware.
+
+Support-card technical flows should state whether a behavior is collection browsing, browser-local
+composition, or account-persistent deck mutation.
+
 ### 1.1 Layered Architecture
 
 ```mermaid
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 3 Components"]
+        Livewire["Livewire 4 Components"]
         Alpine["Alpine.js Interactions"]
     end
-    
+
     subgraph Application["Application Layer"]
         Controllers["Support Card Controllers"]
         FormRequests["Deck Validation Requests"]
         Services["Support Card Services"]
         AIAgents["AI Deck Optimization Agents"]
     end
-    
+
     subgraph Domain["Domain Layer"]
         Models["Eloquent Models"]
         Calculators["Bonus Calculators"]
         Repositories["Repositories"]
         Enums["Card/Deck Enums"]
     end
-    
+
     subgraph Infrastructure["Infrastructure Layer"]
         MySQL[("MySQL Database")]
         Redis[("Redis Cache")]
         ExternalAPI["External Meta Data API"]
     end
-    
+
     Presentation --> Application
     Application --> Domain
     Domain --> Infrastructure
     Application --> ExternalAPI
-    
+
     style Presentation fill:#e3f2fd
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fff3e0
 ```text
+
+### 1.3 Current Implementation Notes
+
+- Active deck-builder entry is `/characters/{character}/deck-builder` via `SupportCardController::deckBuilder()`.
+- Current deck mutation and slot-management behavior is centered on `DeckManagementService` and `SupportDeckService`.
+- Character-backed deck rows are currently managed through `CharacterSupportCard`, while
+`SupportDeck` remains the active deck container exposed through `Character.activeSupportDeck()`.
+- Historical names such as `DeckCompositionService`, `BonusCalculatorService`, or `CardBond` should
+not be treated as authoritative if they diverge from the active repository classes.
+- Lower implementation-task examples in this document predate part of the current deck-management
+surface and should not override the current-state guidance above.
 
 ### 1.2 Component Hierarchy
 
@@ -92,18 +121,18 @@ Support Card Management System
 │   └── BondProgressBar (Blade Component)
 │
 ├── Controllers
-│   ├── SupportCardController (Web)
-│   ├── API/SupportCardController (API)
-│   ├── DeckController
-│   └── BondManagementController
+│   ├── SupportCardController (current web entry)
+│   ├── Deck-builder mutation handlers on the current character routes
+│   ├── Deck validation and persistence actions
+│   └── Bond and training-side progression actions
 │
 ├── Services
-│   ├── SupportCardCatalogService
-│   ├── DeckCompositionService
-│   ├── BonusCalculatorService
-│   ├── BondLevelService
-│   ├── LimitBreakService
-│   └── MetaSyncService
+│   ├── Support-card catalog and query services
+│   ├── DeckManagementService
+│   ├── SupportDeckService
+│   ├── Bond and bonus calculation services
+│   ├── Limit-break and upgrade services
+│   └── Sync or cache refresh services where implemented
 │
 ├── Calculators
 │   ├── TrainingBonusCalculator
@@ -111,14 +140,14 @@ Support Card Management System
 │   └── DeckEffectivenessCalculator
 │
 ├── Repositories
-│   ├── SupportCardRepository
-│   └── SupportDeckRepository
+│   ├── Support-card query boundaries
+│   └── Deck persistence boundaries
 │
 └── Models
     ├── SupportCard
     ├── SupportDeck
-    ├── CardBond
-    └── DeckSlot
+    ├── CharacterSupportCard
+    └── Character
 ```text
 
 ---
@@ -130,48 +159,42 @@ Support Card Management System
 ```mermaid
 sequenceDiagram
     participant User
-    participant UI as Livewire Component
-    participant Controller
-    participant Service as DeckCompositionService
-    participant Validator as DeckValidator
-    participant Calculator as BonusCalculator
+    participant UI as Deck Builder View
+    participant Controller as SupportCardController
+    participant DeckAPI as SupportDeckController
+    participant DeckSvc as SupportDeckService
+    participant Manage as DeckManagementService
     participant DB as Database
     participant Cache
     participant Event as Event Dispatcher
 
-    User->>UI: Build Deck (Select 6 Cards)
-    UI->>Controller: POST /decks/compose
-    Controller->>Service: composeDeck(character, cardIds)
-    
-    Service->>Validator: validateDeckComposition(cardIds)
-    Validator->>Validator: Check exactly 6 cards
-    Validator->>Validator: Check no duplicates
-    Validator->>Validator: Check ownership (5 owned + 1 borrowed)
-    Validator->>Validator: Validate type distribution
-    Validator-->>Service: Validation result
-    
+    User->>UI: Build or update deck
+    UI->>DeckAPI: Trigger deck validation or save action
+    DeckAPI->>DeckSvc: validateDeck(cards)
+
+    DeckSvc->>DeckSvc: Check exactly 6 cards
+    DeckSvc->>DeckSvc: Check no duplicate owned cards
+    DeckSvc->>DeckSvc: Check max 1 borrowed / friend card
+    DeckSvc-->>DeckAPI: Validation result
+
     alt Validation Failed
-        Service-->>Controller: Validation errors
-        Controller-->>UI: Error response
+        DeckAPI-->>UI: Error response
         UI-->>User: Display validation errors
     else Validation Passed
-        Service->>Calculator: calculateDeckBonuses(cards)
-        Calculator->>Calculator: Aggregate stat bonuses
-        Calculator->>Calculator: Calculate synergy score
-        Calculator->>Calculator: Evaluate deck effectiveness
-        Calculator-->>Service: Bonus data
-        
-        Service->>DB: Save SupportDeck
-        DB-->>Service: Deck created
-        
-        Service->>Cache: Cache deck bonuses (1hr TTL)
-        Service->>Event: Dispatch DeckComposed event
-        
-        Service-->>Controller: Deck composition result
-        Controller-->>UI: Success response
-        UI-->>User: Display deck summary + bonuses
+        DeckAPI->>DeckSvc: saveDeck(character, cards)
+        DeckSvc->>Manage: recalculate deck statistics and synergy
+        Manage-->>DeckSvc: Deck metrics
+        DeckSvc->>DB: Persist character-backed deck rows
+        DeckSvc->>Cache: Invalidate related deck caches
+        DeckSvc->>Event: Dispatch deck-updated event
+        DeckSvc-->>DeckAPI: Saved deck result
+        DeckAPI-->>UI: Success response
+        UI-->>User: Display updated deck summary
     end
 ```
+
+- If persistence fails after validation, the UI should preserve the in-progress deck state and
+return actionable validation or save feedback instead of implying that the active deck changed.
 
 ### 2.2 Limit Break Flow
 
@@ -179,30 +202,30 @@ sequenceDiagram
 flowchart TD
     Start([User Triggers Limit Break]) --> LoadCard[Load Support Card]
     LoadCard --> CheckOwnership{Card Owned?}
-    
+
     CheckOwnership -->|No| Error1[Return Error: Not Owned]
     CheckOwnership -->|Yes| CheckLevel{Current LB Level?}
-    
+
     CheckLevel -->|LB4| Error2[Return Error: Max Level]
     CheckLevel -->|LB0-3| ValidateResources{Sufficient Resources?}
-    
+
     ValidateResources -->|No| Error3[Return Error: Insufficient Resources]
     ValidateResources -->|Yes| DeductResources[Deduct Resources]
-    
+
     DeductResources --> IncrementLB[Increment limit_break_level]
     IncrementLB --> RecalcBonuses[Recalculate Card Bonuses]
     RecalcBonuses --> UpdateRecord[Update SupportCard Record]
-    
+
     UpdateRecord --> InvalidateCache[Invalidate Deck Caches]
     InvalidateCache --> TriggerEvent[Trigger CardUpgraded Event]
     TriggerEvent --> UpdateDecks[Update Active Decks with Card]
-    
+
     UpdateDecks --> Return([Return Updated Card])
     Error1 --> End([Error Response])
     Error2 --> End
     Error3 --> End
     Return --> End
-    
+
     style Start fill:#e3f2fd
     style Return fill:#c8e6c9
     style Error1 fill:#ffcdd2
@@ -212,33 +235,37 @@ flowchart TD
 
 ### 2.3 Bond Level Tracking Flow
 
+This diagram is best read as a gameplay-side bond progression reference, not as a statement that
+deck-persistence services own all bond math. Exact per-training bond updates should defer to the
+active training-side services that apply participation, conditions, and friendship thresholds.
+
 ```mermaid
 flowchart TD
     Start([Training Session Completes]) --> LoadDeck[Load Active Support Deck]
     LoadDeck --> IdentifyCards[Identify Participating Cards]
-    
+
     IdentifyCards --> ForEach{For Each Card}
     ForEach --> AwardBond[Award Bond Points +7 base, +9 with Charming]
     AwardBond --> CurrentBond[Load Current Bond Level]
-    
+
     CurrentBond --> CheckThreshold{Milestone Reached?}
     CheckThreshold -->|20%| Reward1[Award Small Bonus]
     CheckThreshold -->|40%| Reward2[Award Skill Hint]
     CheckThreshold -->|60%| Reward3[Trigger Event]
     CheckThreshold -->|80%| Reward4[Unlock Friendship Training]
-    CheckThreshold -->|No| UpdateRecord[Update CardBond Record]
-    
+    CheckThreshold -->|No| UpdateRecord[Update active bond state]
+
     Reward1 --> UpdateRecord
     Reward2 --> UpdateRecord
     Reward3 --> UpdateRecord
     Reward4 --> UpdateRecord
-    
+
     UpdateRecord --> NextCard[Next Card]
     NextCard --> ForEach
-    
+
     ForEach -->|All Cards Processed| BroadcastUpdate[Broadcast Bond Updates]
     BroadcastUpdate --> End([Return Bond Status])
-    
+
     style Start fill:#e3f2fd
     style End fill:#c8e6c9
     style Reward4 fill:#fff9c4
@@ -246,14 +273,54 @@ flowchart TD
 
 ---
 
+## 2.4 Eager Loading Requirements
+
+For deck-builder, collection, and bonus-analysis views, the minimum eager-loaded relationships
+should be stated explicitly:
+
+- `character.supportCards.supportCard`
+- `character.activeSupportDeck.supportCards`
+- `character.currentCareer`
+- `character.gameCharacter`
+
+Lazy loading in loops should be treated as prohibited for deck rendering, recommendation panels, and bonus summaries.
+
+---
+
+## 2.5 Storage-Aware Guidance
+
+- Collection browsing can inform both local and account-backed planning.
+- Local mode supports browser-backed deck composition and analysis inside the local run payload.
+- Account mode persists deck mutations through current character-linked services and database-backed deck rows.
+- Local-to-account promotion of deck state should follow [TECH-
+FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
+FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
+
+---
+
+## 2.6 Related Documents
+
+- [TECH-FLOW-001_Character_Management_Flow.md](TECH-FLOW-001_Character_Management_Flow.md)
+- [TECH-FLOW-002_Training_Optimization_Flow.md](TECH-FLOW-002_Training_Optimization_Flow.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
+FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [SEQ-005](../01-sequences/SEQ-005_Support_Card_Upgrade.md)
+- [SEQ-016](../01-sequences/SEQ-016_Support_Deck_Configuration.md)
+
+---
+
 ## 3. Implementation Tasks
+
+> **Archived design snapshot begins below**
+>
+> The remaining sections preserve historical implementation planning and sample code. They are useful for background and design intent, but they are not the authoritative current-state description unless they match Sections 1-2 and the linked current flow and sequence documents.
 
 ### 3.1 Phase 1: Support Card Models (Week 1, ~10 hours)
 
 #### Task 5.1.1: Create SupportCard Model and Migration
 
-**Priority**: P0  
-**Effort**: 4 hours  
+**Priority**: P0
+**Effort**: 4 hours
 **Status**: ✅ Complete
 
 ```php
@@ -329,7 +396,7 @@ class SupportCard extends Model
     public function getEffectiveBonusesAttribute(): array
     {
         $multiplier = $this->limit_break_multiplier;
-        
+
         return collect($this->base_bonuses)->map(function ($value) use ($multiplier) {
             return (int) round($value * $multiplier);
         })->toArray();
@@ -372,7 +439,7 @@ Schema::create('ucp_support_cards', function (Blueprint $table) {
     $table->json('skills_provided')->nullable();
     $table->timestamps();
     $table->softDeletes();
-    
+
     $table->index(['user_id', 'card_type']);
     $table->index(['rarity', 'meta_tier']);
 });
@@ -390,8 +457,8 @@ Schema::create('ucp_support_cards', function (Blueprint $table) {
 
 #### Task 5.1.2: Create SupportDeck Model and Migration
 
-**Priority**: P0  
-**Effort**: 3 hours  
+**Priority**: P0
+**Effort**: 3 hours
 **Status**: ✅ Complete
 
 ```php
@@ -439,24 +506,24 @@ class SupportDeck extends Model
     public function validate(): array
     {
         $errors = [];
-        
+
         // Exactly 6 cards
         if ($this->cards()->count() !== 6) {
             $errors[] = 'Deck must contain exactly 6 cards';
         }
-        
+
         // No duplicates
         $cardIds = $this->cards()->pluck('id')->toArray();
         if (count($cardIds) !== count(array_unique($cardIds))) {
             $errors[] = 'Deck cannot contain duplicate cards';
         }
-        
+
         // Maximum 1 borrowed card
         $borrowedCount = $this->cards()->wherePivot('is_borrowed', true)->count();
         if ($borrowedCount > 1) {
             $errors[] = 'Deck can have at most 1 borrowed card';
         }
-        
+
         return $errors;
     }
 
@@ -469,15 +536,15 @@ class SupportDeck extends Model
             'guts' => 0,
             'wit' => 0,
         ];
-        
+
         foreach ($this->cards as $card) {
             $bonuses = $card->effective_bonuses;
-            
+
             foreach ($bonuses as $stat => $value) {
                 $totalBonuses[$stat] = ($totalBonuses[$stat] ?? 0) + $value;
             }
         }
-        
+
         return $totalBonuses;
     }
 }
@@ -495,7 +562,7 @@ Schema::create('ucp_support_decks', function (Blueprint $table) {
     $table->float('synergy_score')->nullable();
     $table->json('total_bonuses')->nullable();
     $table->timestamps();
-    
+
     $table->index(['character_id', 'is_active']);
 });
 
@@ -507,7 +574,7 @@ Schema::create('ucp_deck_cards', function (Blueprint $table) {
     $table->integer('slot_position'); // 1-6
     $table->boolean('is_borrowed')->default(false);
     $table->timestamps();
-    
+
     $table->unique(['deck_id', 'slot_position']);
     $table->unique(['deck_id', 'card_id']);
 });
@@ -525,8 +592,8 @@ Schema::create('ucp_deck_cards', function (Blueprint $table) {
 
 #### Task 5.1.3: Create CardBond Model and Migration
 
-**Priority**: P0  
-**Effort**: 3 hours  
+**Priority**: P0
+**Effort**: 3 hours
 **Status**: ✅ Complete
 
 ```php
@@ -578,12 +645,15 @@ class CardBond extends Model
     public function incrementBond(int $points): void
     {
         $this->bond_points += $points;
+        // bond_level is an internal planner representation: floor(bond_points / 200)
+        // The 80% bond threshold (bond_percentage >= 80) corresponds to the rainbow state
+        // in-game (Friendship Training unlocked). This maps to bond_points >= 800 in this model.
         $this->bond_level = (int) floor($this->bond_points / 200);
-        
+
         if ($this->canUnlockFriendship()) {
             $this->friendship_unlocked = true;
         }
-        
+
         $this->save();
     }
 }
@@ -601,7 +671,7 @@ Schema::create('ucp_card_bonds', function (Blueprint $table) {
     $table->integer('bond_points')->default(0);
     $table->boolean('friendship_unlocked')->default(false);
     $table->timestamps();
-    
+
     $table->unique(['character_id', 'support_card_id']);
     $table->index('bond_level');
 });
@@ -621,8 +691,8 @@ Schema::create('ucp_card_bonds', function (Blueprint $table) {
 
 #### Task 5.2.1: Create DeckCompositionService
 
-**Priority**: P0  
-**Effort**: 6 hours  
+**Priority**: P0
+**Effort**: 6 hours
 **Status**: ✅ Complete
 
 ```php
@@ -645,13 +715,13 @@ class DeckCompositionService
         ?string $deckName = null
     ): SupportDeck {
         $this->validateDeckComposition($cardIds);
-        
+
         $deck = SupportDeck::create([
             'character_id' => $character->id,
             'deck_name' => $deckName ?? 'Default Deck',
             'is_active' => true,
         ]);
-        
+
         // Attach cards with slot positions
         foreach ($cardIds as $position => $cardId) {
             $deck->cards()->attach($cardId, [
@@ -659,12 +729,12 @@ class DeckCompositionService
                 'is_borrowed' => $this->isBorrowedCard($character, $cardId),
             ]);
         }
-        
+
         // Calculate and store bonuses
         $deck->total_bonuses = $deck->calculateTotalBonuses();
         $deck->synergy_score = $this->calculateSynergyScore($deck);
         $deck->save();
-        
+
         return $deck->fresh(['cards']);
     }
 
@@ -677,12 +747,12 @@ class DeckCompositionService
         if (count($cardIds) !== 6) {
             throw new \InvalidArgumentException('Deck must contain exactly 6 cards');
         }
-        
+
         // No duplicates
         if (count($cardIds) !== count(array_unique($cardIds))) {
             throw new \InvalidArgumentException('Deck cannot contain duplicate cards');
         }
-        
+
         // All cards exist
         $existingCards = SupportCard::whereIn('id', $cardIds)->count();
         if ($existingCards !== 6) {
@@ -697,25 +767,25 @@ class DeckCompositionService
     {
         $cards = $deck->cards;
         $score = 0;
-        
+
         // Type diversity bonus
         $types = $cards->pluck('card_type')->unique()->count();
         $score += min(30, $types * 5);
-        
+
         // Rarity bonus
         $ssrCount = $cards->where('rarity', 'SSR')->count();
         $score += min(25, $ssrCount * 5);
-        
+
         // Specialization matching
         $specializationMatch = $cards->filter(function ($card) use ($deck) {
             return $this->matchesCharacterGoals($card, $deck->character);
         })->count();
         $score += min(25, $specializationMatch * 5);
-        
+
         // Meta tier bonus
         $topTierCount = $cards->whereIn('meta_tier', ['SS', 'S'])->count();
         $score += min(20, $topTierCount * 4);
-        
+
         return round($score, 2);
     }
 
@@ -740,8 +810,8 @@ class DeckCompositionService
 
 #### Task 5.2.2: Create SupportCardBonusCalculator
 
-**Priority**: P0  
-**Effort**: 8 hours  
+**Priority**: P0
+**Effort**: 8 hours
 **Status**: ✅ Complete
 
 ```php
@@ -761,15 +831,15 @@ class SupportCardBonusCalculator
         TrainingType $facility
     ): array {
         $totalBonuses = $this->initializeEmptyBonuses();
-        
+
         foreach ($deck->cards as $card) {
             $cardBonuses = $this->calculateCardBonus($card, $facility);
-            
+
             foreach ($cardBonuses as $stat => $bonus) {
                 $totalBonuses[$stat] += $bonus;
             }
         }
-        
+
         return $totalBonuses;
     }
 
@@ -783,14 +853,14 @@ class SupportCardBonusCalculator
         $baseBonus = $card->effective_bonuses;
         $typeMatch = $this->isTypeMatch($card->card_type, $facility);
         $limitBreakMultiplier = $card->limit_break_multiplier;
-        
+
         $multiplier = $typeMatch ? $limitBreakMultiplier : ($limitBreakMultiplier * 0.5);
-        
+
         $bonuses = [];
         foreach ($baseBonus as $stat => $value) {
             $bonuses[$stat] = (int) round($value * $multiplier);
         }
-        
+
         return $bonuses;
     }
 
@@ -804,11 +874,12 @@ class SupportCardBonusCalculator
 
     /**
      * Calculate friendship training bonus
-     * 
+     *
      * Game-Accurate Friendship Bonus (Verified Jan 2026):
      * - R cards: 10% bonus
      * - SR cards: 20% bonus
-     * - SSR cards: 35% bonus
+     * - SSR cards: 20% base bonus + additional scaling per limit-break level (0–4 breaks)
+     *   (35% is the maximum at full limit break; see SEQ-002 for full scaling table)
      */
     public function calculateFriendshipBonus(
         SupportCard $card,
@@ -817,11 +888,11 @@ class SupportCardBonusCalculator
         $bond = CardBond::where('character_id', $character->id)
             ->where('support_card_id', $card->id)
             ->first();
-        
+
         if (!$bond || !$bond->friendship_unlocked) {
             return 0;
         }
-        
+
         // Friendship training bonus based on card rarity
         return match($card->rarity->value) {
             'R' => 10,
@@ -859,8 +930,8 @@ class SupportCardBonusCalculator
 
 #### Task 5.3.1: Create LimitBreakService
 
-**Priority**: P1  
-**Effort**: 7 hours  
+**Priority**: P1
+**Effort**: 7 hours
 **Status**: ✅ Complete
 
 ```php
@@ -880,22 +951,22 @@ class LimitBreakService
         if ($card->limit_break_level >= 4) {
             throw new \InvalidArgumentException('Card is already at maximum limit break level');
         }
-        
+
         $requiredResources = $this->getRequiredResources($card);
         $this->validateResources($card->user, $requiredResources);
-        
+
         return DB::transaction(function () use ($card, $requiredResources) {
             // Deduct resources
             $this->deductResources($card->user, $requiredResources);
-            
+
             // Increment limit break level
             $card->increment('limit_break_level');
-            
+
             // Invalidate deck caches
             $this->invalidateDeckCaches($card);
-            
+
             event(new CardLimitBroken($card));
-            
+
             return $card->fresh();
         });
     }
@@ -906,7 +977,7 @@ class LimitBreakService
     private function getRequiredResources(SupportCard $card): array
     {
         $level = $card->limit_break_level;
-        
+
         return [
             'duplicate_cards' => 1,
             'breakthrough_items' => match($level) {
@@ -940,7 +1011,7 @@ class LimitBreakService
     private function invalidateDeckCaches(SupportCard $card): void
     {
         $deckIds = $card->decks()->pluck('id');
-        
+
         foreach ($deckIds as $deckId) {
             Cache::forget("deck.bonuses.{$deckId}");
         }
@@ -963,8 +1034,8 @@ class LimitBreakService
 
 #### Task 5.4.1: Create BondLevelService
 
-**Priority**: P0  
-**Effort**: 6 hours  
+**Priority**: P0
+**Effort**: 6 hours
 **Status**: ✅ Complete
 
 ```php
@@ -979,7 +1050,7 @@ class BondLevelService
 {
     /**
      * Award bond points after training
-     * 
+     *
      * Game-Accurate Bond System (Verified Jan 2026):
      * - Base bond gain: +7 per training session
      * - With Charming condition: +9 per training session
@@ -999,15 +1070,15 @@ class BondLevelService
             'bond_points' => 0,
             'friendship_unlocked' => false,
         ]);
-        
+
         $previousLevel = $bond->bond_level;
         $bond->incrementBond($basePoints);
-        
+
         // Check for milestone rewards
         if ($bond->bond_level > $previousLevel) {
             $this->awardMilestoneReward($character, $card, $bond->bond_level);
         }
-        
+
         return $bond->fresh();
     }
 
@@ -1026,7 +1097,7 @@ class BondLevelService
             4 => ['type' => 'friendship_unlock'],
             default => null,
         };
-        
+
         if ($rewards) {
             event(new BondMilestoneReached($character, $card, $level, $rewards));
         }
@@ -1058,8 +1129,8 @@ class BondLevelService
 
 #### Task 5.4.2: Integrate with Training System
 
-**Priority**: P0  
-**Effort**: 2 hours  
+**Priority**: P0
+**Effort**: 2 hours
 **Status**: ✅ Complete
 
 **Deliverables**:
@@ -1075,8 +1146,8 @@ class BondLevelService
 
 #### Task 5.5.1: Create SupportCardController
 
-**Priority**: P0  
-**Effort**: 6 hours  
+**Priority**: P0
+**Effort**: 6 hours
 **Status**: ✅ Complete
 
 **Endpoints**:
@@ -1094,8 +1165,8 @@ class BondLevelService
 
 #### Task 5.5.2: Create DeckController
 
-**Priority**: P0  
-**Effort**: 6 hours  
+**Priority**: P0
+**Effort**: 6 hours
 **Status**: ✅ Complete
 
 **Endpoints**:
@@ -1115,8 +1186,8 @@ class BondLevelService
 
 #### Task 5.6.1: Feature Tests
 
-**Priority**: P0  
-**Effort**: 6 hours  
+**Priority**: P0
+**Effort**: 6 hours
 **Status**: ✅ Complete
 
 ```php
@@ -1130,10 +1201,10 @@ use App\Services\DeckCompositionService;
 test('creates valid 6-card deck', function () {
     $character = Character::factory()->create();
     $cards = SupportCard::factory()->count(6)->create(['user_id' => $character->user_id]);
-    
+
     $service = app(DeckCompositionService::class);
     $deck = $service->composeDeck($character, $cards->pluck('id')->toArray());
-    
+
     expect($deck->cards)->toHaveCount(6)
         ->and($deck->synergy_score)->toBeGreaterThan(0)
         ->and($deck->total_bonuses)->toBeArray();
@@ -1142,9 +1213,9 @@ test('creates valid 6-card deck', function () {
 test('rejects deck with duplicate cards', function () {
     $character = Character::factory()->create();
     $card = SupportCard::factory()->create();
-    
+
     $service = app(DeckCompositionService::class);
-    
+
     expect(fn() => $service->composeDeck($character, array_fill(0, 6, $card->id)))
         ->toThrow(\InvalidArgumentException::class);
 });
@@ -1152,10 +1223,10 @@ test('rejects deck with duplicate cards', function () {
 test('limit break increases card effectiveness', function () {
     $card = SupportCard::factory()->create(['limit_break_level' => 0]);
     $baseBonuses = $card->effective_bonuses;
-    
+
     $service = app(LimitBreakService::class);
     $upgraded = $service->applyLimitBreak($card);
-    
+
     expect($upgraded->limit_break_level)->toBe(1)
         ->and($upgraded->effective_bonuses['speed'])->toBeGreaterThan($baseBonuses['speed']);
 });
@@ -1163,18 +1234,18 @@ test('limit break increases card effectiveness', function () {
 test('friendship unlocks at 80% bond', function () {
     $character = Character::factory()->create();
     $card = SupportCard::factory()->create();
-    
+
     $bond = CardBond::factory()->create([
         'character_id' => $character->id,
         'support_card_id' => $card->id,
         'bond_points' => 800,
     ]);
-    
+
     expect($bond->bond_percentage)->toBeGreaterThanOrEqual(80)
         ->and($bond->canUnlockFriendship())->toBeTrue();
-    
+
     $bond->incrementBond(10);
-    
+
     expect($bond->friendship_unlocked)->toBeTrue();
 });
 ```text
@@ -1192,8 +1263,8 @@ test('friendship unlocks at 80% bond', function () {
 
 #### Task 5.6.2: Edge Case Testing
 
-**Priority**: P1  
-**Effort**: 4 hours  
+**Priority**: P1
+**Effort**: 4 hours
 **Status**: ✅ Complete
 
 **Test Cases**:
@@ -1214,7 +1285,7 @@ test('friendship unlocks at 80% bond', function () {
 ```php
 /**
  * Compose a new support deck for a character
- * 
+ *
  * @param Character $character The character to create deck for
  * @param array $cardIds Array of 6 card IDs
  * @param string|null $deckName Optional deck name
@@ -1231,11 +1302,11 @@ public function composeDeck(Character $character, array $cardIds, ?string $deckN
 ```php
 /**
  * Calculate total training bonuses from deck
- * 
- * Formula: 
+ *
+ * Formula:
  * - Type match: Base × LB Multiplier
  * - No match: Base × LB Multiplier × 0.5
- * 
+ *
  * @param SupportDeck $deck The active support deck
  * @param TrainingType $facility Training facility type
  * @return array<string, int> Stat bonuses
@@ -1250,10 +1321,10 @@ public function calculateTrainingBonuses(SupportDeck $deck, TrainingType $facili
 ```php
 /**
  * Apply limit break upgrade to support card
- * 
+ *
  * Effectiveness multipliers:
  * LB0: 1.00x, LB1: 1.05x, LB2: 1.10x, LB3: 1.15x, LB4: 1.20x
- * 
+ *
  * @param SupportCard $card Card to upgrade
  * @return SupportCard Upgraded card
  * @throws \InvalidArgumentException If already at max level or insufficient resources
@@ -1275,14 +1346,14 @@ erDiagram
     DeckCards }o--|| SupportCard : references
     SupportCard ||--o{ CardBond : bonds_with
     User ||--o{ SupportCard : owns
-    
+
     Character {
         bigint id PK
         bigint user_id FK
         string name
         json current_stats
     }
-    
+
     SupportCard {
         bigint id PK
         bigint user_id FK
@@ -1293,7 +1364,7 @@ erDiagram
         json base_bonuses
         string meta_tier
     }
-    
+
     SupportDeck {
         bigint id PK
         bigint character_id FK
@@ -1302,7 +1373,7 @@ erDiagram
         float synergy_score
         json total_bonuses
     }
-    
+
     DeckCards {
         bigint id PK
         bigint deck_id FK
@@ -1310,7 +1381,7 @@ erDiagram
         int slot_position
         boolean is_borrowed
     }
-    
+
     CardBond {
         bigint id PK
         bigint character_id FK
@@ -1346,16 +1417,16 @@ flowchart TD
     DeckCompositionService --> SupportCardRepository
     DeckCompositionService --> SynergyCalculator
     DeckCompositionService --> DeckValidator
-    
+
     SupportCardBonusCalculator --> BondLevelService
     SupportCardBonusCalculator --> LimitBreakService
-    
+
     LimitBreakService --> CacheManager
     LimitBreakService --> EventDispatcher
-    
+
     BondLevelService --> RewardService
     BondLevelService --> EventDispatcher
-    
+
     MetaSyncService --> ExternalAPIService
     MetaSyncService --> SupportCardRepository
 ```
@@ -1465,8 +1536,8 @@ pie title Test Distribution
 | Testing & Integration | 2 tasks | 10 | 11 | ✅ Complete |
 | Documentation | 1 task | 4 | 4 | ✅ Complete |
 
-**Total Estimated**: ~64 hours  
-**Total Actual**: ~66 hours  
+**Total Estimated**: ~64 hours
+**Total Actual**: ~66 hours
 **Duration**: ~3 weeks (40-hour weeks)
 
 ---
@@ -1527,12 +1598,15 @@ pie title Test Distribution
 - **Next**: [TECH-FLOW-006: AI Advisory Flow](TECH-FLOW-006_AI_Advisory_Flow.md)
 - **Previous**: [TECH-FLOW-004: Skill Management Flow](TECH-FLOW-004_Skill_Management_Flow.md)
 - **Index**: [000_TECH_FLOW_INDEX.md](000_TECH_FLOW_INDEX.md)
-- **BRS**: [002_BRS_Business_Requirements_Specifications.md](../002_BRS_Business_Requirements_Specifications.md)
-- **SRS**: [003_SRS_Software_Requirement_Specifications.md](../003_SRS_Software_Requirement_Specifications.md)
-- **SDS**: [004_SDS_Software_Design_Specifications.md](../004_SDS_Software_Design_Specifications.md)
-- **DBD**: [009_DBD_Database_Documentation.md](../009_DBD_Database_Documentation.md)
-- **SCD**: [010_SCD_Source_Code_Documentation.md](../010_SCD_Source_Code_Documentation.md)
+- **BRS**: [002_BRS_Business_Requirements_Specifications.md](../00-core-
+docs/002_BRS_Business_Requirements_Specifications.md)
+- **SRS**: [003_SRS_Software_Requirement_Specifications.md](../00-core-
+docs/003_SRS_Software_Requirement_Specifications.md)
+- **SDS**: [004_SDS_Software_Design_Specifications.md](../00-core-docs/004_SDS_Software_Design_Specifications.md)
+- **DBD**: [009_DBD_Database_Documentation.md](../00-core-docs/009_DBD_Database_Documentation.md)
+- **SCD**: [010_SCD_Source_Code_Documentation.md](../00-core-docs/010_SCD_Source_Code_Documentation.md)
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.0.0 and follows
+industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

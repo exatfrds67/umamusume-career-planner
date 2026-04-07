@@ -2,7 +2,26 @@
 
 ## Overview
 
-This directory contains all project documentation organized by category for easy navigation and maintenance. The structure uses numbered prefixes for logical ordering and clear categorization.
+This directory contains all project documentation organized by category for easy navigation and
+maintenance. The structure uses numbered prefixes for logical ordering and clear categorization.
+
+## 🚀 LLM Quick Reference
+
+**For AI assistants (Claude, Copilot, etc.):** Start with
+[`LLM_REFERENCE_INDEX.md`](LLM_REFERENCE_INDEX.md) for categorized links to all critical
+documentation.
+
+---
+
+## Recent Consolidation (2026-01-29)
+
+This documentation has been consolidated from 26+ subdirectories into organized categories:
+- **Redis**: 26 files → 2 master files (23 archived)
+- **Larastan**: 14 files → 2 master files (12 archived)
+- **Audits**: Consolidated from 3 directories → 1 unified location
+- **Testing, Features, Game Mechanics**: Reorganized for clarity
+
+See consolidation indices in each subdirectory's README.md for details.
 
 ---
 
@@ -328,5 +347,5 @@ Documentation verification, status reports, and standards including:
 
 ## Version
 
-**Last Updated**: January 21, 2026  
+**Last Updated**: January 21, 2026
 **Organization Version**: 3.0

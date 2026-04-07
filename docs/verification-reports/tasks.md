@@ -26,7 +26,8 @@
 
 ### 1.1 Purpose
 
-This document breaks down all 59 requirements into specific implementation tasks organized by development phases, with effort estimates, dependencies, and acceptance criteria.
+This document breaks down all 59 requirements into specific implementation tasks organized by
+development phases, with effort estimates, dependencies, and acceptance criteria.
 
 ### 1.2 Task Categories
 
@@ -609,4 +610,5 @@ This document breaks down all 59 requirements into specific implementation tasks
 
 ---
 
-*This document provides a comprehensive breakdown of all implementation tasks for the Umamusume Career Planner system, organized by development phases with effort estimates and dependencies.*
+*This document provides a comprehensive breakdown of all implementation tasks for the Umamusume
+Career Planner system, organized by development phases with effort estimates and dependencies.*

@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.4.0
+**Date**: March 8, 2026
 **Related Documents**: [PRD-003], [SPEC-003], [FLOW-003], [SEQ-004]
 
 **Source Specs**:
@@ -13,13 +13,19 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-003](../prds/PRD-003_Race_Strategy.md)
-- SPEC: [SPEC-003](../specs/SPEC-003_Race_Strategy_Technical.md)
-- Flow: [FLOW-003](../flows/FLOW-003_Race_Strategy_System.md)
-- Tech Flow: [TECH-FLOW-003](../tech-flow/TECH-FLOW-003_Race_Strategy_Flow.md)
-- Sequences: [SEQ-004](../sequences/SEQ-004_Race_Registration_and_Outcome.md)
-- User Flows: [UF-004](../user-flows/UF-004_Race_Day_Flow.md)
+- PRD: [PRD-003](../02-prds/PRD-003_Race_Strategy.md)
+- SPEC: [SPEC-003](../02-specs/SPEC-003_Race_Strategy_Technical.md)
+- Flow: [FLOW-003](../01-flows/FLOW-003_Race_Strategy_System.md)
+- Tech Flow: [TECH-FLOW-003](../01-tech-flow/TECH-FLOW-003_Race_Strategy_Flow.md)
+- Sequences: [SEQ-004](../01-sequences/SEQ-004_Race_Registration_and_Outcome.md)
+- User Flows: [UF-004](../01-user-flows/UF-004_Race_Day_Flow.md), [UF-011](../01-user-
+flows/UF-011_Target_Race_Planning_Flow.md)
 - Related WF: [WF-007](WF-007_Race_Preparation_Screen.md), [WF-001](WF-001_Dashboard_Overview.md)
+
+**Alignment Note**: This wireframe defines the intended race calendar and target-planning
+experience. Exact class names, route ownership, and authenticated entry behavior should be verified
+against the aligned race strategy, target planning, and reporting docs before being treated as
+implementation-exact.
 
 ---
 
@@ -27,7 +33,9 @@
 
 ### 1.1 Purpose
 
-The Race Calendar View provides a comprehensive schedule of all available races throughout a career run, enabling players to plan race participation, assess readiness, and strategize their racing schedule for optimal stat and skill point acquisition.
+The Race Calendar View provides a comprehensive schedule of all available races throughout a career
+run, enabling players to plan race participation, assess readiness, and strategize their racing
+schedule for optimal stat and skill point acquisition.
 
 ### 1.2 Key Objectives
 
@@ -37,7 +45,7 @@ The Race Calendar View provides a comprehensive schedule of all available races 
 | **Readiness Assessment** | Show calculated readiness scores for upcoming races |
 | **Strategic Planning** | Enable players to plan race participation aligned with goals |
 | **Win Probability** | Display estimated win probability based on current stats |
-| **Quick Registration** | Allow direct race registration from calendar view |
+| **Planning and Entry** | Separate future race planning from authenticated race-entry actions |
 
 ### 1.3 User Stories
 
@@ -48,6 +56,25 @@ The Race Calendar View provides a comprehensive schedule of all available races 
 | US-003 | As a player, I want to see my readiness percentage for each race | P0 |
 | US-004 | As a player, I want to view detailed race requirements and win probability | P0 |
 | US-005 | As a player, I want AI recommendations for which races to enter | P1 |
+
+### 1.4 Storage Mode Support
+
+- `StorageMode::ACCOUNT`: supports authenticated race browsing, entry, race history, and reporting.
+- `StorageMode::LOCAL`: should be treated as browser-local planning or advisory-only race context
+unless a verified local persistence path is documented.
+
+### 1.5 Navigation Surface and Entry Boundary
+
+This wireframe uses conceptual labels such as Race Calendar, Selected Race, and Entry Flow. Where
+implementation-backed navigation is relevant, the current route surface includes `/races`,
+`/races/calendar`, `/races/targets`, `/characters/{character}/races/{gameRace}/enter`, and reporting
+routes documented separately.
+
+### 1.6 Planning vs Entry Screen Intent
+
+This screen should support race discovery, filtering, readiness review, and target planning
+directly. Immediate race entry is a separate authenticated action and should not be implied as
+equally available in Local mode.
 
 ---
 
@@ -95,7 +122,7 @@ The Race Calendar View provides a comprehensive schedule of all available races 
 │ │ │ • Rivals: [Symboli Rudolf (A)] [Oguri Cap (B+)] │ │ │
 │ │ │ • Strategy: [Leader] recommended │ │ │
 │ │ │ │ │ │
-│ │ │ [ RESERVE (Cost: 0 TP) ] [ ANALYZE ] [ CANCEL ] │ │ │
+│ │ │ [ PLAN TARGET ] [ ANALYZE ] [ OPEN ENTRY* ] [ CANCEL ] │ │ │
 │ │ └──────────────────────────────────────────────────────────────┘ │ │
 │ └──────────────────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────────────────┘
@@ -136,7 +163,7 @@ The Race Calendar View provides a comprehensive schedule of all available races 
 │ Conditions: Sunny / Good │
 │ Rivals: Symboli Rudolf (A) │
 │ │
-│ [ RESERVE ] [ DETAILS ] [ CANCEL ] │
+│ [ PLAN TARGET ] [ DETAILS ] [ OPEN ENTRY* ] │
 └────────────────────────────────────────────────────┘
 
 ### 2.3 Mobile Layout (<640px)
@@ -171,16 +198,40 @@ The Race Calendar View provides a comprehensive schedule of all available races 
 │ Turf / 1600m (Mile) / Right │
 │ Condition: Sunny / Good │
 │ │
-│ [ RESERVE ] [ INFO ] [ X ] │
+│ [ PLAN TARGET ] [ INFO ] [ OPEN ENTRY* ] │
 │ │
 └──────────────────────────────┘
 │ Bottom Navigation Bar │
 │ [🏠]\[👤]\[⚡]\[🏆]\[🤖]\[⚙️] │
 └──────────────────────────────┘
 
+`*` Account-mode authenticated action only. In Local mode, the equivalent CTA should remain planning or advisory-only.
+
+### 2.4 Responsive Behavior Requirements
+
+- Desktop keeps filters, schedule context, and selected-race detail visible together so planning
+comparisons remain fast.
+- Tablet may collapse filters or detail panels into drawers, tabs, or stacked panes, but no
+readiness or requirement detail should depend on hover.
+- Mobile should keep the primary planning action visible, treat secondary analytics as collapsible,
+and provide visible affordances for any horizontally scrollable race rows or filter chips.
+- Content revealed only by hover on desktop must have a tap or focus equivalent on tablet and mobile.
+
+### 2.5 Screen Variants
+
+- No active run: show race browsing and advisory context without implying entry is available.
+- Unauthorized or account-required entry: preserve planning actions and explain why authenticated entry is blocked.
+- Reduced-detail advisory: if readiness or strategy advice is unavailable, continue to show the race
+catalog with requirement basics.
+- Local-only planning: allow target selection or deferral locally, but do not imply account-backed
+reservation, history, or reporting.
+
 ---
 
 ## 3. Component Specifications
+
+The component names and snippets in this section are illustrative UI contracts. They should not be
+treated as a verified inventory of current file names or final class boundaries.
 
 ### 3.1 Calendar Component
 
@@ -485,6 +536,10 @@ class RaceDetailPanel extends Component
 
 ## 4. State Management
 
+Livewire-driven calendar interactions should be treated as request and hydration flows. Any Alpine
+usage should remain scoped to transient filter, disclosure, or drawer behavior rather than implying
+an alternate race-entry persistence layer.
+
 ### 4.1 Livewire State
 
 **State Properties**:
@@ -631,6 +686,7 @@ sequenceDiagram
 | **2.4.7 Focus Visible** | Clear focus indicators on cells | Visual inspection |
 | **3.2.4 Consistent Identification** | Consistent race grade badges | Manual review |
 | **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
+| **1.4.1 Use of Color** | Readiness states include text or icon support beyond color | Visual + screen reader |
 
 ### 6.2 Keyboard Navigation
 
@@ -642,7 +698,18 @@ sequenceDiagram
 | Next month | `PageDown` or `]` | Calendar view |
 | Open filters | `F` | Calendar view |
 | Switch to list view | `L` | Calendar view |
-| Enter race | `E` | When race selected |
+| Open entry flow | `E` | When authenticated race entry is available |
+
+### 6.4 Accessibility Interaction Requirements
+
+- On initial screen load, focus moves to the page heading, first filter control, or first actionable race item.
+- After dismissing a detail drawer, modal, or blocked-entry dialog, focus returns to the triggering
+race cell or action button.
+- After validation or authorization failure, focus moves to an error summary and then to the first blocked control.
+- Calendar grids, filter groups, and collapsible race detail panels must expose expanded or selected
+state and support keyboard activation with `Enter` and `Space`.
+- Mobile primary actions and icon-only controls must meet a minimum `44x44` CSS pixel touch target.
+- Readiness, warning, and status states must not rely on color alone.
 
 ### 6.3 Screen Reader Announcements
 
@@ -949,24 +1016,28 @@ test.describe("WF-006: Accessibility", () => {
 
 ### 9.1 Product Requirements
 
-- [PRD-003: Race Strategy](../prds/PRD-003_Race_Strategy.md)
+- [PRD-003: Race Strategy](../02-prds/PRD-003_Race_Strategy.md)
 
 ### 9.2 Technical Specifications
 
-- [SPEC-003: Race Strategy Technical](../specs/SPEC-003_Race_Strategy_Technical.md)
+- [SPEC-003: Race Strategy Technical](../02-specs/SPEC-003_Race_Strategy_Technical.md)
 
 ### 9.3 Flow Documentation
 
-- [FLOW-003: Race Strategy System](../flows/FLOW-003_Race_Strategy_System.md)
-- [TECH-FLOW-003: Race Strategy Flow](../tech-flow/TECH-FLOW-003_Race_Strategy_Flow.md)
+- [FLOW-003: Race Strategy System](../01-flows/FLOW-003_Race_Strategy_System.md)
+- [TECH-FLOW-003: Race Strategy Flow](../01-tech-flow/TECH-FLOW-003_Race_Strategy_Flow.md)
+- [TECH-FLOW-009: Target Race Planning Flow](../01-tech-flow/TECH-FLOW-009_Target_Race_Planning_Flow.md)
+- [TECH-FLOW-010: Career Reporting Flow](../01-tech-flow/TECH-FLOW-010_Career_Reporting_Flow.md)
 
 ### 9.4 Sequence Diagrams
 
-- [SEQ-004: Race Registration and Outcome](../sequences/SEQ-004_Race_Registration_and_Outcome.md)
+- [SEQ-004: Race Registration and Outcome](../01-sequences/SEQ-004_Race_Registration_and_Outcome.md)
 
 ### 9.5 User Flows
 
-- [UF-004: Race Day Flow](../user-flows/UF-004_Race_Day_Flow.md)
+- [UF-004: Race Day Flow](../01-user-flows/UF-004_Race_Day_Flow.md)
+- [UF-011: Target Race Planning Flow](../01-user-flows/UF-011_Target_Race_Planning_Flow.md)
+- [UF-010: Career Reporting and Export Flow](../01-user-flows/UF-010_Career_Reporting_and_Export_Flow.md)
 
 ### 9.6 Related Wireframes
 
@@ -979,6 +1050,7 @@ test.describe("WF-006: Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.0 | 2026-03-08 | Development Team | Separated planning from authenticated entry assumptions, added storage-aware screen variants, expanded responsive and accessibility interaction requirements, and clarified that component examples are conceptual unless verified against aligned implementation docs |
 | 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: track conditions (Firm/Good/Soft/Heavy), class pyramid with fan requirements, weather affects track condition probability |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added readiness calculations, win probability, filtering, list view, accessibility specifications, and testing requirements |
@@ -988,7 +1060,8 @@ test.describe("WF-006: Accessibility", () => {
 
 ## 11. Notes
 
-**Implementation Status**: ✅ Complete
+**Implementation Status**: Alignment-reviewed concept; exact entry and reporting contracts must be
+verified against the current race planning and reporting docs
 
 **Known Issues**: None
 
@@ -1003,4 +1076,6 @@ test.describe("WF-006: Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the Race Calendar View and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe specification reflects the intended race calendar and target-planning experience and
+should be read with the aligned race strategy, target planning, and reporting docs before being
+treated as implementation-exact._

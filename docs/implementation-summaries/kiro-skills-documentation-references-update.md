@@ -1,8 +1,8 @@
 # Kiro Skills Documentation References Update
 
-**Date**: 2026-01-29  
-**Type**: Skill Resources Enhancement  
-**Status**: Completed  
+**Date**: 2026-01-29
+**Type**: Skill Resources Enhancement
+**Status**: Completed
 **Related Files**: .kiro/skills/
 
 ---
@@ -326,7 +326,6 @@ docs/
 
 ---
 
-**Document Owner**: Development Team  
-**Last Updated**: 2026-01-29  
+**Document Owner**: Development Team
+**Last Updated**: 2026-01-29
 **Status**: Completed
-

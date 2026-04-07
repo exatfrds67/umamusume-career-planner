@@ -206,4 +206,3 @@ wsl bash -c "sudo service redis-server restart"
 Start with downloading from: <https://pecl.php.net/package/redis/6.1.0/windows>
 
 Look for the PHP 8.4 NTS x64 VS16 version! 🚀
-

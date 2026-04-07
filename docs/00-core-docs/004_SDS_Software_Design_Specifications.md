@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.0
-**Date**: February 22, 2026
+**Document Version**: 2.4.1
+**Date**: March 10, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.4.0 and game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.4.0 and Global English server gameplay scope
 
 ---
 
@@ -27,11 +27,15 @@
 
 ## 1. Introduction
 
-This SDS describes the implemented architecture and design of the Laravel 12 application, focusing on services, data flow, and integration points. The document reflects the current state of the codebase and serves as the authoritative reference for system design decisions.
+This SDS describes the implemented architecture and design of the Laravel 12 application, focusing
+on services, data flow, and integration points. The document reflects the current state of the
+codebase and serves as the authoritative reference for system design decisions.
 
 ### 1.1 Purpose
 
-This document provides detailed system design specifications for the Umamusume Career Planner application. It describes the architecture, components, data models, and implementation patterns that have been realized in the production system.
+This document provides detailed system design specifications for the Umamusume Career Planner
+application. It describes the architecture, components, data models, and implementation patterns
+that have been realized in the production system.
 
 ### 1.2 Scope
 
@@ -51,8 +55,8 @@ This specification covers:
 | Document | Description |
 | --- | --- |
 | PRD-001 through PRD-007 | Product Requirement Documents |
-| SPEC-001 through SPEC-007 | Technical Specifications |
-| FLOW-001 through FLOW-007 | System Flow Documents |
+| SPEC-001 through SPEC-008 | Technical Specifications |
+| FLOW-001 through FLOW-010 | System Flow Documents |
 | TECH-FLOW-001 through TECH-FLOW-007 | Technical Flow Documents |
 
 ---
@@ -69,7 +73,7 @@ flowchart TB
         Alpine["Alpine.js"]
         Livewire["Livewire 4"]
     end
-    
+
     subgraph Application["Application Layer"]
         Controllers["Controllers"]
         FormRequests["Form Requests"]
@@ -77,13 +81,13 @@ flowchart TB
         AIAgents["AI Agents"]
         MCPTools["MCP Tools"]
     end
-    
+
     subgraph Domain["Domain Layer"]
         Models["Eloquent Models"]
         Repositories["Repositories"]
         Enums["Enums"]
     end
-    
+
     subgraph Infrastructure["Infrastructure Layer"]
         MySQL["MySQL Database"]
         Redis["Redis Cache"]
@@ -92,11 +96,11 @@ flowchart TB
         Ollama["Ollama AI"]
         Bedrock["AWS Bedrock"]
     end
-    
+
     Presentation --> Application
     Application --> Domain
     Domain --> Infrastructure
-    
+
     style Presentation fill:#e3f2fd
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
@@ -109,7 +113,7 @@ flowchart TB
 app/
 ├── Collections/                # Custom collection classes
 ├── Console/Commands/           # Artisan commands
-├── Enums/                      # PHP 8.2+ enums (8 enums)
+├── Enums/                      # PHP 8.2+ enums (12 enums)
 ├── Events/                     # Event classes
 ├── Helpers/                    # Helper utilities
 ├── Http/
@@ -120,13 +124,13 @@ app/
 ├── Listeners/                  # Event listeners
 ├── Livewire/                   # Livewire components (AdvisoryPanel)
 ├── MCP/                        # MCP tools and handlers
-├── Models/                     # Eloquent models (30 models)
+├── Models/                     # Eloquent models (40 models)
 ├── Neuron/                     # AI agent definitions (6 agents, 3 tools, 4 responses)
 ├── Notifications/              # Notification classes
 ├── Policies/                   # Authorization policies
 ├── Providers/                  # Service providers
 ├── Repositories/               # Data access layer
-├── Services/                   # Business logic (166 service files)
+├── Services/                   # Business logic (191 service files)
 │   ├── Admin/                  # Admin panel services (3)
 │   ├── Agents/                 # Agent services (1)
 │   ├── AI/                     # AI services - Ollama, Bedrock, Dashboard (20)
@@ -149,7 +153,7 @@ app/
 | Styling | TailwindCSS | v4 | Utility-first CSS |
 | Build Tool | Vite | 7 | Asset compilation |
 | PHP Runtime | PHP | 8.2+ (runtime 8.4.11) | Server runtime |
-| Database | MySQL/MariaDB | 8.0+ | Primary data store (30 models, 52 migrations) |
+| Database | MySQL/MariaDB | 8.0+ | Primary data store (40 models, 67 migrations) |
 | Cache | Redis | 7+ (via WSL) | Caching and queues |
 | AI Framework | Neuron AI / neuron-laravel | v2.11 / v0.3.4 | AI agent framework |
 | AI (Local) | Ollama | Latest | Local AI inference |
@@ -176,14 +180,14 @@ flowchart TD
         Skill["SkillController"]
         SupportCard["SupportCardController"]
     end
-    
+
     subgraph APIControllers["API Controllers (29+)"]
         APICharacter["API/CharacterController"]
         APITraining["API/TrainingController"]
         APIRace["API/RaceController"]
         AIAI["API/AIAdvisoryController"]
     end
-    
+
     subgraph AdminControllers["Admin Controllers (5)"]
         APM["Admin/DatabaseController"]
         Cache["Admin/LogController"]
@@ -191,7 +195,7 @@ flowchart TD
         SysSettings["Admin/SystemSettingsController"]
         UserMgmt["Admin/UserController"]
     end
-    
+
     WebControllers --> Services
     APIControllers --> Services
     AdminControllers --> Services
@@ -213,32 +217,49 @@ flowchart TD
         MainContent["Main Content Area"]
         ToastContainer["Toast Notifications"]
     end
-    
+
     subgraph DashboardPage["Dashboard"]
         StatsPanel["Stats Overview Panel"]
         RecentActivity["Recent Activity"]
         QuickActions["Quick Actions"]
         AIInsights["AI Insights Widget"]
     end
-    
+
     subgraph CareerPage["Career Management"]
         CharacterSelect["Character Selector"]
         CareerTimeline["Career Timeline"]
         StatProgression["Stat Progression Chart"]
         GoalTracker["Goal Progress Tracker"]
     end
-    
+
     subgraph TrainingPage["Training Optimization"]
         PredictionPanel["Training Predictions"]
         FacilitySelect["Facility Selection"]
         SupportCardDisplay["Active Support Cards"]
         RiskIndicator["Risk Assessment"]
     end
-    
+
     MainContent --> DashboardPage
     MainContent --> CareerPage
     MainContent --> TrainingPage
 ```
+
+### 3.4 Authorization and Ownership Boundaries
+
+Account-mode writes are guarded by Laravel policies and controller-level authorization checks rather
+than implicit trust in route parameters or frontend state.
+
+| Boundary | Implementation Anchor | Current Behavior |
+| --- | --- | --- |
+| Character ownership | `CharacterPolicy` | Owners may view and update their own characters; seeded characters remain readable and updateable by authenticated users; admins bypass standard checks via `before()`. |
+| Career ownership | `CareerPolicy` | Career reads and writes are scoped to careers whose parent character belongs to the authenticated user; admins bypass standard checks via `before()`. |
+| Race entry | `RaceController::enter()` | Account-mode race entry calls `$this->authorize('update', $character)` before delegating to `RaceExecutionService`. |
+| Reporting | `CareerReportController` | Career and character report pages, exports, APIs, and comparison flows all use policy-backed `view` authorization. |
+| Storage-mode resolution | `DetectStorageMode` middleware | Requests resolve Local versus Account mode through route shape, session state, and authentication context before downstream UI and service logic consume the mode. |
+
+These checks are the primary write boundary for authenticated Account-mode operations. Local mode
+remains browser-managed and UUID-oriented until the user explicitly converts the data into account-
+backed records.
 
 ---
 
@@ -258,7 +279,7 @@ erDiagram
     CareerRun }o--|| SupportDeck : uses
     SupportDeck ||--|{ SupportCard : contains
     Skill ||--o{ SkillAcquisition : acquired_as
-    
+
     User {
         bigint id PK
         string name
@@ -266,7 +287,7 @@ erDiagram
         json preferences
         timestamp created_at
     }
-    
+
     Character {
         bigint id PK
         bigint user_id FK
@@ -277,7 +298,7 @@ erDiagram
         json growth_rates
         string image_path
     }
-    
+
     CareerRun {
         bigint id PK
         uuid uuid UK
@@ -292,7 +313,7 @@ erDiagram
         enum mood
         int energy
     }
-    
+
     StatProgress {
         bigint id PK
         bigint career_run_id FK
@@ -303,7 +324,7 @@ erDiagram
         int guts
         int wit
     }
-    
+
     SupportCard {
         bigint id PK
         string name
@@ -323,7 +344,7 @@ erDiagram
 class Character extends Model
 {
     use SoftDeletes, HasFactory;
-    
+
     protected $fillable = [
         'user_id', 'name', 'name_jp', 'image_path',
         'base_speed', 'base_stamina', 'base_power', 'base_guts', 'base_wit',
@@ -332,18 +353,18 @@ class Character extends Model
         'aptitude_sprint', 'aptitude_mile', 'aptitude_medium', 'aptitude_long',
         'aptitude_nige', 'aptitude_senkou', 'aptitude_sashi', 'aptitude_oikomi',
     ];
-    
+
     protected $casts = [
         'aptitude_turf' => AptitudeGrade::class,
         'aptitude_dirt' => AptitudeGrade::class,
         // ... additional casts
     ];
-    
+
     public function careerRuns(): HasMany
     {
         return $this->hasMany(CareerRun::class);
     }
-    
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -357,7 +378,7 @@ class Character extends Model
 class CareerRun extends Model
 {
     use SoftDeletes, HasFactory, HasUuids;
-    
+
     protected $fillable = [
         'uuid', 'character_id', 'user_id', 'scenario',
         'status', 'career_stage', 'current_turn',
@@ -365,31 +386,31 @@ class CareerRun extends Model
         'energy', 'mood', 'conditions',
         'total_sp_available', 'support_deck_id',
     ];
-    
+
     protected $casts = [
         'status' => RunStatus::class,
         'career_stage' => CareerStage::class,
         'mood' => Mood::class,
         'conditions' => 'array',
     ];
-    
+
     public function character(): BelongsTo
     {
         return $this->belongsTo(Character::class);
     }
-    
+
     public function statProgress(): HasMany
     {
         return $this->hasMany(StatProgress::class);
     }
-    
+
     public function skills(): BelongsToMany
     {
         return $this->belongsToMany(Skill::class, 'skill_acquisitions')
             ->withPivot('status', 'turn_acquired', 'sp_cost_paid')
             ->withTimestamps();
     }
-    
+
     public function supportDeck(): BelongsTo
     {
         return $this->belongsTo(SupportDeck::class);
@@ -408,14 +429,14 @@ classDiagram
         Archived
         Abandoned
     }
-    
+
     class CareerStage {
         <<enumeration>>
         Junior
         Classic
         Senior
     }
-    
+
     class AptitudeGrade {
         <<enumeration>>
         S : +5% (max)
@@ -428,7 +449,7 @@ classDiagram
         G : -90%
         +effectiveness() int
     }
-    
+
     class Mood {
         <<enumeration>>
         Great : +4%
@@ -438,7 +459,7 @@ classDiagram
         Awful : -4%
         +modifier() int
     }
-    
+
     class SkillStatus {
         <<enumeration>>
         Acquired
@@ -448,20 +469,24 @@ classDiagram
     }
 ```
 
-#### 4.3.1 Implemented Enum Files (8)
+#### 4.3.1 Implemented Enum Files
 
-| Enum | File | Description |
+| Enum File | Path | Purpose |
 | --- | --- | --- |
+| `AffinityGrade` | `app/Enums/AffinityGrade.php` | Factor inheritance affinity |
 | `AlertType` | `app/Enums/AlertType.php` | Alert/notification type classification |
 | `CareerPhase` | `app/Enums/CareerPhase.php` | Career progression phases |
+| `ConsentType` | `app/Enums/ConsentType.php` | Privacy consent types |
+| `DeletionStatus` | `app/Enums/DeletionStatus.php` | Data deletion request status |
 | `Mood` | `app/Enums/Mood.php` | Character mood states with stat modifiers |
 | `Priority` | `app/Enums/Priority.php` | Task/requirement priority levels |
 | `RaceDistance` | `app/Enums/RaceDistance.php` | Race distance categories |
 | `RecommendationType` | `app/Enums/RecommendationType.php` | AI recommendation type classification |
 | `RunningStyle` | `app/Enums/RunningStyle.php` | Running style aptitudes (Nige, Senkou, Sashi, Oikomi) |
+| `SparkType` | `app/Enums/SparkType.php` | Training spark / synergy types |
 | `StorageMode` | `app/Enums/StorageMode.php` | Storage mode (Local vs Account) |
 
-> **Note**: The domain model diagram above shows conceptual enums (RunStatus, CareerStage, AptitudeGrade, SkillStatus) used across the domain. The actual PHP enum files listed here implement the core typed enumerations.
+> **Note**: The domain model diagram above shows conceptual enums (RunStatus, SkillStatus, AptitudeGrade) used across the domain. For aptitude documentation, **S is the maximum grade** and no separate "SS" aptitude tier exists. The actual PHP enum files listed here implement the core typed enumerations.
 
 ---
 
@@ -471,15 +496,15 @@ classDiagram
 
 ```mermaid
 flowchart TD
-    subgraph CoreServices["Core Services (55 top-level)"]
-        CharacterService["CharacterService"]
+    subgraph CoreServices["Core Services (representative set)"]
+        CharacterStateService["CharacterStateService"]
         CareerRunService["CareerRunService"]
         TrainingService["TrainingService"]
-        RaceService["RaceService"]
+        RaceConditionService["RaceConditionService"]
         SkillService["SkillService"]
         SupportDeckService["SupportDeckService"]
     end
-    
+
     subgraph AIServices["AI Services (20)"]
         AIDashboardService["AIDashboardService"]
         HybridAIService["HybridAIService"]
@@ -487,31 +512,31 @@ flowchart TD
         BedrockService["BedrockService"]
         AIRouterService["AIRouterService"]
     end
-    
+
     subgraph NeuronServices["Neuron Services (5)"]
         NeuronAgentService["NeuronAgentService"]
         NeuronConfigService["NeuronConfigService"]
     end
-    
+
     subgraph MCPServices["MCP Services (42)"]
         AgentOrchestration["AgentOrchestrationService"]
         MCPMonitoring["MCPMonitoringService"]
         MCPTools["MCP Tool Services"]
     end
-    
-    subgraph IntegrationServices["Integration Services (25)"]
+
+    subgraph IntegrationServices["Integration Services (representative set)"]
         ExternalAPIService["ExternalAPIService"]
-        OCRService["OCRService (12)"]
+        TesseractService["TesseractService"]
     end
-    
+
     subgraph TrainingServices["Training Services (3)"]
         TrainingPrediction["TrainingPredictionService"]
     end
-    
+
     subgraph AdminServices["Admin Services (3)"]
         AdminService["Admin Management"]
     end
-    
+
     CoreServices --> AIServices
     CoreServices --> NeuronServices
     CoreServices --> MCPServices
@@ -533,19 +558,19 @@ class TrainingService
         private RiskCalculator $riskCalculator,
         private CacheManager $cache,
     ) {}
-    
+
     public function predictTrainingOutcome(
         CareerRun $run,
         string $facility,
         ?SupportDeck $deck = null
     ): TrainingPrediction {
         $cacheKey = "training_prediction:{$run->id}:{$facility}";
-        
+
         return $this->cache->remember($cacheKey, 300, function () use ($run, $facility, $deck) {
             $baseGains = $this->statCalculator->calculateBaseGains($facility, $run);
             $bonuses = $this->bonusCalculator->calculateDeckBonuses($deck, $facility);
             $risk = $this->riskCalculator->calculateFailureRisk($run);
-            
+
             return new TrainingPrediction(
                 facility: $facility,
                 statGains: $baseGains->applyBonuses($bonuses),
@@ -555,13 +580,13 @@ class TrainingService
             );
         });
     }
-    
+
     public function executeTraining(
         CareerRun $run,
         string $facility
     ): TrainingResult {
         $prediction = $this->predictTrainingOutcome($run, $facility, $run->supportDeck);
-        
+
         DB::transaction(function () use ($run, $prediction) {
             $run->update([
                 'speed' => $run->speed + $prediction->statGains->speed,
@@ -571,7 +596,7 @@ class TrainingService
                 'wit' => $run->wit + $prediction->statGains->wit,
                 'current_turn' => $run->current_turn + 1,
             ]);
-            
+
             StatProgress::create([
                 'career_run_id' => $run->id,
                 'turn_number' => $run->current_turn,
@@ -582,39 +607,40 @@ class TrainingService
                 'wit' => $run->wit,
             ]);
         });
-        
+
         event(new TrainingCompleted($run, $prediction));
-        
+
         return new TrainingResult($run->fresh(), $prediction);
     }
 }
 ```
 
-#### 5.2.2 AIAdvisoryService
+#### 5.2.2 HybridAIService
 
 ```php
-class AIAdvisoryService
+class HybridAIService
 {
     public function __construct(
-        private AIRouterService $router,
+        private OllamaService $ollama,
+        private BedrockService $bedrock,
         private ContextBuilder $contextBuilder,
-        private CostTracker $costTracker,
+        private CostTrackingService $costTracker,
     ) {}
-    
+
     public function getAdvice(
         CareerRun $run,
         string $topic,
         ?string $userQuery = null
     ): AIAdvice {
         $context = $this->contextBuilder->build($run, $topic);
-        
-        $provider = $this->router->selectProvider($topic, $context->complexity);
-        
+
+        $provider = $this->selectProvider($topic, $context->complexity);
+
         try {
             $response = $provider->generate($context->prompt, $context->systemPrompt);
-            
+
             $this->costTracker->record($provider->getName(), $response->tokenUsage);
-            
+
             return new AIAdvice(
                 content: $response->content,
                 confidence: $response->confidence,
@@ -622,7 +648,7 @@ class AIAdvisoryService
                 reasoning: $response->reasoning,
             );
         } catch (AIProviderException $e) {
-            return $this->router->fallback($context, $e);
+            return $this->fallback($context, $e);
         }
     }
 }
@@ -641,31 +667,31 @@ flowchart TD
         QuickAdvice["Quick Advice Buttons"]
         ContextualTips["Contextual Tips"]
     end
-    
+
     subgraph AgentLayer["Neuron AI Agents"]
         TrainingAgent["Training Advisor Agent"]
         RaceAgent["Race Strategy Agent"]
         SkillAgent["Skill Planning Agent"]
         CareerAgent["Career Strategy Agent"]
     end
-    
+
     subgraph RouterLayer["AI Router"]
         ComplexityAnalyzer["Complexity Analyzer"]
         ProviderSelector["Provider Selector"]
         FallbackHandler["Fallback Handler"]
     end
-    
+
     subgraph ProviderLayer["AI Providers"]
         Ollama["Ollama (Local)"]
         Bedrock["AWS Bedrock Claude 4.5"]
     end
-    
+
     subgraph MCPLayer["MCP Integration"]
         MCPServer["MCP Server"]
         MCPTools["MCP Tools"]
         MCPResources["MCP Resources"]
     end
-    
+
     UserLayer --> AgentLayer
     AgentLayer --> RouterLayer
     RouterLayer --> ProviderLayer
@@ -688,7 +714,8 @@ The application defines 6 Neuron agents in `app/Neuron/Agents/`:
 Supporting infrastructure:
 
 - **3 Agent Tools**: `CharacterStatsTool`, `RaceDataTool`, `SkillDataTool`
-- **4 Response Types**: `CareerPlanningResponse`, `RaceStrategyResponse`, `SkillRecommendationResponse`, `TrainingAdviceResponse`
+- **4 Response Types**: `CareerPlanningResponse`, `RaceStrategyResponse`,
+`SkillRecommendationResponse`, `TrainingAdviceResponse`
 - **1 Support Class**: `McpConnectorFactory`
 
 ```php
@@ -696,15 +723,15 @@ Supporting infrastructure:
 class TrainingAdvisorAgent extends Agent
 {
     protected string $name = 'Training Advisor';
-    
+
     protected string $description = 'Provides training recommendations based on current career state';
-    
+
     protected array $tools = [
         TrainingPredictionTool::class,
         StatAnalysisTool::class,
         GoalProgressTool::class,
     ];
-    
+
     public function systemPrompt(): string
     {
         return <<<PROMPT
@@ -736,13 +763,13 @@ flowchart LR
         SkillTool["skill_recommend"]
         DeckTool["deck_optimize"]
     end
-    
+
     subgraph MCPResources["MCP Resources"]
         GameData["game://data"]
         MetaInfo["meta://tiers"]
         UserData["user://careers"]
     end
-    
+
     MCPServer["MCP Server"] --> MCPTools
     MCPServer --> MCPResources
 ```
@@ -767,19 +794,19 @@ flowchart TD
     Upload["Screenshot Upload"]
     Validate["Validate Image"]
     Preprocess["Preprocess Image"]
-    
+
     subgraph OCREngine["OCR Engine"]
         Tesseract["Tesseract OCR"]
         OpenCV["OpenCV Preprocessing"]
         RegionDetect["Region Detection"]
     end
-    
+
     Parse["Parse Extracted Text"]
     Validate2["Validate Parsed Data"]
     Map["Map to Data Model"]
     Review["User Review"]
     Save["Save to Database"]
-    
+
     Upload --> Validate
     Validate --> Preprocess
     Preprocess --> OCREngine
@@ -793,7 +820,7 @@ flowchart TD
 ### 7.2 OCR Service Implementation
 
 ```php
-class OCRService
+class TesseractService
 {
     public function __construct(
         private ImagePreprocessor $preprocessor,
@@ -801,26 +828,26 @@ class OCRService
         private DataParser $parser,
         private ValidationService $validator,
     ) {}
-    
+
     public function processScreenshot(UploadedFile $file): OCRResult
     {
         // Validate and preprocess
         $image = $this->preprocessor->prepare($file);
-        
+
         // Detect regions of interest
         $regions = $this->detectRegions($image);
-        
+
         // Extract text from each region
         $extractions = collect($regions)->map(function ($region) use ($image) {
             return $this->tesseract->extractFromRegion($image, $region);
         });
-        
+
         // Parse extracted text into structured data
         $parsed = $this->parser->parse($extractions);
-        
+
         // Validate against game data
         $validation = $this->validator->validate($parsed);
-        
+
         return new OCRResult(
             data: $parsed,
             confidence: $validation->confidence,
@@ -846,13 +873,13 @@ flowchart LR
         Races["/api/v1/races"]
         Skills["/api/v1/skills"]
     end
-    
+
     subgraph InternalAPI["Internal API"]
         AIAdvice["/internal/ai/advice"]
         Predictions["/internal/predictions"]
         SkillSearch["/internal/skills/search"]
     end
-    
+
     subgraph WebhookAPI["Webhook API"]
         OCRCallback["/webhooks/ocr"]
         SyncCallback["/webhooks/sync"]
@@ -917,26 +944,26 @@ flowchart TD
         OCR["OCR Screenshots"]
         External["External APIs"]
     end
-    
+
     subgraph Processing["Processing Layer"]
         Validate["Validation"]
         Transform["Transformation"]
         Dedupe["Deduplication"]
         Merge["Merge Strategy"]
     end
-    
+
     subgraph Storage["Storage"]
         Primary[(MySQL)]
         Cache[(Redis)]
         Files["File Storage"]
     end
-    
+
     subgraph Export["Export Formats"]
         JSONExport["JSON Export"]
         ExcelExport["Excel Export"]
         Backup["Backup Archive"]
     end
-    
+
     Import --> Processing
     Processing --> Storage
     Storage --> Export
@@ -953,32 +980,32 @@ class DataManagementService
     ): ImportResult {
         $format = $this->detectFormat($file);
         $adapter = $this->getAdapter($format);
-        
+
         $data = $adapter->parse($file);
         $validated = $this->validator->validate($data);
-        
+
         if ($validated->hasErrors() && !$options->skipErrors) {
             return ImportResult::failed($validated->errors);
         }
-        
+
         $duplicates = $this->duplicateDetector->find($validated->data);
         $resolved = $this->resolveDuplicates($duplicates, $options->duplicateStrategy);
-        
+
         DB::transaction(function () use ($resolved) {
             foreach ($resolved as $record) {
                 $this->persistRecord($record);
             }
         });
-        
+
         return ImportResult::success($resolved->count(), $validated->warnings);
     }
-    
+
     public function export(
         ExportOptions $options
     ): ExportResult {
         $query = $this->buildExportQuery($options);
         $data = $query->get();
-        
+
         return match ($options->format) {
             'json' => $this->exportJson($data, $options),
             'excel' => $this->exportExcel($data, $options),
@@ -997,19 +1024,19 @@ flowchart LR
         Manual["Manual Backup"]
         Incremental["Incremental Backup"]
     end
-    
+
     subgraph Storage["Backup Storage"]
         Local["Local Storage"]
         S3["AWS S3"]
         Archive["Archive Storage"]
     end
-    
+
     subgraph Restore["Restore Options"]
         FullRestore["Full Restore"]
         PointInTime["Point-in-Time"]
         Selective["Selective Restore"]
     end
-    
+
     Backup --> Storage
     Storage --> Restore
 ```text
@@ -1054,7 +1081,8 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.4.0 | 2026-02-22 | Development Team | Updated directory structure to match codebase (166 services, 30 models, 52 migrations, 585 routes); corrected Livewire to single AdvisoryPanel component; expanded service architecture with Neuron (5), MCP (42), Training (3), Admin (3) breakdowns; updated admin controllers to actual 5 (Database, Log, Queue, SystemSettings, User); added Neuron agent inventory; updated tech stack with test metrics (3,316+ tests) |
+| 2.4.1 | 2026-03-10 | Development Team | Clarified the conceptual AptitudeGrade design to reflect the Global English server scale of S through G only |
+| 2.4.0 | 2026-02-22 | Development Team | Updated directory structure to match codebase (166 services, 40 models, 67 migrations, 585 routes); corrected Livewire to single AdvisoryPanel component; expanded service architecture with Neuron (5), MCP (42), Training (3), Admin (3) breakdowns; updated admin controllers to actual 5 (Database, Log, Queue, SystemSettings, User); added Neuron agent inventory; updated tech stack with test metrics (3,316+ tests) |
 | 2.3.0 | 2026-02-21 | Development Team | Prior version aligned to v2.3.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current implementation including AI, MCP, OCR, and data management systems |
 | 2.0.0 | 2026-01-14 | Development Team | Prior comprehensive revision |
@@ -1062,4 +1090,5 @@ flowchart LR
 
 ---
 
-*This SDS reflects the current system architecture and design patterns implemented in the production codebase as of February 22, 2026.*
+*This SDS reflects the current system architecture and design patterns implemented in the production
+codebase as of March 10, 2026.*

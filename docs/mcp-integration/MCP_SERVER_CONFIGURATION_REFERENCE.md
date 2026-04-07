@@ -24,7 +24,9 @@
 
 ## 1. Executive Summary
 
-This document provides the authoritative reference for all Model Context Protocol (MCP) server configurations in the Umamusume Career Planner project. The application utilizes 10 MCP servers to enhance AI capabilities, infrastructure management, and external integrations.
+This document provides the authoritative reference for all Model Context Protocol (MCP) server
+configurations in the Umamusume Career Planner project. The application utilizes 10 MCP servers to
+enhance AI capabilities, infrastructure management, and external integrations.
 
 ### Key MCP Integration Benefits
 
@@ -829,4 +831,5 @@ php artisan mcp:logs --server=memory --lines=100
 
 ---
 
-*This document serves as the authoritative reference for all MCP server configurations and integration patterns in the Umamusume Career Planner project.*
+*This document serves as the authoritative reference for all MCP server configurations and
+integration patterns in the Umamusume Career Planner project.*

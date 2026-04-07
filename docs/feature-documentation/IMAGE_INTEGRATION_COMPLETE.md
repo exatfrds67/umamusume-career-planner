@@ -1,6 +1,6 @@
 # Support Card Image Integration - Complete ✅
 
-**Date**: January 18, 2026  
+**Date**: January 18, 2026
 **Status**: Successfully Integrated
 
 ---
@@ -83,8 +83,8 @@ The 7 cards with actual images will now display your uploaded artwork instead of
 
 These cards still use placeholder images:
 
-**S+ Tier**: Biko Pegasus  
-**S Tier**: Rice Shower, Riko Kashimoto, Sweep Tosho, Narita Brian  
+**S+ Tier**: Biko Pegasus
+**S Tier**: Rice Shower, Riko Kashimoto, Sweep Tosho, Narita Brian
 **A Tier**: Special Week, El Condor Pasa, Twin Turbo
 
 ### To Add More Images
@@ -97,7 +97,9 @@ These cards still use placeholder images:
 Or use Tinker for quick updates:
 
 ```bash
-php artisan tinker --execute="DB::table('ucp_support_cards')->where('internal_id', 'GLOBAL_SC_BIKOPEGASUS_CARROT')->update(['artwork_url' => '/images/support_cards/Biko_Pegasus_Double_Carrot_Punch.png']);"
+php artisan tinker --execute="DB::table('ucp_support_cards')->where('internal_id',
+'GLOBAL_SC_BIKOPEGASUS_CARROT')->update(['artwork_url' =>
+'/images/support_cards/Biko_Pegasus_Double_Carrot_Punch.png']);"
 ```text
 
 ---
@@ -123,4 +125,3 @@ php artisan tinker --execute="DB::table('ucp_support_cards')->where('internal_id
 **Integration Complete!** 🎉
 
 Your support card images are now live in the application.
-

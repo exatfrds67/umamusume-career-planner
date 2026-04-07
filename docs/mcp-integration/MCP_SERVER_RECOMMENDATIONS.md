@@ -21,7 +21,8 @@ Kiro has a limit of 50 MCP tools total. To avoid warnings, we split tools strate
 - **User Config**: 25 tools (global development tools)
 - **Workspace Config**: 25 tools (project-specific tools)
 
-**Note**: All Power servers in the user config are disabled to stay under the 50-tool limit. Enable them individually only when needed for specific AWS/cloud tasks
+**Note**: All Power servers in the user config are disabled to stay under the 50-tool limit. Enable
+them individually only when needed for specific AWS/cloud tasks
 
 ---
 
@@ -34,7 +35,8 @@ Before configuring MCP servers, ensure you have:
 - **PHP** (v8.1+) - Required for Laravel Boost
 - **GitKraken Desktop** - Required for GitKraken MCP server
 
-**Note**: All file paths in configuration examples (e.g., `C:\XAMPP\htdocs\umamusume-career-planner\`) are examples. Replace them with your actual project paths.
+**Note**: All file paths in configuration examples (e.g., `C:\XAMPP\htdocs\umamusume-career-
+planner\`) are examples. Replace them with your actual project paths.
 
 ---
 
@@ -233,7 +235,8 @@ Before configuring MCP servers, ensure you have:
 }
 ```text
 
-**Note**: All Power servers are disabled. Enable them individually from the MCP Servers view when needed for AWS/cloud development tasks.
+**Note**: All Power servers are disabled. Enable them individually from the MCP Servers view when
+needed for AWS/cloud development tasks.
 
 ### Workspace Config (`.kiro/settings/mcp.json`)
 
@@ -452,7 +455,8 @@ brew install uv
 
 ## Configuration Tips
 
-1. **Auto-approve carefully** - Only auto-approve tools you trust completely. Auto-approved tools can execute without confirmation, which may pose security risks if misconfigured.
+1. **Auto-approve carefully** - Only auto-approve tools you trust completely. Auto-approved tools
+can execute without confirmation, which may pose security risks if misconfigured.
 2. **Use environment variables** - Store API keys in `.env` files, never hardcode them in config
 3. **Disable unused servers** - Set `"disabled": true` to keep config but disable
 4. **Test incrementally** - Enable one server at a time to verify functionality

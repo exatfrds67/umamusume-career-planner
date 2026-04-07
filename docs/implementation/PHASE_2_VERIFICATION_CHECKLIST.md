@@ -1,7 +1,7 @@
 # Phase 2: Support Card Management - Verification Checklist
 
-**Date**: January 25, 2026  
-**Status**: Ready for Testing  
+**Date**: January 25, 2026
+**Status**: Ready for Testing
 **URL**: <http://127.0.0.1:8000/support-cards>
 
 ---
@@ -150,9 +150,9 @@
 **SQL Query:**
 
 ```sql
-SELECT * FROM support_card_definitions 
-WHERE external_source_id = '{CARD_ID}' 
-ORDER BY created_at DESC 
+SELECT * FROM support_card_definitions
+WHERE external_source_id = '{CARD_ID}'
+ORDER BY created_at DESC
 LIMIT 1;
 ```text
 
@@ -338,15 +338,15 @@ Document any issues found during testing:
 
 ## Sign-Off
 
-**Tester Name**: _______________________________________________  
-**Date**: _______________________________________________  
-**Overall Status**: [ ] Pass / [ ] Pass with Issues / [ ] Fail  
+**Tester Name**: _______________________________________________
+**Date**: _______________________________________________
+**Overall Status**: [ ] Pass / [ ] Pass with Issues / [ ] Fail
 
 **Summary**: _______________________________________________
 \_______________________________________________
 \_______________________________________________
 
-**Ready for Phase 3**: [ ] Yes / [ ] No  
+**Ready for Phase 3**: [ ] Yes / [ ] No
 
 **Additional Notes**: _______________________________________________
 \_______________________________________________

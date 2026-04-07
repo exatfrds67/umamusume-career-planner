@@ -1,9 +1,9 @@
 # SPEC-006: AI Advisory System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate mechanics references  
+**Document Version**: 2.4.0
+**Date**: 2026-03-11
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Active - Updated with refined advisory prompts, resilience roadmap, and training plan visualisation
 **Classification**: Internal - Development Team
 
 ---
@@ -13,30 +13,32 @@
 | Attribute | Value |
 | --- | --- |
 | **Document ID** | SPEC-006 |
-| **Related PRD** | [PRD-006: AI Advisory](../prds/PRD-006_AI_Advisory.md) |
-| **Architecture Version** | v2.2.0 |
+| **Related PRD** | [PRD-006: AI Advisory](../02-prds/PRD-006_AI_Advisory.md) |
+| **Architecture Version** | v2.4.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-03-11 |
 
 ### Related Documents
 
 **Requirements & Design**:
 
-- [SRS Section 2.7: AI Advisory](../003_SRS_Software_Requirement_Specifications.md#27-ai-advisory-fr-07)
-- [SDS Section 6: AI and MCP Integration](../004_SDS_Software_Design_Specifications.md#6-ai-and-mcp-integration)
+- [SRS Section 2.7: AI Advisory](../00-core-docs/003_SRS_Software_Requirement_Specifications.md#27-ai-advisory-fr-07)
+- [SDS Section 6: AI and MCP Integration](../00-core-
+docs/004_SDS_Software_Design_Specifications.md#6-ai-and-mcp-integration)
 
 **Data & Integration**:
 
-- [DBD Section 4.5: AI Conversations](../009_DBD_Database_Documentation.md#45-ucp_ai_conversations)
-- [SIS Section 2: AI Provider Integration](../008_SIS_Software_Integration_Specifications.md#2-ai-provider-integration)
-- [SIP Section 5: Integration Points](../007_SIP_Software_Integration_Plan.md#5-integration-points)
+- [DBD Section 4.5: AI Conversations](../00-core-docs/009_DBD_Database_Documentation.md#45-ucp_ai_conversations)
+- [SIS Section 2: AI Provider Integration](../00-core-
+docs/008_SIS_Software_Integration_Specifications.md#2-ai-provider-integration)
+- [SIP Section 5: Integration Points](../00-core-docs/007_SIP_Software_Integration_Plan.md#5-integration-points)
 
 **Visual Documentation**:
 
-- [FLOW-006: AI Advisory System](../flows/FLOW-006_AI_Advisory_System.md)
-- [SEQ-006: AI Advice Generation](../sequences/SEQ-006_AI_Advice_Generation.md)
-- [WF-012: AI Advisor Interface](../wireframes/WF-012_AI_Advisor_Interface.md)
-- [UF-007: AI Advisor Journey](../user-flows/UF-007_AI_Advisor_Journey.md)
+- [FLOW-006: AI Advisory System](../01-flows/FLOW-006_AI_Advisory_System.md)
+- [SEQ-006: AI Advice Generation](../01-sequences/SEQ-006_AI_Advice_Generation.md)
+- [WF-012: AI Advisor Interface](../01-wireframes/WF-012_AI_Advisor_Interface.md)
+- [UF-007: AI Advisor Journey](../01-user-flows/UF-007_AI_Advisor_Journey.md)
 
 ---
 
@@ -55,9 +57,10 @@
 11. [Integration Points](#11-integration-points)
 12. [Error Handling](#12-error-handling)
 13. [Performance Optimization](#13-performance-optimization)
-14. [Security Considerations](#14-security-considerations)
-15. [Testing Strategy](#15-testing-strategy)
-16. [Appendices](#16-appendices)
+14. [Training Plan Visualisation](#14-training-plan-visualisation)
+15. [Security Considerations](#15-security-considerations)
+16. [Testing Strategy](#16-testing-strategy)
+17. [Appendices](#17-appendices)
 
 ---
 
@@ -65,7 +68,10 @@
 
 ### 1.1 Module Purpose
 
-The AI Advisory System provides intelligent, context-aware recommendations for training optimization, race strategy, skill acquisition, and career planning. The system uses a hybrid architecture with local-first processing via Ollama and cloud fallback via AWS Bedrock Claude models.
+The AI Advisory System provides intelligent, context-aware recommendations for training
+optimization, race strategy, skill acquisition, and career planning. The system uses a hybrid
+architecture with local-first processing via Ollama and cloud fallback via AWS Bedrock Claude
+models.
 
 **Core Responsibilities**:
 
@@ -87,7 +93,8 @@ In Umamusume Pretty Derby, optimal decision-making requires:
 - **Skill Planning**: Prioritizing skill acquisitions within SP budget
 - **Long-term Strategy**: Balancing immediate gains with future goals
 
-The AI Advisory System provides intelligent guidance across all these domains, reducing the complexity of optimization while respecting player agency.
+The AI Advisory System provides intelligent guidance across all these domains, reducing the
+complexity of optimization while respecting player agency.
 
 ### 1.3 Technical Scope
 
@@ -97,15 +104,18 @@ The AI Advisory System provides intelligent guidance across all these domains, r
 - Neuron AI agent orchestration
 - MCP server integration for tool execution
 - Context building and prompt engineering
+- Planned retrieval-augmented grounding via an optional vector-backed knowledge layer
 - Conversation persistence and history
+- Recommendation feedback capture, including explicit ratings and outcome tracking
 - Cost tracking and budget management
 - Confidence scoring algorithms
 - Response formatting and normalization
+- Asynchronous processing guidance for long-running advisory workloads
 
 **Out of Scope**:
 
 - AI model training or fine-tuning
-- Real-time game integration
+- Fully automated real-time game integration
 - Voice or speech interfaces
 - Multi-language response generation
 
@@ -120,7 +130,8 @@ The AI Advisory System provides intelligent guidance across all these domains, r
 | **Framework** | Laravel | 12.x | Application foundation |
 | **Language** | PHP | 8.3+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Conversation persistence |
-| **Cache** | Redis | 7.x | Response caching |
+| **Cache / Queue** | Redis + Horizon | 7.x / 5.x | Response caching and async advisory jobs |
+| **Planned RAG Store** | pgvector-compatible vector store | Future | Optional factual grounding layer |
 
 ---
 
@@ -131,16 +142,18 @@ The AI Advisory System provides intelligent guidance across all these domains, r
 ```mermaid
 graph TB
     subgraph "Presentation Layer"
-        API[AIAdvisoryController]
-        Livewire[AdvisorChat Component]
+        API[AdvisoryController]
+        Livewire[AI Chat UI Components]
         FormRequest[AIAdviceRequest]
     end
 
     subgraph "Application Layer"
-        AdvisorySvc[AIAdvisoryService]
+        AdvisorySvc[HybridAIService]
         ContextBuilder[ContextBuilder]
+        RAGBuilder[RAGContextBuilder - Planned]
         RouterSvc[HybridAIService]
         CostSvc[CostTrackingService]
+        JobQueue[Async Advisory Jobs]
     end
 
     subgraph "Agent Layer"
@@ -160,6 +173,7 @@ graph TB
         MemoryServer[Memory Server]
         FilesystemServer[Filesystem Server]
         FetchServer[Fetch Server]
+        ScreenAnalysisServer[Screen Analysis Server - Planned]
     end
 
     subgraph "Infrastructure Layer"
@@ -170,31 +184,35 @@ graph TB
     API --> FormRequest
     FormRequest --> AdvisorySvc
     Livewire --> AdvisorySvc
-    
+
     AdvisorySvc --> ContextBuilder
+    AdvisorySvc --> RAGBuilder
     AdvisorySvc --> RouterSvc
     AdvisorySvc --> CostSvc
-    
+    AdvisorySvc --> JobQueue
+
     RouterSvc --> OllamaSvc
     RouterSvc --> BedrockSvc
-    
+
     AdvisorySvc --> TrainingAgent
     AdvisorySvc --> RaceAgent
     AdvisorySvc --> SkillAgent
     AdvisorySvc --> CareerAgent
-    
+
     TrainingAgent --> MCPClient
     RaceAgent --> MCPClient
     SkillAgent --> MCPClient
     CareerAgent --> MCPClient
-    
+
     MCPClient --> MemoryServer
     MCPClient --> FilesystemServer
     MCPClient --> FetchServer
-    
+    MCPClient --> ScreenAnalysisServer
+
     AdvisorySvc --> DB
     RouterSvc --> Cache
     CostSvc --> DB
+    JobQueue --> Cache
 ```text
 
 ### 2.2 Layer Responsibilities
@@ -209,8 +227,10 @@ graph TB
 
 - Advisory workflow orchestration
 - Context building and prompt assembly
+- Planned retrieval and knowledge grounding for high-confidence answers
 - Provider routing decisions
 - Cost tracking and budget enforcement
+- Async job dispatch for long-running career-planning or multi-turn analysis
 
 **Agent Layer**:
 
@@ -229,11 +249,13 @@ graph TB
 - Tool execution and context management
 - Memory persistence
 - External resource access
+- Planned screenshot analysis and live-meta retrieval extensions
 
 **Infrastructure Layer**:
 
 - Database persistence
 - Cache management
+- Queue-backed background processing
 - External service communication
 
 ### 2.3 Design Patterns
@@ -243,9 +265,11 @@ graph TB
 | **Strategy** | Provider selection | Pluggable AI backends |
 | **Factory** | Agent creation | Dynamic agent instantiation |
 | **Chain of Responsibility** | Fallback handling | Graceful degradation |
+| **Circuit Breaker** | Cloud provider protection | Prevent cascading Bedrock failures |
 | **Observer** | Cost tracking | React to AI completions |
 | **Decorator** | Context enrichment | Layer context onto prompts |
 | **Repository** | Conversation storage | Abstract data access |
+| **Retrieval-Augmented Generation** | Planned factual grounding | Reduce unsupported answers on meta-heavy queries |
 
 ---
 
@@ -270,35 +294,40 @@ use App\Neuron\Tools\{
 
 /**
  * Training Advisor Agent
- * 
+ *
  * Provides intelligent training recommendations based on
  * current character state, goals, and game mechanics.
  */
 class TrainingAdvisorAgent extends Agent
 {
     protected string $name = 'Training Advisor';
-    
+
     protected string $description = 'Provides training recommendations based on current career state';
 
     /**
      * Get system instructions
-     * 
+     *
      * @return string
      */
     public function instructions(): string
     {
         return <<<PROMPT
-You are an expert Umamusume training advisor. Your role is to analyze the current 
+You are an expert Umamusume training advisor. Your role is to analyze the current
 character state and recommend optimal training decisions.
 
 **Context Understanding:**
 - Speed, Stamina, Power, Guts, and Wit are the five core stats (0-1200+ range, soft cap at 1200)
 - Stats above 1200 have diminishing returns (50% effectiveness)
-- Per-training cap: +100 (reduced to +50 if stat > 1200)
+- Training efficiency becomes more context-sensitive once midgame stats are established; support-
+card composition matters as much as raw base gains
 - Energy level affects training success rate (0-100%)
 - Mood affects stat gains: Great +4%, Good +2%, Normal 0%, Bad -2%, Awful -4%
-- Support cards provide bonuses when present at training facilities (+5% per card)
-- Friendship training activates at 80%+ bond level (1.2x multiplier)
+- Support cards present at a facility materially change projected gains through type bonuses, card
+count, and event support
+- Friendship training activates when support bond reaches 80+, and planner shorthand may treat each
+contributing card as roughly a 1.2x stat contribution boost
+- "Rainbow" or brilliant training indicates an especially valuable friendship state and should be
+treated as a major upside signal when available
 
 **Response Requirements:**
 1. Always provide a clear, actionable recommendation
@@ -326,7 +355,7 @@ PROMPT;
 
     /**
      * Get available tools
-     * 
+     *
      * @return array
      */
     public function tools(): array
@@ -340,7 +369,7 @@ PROMPT;
 
     /**
      * Get the AI provider for this agent
-     * 
+     *
      * @return \NeuronAI\Provider
      */
     public function provider(): \NeuronAI\Provider
@@ -367,38 +396,55 @@ use App\Neuron\Tools\{
 
 /**
  * Race Strategy Agent
- * 
+ *
  * Provides race preparation and strategy recommendations.
  */
 class RaceStrategyAgent extends Agent
 {
     protected string $name = 'Race Strategy Advisor';
-    
+
     protected string $description = 'Optimizes race preparation and running style selection';
 
     /**
      * Get system instructions
-     * 
+     *
      * @return string
      */
     public function instructions(): string
     {
         return <<<PROMPT
-You are an expert Umamusume race strategist. Analyze race requirements and 
+You are an expert Umamusume race strategist. Analyze race requirements and
 character capabilities to recommend optimal race strategy.
 
 **Race Analysis Factors:**
 - Distance categories: Sprint (1000-1400m), Mile (1401-1800m), Medium (1801-2400m), Long (2401m+)
 - Surface types: Turf, Dirt
-- Running styles: Front Runner (Nige), Pace Chaser (Senkou), Late Surger (Sashi), End Closer (Oikomi)
-- Aptitude grades (G-S): S=+5%, A=0% (baseline), B=-10%, C=-20%, D=-35%, E=-55%, F=-75%, G=-90%
-- Track conditions: Firm (no penalty), Good (Power -50), Soft (Power -50/-100, +2% stamina drain), Heavy (Speed -50, Power -50/-100, +2% stamina drain)
+- Running styles: Front Runner (Nige), Pace Chaser (Senkou), Late Surger (Sashi), Closer (Oikomi)
+- Aptitude grades (G-S): S (+5%), A (baseline 0%), B (-10%), C (-20%), D (-35%), E (-55%), F (-75%),
+G (-90%). Aptitudes apply to distance, surface, and running style independently.
+- Track conditions: Firm (no penalty), Good (Power -50), Soft (Power -50/-100, +2% stamina drain per
+phase), Heavy (Speed -50, Power -50/-100, +2% stamina drain per phase)
+- Stamina consumption scales with race distance: longer races require proportionally more stamina.
+Running style also affects drain — Front Runners consume stamina faster early, Closers conserve for
+the final stretch.
+- Mandatory target races (G1 events, career-gating races) should be treated as higher-priority
+planning checkpoints than optional filler races
+- Wit governs skill activation probability: max(100 − 9000 / BaseWit, 20%). Low Wit risks skill
+misfires during critical race phases.
+- Skill activation phases: Start, Middle, Final Corner, Final Straight. Match skill loadout to the
+running style's phase windows.
 
 **Readiness Assessment:**
-- Compare character stats against race requirements
-- Evaluate aptitude match for distance, surface, and style
-- Consider active skills and their synergy with race conditions
+- Compare character stats against race requirements and stat benchmarks for the race distance and grade
+- Evaluate aptitude match for distance, surface, and style. Calculate the combined aptitude impact on effective stats.
+- Check Wit adequacy for skill reliability: flag if Wit is below 400 (unreliable) or below 300
+(critical — frequent misfires)
+- Assess stamina requirements factoring race distance, running style drain, and track condition penalties
+- Consider active skills and their synergy with race conditions (distance, phase, surface match)
 - Factor in current mood and condition status
+- Calculate a realistic win probability from readiness factors while acknowledging that race RNG and
+pack dynamics still introduce uncertainty
+- Recommend preparation actions if the race is upcoming: training focus, skills to acquire, rest needs
 
 **Output Format (JSON):**
 {
@@ -406,6 +452,8 @@ character capabilities to recommend optimal race strategy.
     "recommended_style": "sashi",
     "win_probability": 35,
     "stat_gaps": {"speed": -50, "stamina": 0},
+    "aptitude_assessment": {"distance": "A", "surface": "A", "style": "S"},
+    "wit_adequacy": "Wit 450 — reliable (≈78% activation)",
     "skill_recommendations": ["skill_id_1", "skill_id_2"],
     "reasoning": "Detailed analysis",
     "risks": ["List of concerns"],
@@ -417,7 +465,7 @@ PROMPT;
 
     /**
      * Get available tools
-     * 
+     *
      * @return array
      */
     public function tools(): array
@@ -449,40 +497,53 @@ use App\Neuron\Tools\{
 
 /**
  * Skill Advisor Agent
- * 
+ *
  * Provides skill acquisition recommendations and SP optimization.
  */
 class SkillAdvisorAgent extends Agent
 {
     protected string $name = 'Skill Advisor';
-    
+
     protected string $description = 'Recommends skill acquisitions and optimizes SP budget';
 
     /**
      * Get system instructions
-     * 
+     *
      * @return string
      */
     public function instructions(): string
     {
         return <<<PROMPT
-You are an expert Umamusume skill build advisor. Recommend optimal skill 
+You are an expert Umamusume skill build advisor. Recommend optimal skill
 acquisitions based on race goals, SP budget, and available hints.
 
 **Skill System Knowledge:**
 - Skills cost SP (Skill Points) to acquire
-- Hints reduce cost: Level 1=10%, Level 2=20%, Level 3=30%, Level 4=35%, Level 5=40% (max)
-- Additional discount sources: Fast Learner condition, Skill Sparks, Hint Books
-- Skill categories: Normal, Rare, Unique
-- Some Normal skills can evolve to Rare versions
-- Skills have activation conditions (distance, position, phase)
+- **Hint Discounts:** Hints from support card events reduce cost by tier: Level 1=10%, Level 2=20%,
+Level 3=30%, Level 4=35%, Level 5=40% (maximum)
+- **Other Discounts:** "Fast Learner" condition (flat SP reduction), Skill Sparks (from
+inheritance), Hint Books (consumable). These stack with hint discounts for maximum efficiency.
+- Skill categories: Normal (common, lower cost), Rare (gold border, higher impact), Unique
+(character-specific, powerful)
+- **Skill Evolution:** Some Normal skills can evolve to Rare versions if run-specific prerequisites
+are met (stat thresholds, specific race wins, or support card requirements). Evolved skills are
+significantly more powerful.
+- Skills have activation conditions (distance, position, phase, surface)
+- Wit governs skill activation probability: max(100 − 9000 / BaseWit, 20%). Low Wit makes even well-
+chosen skills unreliable.
+- Skill duration scales with race distance via: BaseDuration × (RaceDistance / 1000). Longer races
+extract more value from duration-based skills.
 
 **Optimization Factors:**
-- Match skills to target race conditions
-- Prioritize skills with hint discounts
-- Consider skill synergies and combinations
-- Balance immediate needs vs long-term build
-- Account for evolution opportunities
+- Match skills to target race conditions (distance, surface, running style phase windows)
+- Calculate effective cost: apply hint discount, then stack additional modifiers (Fast Learner, Sparks, Hint Books)
+- Prioritize skills with the highest effective discount combined with good race synergy
+- Consider skill synergies and combinations within the loadout
+- Check Wit adequacy: if Wit is below 400, adding more activation-dependent skills may be less
+valuable than improving Wit first
+- **Evolution Planning:** Flag skills with valuable evolution paths and call out prerequisite
+conditions the player still needs to satisfy
+- Balance immediate race needs vs long-term career build value
 
 **Output Format (JSON):**
 {
@@ -491,7 +552,8 @@ acquisitions based on race goals, SP budget, and available hints.
             "skill_id": 123,
             "skill_name": "Skill Name",
             "base_cost": 120,
-            "discounted_cost": 96,
+            "discounted_cost": 84,
+            "discount_breakdown": "Hint Lv3 (30%) + Fast Learner",
             "priority": "high",
             "reasoning": "Why this skill"
         }
@@ -502,7 +564,10 @@ acquisitions based on race goals, SP budget, and available hints.
         "remaining": 70
     },
     "build_strategy": "Description of overall strategy",
-    "evolution_opportunities": ["skill_id_1"],
+    "evolution_opportunities": [
+        {"skill_id": "skill_id_1", "evolves_to": "Rare Skill Name", "prerequisite": "Win Arima Kinen"}
+    ],
+    "wit_adequacy": "Wit 450 — reliable (≈78% activation)",
     "confidence": 0.85
 }
 PROMPT;
@@ -510,7 +575,7 @@ PROMPT;
 
     /**
      * Get available tools
-     * 
+     *
      * @return array
      */
     public function tools(): array
@@ -593,18 +658,18 @@ use App\Services\TrainingPredictionService;
 
 /**
  * Get Training Predictions Tool
- * 
+ *
  * Retrieves training predictions for all facilities.
  */
 class GetTrainingPredictionsTool extends Tool
 {
     protected string $name = 'get_training_predictions';
-    
+
     protected string $description = 'Get predicted stat gains for all training options';
 
     /**
      * Define tool parameters
-     * 
+     *
      * @return array
      */
     public function parameters(): array
@@ -620,7 +685,7 @@ class GetTrainingPredictionsTool extends Tool
 
     /**
      * Execute the tool
-     * 
+     *
      * @param array $params
      * @return array
      */
@@ -628,7 +693,7 @@ class GetTrainingPredictionsTool extends Tool
     {
         $character = Character::findOrFail($params['character_id']);
         $service = app(TrainingPredictionService::class);
-        
+
         return $service->getPredictions($character);
     }
 }
@@ -644,18 +709,18 @@ use App\Models\Character;
 
 /**
  * Get Character Stats Tool
- * 
+ *
  * Retrieves current character state including stats, mood, and energy.
  */
 class GetCharacterStatsTool extends Tool
 {
     protected string $name = 'get_character_stats';
-    
+
     protected string $description = 'Get current character stats, mood, energy, and conditions';
 
     /**
      * Define tool parameters
-     * 
+     *
      * @return array
      */
     public function parameters(): array
@@ -671,7 +736,7 @@ class GetCharacterStatsTool extends Tool
 
     /**
      * Execute the tool
-     * 
+     *
      * @param array $params
      * @return array
      */
@@ -679,7 +744,7 @@ class GetCharacterStatsTool extends Tool
     {
         $character = Character::with(['aptitudes', 'activeCareer'])
             ->findOrFail($params['character_id']);
-        
+
         return [
             'id' => $character->id,
             'name' => $character->name,
@@ -770,7 +835,7 @@ use App\DTOs\AI\AIResponse;
 
 /**
  * Ollama Local AI Service
- * 
+ *
  * Handles communication with local Ollama instance.
  */
 class OllamaService
@@ -790,18 +855,18 @@ class OllamaService
 
     /**
      * Check if Ollama is available
-     * 
+     *
      * @return bool
      */
     public function isAvailable(): bool
     {
         $cacheKey = 'ollama:health:status';
-        
+
         return Cache::remember($cacheKey, 30, function () {
             try {
                 $response = Http::timeout(5)
                     ->get("{$this->baseUrl}/api/tags");
-                    
+
                 return $response->successful();
             } catch (\Exception $e) {
                 Log::warning('Ollama health check failed', [
@@ -814,7 +879,7 @@ class OllamaService
 
     /**
      * Generate AI response
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -876,7 +941,7 @@ class OllamaService
             Log::error('Ollama generation failed', [
                 'error' => $e->getMessage(),
             ]);
-            
+
             throw new OllamaUnavailableException(
                 "Ollama generation failed: {$e->getMessage()}",
                 previous: $e
@@ -886,7 +951,7 @@ class OllamaService
 
     /**
      * Get provider name
-     * 
+     *
      * @return string
      */
     public function getName(): string
@@ -896,7 +961,7 @@ class OllamaService
 
     /**
      * Get current model
-     * 
+     *
      * @return string
      */
     public function getModel(): string
@@ -920,7 +985,7 @@ use App\DTOs\AI\AIResponse;
 
 /**
  * AWS Bedrock AI Service
- * 
+ *
  * Handles communication with AWS Bedrock Claude models.
  */
 class BedrockService
@@ -936,7 +1001,7 @@ class BedrockService
             'region' => config('ai.providers.bedrock.region'),
             'version' => 'latest',
         ]);
-        
+
         $this->modelId = config('ai.providers.bedrock.model');
         $this->maxTokens = config('ai.providers.bedrock.max_tokens');
         $this->temperature = config('ai.providers.bedrock.temperature');
@@ -944,7 +1009,7 @@ class BedrockService
 
     /**
      * Check if Bedrock is enabled
-     * 
+     *
      * @return bool
      */
     public function isEnabled(): bool
@@ -954,7 +1019,7 @@ class BedrockService
 
     /**
      * Generate AI response
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -1025,7 +1090,7 @@ class BedrockService
                 'error' => $e->getMessage(),
                 'model' => $this->modelId,
             ]);
-            
+
             throw new BedrockException(
                 "Bedrock generation failed: {$e->getMessage()}",
                 previous: $e
@@ -1035,7 +1100,7 @@ class BedrockService
 
     /**
      * Calculate cost based on token usage
-     * 
+     *
      * @param int $inputTokens
      * @param int $outputTokens
      * @return float
@@ -1043,16 +1108,16 @@ class BedrockService
     private function calculateCost(int $inputTokens, int $outputTokens): float
     {
         $pricing = $this->getPricing();
-        
+
         $inputCost = ($inputTokens / 1_000_000) * $pricing['input'];
         $outputCost = ($outputTokens / 1_000_000) * $pricing['output'];
-        
+
         return round($inputCost + $outputCost, 6);
     }
 
     /**
      * Get pricing for current model
-     * 
+     *
      * @return array
      */
     private function getPricing(): array
@@ -1076,7 +1141,7 @@ class BedrockService
 
     /**
      * Get provider name
-     * 
+     *
      * @return string
      */
     public function getName(): string
@@ -1086,7 +1151,7 @@ class BedrockService
 
     /**
      * Get current model
-     * 
+     *
      * @return string
      */
     public function getModel(): string
@@ -1097,6 +1162,10 @@ class BedrockService
 ```
 
 ### 4.4 Hybrid AI Service (Router)
+
+The current `develop` branch uses structured application context plus static prompt knowledge.
+Retrieval-augmented generation is a recommended next-step architecture for factual grounding, but it
+is not yet implemented in the production routing flow documented below.
 
 ```php
 <?php
@@ -1109,7 +1178,7 @@ use App\Exceptions\AI\{AIProviderException, AIBudgetExceededException};
 
 /**
  * Hybrid AI Service
- * 
+ *
  * Routes requests to appropriate AI provider based on complexity,
  * availability, and cost constraints.
  */
@@ -1123,7 +1192,7 @@ class HybridAIService
 
     /**
      * Generate AI response with automatic provider selection
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -1160,7 +1229,7 @@ class HybridAIService
 
     /**
      * Try local provider with cloud fallback
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -1191,7 +1260,7 @@ class HybridAIService
 
     /**
      * Try cloud provider with local fallback
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -1222,7 +1291,7 @@ class HybridAIService
 
     /**
      * Try cloud provider with budget check
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -1254,7 +1323,7 @@ class HybridAIService
 
     /**
      * Determine if cloud should be used based on complexity
-     * 
+     *
      * @param int $complexity
      * @param array $options
      * @return bool
@@ -1273,13 +1342,13 @@ class HybridAIService
 
         // Check complexity threshold
         $threshold = config('ai.routing.local_complexity_threshold');
-        
+
         return $complexity > $threshold;
     }
 
     /**
      * Assess query complexity
-     * 
+     *
      * @param string $prompt
      * @param array $options
      * @return int 0-100 complexity score
@@ -1318,7 +1387,7 @@ class HybridAIService
 
     /**
      * Get the current provider for direct access
-     * 
+     *
      * @return OllamaService|BedrockService
      */
     public function getProvider(): OllamaService|BedrockService
@@ -1332,7 +1401,53 @@ class HybridAIService
 }
 ```text
 
-### 4.5 AI Response DTO
+### 4.5 Retrieval-Augmented Context Builder (Planned Enhancement)
+
+For higher-confidence skill, race, and meta advice, the advisory stack should support a retrieval
+layer that injects verified reference material into prompts before provider routing.
+
+Recommended data sources:
+
+- Curated internal analysis notes and balance summaries
+- Structured exports from trusted community datasets and scrapers
+- Moderated wiki content snapshots from sources such as GameWith and Game8
+- Planner-owned race, skill, and support-card reference documents
+
+Recommended flow:
+
+1. The user query is embedded with a local embedding model.
+2. A vector store such as `pgvector` returns the top matching advisory documents.
+3. `ContextBuilder` merges those grounded snippets with live character state.
+4. `HybridAIService` routes the enriched prompt to Ollama or Bedrock.
+
+```php
+<?php
+
+namespace App\Services\AI;
+
+class RAGContextBuilder
+{
+    public function build(string $query, string $userId): array
+    {
+        $embedding = $this->embed($query);
+
+        $documents = DB::table('rag_documents')
+            ->select(['title', 'content', 'source'])
+            ->orderByRaw('embedding <=> ?', [$embedding])
+            ->limit(5)
+            ->get();
+
+        return [
+            'query' => $query,
+            'documents' => $documents,
+            'grounding_note' => 'Retrieved context is advisory support and must still respect live game state
+            and planner validation.',
+        ];
+    }
+}
+```
+
+### 4.6 AI Response DTO
 
 ```php
 <?php
@@ -1357,7 +1472,7 @@ readonly class AIResponse
 
     /**
      * Parse JSON content from response
-     * 
+     *
      * @return array|null
      */
     public function parseJson(): ?array
@@ -1375,7 +1490,7 @@ readonly class AIResponse
 
     /**
      * Check if response was from local provider
-     * 
+     *
      * @return bool
      */
     public function isLocal(): bool
@@ -1385,7 +1500,7 @@ readonly class AIResponse
 
     /**
      * Check if response was from cloud provider
-     * 
+     *
      * @return bool
      */
     public function isCloud(): bool
@@ -1395,7 +1510,7 @@ readonly class AIResponse
 
     /**
      * Convert to array
-     * 
+     *
      * @return array
      */
     public function toArray(): array
@@ -1481,7 +1596,7 @@ use App\Models\MCPToolUsage;
 
 /**
  * MCP Client Service
- * 
+ *
  * Manages MCP server connections and tool execution.
  */
 class MCPClientService
@@ -1491,7 +1606,7 @@ class MCPClientService
 
     /**
      * Initialize MCP servers
-     * 
+     *
      * @return void
      */
     public function initialize(): void
@@ -1507,7 +1622,7 @@ class MCPClientService
 
     /**
      * Start an MCP server
-     * 
+     *
      * @param string $name
      * @param array $settings
      * @return void
@@ -1542,7 +1657,7 @@ class MCPClientService
 
     /**
      * Execute a tool on an MCP server
-     * 
+     *
      * @param string $serverName
      * @param string $toolName
      * @param array $params
@@ -1585,7 +1700,7 @@ class MCPClientService
 
     /**
      * Send tool request to MCP server
-     * 
+     *
      * @param string $serverName
      * @param string $toolName
      * @param array $params
@@ -1606,13 +1721,13 @@ class MCPClientService
 
         // Send to server process and await response
         // Implementation depends on MCP SDK being used
-        
+
         return [];
     }
 
     /**
      * Track tool usage
-     * 
+     *
      * @param string $serverName
      * @param string $toolName
      * @param bool $success
@@ -1648,7 +1763,7 @@ class MCPClientService
 
     /**
      * Get server health status
-     * 
+     *
      * @return array
      */
     public function getHealthStatus(): array
@@ -1658,8 +1773,8 @@ class MCPClientService
         foreach ($this->servers as $name => $server) {
             $status[$name] = [
                 'status' => $server['status'],
-                'uptime' => $server['started_at'] 
-                    ? now()->diffInSeconds($server['started_at']) 
+                'uptime' => $server['started_at']
+                    ? now()->diffInSeconds($server['started_at'])
                     : null,
                 'error' => $server['error'] ?? null,
             ];
@@ -1670,7 +1785,7 @@ class MCPClientService
 
     /**
      * Shutdown all MCP servers
-     * 
+     *
      * @return void
      */
     public function shutdown(): void
@@ -1695,6 +1810,29 @@ class MCPClientService
 ### 5.3 MCP Monitoring Service
 
 ```php
+
+### 5.4 High-Value MCP Use Cases
+
+The existing MCP configuration is intentionally conservative. The following use cases are
+recommended extensions for higher-value advisory workflows.
+
+- `memory` server: Persist user preferences such as stat priorities, preferred racing styles, and
+prior accepted advice patterns across sessions.
+- `fetch` server: Retrieve time-sensitive community meta context from allowlisted sources with
+attribution, caching, and rate limiting.
+- `screen-analysis` server: Proposed custom MCP server that accepts screenshots, runs OCR or
+lightweight local vision analysis, and returns structured game state for advisory prompts.
+
+The proposed `screen-analysis` server is not implemented on the current `develop` branch and should
+be treated as a roadmap capability.
+
+```php
+$tools = [
+    'memory.rememberPreferences',
+    'fetch.getMetaSnapshot',
+    'screen-analysis.analyzeScreenshot',
+];
+```
 <?php
 
 namespace App\Services\MCP;
@@ -1704,14 +1842,14 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * MCP Monitoring Service
- * 
+ *
  * Provides monitoring and analytics for MCP tool usage.
  */
 class MCPMonitoringService
 {
     /**
      * Get usage summary for date range
-     * 
+     *
      * @param \Carbon\Carbon $startDate
      * @param \Carbon\Carbon $endDate
      * @return array
@@ -1748,7 +1886,7 @@ class MCPMonitoringService
 
     /**
      * Get today's tool usage
-     * 
+     *
      * @return array
      */
     public function getTodayUsage(): array
@@ -1762,7 +1900,7 @@ class MCPMonitoringService
 
     /**
      * Get error rates by server
-     * 
+     *
      * @return array
      */
     public function getErrorRatesByServer(): array
@@ -1808,10 +1946,10 @@ use Illuminate\Support\Facades\{DB, Log};
 
 /**
  * AI Advisory Service
- * 
+ *
  * Orchestrates AI advisory operations across all domains.
  */
-class AIAdvisoryService
+class HybridAIService
 {
     public function __construct(
         private HybridAIService $aiService,
@@ -1821,7 +1959,7 @@ class AIAdvisoryService
 
     /**
      * Get training advice
-     * 
+     *
      * @param Character $character
      * @param string $query
      * @param array $options
@@ -1833,14 +1971,14 @@ class AIAdvisoryService
         array $options = []
     ): AIAdvice {
         $context = $this->contextBuilder->buildTrainingContext($character);
-        
+
         $agent = new TrainingAdvisorAgent();
         $agent->withContext($context);
 
         $response = $this->executeAgent($agent, $query, $options);
 
         $advice = $this->parseAdvice($response, 'training');
-        
+
         $this->persistRecommendation($character, $advice, 'training');
 
         return $advice;
@@ -1848,7 +1986,7 @@ class AIAdvisoryService
 
     /**
      * Get race strategy advice
-     * 
+     *
      * @param Character $character
      * @param int $raceId
      * @param string $query
@@ -1862,14 +2000,14 @@ class AIAdvisoryService
         array $options = []
     ): AIAdvice {
         $context = $this->contextBuilder->buildRaceContext($character, $raceId);
-        
+
         $agent = new RaceStrategyAgent();
         $agent->withContext($context);
 
         $response = $this->executeAgent($agent, $query, $options);
 
         $advice = $this->parseAdvice($response, 'race');
-        
+
         $this->persistRecommendation($character, $advice, 'race');
 
         return $advice;
@@ -1877,7 +2015,7 @@ class AIAdvisoryService
 
     /**
      * Get skill advice
-     * 
+     *
      * @param Character $character
      * @param string $query
      * @param array $options
@@ -1889,14 +2027,14 @@ class AIAdvisoryService
         array $options = []
     ): AIAdvice {
         $context = $this->contextBuilder->buildSkillContext($character);
-        
+
         $agent = new SkillAdvisorAgent();
         $agent->withContext($context);
 
         $response = $this->executeAgent($agent, $query, $options);
 
         $advice = $this->parseAdvice($response, 'skill');
-        
+
         $this->persistRecommendation($character, $advice, 'skill');
 
         return $advice;
@@ -1904,7 +2042,7 @@ class AIAdvisoryService
 
     /**
      * Handle interactive conversation
-     * 
+     *
      * @param Character $character
      * @param string $message
      * @param string $contextType
@@ -1961,7 +2099,7 @@ class AIAdvisoryService
 
     /**
      * Execute agent with query
-     * 
+     *
      * @param mixed $agent
      * @param string $query
      * @param array $options
@@ -1977,7 +2115,7 @@ class AIAdvisoryService
 
     /**
      * Build prompt with context
-     * 
+     *
      * @param string $query
      * @param array $context
      * @return string
@@ -2001,7 +2139,7 @@ PROMPT;
 
     /**
      * Parse AI response into advice structure
-     * 
+     *
      * @param AIResponse $response
      * @param string $type
      * @return AIAdvice
@@ -2042,7 +2180,7 @@ PROMPT;
 
     /**
      * Persist recommendation to database
-     * 
+     *
      * @param Character $character
      * @param AIAdvice $advice
      * @param string $type
@@ -2067,13 +2205,13 @@ PROMPT;
             'model' => $advice->model,
             'tokens_used' => $advice->tokensUsed,
             'cost_usd' => $advice->costUsd,
-            'was_accepted' => null, // Updated later by user action
+            'was_accepted' => null, // Updated later by explicit or implicit feedback
         ]);
     }
 
     /**
      * Create new conversation
-     * 
+     *
      * @param Character $character
      * @param string $contextType
      * @return AIConversation
@@ -2096,7 +2234,7 @@ PROMPT;
 
     /**
      * Update conversation with new message
-     * 
+     *
      * @param AIConversation $conversation
      * @param string $userMessage
      * @param AIResponse $response
@@ -2140,7 +2278,7 @@ PROMPT;
 
     /**
      * Get agent for context type
-     * 
+     *
      * @param string $contextType
      * @return mixed
      */
@@ -2157,14 +2295,14 @@ PROMPT;
 
     /**
      * Extract confidence from response
-     * 
+     *
      * @param AIResponse $response
      * @return float
      */
     private function extractConfidence(AIResponse $response): float
     {
         $parsed = $response->parseJson();
-        
+
         return $parsed['confidence'] ?? 0.7;
     }
 }
@@ -2179,24 +2317,24 @@ PROMPT;
 namespace App\Services\AI;
 
 use App\Models\{Character, Race};
-use App\Services\{TrainingPredictionService, RaceService, SkillService};
+use App\Services\{TrainingPredictionService, RaceConditionService, SkillService};
 
 /**
  * Context Builder Service
- * 
+ *
  * Builds domain context for AI prompts.
  */
 class ContextBuilder
 {
     public function __construct(
         private TrainingPredictionService $trainingService,
-        private RaceService $raceService,
+        private RaceConditionService $raceConditionService,
         private SkillService $skillService
     ) {}
 
     /**
      * Build training context
-     * 
+     *
      * @param Character $character
      * @return array
      */
@@ -2223,14 +2361,14 @@ class ContextBuilder
             ] : null,
             'goals' => $character->goals ?? [],
             'training_predictions' => $this->trainingService->getPredictions($character),
-            'upcoming_races' => $this->raceService->getUpcomingRaces($character, 3),
+            'upcoming_races' => $this->raceConditionService->getUpcomingRaces($character, 3),
             'support_deck' => $this->getSupportDeckSummary($character),
         ];
     }
 
     /**
      * Build race context
-     * 
+     *
      * @param Character $character
      * @param int $raceId
      * @return array
@@ -2238,7 +2376,7 @@ class ContextBuilder
     public function buildRaceContext(Character $character, int $raceId): array
     {
         $race = Race::findOrFail($raceId);
-        $readiness = $this->raceService->calculateReadiness($character, $race);
+        $readiness = $this->raceConditionService->calculateReadiness($character, $race);
 
         return [
             'character' => [
@@ -2257,13 +2395,13 @@ class ContextBuilder
             ],
             'readiness' => $readiness,
             'active_skills' => $this->skillService->getActiveSkills($character),
-            'recommended_styles' => $this->raceService->getRecommendedStyles($character, $race),
+            'recommended_styles' => $this->raceConditionService->getRecommendedStyles($character, $race),
         ];
     }
 
     /**
      * Build skill context
-     * 
+     *
      * @param Character $character
      * @return array
      */
@@ -2285,14 +2423,14 @@ class ContextBuilder
             ],
             'acquired_skills' => $this->skillService->getAcquiredSkills($character),
             'available_hints' => $this->skillService->getAvailableHints($character),
-            'target_races' => $this->raceService->getTargetRaces($character),
+            'target_races' => $this->raceConditionService->getTargetRaces($character),
             'recommended_skills' => $this->skillService->getRecommendedSkills($character, 10),
         ];
     }
 
     /**
      * Build conversation context with history
-     * 
+     *
      * @param Character $character
      * @param string $contextType
      * @param array $conversationHistory
@@ -2320,7 +2458,7 @@ class ContextBuilder
 
     /**
      * Get support deck summary
-     * 
+     *
      * @param Character $character
      * @return array
      */
@@ -2369,7 +2507,7 @@ readonly class AIAdvice
 
     /**
      * Convert to array for API response
-     * 
+     *
      * @return array
      */
     public function toArray(): array
@@ -2385,7 +2523,7 @@ readonly class AIAdvice
 
     /**
      * Get metadata for API response
-     * 
+     *
      * @return array
      */
     public function getMeta(): array
@@ -2455,7 +2593,8 @@ readonly class AIAdvice
             "risk_percentage": 12,
             "energy_after": 68
         },
-        "reasoning": "Speed training is optimal because your next race requires high speed stats and you have 3 speed support cards active with friendship bonuses.",
+        "reasoning": "Speed training is optimal because your next race requires high speed stats and you
+        have 3 speed support cards active with friendship bonuses.",
         "risks": [
             "Energy will drop below 70%, increasing failure risk next turn",
             "Missing stamina training may affect long-distance race performance"
@@ -2517,7 +2656,8 @@ readonly class AIAdvice
                 "wit": 0
             }
         },
-        "reasoning": "Your speed and power stats exceed requirements. Late Surger (Sashi) style recommended due to your A aptitude and strong finishing power.",
+        "reasoning": "Your speed and power stats exceed requirements. Late Surger (Sashi) style recommended
+        due to your A aptitude and strong finishing power.",
         "risks": [
             "Stamina 50 points below optimal for this distance",
             "Guts slightly low for last spurt effectiveness"
@@ -2591,7 +2731,8 @@ readonly class AIAdvice
                 "remaining_after": 70
             }
         },
-        "reasoning": "Prioritizing skills with hint discounts maximizes SP efficiency. Focus on positioning and speed skills for your Late Surger build.",
+        "reasoning": "Prioritizing skills with hint discounts maximizes SP efficiency. Focus on positioning
+        and speed skills for your Late Surger build.",
         "risks": [
             "Spending all SP now limits flexibility for rare skill opportunities"
         ],
@@ -2645,7 +2786,9 @@ readonly class AIAdvice
         "conversation_id": 789,
         "message": {
             "role": "assistant",
-            "content": "Given your current energy at 55%, I recommend resting this turn. Training at low energy increases failure risk to approximately 35%, which could result in stat losses and mood decrease. After resting, your energy should recover to ~80%, making training much safer next turn.",
+            "content": "Given your current energy at 55%, I recommend resting this turn. Training at low energy
+            increases failure risk to approximately 35%, which could result in stat losses and mood decrease.
+            After resting, your energy should recover to ~80%, making training much safer next turn.",
             "timestamp": "2026-01-24T10:30:00Z"
         },
         "confidence": 0.88
@@ -2728,7 +2871,7 @@ CREATE TABLE ucp_ai_conversations (
     cost_usd DECIMAL(10, 6) NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     INDEX idx_user_context (user_id, context_type),
     INDEX idx_created_at (created_at)
@@ -2751,14 +2894,25 @@ CREATE TABLE ucp_ai_recommendations (
     tokens_used INT UNSIGNED NOT NULL DEFAULT 0,
     cost_usd DECIMAL(10, 6) NOT NULL DEFAULT 0,
     was_accepted BOOLEAN NULL COMMENT 'NULL = pending, TRUE = accepted, FALSE = rejected',
+    feedback_rating ENUM('up', 'down') NULL COMMENT 'Explicit user rating',
+    feedback_reason VARCHAR(255) NULL COMMENT 'Optional short reason for explicit feedback',
+    outcome_label ENUM('improved', 'neutral', 'worse', 'unknown') NULL COMMENT 'Observed outcome after
+    following advice',
+    outcome_notes TEXT NULL COMMENT 'Implicit feedback or follow-up outcome details',
+    prompt_variant VARCHAR(50) NULL COMMENT 'Prompt revision or A/B test key',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE CASCADE,
     INDEX idx_character_type (character_id, recommendation_type),
     INDEX idx_created_at (created_at),
-    INDEX idx_confidence (confidence_score)
+    INDEX idx_confidence (confidence_score),
+    INDEX idx_feedback_rating (feedback_rating),
+    INDEX idx_outcome_label (outcome_label)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
+
+This expanded schema supports both explicit feedback and implicit outcome tracking so prompt
+revisions can be evaluated against actual player results instead of acceptance alone.
 
 ### 8.3 Table: `ucp_ai_usage_daily`
 
@@ -2779,7 +2933,7 @@ CREATE TABLE ucp_ai_usage_daily (
     error_count INT UNSIGNED NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_date_provider (user_id, usage_date, provider),
     INDEX idx_usage_date (usage_date)
@@ -2803,7 +2957,7 @@ use Illuminate\Support\Facades\{DB, Cache, Log};
 
 /**
  * Cost Tracking Service
- * 
+ *
  * Tracks AI usage and costs for budget management.
  */
 class CostTrackingService
@@ -2812,7 +2966,7 @@ class CostTrackingService
 
     /**
      * Track AI usage from response
-     * 
+     *
      * @param AIResponse $response
      * @param string|null $userId
      * @return void
@@ -2856,7 +3010,7 @@ class CostTrackingService
 
     /**
      * Get today's spend for user
-     * 
+     *
      * @param string|null $userId
      * @return float
      */
@@ -2874,7 +3028,7 @@ class CostTrackingService
 
     /**
      * Get usage summary for period
-     * 
+     *
      * @param string $userId
      * @param \Carbon\Carbon $startDate
      * @param \Carbon\Carbon $endDate
@@ -2912,7 +3066,7 @@ class CostTrackingService
 
     /**
      * Check if budget exceeded
-     * 
+     *
      * @param string|null $userId
      * @return bool
      */
@@ -2926,7 +3080,7 @@ class CostTrackingService
 
     /**
      * Update cached spend
-     * 
+     *
      * @param string $userId
      * @param float $additionalCost
      * @return void
@@ -2940,7 +3094,7 @@ class CostTrackingService
 
     /**
      * Track error
-     * 
+     *
      * @param string $provider
      * @param string|null $userId
      * @return void
@@ -3045,8 +3199,8 @@ Race strategy uses readiness calculations:
 
 ```php
 // In RaceStrategyAgent tool
-$readiness = app(RaceService::class)->calculateReadiness($character, $race);
-$winProbability = app(RaceService::class)->calculateWinProbability($character, $race);
+$readiness = app(RaceConditionService::class)->calculateReadiness($character, $race);
+$winProbability = app(RaceConditionService::class)->calculateWinProbability($character, $race);
 
 $context['readiness'] = $readiness;
 $context['win_probability'] = $winProbability;
@@ -3105,6 +3259,45 @@ App\Exceptions\AI\AIException (Base)
 }
 ```text
 
+### 12.4 Resilience Strategy
+
+The current fallback chain should be strengthened with explicit circuit-breaker and graceful-degradation behavior.
+
+- If Bedrock fails 5 times within 60 seconds, open a circuit for 300 seconds and route all advisory traffic to Ollama.
+- While the Bedrock circuit is open, skip cloud attempts entirely to avoid cascading failures and unnecessary cost.
+- If both providers are unavailable, return either a cached near-match response or a friendly
+degraded payload that points the user to static planner guidance.
+
+```php
+if (Cache::has('bedrock:circuit:open')) {
+    throw new BedrockException('Bedrock circuit is open');
+}
+
+$failures = Cache::increment('bedrock:failures');
+Cache::put('bedrock:failures', $failures, 60);
+
+if ($failures >= 5) {
+    Cache::put('bedrock:circuit:open', true, 300);
+    Cache::forget('bedrock:failures');
+}
+```
+
+```json
+{
+    "success": false,
+    "error": {
+        "code": "AI_001",
+        "message": "AI advisors are temporarily unavailable.",
+        "details": "Using graceful degradation mode. Try again shortly or review the static planner guides.",
+        "retry_after": 300
+    },
+    "fallback": {
+        "cached_response_available": true,
+        "static_guides": ["training-basics", "race-readiness", "skill-priority"]
+    }
+}
+```
+
 ---
 
 ## 13. Performance Optimization
@@ -3137,11 +3330,332 @@ Cache::remember($cacheKey, 300, fn() => $this->generate($prompt));
 - **Prompt Compression**: Minimize token usage in prompts
 - **Response Streaming**: Stream long responses (future enhancement)
 
+### 13.4 Asynchronous Long-Running Analysis
+
+Complex requests such as full career-planning or multi-turn build optimization should use queued
+background processing instead of a long synchronous HTTP request.
+
+Recommended pattern:
+
+1. Client submits a long-running advisory job.
+2. API returns `202 Accepted` with a job identifier.
+3. Laravel Horizon workers process the request asynchronously.
+4. Client polls a status endpoint until the completed plan is available.
+
+```json
+{
+    "success": true,
+    "data": {
+        "job_id": "career-plan-01HV9Y6P5A8R",
+        "status": "queued"
+    }
+}
+```
+
+```php
+Route::post('/ai/career-plan/jobs', [CareerPlanningController::class, 'dispatch']);
+Route::get('/ai/career-plan/jobs/{jobId}', [CareerPlanningController::class, 'status']);
+```
+
 ---
 
-## 14. Security Considerations
+## 14. Training Plan Visualisation
 
-### 14.1 Authentication
+### 14.1 Overview
+
+The asynchronous career plan generation flow described in Section 13.4 should return more than a
+textual summary. For a full career-planning experience, the generated output should include a
+structured, turn-by-turn timeline that the frontend can render visually, inspect interactively, lock
+for execution, and connect to reminder notifications.
+
+This enhancement shifts the career plan feature from a long-form advisory response to a durable
+planning artifact that users can revisit throughout a run.
+
+### 14.2 Data Structure
+
+The `GenerateCareerPlan` background job should persist and return a JSON payload with a stable
+`plan_id`, a turn timeline, and a high-level summary.
+
+```json
+{
+    "plan_id": "550e8400-e29b-41d4-a716-446655440000",
+    "character_id": 123,
+    "created_at": "2026-03-11T10:00:00Z",
+    "goal": "win the final race",
+    "total_turns": 72,
+    "timeline": [
+        {
+            "turn": 1,
+            "action": {
+                "type": "training",
+                "facility": "speed",
+                "expected_gains": {
+                    "speed": 45,
+                    "stamina": 5,
+                    "power": 2,
+                    "guts": 1,
+                    "wit": 1
+                },
+                "energy_after": 68,
+                "risk_percentage": 12,
+                "reasoning": "Speed training is optimal because the next target race requires higher speed and three
+                speed support cards are present."
+            },
+            "state_after": {
+                "stats": {
+                    "speed": 350,
+                    "stamina": 200,
+                    "power": 180,
+                    "guts": 150,
+                    "wit": 140
+                },
+                "energy": 68,
+                "mood": "good",
+                "sp": 450,
+                "skills": ["skill_id_1"]
+            }
+        },
+        {
+            "turn": 2,
+            "action": {
+                "type": "rest",
+                "energy_after": 95,
+                "reasoning": "Recover energy after intensive training."
+            },
+            "state_after": {}
+        },
+        {
+            "turn": 3,
+            "action": {
+                "type": "race",
+                "race_id": 456,
+                "expected_result": "win_probability: 35%",
+                "reasoning": "This race matches the current build and supports the long-term plan."
+            },
+            "state_after": {}
+        },
+        {
+            "turn": 4,
+            "action": {
+                "type": "skill",
+                "skill_id": 101,
+                "spent_sp": 96,
+                "reasoning": "Acquire Speed Star with a hint discount."
+            },
+            "state_after": {}
+        }
+    ],
+    "summary": {
+        "final_predicted_stats": {},
+        "total_sp_earned": 1200,
+        "races_won": 8,
+        "confidence": 0.82
+    }
+}
+```
+
+Required action types:
+
+- `training`: includes facility, expected gains, energy after, risk percentage, and reasoning.
+- `rest`: includes energy after and reasoning.
+- `race`: includes `race_id`, expected result or win probability, and reasoning.
+- `skill`: includes `skill_id`, SP spent, and reasoning.
+
+Each timeline entry must also include a `state_after` snapshot so the frontend can render stat
+progression, SP changes, mood changes, and acquired skills over time.
+
+### 14.3 Generation in Background Job
+
+The existing `GenerateCareerPlan` job should be enhanced to populate the `timeline` array while
+simulating the run from the current turn through the plan horizon.
+
+Recommended generation flow:
+
+1. Reserve a `plan_id` when the request is accepted.
+2. Build the initial context from the character, career, deck, goals, and race calendar.
+3. Simulate each turn by invoking the same domain-specific logic used elsewhere in the advisory system:
+     - `TrainingAdvisorAgent` for training turns
+     - `RaceStrategyAgent` for race turns
+     - `SkillRecommendationAgent` for SP allocation turns
+4. Optionally incorporate a simulation service or simulation-oriented MCP server to improve projected outcomes.
+5. Persist the final plan to the database and cache it in Redis for fast retrieval.
+
+The output should contain both machine-readable timeline data and a summary block suitable for quick dashboard display.
+
+### 14.4 API Endpoints
+
+#### `POST /api/ai/career/plan`
+
+This endpoint already exists conceptually via the async planning flow, but it should now reserve and
+return a `plan_id` immediately.
+
+Request:
+
+```json
+{
+        "character_id": 123,
+        "goal": "win the final race",
+        "options": {
+                "depth": "full"
+        }
+}
+```
+
+Response (`202 Accepted`):
+
+```json
+{
+        "success": true,
+        "job_id": "550e8400-e29b-41d4-a716-446655440000",
+        "plan_id": "550e8400-e29b-41d4-a716-446655440111",
+        "status_url": "/api/ai/job/550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+#### `GET /api/ai/plan/{plan_id}`
+
+Returns the full persisted plan payload once the async job is complete. If the job is still pending,
+respond with `202 Accepted` and include a `Retry-After` header.
+
+Response (`200 OK`):
+
+```json
+{
+        "success": true,
+        "plan": {}
+}
+```
+
+#### `POST /api/ai/plan/{plan_id}/lock`
+
+Locks the plan for the current user so they can follow it turn by turn and receive notifications.
+
+Request:
+
+```json
+{
+        "start_turn": 1,
+        "notification_preferences": {
+                "email": true,
+                "push": true
+        }
+}
+```
+
+Response:
+
+```json
+{
+        "success": true,
+        "message": "Plan locked. You will receive notifications for each turn."
+}
+```
+
+#### `GET /api/ai/plan/{plan_id}/next`
+
+Returns the next recommended action for a locked plan, based on the stored `current_turn`. This
+supports compact surfaces such as widgets or mobile summary views.
+
+Response:
+
+```json
+{
+        "success": true,
+        "turn": 5,
+        "action": {},
+        "remaining_turns": 67
+}
+```
+
+### 14.5 Frontend Rendering
+
+The frontend should render the timeline as an interactive, turn-based visual plan rather than a plain text blob.
+
+Suggested rendering options:
+
+- **Frappe Gantt** for a lightweight Gantt-style timeline.
+- **vis-timeline** for richer zoom and interaction controls.
+- **Custom SVG with D3.js** if full visual control is required.
+
+Suggested interactions:
+
+- Click a turn bar or turn card to expand action details, expected gains, reasoning, and `state_after`.
+- Hover to show a compact tooltip summary.
+- Add a slider or scrubber to jump to any turn quickly.
+- Provide a `Lock Plan` action near the summary header.
+- After locking, highlight the current recommended turn and completed turns.
+
+Mobile rendering guidance:
+
+- Replace the horizontal timeline with a vertical collapsible list on narrow screens.
+- Allow swipe or segmented navigation between turn ranges.
+- Keep the next recommended action pinned near the top for quick access.
+
+### 14.6 Database Schema
+
+Store generated plans in a dedicated `career_plans` table.
+
+```sql
+CREATE TABLE career_plans (
+        id CHAR(36) PRIMARY KEY,
+        user_id BIGINT UNSIGNED NOT NULL,
+        character_id BIGINT UNSIGNED NOT NULL,
+        goal TEXT NULL,
+        plan JSON NOT NULL,
+        plan_hash CHAR(64) NULL,
+        is_locked BOOLEAN DEFAULT FALSE,
+        locked_at TIMESTAMP NULL,
+        current_turn INT UNSIGNED DEFAULT 1,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+        CONSTRAINT fk_career_plans_user
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        CONSTRAINT fk_career_plans_character
+                FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE CASCADE,
+        INDEX idx_career_plans_user_character (user_id, character_id),
+        INDEX idx_career_plans_locked (is_locked),
+        INDEX idx_career_plans_hash (plan_hash)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+`plan_hash` is optional but recommended so identical requests can be deduplicated or served from cache when appropriate.
+
+### 14.7 Notifications
+
+When a plan is locked, the system should schedule or derive notifications from the locked plan state
+and the user\'s current progress.
+
+Notification channels:
+
+- **Email**: a short summary of the next recommended action with a deep link back into the planner.
+- **Push notification**: a concise reminder for the next turn or milestone.
+
+Implementation guidance:
+
+1. Persist notification preferences at plan lock time.
+2. Use Laravel notifications for channel dispatch.
+3. Drive reminders from a scheduled command, queue job, or user progress events.
+4. Personalize notifications with the turn number, action type, and reason the action matters.
+
+### 14.8 Integration with Existing Components
+
+This section builds directly on existing platform capabilities:
+
+- **Job queue / Horizon** already handles async plan generation.
+- **Redis cache** can retain in-progress and recently generated plans for fast retrieval.
+- **Feedback capture** can later be extended to measure whether the user followed the plan and what outcome it produced.
+- **AI advisory agents** remain the same decision engines; this feature primarily enriches the
+output shape and UX around the generated plan.
+
+Together, these changes position the AI advisory system as a persistent career co-pilot instead of a
+one-off answer generator.
+
+---
+
+## 15. Security Considerations
+
+### 15.1 Authentication
 
 All AI endpoints require authentication via Sanctum:
 
@@ -3154,7 +3668,7 @@ Route::middleware('auth:sanctum')->prefix('ai')->group(function () {
 });
 ```text
 
-### 14.2 Authorization
+### 15.2 Authorization
 
 Users can only access AI for their own characters:
 
@@ -3162,12 +3676,12 @@ Users can only access AI for their own characters:
 public function authorize(): bool
 {
     $character = Character::find($this->character_id);
-    
+
     return $character && $character->user_id === auth()->id();
 }
 ```
 
-### 14.3 Input Sanitization
+### 15.3 Input Sanitization
 
 ```php
 // Sanitize user query
@@ -3181,7 +3695,7 @@ $provider = in_array($request->provider, ['ollama', 'bedrock', 'auto'])
     : 'auto';
 ```text
 
-### 14.4 Rate Limiting
+### 15.4 Rate Limiting
 
 ```php
 RateLimiter::for('ai', function (Request $request) {
@@ -3191,33 +3705,33 @@ RateLimiter::for('ai', function (Request $request) {
 
 ---
 
-## 15. Testing Strategy
+## 16. Testing Strategy
 
-### 15.1 Unit Tests
+### 16.1 Unit Tests
 
 ```php
 // tests/Unit/Services/AI/HybridAIServiceTest.php
 
 test('routes simple queries to local provider', function () {
     $service = app(HybridAIService::class);
-    
+
     Http::fake([
         'localhost:11434/*' => Http::response(['response' => 'test'], 200),
     ]);
-    
+
     $response = $service->generate('Simple question', null, ['topic' => 'training']);
-    
+
     expect($response->provider)->toBe('ollama');
 });
 
 test('falls back to cloud when local unavailable', function () {
     $service = app(HybridAIService::class);
-    
+
     // Mock Ollama as unavailable
     Http::fake([
         'localhost:11434/*' => Http::response(null, 500),
     ]);
-    
+
     // Mock Bedrock response
     $this->mock(BedrockService::class)
         ->shouldReceive('generate')
@@ -3232,9 +3746,9 @@ test('falls back to cloud when local unavailable', function () {
             durationMs: 1000,
             costUsd: 0.001
         ));
-    
+
     $response = $service->generate('Test query');
-    
+
     expect($response->provider)->toBe('bedrock');
 });
 
@@ -3242,20 +3756,20 @@ test('respects budget threshold', function () {
     $costTracker = $this->mock(CostTrackingService::class);
     $costTracker->shouldReceive('isBudgetExceeded')->andReturn(true);
     $costTracker->shouldReceive('getTodaySpend')->andReturn(0.15);
-    
+
     $service = new HybridAIService(
         app(OllamaService::class),
         app(BedrockService::class),
         $costTracker
     );
-    
+
     // Force cloud should fail due to budget
     expect(fn() => $service->generate('Test', null, ['force_cloud' => true]))
         ->toThrow(AIBudgetExceededException::class);
 });
 ```text
 
-### 15.2 Feature Tests
+### 16.2 Feature Tests
 
 ```php
 // tests/Feature/AI/AIAdvisoryTest.php
@@ -3263,7 +3777,7 @@ test('respects budget threshold', function () {
 test('authenticated user can get training advice', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
-    
+
     // Mock AI response
     Http::fake([
         'localhost:11434/*' => Http::response([
@@ -3277,13 +3791,13 @@ test('authenticated user can get training advice', function () {
             'eval_count' => 100,
         ], 200),
     ]);
-    
+
     $response = $this->actingAs($user)
         ->postJson('/api/ai/training', [
             'character_id' => $character->id,
             'query' => 'What should I train?',
         ]);
-    
+
     $response->assertStatus(200)
         ->assertJsonPath('success', true)
         ->assertJsonStructure([
@@ -3307,7 +3821,7 @@ test('unauthenticated user cannot access AI endpoints', function () {
         'character_id' => 1,
         'query' => 'Test',
     ]);
-    
+
     $response->assertStatus(401);
 });
 
@@ -3315,22 +3829,22 @@ test('user cannot access other users characters', function () {
     $user1 = User::factory()->create();
     $user2 = User::factory()->create();
     $character = Character::factory()->for($user1)->create();
-    
+
     $response = $this->actingAs($user2)
         ->postJson('/api/ai/training', [
             'character_id' => $character->id,
             'query' => 'Test',
         ]);
-    
+
     $response->assertStatus(403);
 });
 
 test('rate limiting is enforced', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
-    
+
     Http::fake(['*' => Http::response(['response' => 'test'], 200)]);
-    
+
     // Make 30 requests (limit)
     for ($i = 0; $i < 30; $i++) {
         $this->actingAs($user)
@@ -3339,19 +3853,19 @@ test('rate limiting is enforced', function () {
                 'query' => 'Test',
             ]);
     }
-    
+
     // 31st request should be rate limited
     $response = $this->actingAs($user)
         ->postJson('/api/ai/training', [
             'character_id' => $character->id,
             'query' => 'Test',
         ]);
-    
+
     $response->assertStatus(429);
 });
 ```
 
-### 15.3 Integration Tests
+### 16.3 Integration Tests
 
 ```php
 // tests/Integration/AI/NeuronAgentTest.php
@@ -3360,7 +3874,7 @@ test('training advisor agent provides structured recommendations', function () {
     $character = Character::factory()
         ->has(Career::factory()->state(['current_turn' => 30]))
         ->create();
-    
+
     $agent = new TrainingAdvisorAgent();
     $agent->withContext([
         'character' => $character->toArray(),
@@ -3370,13 +3884,13 @@ test('training advisor agent provides structured recommendations', function () {
             'mood' => 'good',
         ],
     ]);
-    
+
     // This would require actual AI model in integration environment
     // For CI, we mock the provider
     $response = $agent->run('What should I train?');
-    
+
     $parsed = json_decode($response, true);
-    
+
     expect($parsed)->toHaveKeys([
         'recommendation',
         'reasoning',
@@ -3385,7 +3899,7 @@ test('training advisor agent provides structured recommendations', function () {
 });
 ```text
 
-### 15.4 Test Data Factories
+### 16.4 Test Data Factories
 
 ```php
 // database/factories/AIConversationFactory.php
@@ -3453,7 +3967,7 @@ class AIRecommendationFactory extends Factory
     public function definition(): array
     {
         $type = $this->faker->randomElement(['training', 'race', 'skill']);
-        
+
         return [
             'character_id' => \App\Models\Character::factory(),
             'recommendation_type' => $type,
@@ -3526,7 +4040,7 @@ class AIRecommendationFactory extends Factory
 
 ---
 
-## 16. Appendices
+## 17. Appendices
 
 ### Appendix A: Environment Variables
 
@@ -3569,6 +4083,7 @@ class AIRecommendationFactory extends Factory
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.0 | 2026-03-11 | Development Team | Refined training, race, and skill advisory prompts with more precise planner-facing mechanics; documented planned RAG grounding and higher-value MCP extensions; expanded recommendation feedback/outcome tracking; added Bedrock circuit-breaker guidance, graceful degradation behavior, and async processing guidance for long-running career plans. |
 | 2.2.0 | 2026-01-28 | Development Team | Updated AI agent prompts with game-accurate mechanics: 5-level hint system, S max aptitude, stat soft cap, track condition penalties |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment with comprehensive services, agents, API endpoints, database schema, cost tracking, security, testing strategy, and complete appendices following SPEC-005 format |
 | 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
@@ -3586,10 +4101,10 @@ class AIRecommendationFactory extends Factory
 
 ---
 
-**Document Control**  
-**Maintained By**: Backend Development Team  
-**Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Document Control**
+**Maintained By**: Backend Development Team
+**Review Frequency**: Bi-weekly during active development
+**Next Review Date**: 2026-02-07
 **Distribution**: Development Team, QA Team, Product Management, AI Team
 
 ---

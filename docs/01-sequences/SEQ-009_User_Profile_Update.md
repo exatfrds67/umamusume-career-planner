@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001]
 
 ---
@@ -25,7 +25,9 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the user profile update workflow in the Umamusume Career Planner application, covering profile management, preference updates, accessibility settings, AI configuration, and session management.
+This sequence diagram documents the user profile update workflow in the Umamusume Career Planner
+application, covering profile management, preference updates, accessibility settings, AI
+configuration, and session management.
 
 ### 1.2 Scope
 
@@ -41,9 +43,9 @@ This sequence diagram documents the user profile update workflow in the Umamusum
 
 **Related Artifacts:**
 
-- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
-- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
-- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
+- PRD: [PRD-001](../02-prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md)
 
 ### 1.3 Business Context
 
@@ -142,23 +144,23 @@ sequenceDiagram
     UI->>Controller: POST /settings/profile
     Controller->>Controller: Authorize user
     Controller->>UserSvc: updateProfile(user, data)
-    
+
     UserSvc->>DB: BEGIN TRANSACTION
-    
+
     UserSvc->>UserSvc: Validate profile data
     UserSvc->>DB: UPDATE users SET name, email, avatar
-    
+
     alt Email Changed
         UserSvc->>DB: SET email_verified_at = NULL
         UserSvc->>Events: Dispatch EmailChangeRequested
         Events->>Events: Queue verification email
     end
-    
+
     UserSvc->>DB: COMMIT TRANSACTION
-    
+
     UserSvc->>Cache: Invalidate user cache
     Cache-->>UserSvc: Cache cleared
-    
+
     UserSvc-->>Controller: Updated user
     Controller-->>UI: 200 OK + user data
     UI->>UI: Update reactive properties
@@ -168,25 +170,25 @@ sequenceDiagram
     User->>UI: Modify preferences
     UI->>Controller: POST /settings/preferences
     Controller->>PrefSvc: updatePreferences(user, prefs)
-    
+
     PrefSvc->>DB: BEGIN TRANSACTION
-    
+
     PrefSvc->>DB: UPDATE user_preferences
-    
+
     alt Theme Changed
         PrefSvc->>Events: Dispatch ThemeChanged
         Events->>Events: Broadcast to active sessions
     end
-    
+
     alt Language Changed
         PrefSvc->>Cache: Update locale cache
     end
-    
+
     PrefSvc->>DB: COMMIT TRANSACTION
-    
+
     PrefSvc->>Cache: Store updated preferences
     Cache-->>PrefSvc: Cached (1h TTL)
-    
+
     PrefSvc-->>Controller: Preference summary
     Controller-->>UI: 200 OK
     UI->>UI: Apply preferences to UI
@@ -196,11 +198,11 @@ sequenceDiagram
     User->>UI: Configure accessibility
     UI->>Controller: POST /settings/accessibility
     Controller->>A11ySvc: updateSettings(user, a11y)
-    
+
     A11ySvc->>A11ySvc: Validate settings
     A11ySvc->>DB: UPDATE accessibility_settings JSON
     A11ySvc->>Cache: Update a11y cache
-    
+
     A11ySvc-->>Controller: A11y settings
     Controller-->>UI: 200 OK
     UI->>UI: Apply a11y settings (reduced motion, contrast, etc.)
@@ -257,39 +259,39 @@ class UserService
         private Cache $cache,
         private EventDispatcher $events,
     ) {}
-    
+
     public function updateProfile(User $user, array $data): User
     {
         return DB::transaction(function () use ($user, $data) {
             // 1. Validate input
             $validated = $this->validateProfileData($data);
-            
+
             // 2. Track email change
-            $emailChanged = isset($validated['email']) && 
+            $emailChanged = isset($validated['email']) &&
                             $validated['email'] !== $user->email;
-            
+
             // 3. Update user record
             $user->update($validated);
-            
+
             // 4. Handle email verification
             if ($emailChanged) {
                 $user->update(['email_verified_at' => null]);
                 $this->events->dispatch(new EmailChangeRequested($user, $validated['email']));
             }
-            
+
             // 5. Handle avatar upload
             if (isset($validated['avatar'])) {
                 $this->handleAvatarUpload($user, $validated['avatar']);
             }
-            
+
             // 6. Clear cache
             $this->cache->forget("user.{$user->id}");
             $this->cache->forget("user.email.{$user->email}");
-            
+
             return $user->fresh();
         });
     }
-    
+
     private function validateProfileData(array $data): array
     {
         return validator($data, [
@@ -298,14 +300,14 @@ class UserService
             'avatar' => 'sometimes|image|max:2048', // 2MB max
         ])->validate();
     }
-    
+
     private function handleAvatarUpload(User $user, UploadedFile $file): void
     {
         // Delete old avatar if exists
         if ($user->avatar_path) {
             Storage::delete($user->avatar_path);
         }
-        
+
         // Store new avatar
         $path = $file->store('avatars', 'public');
         $user->update(['avatar_path' => $path]);
@@ -325,42 +327,42 @@ class PreferenceService
     {
         return DB::transaction(function () use ($user, $preferences) {
             $updated = [];
-            
+
             // UI Preferences
             if (isset($preferences['ui'])) {
                 $updated['ui'] = $this->updateUIPreferences($user, $preferences['ui']);
             }
-            
+
             // Notification Preferences
             if (isset($preferences['notifications'])) {
                 $updated['notifications'] = $this->updateNotificationPreferences($user, $preferences['notifications']);
             }
-            
+
             // Privacy Preferences
             if (isset($preferences['privacy'])) {
                 $updated['privacy'] = $this->updatePrivacyPreferences($user, $preferences['privacy']);
             }
-            
+
             // AI Preferences
             if (isset($preferences['ai'])) {
                 $updated['ai'] = $this->updateAIPreferences($user, $preferences['ai']);
             }
-            
+
             // Update user preferences JSON
             $user->update(['preferences' => array_merge($user->preferences ?? [], $updated)]);
-            
+
             // Cache updated preferences
             $this->cache->put("user.{$user->id}.preferences", $user->preferences, 3600);
-            
+
             // Dispatch events for reactive changes
             if (isset($updated['ui']['theme'])) {
                 event(new ThemeChanged($user, $updated['ui']['theme']));
             }
-            
+
             return $updated;
         });
     }
-    
+
     private function updateUIPreferences(User $user, array $ui): array
     {
         return validator($ui, [
@@ -370,7 +372,7 @@ class PreferenceService
             'compact_view' => 'sometimes|boolean',
         ])->validate();
     }
-    
+
     private function updateNotificationPreferences(User $user, array $notifications): array
     {
         return validator($notifications, [
@@ -380,7 +382,7 @@ class PreferenceService
             'email_notifications' => 'sometimes|boolean',
         ])->validate();
     }
-    
+
     private function updateAIPreferences(User $user, array $ai): array
     {
         return validator($ai, [
@@ -411,19 +413,19 @@ class AccessibilityService
             'font_size' => 'sometimes|in:small,medium,large,extra-large',
             'focus_indicators' => 'sometimes|in:default,enhanced,high-contrast',
         ])->validate();
-        
+
         $user->update(['accessibility_settings' => array_merge(
             $user->accessibility_settings ?? [],
             $validated
         )]);
-        
+
         // Cache a11y settings for fast retrieval
         $this->cache->put(
             "user.{$user->id}.accessibility",
             $user->accessibility_settings,
             3600
         );
-        
+
         return $validated;
     }
 }
@@ -441,22 +443,22 @@ class AuthService
     {
         // Generate new access token
         $accessToken = $user->createToken('access_token')->plainTextToken;
-        
+
         // Update last activity
         $user->update(['last_activity_at' => now()]);
-        
+
         return [
             'access_token' => $accessToken,
             'token_type' => 'Bearer',
             'expires_in' => config('sanctum.expiration'),
         ];
     }
-    
+
     public function requiresSessionRefresh(User $user, array $changes): bool
     {
         // Refresh session if security-sensitive fields changed
         $securityFields = ['email', 'password'];
-        
+
         return collect($changes)->keys()->intersect($securityFields)->isNotEmpty();
     }
 }
@@ -615,7 +617,7 @@ sequenceDiagram
     User->>UI: Submit profile changes
     UI->>Controller: POST /settings/profile
     Controller->>Service: updateProfile(user, data)
-    
+
     alt Validation Error
         Service-->>Controller: ValidationException
         Controller-->>UI: 422 Validation Error
@@ -734,9 +736,9 @@ $this->cache->forget("user.email.{$user->email}");
 
 | Document | Description |
 | --- | --- |
-| [PRD-001](../prds/PRD-001_Character_Management.md) | Product requirements for user management |
-| [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) | Technical specification for user system |
-| [FLOW-001](../flows/FLOW-001_Character_Management_System.md) | System flow for user operations |
+| [PRD-001](../02-prds/PRD-001_Character_Management.md) | Product requirements for user management |
+| [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md) | Technical specification for user system |
+| [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md) | System flow for user operations |
 
 ### 8.2 Related Sequences
 
@@ -786,4 +788,6 @@ $this->cache->forget("user.email.{$user->email}");
 
 ---
 
-*This sequence diagram reflects the current implementation of the user profile update workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/UserService.php`, `app/Services/PreferenceService.php`, and related files.*
+*This sequence diagram reflects the current implementation of the user profile update workflow as of
+v2.0.0. For the most up-to-date information, refer to the source code in
+`app/Services/UserService.php`, `app/Services/PreferenceService.php`, and related files.*

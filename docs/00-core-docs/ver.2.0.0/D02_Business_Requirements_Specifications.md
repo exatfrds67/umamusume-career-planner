@@ -2,8 +2,8 @@
 
 ## Uma Musume Career Planner
 
-**Document Version:** 2.0  
-**Date:** 2026-01-03  
+**Document Version:** 2.0
+**Date:** 2026-01-03
 **Status:** Active
 
 ---
@@ -12,11 +12,15 @@
 
 ### 1.1 Purpose
 
-This document defines the business requirements for the Uma Musume Career Planner application. It establishes the business context, stakeholder needs, and high-level requirements that will guide the technical implementation.
+This document defines the business requirements for the Uma Musume Career Planner application. It
+establishes the business context, stakeholder needs, and high-level requirements that will guide the
+technical implementation.
 
 ### 1.2 Scope
 
-The Uma Musume Career Planner is a web application that enables players of Uma Musume: Pretty Derby to track, manage, and analyze their career progression. The system consolidates features from six legacy applications into a unified platform.
+The Uma Musume Career Planner is a web application that enables players of Uma Musume: Pretty Derby
+to track, manage, and analyze their career progression. The system consolidates features from six
+legacy applications into a unified platform.
 
 ### 1.3 Definitions and Acronyms
 

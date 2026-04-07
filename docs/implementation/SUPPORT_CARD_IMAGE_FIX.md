@@ -1,8 +1,8 @@
 # Support Card Image Fix
 
-**Date**: January 25, 2026  
-**Status**: ✅ COMPLETED  
-**Issue**: Support card images showing as placeholders  
+**Date**: January 25, 2026
+**Status**: ✅ COMPLETED
+**Issue**: Support card images showing as placeholders
 
 ---
 
@@ -47,16 +47,18 @@ https://gametora.com/images/umamusume/supports/tex_support_card_{CARD_ID}.png
 
 ```blade
 <img :src="card.image" :alt="card.title_en || card.name" loading="lazy" decoding="async"
-    x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(card.title_en || card.name || 'Card') + '&background=random&color=fff'"
+    x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(card.title_en ||
+    card.name || 'Card') + '&background=random&color=fff'"
     class="w-full h-full object-cover">
 ```text
 
 **After**:
 
 ```blade
-<img :src="'https://gametora.com/images/umamusume/supports/tex_support_card_' + card.id + '.png'" 
+<img :src="'https://gametora.com/images/umamusume/supports/tex_support_card_' + card.id + '.png'"
     :alt="card.title_en || card.name" loading="lazy" decoding="async"
-    x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(card.title_en || card.name || 'Card') + '&background=random&color=fff'"
+    x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(card.title_en ||
+    card.name || 'Card') + '&background=random&color=fff'"
     class="w-full h-full object-cover">
 ```
 
@@ -82,8 +84,8 @@ body: JSON.stringify({
 
 ```javascript
 // Construct image URL from card ID (gametora.com pattern)
-const imageUrl = card.id ? 
-    `https://gametora.com/images/umamusume/supports/tex_support_card_${card.id}.png` : 
+const imageUrl = card.id ?
+    `https://gametora.com/images/umamusume/supports/tex_support_card_${card.id}.png` :
     null;
 
 body: JSON.stringify({
@@ -165,13 +167,13 @@ Move image URL construction to the backend `ResponseTransformer`:
 protected function transformSupportCard(array $card): array
 {
     $cardId = $card['id'] ?? 0;
-    
+
     return [
         'id' => $cardId,
         'name' => $card['name'] ?? $card['title_en'] ?? '',
         // ... other fields ...
-        'image_url' => $cardId ? 
-            "https://gametora.com/images/umamusume/supports/tex_support_card_{$cardId}.png" : 
+        'image_url' => $cardId ?
+            "https://gametora.com/images/umamusume/supports/tex_support_card_{$cardId}.png" :
             null,
         // ... metadata ...
     ];
@@ -204,7 +206,7 @@ Implement service worker caching for frequently accessed card images:
 
 ## Conclusion
 
-The support card image issue has been resolved by constructing image URLs from card IDs using the gametora.com URL pattern. All 487 cards now display with proper images instead of placeholders.
+The support card image issue has been resolved by constructing image URLs from card IDs using the
+gametora.com URL pattern. All 487 cards now display with proper images instead of placeholders.
 
 **Status**: ✅ Issue resolved, ready for Phase 3 (Training System Integration)
-

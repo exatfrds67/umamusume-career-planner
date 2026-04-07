@@ -1,7 +1,7 @@
 # Sidebar Minimize Feature - Quick Start Guide
 
-**Document Version**: 1.0.0  
-**Date**: February 8, 2026  
+**Document Version**: 1.0.0
+**Date**: February 8, 2026
 **Related**: [Implementation Plan](./sidebar-minimize-implementation-plan.md) | [Visual
 Reference](./sidebar-minimize-visual-reference.md)
 
@@ -16,7 +16,7 @@ Reference](./sidebar-minimize-visual-reference.md)
 ```javascript
 export default {
     minimized: localStorage.getItem('sidebar-minimized') === 'true',
-    
+
     toggle() {
         this.minimized = !this.minimized;
         localStorage.setItem('sidebar-minimized', this.minimized);
@@ -86,27 +86,30 @@ Alpine.store('sidebar', sidebarStore);
     <!-- Logo -->
     <div class="flex items-center gap-3" :class="$store.sidebar.minimized ? 'flex-col' : ''">
         <img src="/images/app_logo/uma_musume_race_planner_logo_128.png"
-            alt="{{ config('app.name') }} logo" 
+            alt="{{ config('app.name') }} logo"
             class="h-10 w-10 shrink-0">
-        <span x-show="!$store.sidebar.minimized" 
+        <span x-show="!$store.sidebar.minimized"
               x-transition
               class="text-base font-bold text-primary-600 dark:text-primary-400 leading-tight">
             Umamusume<br>Career Planner
         </span>
     </div>
-    
+
     <!-- Toggle Button (Desktop Only) -->
     <button @click="$store.sidebar.toggle()"
             type="button"
-            class="hidden lg:flex p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="hidden lg:flex p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200
+            hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             :aria-label="$store.sidebar.minimized ? 'Expand sidebar' : 'Minimize sidebar'"
             :aria-expanded="!$store.sidebar.minimized">
         <!-- Minimize Icon -->
-        <svg x-show="!$store.sidebar.minimized" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <svg x-show="!$store.sidebar.minimized" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-
+        width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
         </svg>
         <!-- Expand Icon -->
-        <svg x-show="$store.sidebar.minimized" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <svg x-show="$store.sidebar.minimized" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-
+        width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
         </svg>
     </button>
@@ -180,15 +183,16 @@ Alpine.store('sidebar', sidebarStore);
 <!-- Minimized State: Show icon with tooltip -->
 <li x-show="$store.sidebar.minimized" x-transition>
     <div x-data="{ tooltip: false }" class="relative">
-        <button @mouseenter="tooltip = true" 
+        <button @mouseenter="tooltip = true"
                 @mouseleave="tooltip = false"
                 class="group flex justify-center rounded-md p-2 w-full ...">
             <svg class="h-6 w-6 shrink-0" ...>...</svg>
         </button>
         <!-- Tooltip -->
-        <div x-show="tooltip" 
+        <div x-show="tooltip"
              x-transition
-             class="absolute left-full ml-2 top-0 z-50 bg-gray-900 dark:bg-gray-700 text-white text-sm px-3 py-2 rounded-md whitespace-nowrap pointer-events-none">
+             class="absolute left-full ml-2 top-0 z-50 bg-gray-900 dark:bg-gray-700 text-white text-sm px-3 py-2
+             rounded-md whitespace-nowrap pointer-events-none">
             Data Management
             <!-- Arrow -->
             <div class="absolute w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45 -left-1 top-1/2 -translate-y-1/2"></div>
@@ -223,9 +227,9 @@ document.addEventListener('keydown', (e) => {
 
 ```blade
 <!-- Screen Reader Announcement -->
-<div role="status" 
-     aria-live="polite" 
-     aria-atomic="true" 
+<div role="status"
+     aria-live="polite"
+     aria-atomic="true"
      class="sr-only">
     <span x-text="$store.sidebar.minimized ? 'Sidebar minimized' : 'Sidebar expanded'"></span>
 </div>
@@ -316,4 +320,3 @@ For questions or issues:
 
 *This quick start guide provides the essential steps to implement the sidebar minimize feature. For detailed
 specifications, refer to the full implementation plan.*
-

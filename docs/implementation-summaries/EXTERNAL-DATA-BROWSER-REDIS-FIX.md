@@ -1,8 +1,8 @@
 # External Data Browser Redis Connection Issue Fix
 
-**Date**: January 26, 2026  
-**Status**: ✅ Identified - Solution Provided  
-**Issue**: umapyoi.net character API not working in external data browser due to Redis connection failure  
+**Date**: January 26, 2026
+**Status**: ✅ Identified - Solution Provided
+**Issue**: umapyoi.net character API not working in external data browser due to Redis connection failure
 
 ## Problem Analysis
 
@@ -69,7 +69,7 @@ REDIS_PORT=6379
 // To:
 CACHE_DRIVER=array
 # REDIS_HOST=127.0.0.1
-# REDIS_PASSWORD=null  
+# REDIS_PASSWORD=null
 # REDIS_PORT=6379
 ```text
 
@@ -135,7 +135,7 @@ After fixing Redis connectivity:
 ### API Endpoints Working
 
 - `GET /api/external/characters` - Fetches from umapyoi.net
-- `GET /api/external/support-cards` - Fetches from umapyoi.net  
+- `GET /api/external/support-cards` - Fetches from umapyoi.net
 - `GET /api/external/skills` - Fetches from local database
 - `GET /api/external/news` - Fetches from umapyoi.net
 - `GET /api/external/status` - Health check
@@ -150,7 +150,7 @@ After fixing Redis connectivity:
 ### Caching Strategy
 
 - **Characters**: 24 hours TTL
-- **Support Cards**: 24 hours TTL  
+- **Support Cards**: 24 hours TTL
 - **Skills**: Local database (no external caching)
 - **News**: 1 hour TTL (more frequent updates)
 

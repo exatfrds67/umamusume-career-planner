@@ -65,7 +65,7 @@ parameters:
     # Using wildcard to match all test properties since Pest uses dynamic property assignment
     - message: '#Access to an undefined property PHPUnit\\Framework\\TestCase::\$\w+\.#'
       path: tests/*
-    
+
     # Laravel testing methods available through traits but not recognized by PHPStan
     - message: '#Call to an undefined method PHPUnit\\Framework\\TestCase::mock\(\)\.#'
       path: tests/*
@@ -80,8 +80,9 @@ Added @property annotations to `tests/TestCase.php` to document common test prop
  * @property mixed $parser Parser instance used in various parsing tests
  * @property mixed $service Service instance used in service tests
  * // ... additional properties
- * 
- * @method \Illuminate\Testing\TestResponse<\Illuminate\Http\Response> get(string $uri, array<string, string> $headers = [])
+ *
+ * @method \Illuminate\Testing\TestResponse<\Illuminate\Http\Response> get(string $uri, array<string,
+ string> $headers = [])
  * // ... existing method annotations
  */
 abstract class TestCase extends BaseTestCase

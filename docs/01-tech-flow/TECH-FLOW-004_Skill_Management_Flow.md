@@ -1,8 +1,14 @@
 # TECH-FLOW-004: Skill Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Document Version**: 2.4.0
+**Date**: March 8, 2026
+**Status**: Directionally aligned; storage-mode, eager-loading, and route-surface guidance added
+
+Historical implementation-task sections below are retained for design history only. Where any task
+list, API endpoint, class name, migration, or code block below conflicts with Sections 1, 2, or the
+current flow and sequence documents, treat the lower section as archived and non-authoritative.
+
+> **Reader note:** Sections below "System Architecture" may contain historical implementation-task examples retained for traceability. Unless a lower section explicitly states that it matches the current route surface and active repository classes, prefer Sections 1-2 and the linked storage-aware flow and sequence documents.
 
 **Source Specifications**:
 
@@ -12,14 +18,15 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-004](../prds/PRD-004_Skill_Management.md)
-- SPEC: [SPEC-004](../specs/SPEC-004_Skill_Management_Technical.md)
-- Flow: [FLOW-004](../flows/FLOW-004_Skill_Management_System.md)
-- Wireframes: [WF-008](../wireframes/WF-008_Skill_Shop_Interface.md), [WF-009](../wireframes/WF-009_Skill_Loadout_Manager.md)
-- Sequences: [SEQ-003](../sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
-- User Flows: [UF-005](../user-flows/UF-005_Skill_Management_Flow.md)
-- BRS: [002_BRS](../002_BRS_Business_Requirements_Specifications.md) (BR-4)
-- SRS: [003_SRS](../003_SRS_Software_Requirement_Specifications.md) (FR-05)
+- PRD: [PRD-004](../02-prds/PRD-004_Skill_Management.md)
+- SPEC: [SPEC-004](../02-specs/SPEC-004_Skill_Management_Technical.md)
+- Flow: [FLOW-004](../01-flows/FLOW-004_Skill_Management_System.md)
+- Wireframes: [WF-008](../01-wireframes/WF-008_Skill_Shop_Interface.md),
+[WF-009](../01-wireframes/WF-009_Skill_Loadout_Manager.md)
+- Sequences: [SEQ-003](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- User Flows: [UF-005](../01-user-flows/UF-005_Skill_Management_Flow.md)
+- BRS: [002_BRS](../00-core-docs/002_BRS_Business_Requirements_Specifications.md) (BR-4)
+- SRS: [003_SRS](../00-core-docs/003_SRS_Software_Requirement_Specifications.md) (FR-05)
 
 ---
 
@@ -40,45 +47,64 @@
 
 ## 1. System Architecture
 
+### 1.0 Storage Mode Support
+
+- `StorageMode::ACCOUNT`: implemented for authenticated character-owned skill views, acquisition,
+evolution, and saved build operations.
+- `StorageMode::LOCAL`: local-mode skill planning and hint visibility should be treated as advisory
+or browser-local until explicitly persisted through account-backed or conversion-aware flows.
+
+Skill-management technical flows should distinguish between advisory-only behavior, browser-local
+planning, and account-persistent acquisition or evolution.
+
 ### 1.1 Layered Architecture
 
 ```mermaid
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 3 Components"]
+        Livewire["Livewire 4 Components"]
         Alpine["Alpine.js Interactions"]
     end
-    
+
     subgraph Application["Application Layer"]
         Controllers["Skill Controllers"]
         FormRequests["Skill Requests"]
         Services["Skill Services"]
         AIAgents["AI Skill Agents"]
     end
-    
+
     subgraph Domain["Domain Layer"]
         Models["Eloquent Models"]
         Calculators["SP Calculators"]
         Repositories["Repositories"]
         Enums["Skill Enums"]
     end
-    
+
     subgraph Infrastructure["Infrastructure Layer"]
         MySQL[("MySQL Database")]
         Redis[("Redis Cache")]
         ExternalAPI["External Skill Data"]
     end
-    
+
     Presentation --> Application
     Application --> Domain
     Domain --> Infrastructure
-    
+
     style Presentation fill:#e3f2fd
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fff3e0
 ```text
+
+### 1.3 Current Route Surface Notes
+
+- Current web entry is `/skills` via `SkillController`.
+- Current API-style skill operations live under the `/api/skills/*` route group.
+- If an endpoint example in this document is illustrative rather than verified as a current route
+contract, it should be treated as non-authoritative.
+- Lower implementation-task examples in this document predate part of the current route surface and
+should not override the current-state guidance above.
 
 ### 1.2 Component Hierarchy
 
@@ -91,16 +117,16 @@ Skill Management System
 │   └── SkillLoadout (Blade Component)
 │
 ├── Controllers
-│   ├── SkillController (Web)
-│   ├── API/SkillController (API)
-│   ├── SkillAcquisitionController
-│   └── SkillEvolutionController
+│   ├── SkillController (current web entry)
+│   ├── API skill route handlers (current `/api/skills/*` surface)
+│   ├── Account-backed skill acquisition actions
+│   └── Account-backed skill evolution actions
 │
 ├── Services
 │   ├── SkillCatalogService
 │   ├── SkillHintService
 │   ├── SkillEvolutionService
-│   └── AISkillAdvisorService
+│   └── Advisory and AI orchestration services
 │
 ├── Calculators
 │   ├── SPCostCalculator
@@ -108,8 +134,8 @@ Skill Management System
 │   └── SkillBuildOptimizer
 │
 ├── Repositories
-│   ├── SkillRepository
-│   └── SkillAcquisitionRepository
+│   ├── Eloquent skill query and cache boundaries
+│   └── Skill acquisition persistence boundaries
 │
 └── Models
     ├── Skill
@@ -124,6 +150,10 @@ Skill Management System
 
 ### 2.1 Skill Acquisition Flow
 
+The acquisition flow below represents the authenticated account-backed persistence path. Browser-
+local skill planning should be treated as advisory or client-managed until explicitly converted into
+account-backed records.
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -137,29 +167,29 @@ sequenceDiagram
     participant Event as Event Dispatcher
 
     User->>UI: Select Skill to Acquire
-    UI->>Controller: POST /skills/{id}/acquire
+    UI->>Controller: Trigger account-backed skill acquisition action
     Controller->>Service: acquireSkill(character, skill)
-    
+
     Service->>Service: Validate character has sufficient SP
     Service->>HintService: getHintsForSkill(character, skill)
     HintService->>DB: Load skill hints
     DB-->>HintService: Hint records
     HintService-->>Service: Hint data with discount
-    
+
     Service->>SPCalc: calculateFinalCost(baseCost, hints)
     SPCalc->>SPCalc: Apply hint level discount (10%/20%/30%/35%/40% max)
     SPCalc-->>Service: Final SP cost
-    
+
     Service->>Service: Deduct SP from character
     Service->>DB: Create SkillAcquisition record
     DB-->>Service: Acquisition created
-    
+
     Service->>HintService: markHintsAsUsed(hints)
     HintService->>DB: Update hint records
-    
+
     Service->>Cache: Invalidate character skills cache
     Service->>Event: Dispatch SkillAcquired event
-    
+
     Service-->>Controller: Acquisition result
     Controller-->>UI: Success response
     UI-->>User: Display updated skills + SP balance
@@ -171,30 +201,30 @@ sequenceDiagram
 flowchart TD
     Start([Training Session Completes]) --> CheckCards[Check Active Support Cards]
     CheckCards --> RedExclamation{Red Exclamation (!)?}
-    
+
     RedExclamation -->|Yes| GuaranteedHint[Guaranteed Skill Hint]
     RedExclamation -->|No| NormalChance{Normal Hint Chance 25%}
-    
+
     GuaranteedHint --> HintService[SkillHintService::trackHint]
     NormalChance -->|Success| HintService
     NormalChance -->|Fail| NoHint[No Hint Acquired]
-    
+
     HintService --> CheckExisting{Hint Exists?}
     CheckExisting -->|Yes| IncrementCount[Increment hint_level]
     CheckExisting -->|No| CreateNew[Create New SkillHint Level 1]
-    
+
     IncrementCount --> CheckMax{Level >= 5?}
     CheckMax -->|Yes| CapAtMax[Cap at 5 hints - 40% max]
     CheckMax -->|No| StoreCount[Store Updated Level]
-    
+
     CreateNew --> StoreCount
     CapAtMax --> StoreCount
-    
+
     StoreCount --> CalcDiscount[Calculate Discount %]
     CalcDiscount --> UpdateUI[Update Skill Shop UI]
     UpdateUI --> End([Hint Tracked])
     NoHint --> End
-    
+
     style Start fill:#e3f2fd
     style End fill:#c8e6c9
     style GuaranteedHint fill:#fff9c4
@@ -213,7 +243,8 @@ flowchart TD
 
 **Additional Discount Sources**:
 
-- **Fast Learner Condition**: Extra 10% discount on all skill costs
+- **Fast Learner Condition**: Extra 10% discount on all skill costs (temporary condition granted by
+specific support card events; expires at end of training turn)
 - **Skill Sparks (Inheritance)**: White sparks provide bonus discount based on star rating
 - **Hint Books**: Green (white skills), Gold (rare skills) for manual hint addition
 
@@ -223,32 +254,32 @@ flowchart TD
 flowchart TD
     Start([User Triggers Evolution]) --> LoadSkill[Load Base Skill]
     LoadSkill --> ValidatePath{Has Evolution Path?}
-    
+
     ValidatePath -->|No| Error1[Return Error: No evolution available]
     ValidatePath -->|Yes| CheckOwned{Character Has Skill?}
-    
+
     CheckOwned -->|No| Error2[Return Error: Skill not owned]
     CheckOwned -->|Yes| LoadEvolution[Load Target Skill]
-    
+
     LoadEvolution --> CalcCost[Calculate SP Cost Difference]
     CalcCost --> CheckSP{Sufficient SP?}
-    
+
     CheckSP -->|No| Error3[Return Error: Insufficient SP]
     CheckSP -->|Yes| DeductSP[Deduct Additional SP]
-    
+
     DeductSP --> RemoveNormal[Remove Normal Skill]
     RemoveNormal --> AddRare[Add Rare Skill Variant]
     AddRare --> CreateRecord[Create SkillEvolution Record]
-    
+
     CreateRecord --> TriggerEvent[Trigger SkillEvolved Event]
     TriggerEvent --> InvalidateCache[Invalidate Skills Cache]
     InvalidateCache --> Return([Return Evolved Skill])
-    
+
     Error1 --> End([Error Response])
     Error2 --> End
     Error3 --> End
     Return --> End
-    
+
     style Start fill:#e3f2fd
     style Return fill:#c8e6c9
     style Error1 fill:#ffcdd2
@@ -258,14 +289,58 @@ flowchart TD
 
 ---
 
+## 2.4 Eager Loading Requirements
+
+For catalog, owned-skill, and recommendation rendering, the minimum eager-loaded relationships
+should be stated explicitly:
+
+- `character.skills`
+- `character.skillAcquisitions`
+- `character.currentCareer`
+- `skill.evolutionTo`
+- `skill.evolutionFrom`
+- `skillHint.skill`
+- `skillHint.supportCard`
+
+Lazy loading in loops should be treated as prohibited for skill catalog, acquired-skill, and build-planning views.
+
+---
+
+## 2.5 Storage-Aware Guidance
+
+- Hint visibility and skill planning may be supported in local mode as browser-backed or advisory-only behavior.
+- Final acquisition, SP deduction, and evolution should be documented as account-backed unless a
+local-mode persistence path is explicitly introduced.
+- If advisory or pricing guidance is available while offline, it should be treated as planning-only;
+account-backed acquisition still requires authenticated persistence.
+- When local skill plans are converted to account-backed records, they should follow the storage
+transition guidance in [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
+FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
+
+---
+
+## 2.6 Related Documents
+
+- [TECH-FLOW-001_Character_Management_Flow.md](TECH-FLOW-001_Character_Management_Flow.md)
+- [TECH-FLOW-002_Training_Optimization_Flow.md](TECH-FLOW-002_Training_Optimization_Flow.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
+FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [SEQ-003](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+
+---
+
 ## 3. Implementation Tasks
+
+> **Archived design snapshot begins below**
+>
+> The remaining sections preserve historical implementation planning and sample code. They are useful for background and design intent, but they are not the authoritative current-state description unless they match Sections 1-2 and the linked current flow and sequence documents.
 
 ### 3.1 Phase 1: Skill Catalog Service (Week 1, ~12 hours)
 
 #### Task 4.1.1: Create Skill Model and Migration
 
-**Priority**: P0  
-**Effort**: 4 hours  
+**Priority**: P0
+**Effort**: 4 hours
 **Status**: ✅ Complete
 
 ```php
@@ -371,7 +446,7 @@ Schema::create('ucp_skills', function (Blueprint $table) {
     $table->json('effects')->nullable();
     $table->json('activation_conditions')->nullable();
     $table->timestamps();
-    
+
     $table->index(['skill_type', 'rarity']);
 });
 ```
@@ -388,8 +463,8 @@ Schema::create('ucp_skills', function (Blueprint $table) {
 
 #### Task 4.1.2: Create SkillCatalogService
 
-**Priority**: P0  
-**Effort**: 6 hours  
+**Priority**: P0
+**Effort**: 6 hours
 **Status**: ✅ Complete
 
 ```php
@@ -408,22 +483,22 @@ class SkillCatalogService
     public function getAllSkills(array $filters = []): Collection
     {
         $cacheKey = 'skills.catalog.' . md5(json_encode($filters));
-        
+
         return Cache::remember($cacheKey, 3600, function () use ($filters) {
             $query = Skill::query();
-            
+
             if (!empty($filters['type'])) {
                 $query->byType($filters['type']);
             }
-            
+
             if (!empty($filters['rarity'])) {
                 $query->byRarity($filters['rarity']);
             }
-            
+
             if (!empty($filters['search'])) {
                 $query->searchable($filters['search']);
             }
-            
+
             return $query->orderBy('name')->get();
         });
     }
@@ -506,8 +581,8 @@ class SkillCatalogService
 
 #### Task 4.1.3: Seed Skill Database
 
-**Priority**: P0  
-**Effort**: 2 hours  
+**Priority**: P0
+**Effort**: 2 hours
 **Status**: ✅ Complete
 
 **Deliverables**:
@@ -523,8 +598,8 @@ class SkillCatalogService
 
 #### Task 4.2.1: Create SkillHint Model and Migration
 
-**Priority**: P0  
-**Effort**: 3 hours  
+**Priority**: P0
+**Effort**: 3 hours
 **Status**: ✅ Complete
 
 ```php
@@ -571,7 +646,7 @@ class SkillHint extends Model
 
     /**
      * Calculate discount based on hint level
-     * 
+     *
      * Game-Accurate Discount Rates (Verified Jan 2026):
      * - Levels 1-3: 10% each (cumulative: 10%, 20%, 30%)
      * - Levels 4-5: 5% each (cumulative: 35%, 40%)
@@ -610,7 +685,7 @@ Schema::create('ucp_skill_hints', function (Blueprint $table) {
     $table->integer('discount_percentage')->default(10); // 10/20/30/35/40
     $table->boolean('is_used')->default(false);
     $table->timestamps();
-    
+
     $table->index(['character_id', 'skill_id']);
     $table->unique(['character_id', 'skill_id', 'support_card_id']);
 });
@@ -629,8 +704,8 @@ Schema::create('ucp_skill_hints', function (Blueprint $table) {
 
 #### Task 4.2.2: Create SkillHintService
 
-**Priority**: P0  
-**Effort**: 8 hours  
+**Priority**: P0
+**Effort**: 8 hours
 **Status**: ✅ Complete
 
 ```php
@@ -641,7 +716,7 @@ class SkillHintService
 {
     /**
      * Track hint acquisition during training
-     * 
+     *
      * Game-Accurate Hint System (Verified Jan 2026):
      * - 5 hint levels with progressive discounts
      * - Levels 1-3: +10% each (10%, 20%, 30%)
@@ -678,7 +753,7 @@ class SkillHintService
 
     /**
      * Calculate final SP cost with hint discount and additional modifiers
-     * 
+     *
      * Additional Discount Sources:
      * - Fast Learner condition: +10% discount
      * - Skill Sparks (inheritance): Variable based on star rating
@@ -698,13 +773,13 @@ class SkillHintService
 
         // Check for Fast Learner condition
         $fastLearnerBonus = $this->hasFastLearnerCondition($character) ? 10 : 0;
-        
+
         // Total discount capped at reasonable maximum
         $totalDiscount = min(50, $hintDiscount + $fastLearnerBonus);
 
         return (int) round($skill->base_sp_cost * (1 - $totalDiscount / 100));
     }
-    
+
     private function hasFastLearnerCondition(Character $character): bool
     {
         return collect($character->conditions ?? [])->contains(function ($condition) {
@@ -752,7 +827,8 @@ class SkillHintService
 - Calculate discounted SP cost (5 levels: 10%/20%/30%/35%/40% max)
 - Track hint acquisition during training (5 levels maximum)
 - Support additional discount sources (Fast Learner, Skill Sparks)
-- Auto-consume hints on skill purchase
+- Auto-consume hints on skill purchase (hints are non-reusable; once a skill is purchased the hint
+discount for that skill is gone)
 - Get unused hints for character
 - Unit tests: 8 tests
 - **Files**: `app/Services/SkillHintService.php`
@@ -761,8 +837,8 @@ class SkillHintService
 
 #### Task 4.2.3: Integrate with Training System
 
-**Priority**: P0  
-**Effort**: 3 hours  
+**Priority**: P0
+**Effort**: 3 hours
 **Status**: ✅ Complete
 
 **Deliverables**:
@@ -779,8 +855,8 @@ class SkillHintService
 
 #### Task 4.3.1: Create SkillEvolution Model and Migration
 
-**Priority**: P1  
-**Effort**: 2 hours  
+**Priority**: P1
+**Effort**: 2 hours
 **Status**: ✅ Complete
 
 ```php
@@ -798,8 +874,8 @@ class SkillHintService
 
 #### Task 4.3.2: Create SkillEvolutionService
 
-**Priority**: P1  
-**Effort**: 6 hours  
+**Priority**: P1
+**Effort**: 6 hours
 **Status**: ✅ Complete
 
 ```php
@@ -926,8 +1002,8 @@ class SkillEvolutionService
 
 #### Task 4.4.1: Create SkillController
 
-**Priority**: P0  
-**Effort**: 6 hours  
+**Priority**: P0
+**Effort**: 6 hours
 **Status**: ✅ Complete
 
 **Endpoints**:
@@ -947,8 +1023,8 @@ class SkillEvolutionService
 
 #### Task 4.4.2: Create SkillEvolutionController
 
-**Priority**: P1  
-**Effort**: 4 hours  
+**Priority**: P1
+**Effort**: 4 hours
 **Status**: ✅ Complete
 
 **Endpoints**:
@@ -966,8 +1042,8 @@ class SkillEvolutionService
 
 #### Task 4.5.1: Feature Tests
 
-**Priority**: P0  
-**Effort**: 6 hours  
+**Priority**: P0
+**Effort**: 6 hours
 **Status**: ✅ Complete
 
 ```php
@@ -982,7 +1058,7 @@ use App\Services\SkillEvolutionService;
 test('acquires skill with hint discount', function () {
     $character = Character::factory()->create(['total_sp_available' => 500]);
     $skill = Skill::factory()->create(['base_sp_cost' => 120]);
-    
+
     // Add 5 hints (40% max discount)
     SkillHint::factory()->create([
         'character_id' => $character->id,
@@ -990,17 +1066,17 @@ test('acquires skill with hint discount', function () {
         'hint_level' => 5,
         'discount_percentage' => 40,
     ]);
-    
+
     $hintService = app(SkillHintService::class);
     $finalCost = $hintService->calculateFinalCost($skill, $character);
-    
+
     expect($finalCost)->toBe(72); // 120 - 40% = 72
 });
 
 test('hint discount levels are game-accurate', function () {
     $character = Character::factory()->create(['total_sp_available' => 500]);
     $skill = Skill::factory()->create(['base_sp_cost' => 100]);
-    
+
     // Test each hint level
     $expectedDiscounts = [
         1 => 10,  // Level 1: 10%
@@ -1009,14 +1085,14 @@ test('hint discount levels are game-accurate', function () {
         4 => 35,  // Level 4: 35%
         5 => 40,  // Level 5: 40% (maximum)
     ];
-    
+
     foreach ($expectedDiscounts as $level => $expectedDiscount) {
         $hint = SkillHint::factory()->create([
             'character_id' => $character->id,
             'skill_id' => $skill->id,
             'hint_level' => $level,
         ]);
-        
+
         expect($hint->calculateDiscount())->toBe($expectedDiscount);
         $hint->delete();
     }
@@ -1030,16 +1106,16 @@ test('skill evolution replaces normal with rare', function () {
         'rarity' => 'rare',
         'evolution_from_id' => $normalSkill->id,
     ]);
-    
+
     SkillAcquisition::factory()->create([
         'character_id' => $character->id,
         'skill_id' => $normalSkill->id,
         'is_active' => true,
     ]);
-    
+
     $service = app(SkillEvolutionService::class);
     $evolved = $service->evolveSkill($character, $normalSkill);
-    
+
     expect($evolved->skill_id)->toBe($rareSkill->id)
         ->and($evolved->is_evolution)->toBeTrue()
         ->and($character->fresh()->total_sp_available)->toBe(240); // 300 - 60 = 240
@@ -1047,12 +1123,12 @@ test('skill evolution replaces normal with rare', function () {
 
 test('skill search finds by name or japanese name', function () {
     Skill::factory()->create(['name' => 'Lane Guidance', 'name_jp' => 'レーンガイダンス']);
-    
+
     $service = app(SkillCatalogService::class);
-    
+
     $resultsEnglish = $service->searchSkills('Lane');
     $resultsJapanese = $service->searchSkills('レーン');
-    
+
     expect($resultsEnglish)->toHaveCount(1)
         ->and($resultsJapanese)->toHaveCount(1);
 });
@@ -1071,8 +1147,8 @@ test('skill search finds by name or japanese name', function () {
 
 #### Task 4.5.2: Edge Case Testing
 
-**Priority**: P1  
-**Effort**: 4 hours  
+**Priority**: P1
+**Effort**: 4 hours
 **Status**: ✅ Complete
 
 **Test Cases**:
@@ -1094,7 +1170,7 @@ test('skill search finds by name or japanese name', function () {
 ```php
 /**
  * Search skills by name (English or Japanese)
- * 
+ *
  * @param string $term Search term
  * @param int $limit Maximum results to return
  * @return \Illuminate\Support\Collection
@@ -1109,18 +1185,18 @@ public function searchSkills(string $term, int $limit = 10): Collection;
 ```php
 /**
  * Calculate final SP cost with hint discounts applied
- * 
+ *
  * Game-Accurate Formula (Verified Jan 2026):
  * - Hint Level 1: 10% discount
  * - Hint Level 2: 20% discount
  * - Hint Level 3: 30% discount
  * - Hint Level 4: 35% discount
  * - Hint Level 5: 40% discount (MAXIMUM)
- * 
+ *
  * Additional Discount Sources:
  * - Fast Learner condition: +10% discount
  * - Skill Sparks (inheritance): Variable based on star rating
- * 
+ *
  * @param Skill $skill The skill to calculate cost for
  * @param Character $character The character acquiring the skill
  * @return int Final SP cost after discounts
@@ -1135,7 +1211,7 @@ public function calculateFinalCost(Skill $skill, Character $character): int;
 ```php
 /**
  * Evolve skill from Normal to Rare variant
- * 
+ *
  * @param Character $character
  * @param Skill $normalSkill Base skill to evolve
  * @return SkillAcquisition New acquisition record
@@ -1150,6 +1226,8 @@ public function evolveSkill(Character $character, Skill $normalSkill): SkillAcqu
 
 ### 5.1 Entity Relationship Diagram
 
+> **Scope note:** The ERD below is a historical design snapshot. Current user-facing docs treat skill acquisition as acting on active run context, with account-backed persistence creating or updating the relevant acquisition and hint records. Do not read this diagram as the authoritative current persistence contract.
+
 ```mermaid
 erDiagram
     Character ||--o{ SkillAcquisition : has
@@ -1158,7 +1236,7 @@ erDiagram
     Skill ||--o{ SkillHint : provides
     Skill ||--o| Skill : evolves_to
     SupportCard ||--o{ SkillHint : sources
-    
+
     Character {
         bigint id PK
         bigint user_id FK
@@ -1166,7 +1244,7 @@ erDiagram
         int total_sp_available
         json current_stats
     }
-    
+
     Skill {
         bigint id PK
         string name
@@ -1178,7 +1256,7 @@ erDiagram
         json evolution_links
         json effects
     }
-    
+
     SkillAcquisition {
         bigint id PK
         bigint character_id FK
@@ -1189,7 +1267,7 @@ erDiagram
         boolean is_evolution
         boolean is_active
     }
-    
+
     SkillHint {
         bigint id PK
         bigint character_id FK
@@ -1225,25 +1303,29 @@ erDiagram
 flowchart TD
     SkillCatalogService --> SkillRepository
     SkillCatalogService --> CacheManager
-    
+
     SkillHintService --> SkillRepository
     SkillHintService --> SkillHintRepository
-    
+
     SkillEvolutionService --> SkillRepository
     SkillEvolutionService --> SkillAcquisitionRepository
     SkillEvolutionService --> EventDispatcher
-    
+
     AISkillAdvisorService --> SkillCatalogService
     AISkillAdvisorService --> HybridAIService
 ```
 
 ---
 
-## 7. API Endpoints
+## 7. API Endpoint Examples (Illustrative, Not Authoritative)
+
+The endpoint table below is retained as an archived design snapshot. It should not be treated as the
+current route contract. For current behavior, prefer the route-surface notes in Sections 1 and 2,
+the aligned skill flow documents, and the repository route files.
 
 ### 7.1 REST API Endpoints
 
-| Endpoint | Method | Description | Auth | Rate Limit | Cache TTL |
+| Example Endpoint | Method | Description | Auth | Rate Limit | Cache TTL |
 | --- | --- | --- | --- | --- | --- |
 | `/api/v1/skills` | GET | List skills with filters | Optional | 100/min | 1 hour |
 | `/api/v1/skills/{id}` | GET | Get skill details | Optional | 100/min | 1 hour |
@@ -1338,8 +1420,8 @@ pie title Test Distribution
 | Testing & Integration | 2 tasks | 10 | 11 | ✅ Complete |
 | Documentation | 1 task | 4 | 4 | ✅ Complete |
 
-**Total Estimated**: ~54 hours  
-**Total Actual**: ~57 hours  
+**Total Estimated**: ~54 hours
+**Total Actual**: ~57 hours
 **Duration**: ~2-3 weeks (40-hour weeks)
 
 ---
@@ -1399,12 +1481,15 @@ pie title Test Distribution
 - **Next**: [TECH-FLOW-005: Support Card Management Flow](TECH-FLOW-005_Support_Card_Management_Flow.md)
 - **Previous**: [TECH-FLOW-003: Race Strategy Flow](TECH-FLOW-003_Race_Strategy_Flow.md)
 - **Index**: [000_TECH_FLOW_INDEX.md](000_TECH_FLOW_INDEX.md)
-- **BRS**: [002_BRS_Business_Requirements_Specifications.md](../002_BRS_Business_Requirements_Specifications.md)
-- **SRS**: [003_SRS_Software_Requirement_Specifications.md](../003_SRS_Software_Requirement_Specifications.md)
-- **SDS**: [004_SDS_Software_Design_Specifications.md](../004_SDS_Software_Design_Specifications.md)
-- **DBD**: [009_DBD_Database_Documentation.md](../009_DBD_Database_Documentation.md)
-- **SCD**: [010_SCD_Source_Code_Documentation.md](../010_SCD_Source_Code_Documentation.md)
+- **BRS**: [002_BRS_Business_Requirements_Specifications.md](../00-core-
+docs/002_BRS_Business_Requirements_Specifications.md)
+- **SRS**: [003_SRS_Software_Requirement_Specifications.md](../00-core-
+docs/003_SRS_Software_Requirement_Specifications.md)
+- **SDS**: [004_SDS_Software_Design_Specifications.md](../00-core-docs/004_SDS_Software_Design_Specifications.md)
+- **DBD**: [009_DBD_Database_Documentation.md](../00-core-docs/009_DBD_Database_Documentation.md)
+- **SCD**: [010_SCD_Source_Code_Documentation.md](../00-core-docs/010_SCD_Source_Code_Documentation.md)
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.0.0 and follows
+industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

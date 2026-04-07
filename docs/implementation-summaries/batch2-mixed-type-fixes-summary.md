@@ -1,7 +1,7 @@
 # Batch 2: Mixed Type Fixes - Implementation Summary (COMPLETED)
 
-**Date**: 2026-02-03  
-**Task**: Resolve "Mixed" type errors in Service and Controller layers  
+**Date**: 2026-02-03
+**Task**: Resolve "Mixed" type errors in Service and Controller layers
 **Status**: ✅ COMPLETED - 54% Error Reduction Achieved
 
 ## Overview
@@ -36,7 +36,8 @@ This batch focused on eliminating "mixed" type contagion in the logic layer, spe
 
 ```php
 // Added PHPDoc type hint for skill array
-/** @var array{name?: string, tier?: string, rarity?: string, base_cost?: int, hint_level?: int, category?: string} $skill */
+/** @var array{name?: string, tier?: string, rarity?: string, base_cost?: int, hint_level?: int,
+category?: string} $skill */
 
 // Explicit casting in sprintf
 sprintf(
@@ -306,7 +307,8 @@ $fanGain = (int) ($actualResultData['fan_gain'] ?? 0);
 
 ### AdvisoryController.php (38 errors)
 
-Most remaining errors are "Cannot cast mixed" warnings where Laravel's validation guarantees the type but PHPStan cannot infer it. These are false positives that can be:
+Most remaining errors are "Cannot cast mixed" warnings where Laravel's validation guarantees the
+type but PHPStan cannot infer it. These are false positives that can be:
 
 1. Suppressed with `@phpstan-ignore-next-line` comments
 2. Fixed by improving Form Request type hints
@@ -423,13 +425,16 @@ We've successfully eliminated the majority of mixed-type errors by:
 - Establishing clear type casting conventions
 - Creating reusable patterns for future development
 
-The remaining errors are primarily false positives that don't represent actual type safety issues. The codebase is now significantly more type-safe and maintainable.
+The remaining errors are primarily false positives that don't represent actual type safety issues.
+The codebase is now significantly more type-safe and maintainable.
 
 ---
 
-**Next Steps**: Move to Batch 3 (remaining service layer files) or address remaining false positives with targeted suppressions.
+**Next Steps**: Move to Batch 3 (remaining service layer files) or address remaining false positives
+with targeted suppressions.
 
-**Estimated Time Saved**: Future developers will spend ~30% less time debugging type-related issues thanks to explicit type handling.
+**Estimated Time Saved**: Future developers will spend ~30% less time debugging type-related issues
+thanks to explicit type handling.
 
 ## Overview (Initial Analysis)
 
@@ -456,7 +461,8 @@ This batch focused on eliminating "mixed" type contagion in the logic layer, spe
 
 - **Issue**: `sprintf` calls receiving mixed values from `$skill` arrays
 - **Solution**:
-  - Added PHPDoc type hint: `@var array{name?: string, tier?: string, rarity?: string, base_cost?: int, hint_level?: int, category?: string} $skill`
+  - Added PHPDoc type hint: `@var array{name?: string, tier?: string, rarity?: string, base_cost?:
+  int, hint_level?: int, category?: string} $skill`
   - Explicit casting to int: `(int) ($skill['base_cost'] ?? 100)`
   - Explicit casting to string in sprintf: `(string) ($skill['name'] ?? 'Unknown')`
   - Cast all str_replace parameters to string
@@ -559,7 +565,8 @@ The remaining errors are concentrated in methods that process validated request 
 
 ### Strategy for Completion
 
-1. **Create Type-Safe Wrappers**: For complex validated arrays, consider creating small DTO classes or using PHPDoc `@var` annotations at the method level
+1. **Create Type-Safe Wrappers**: For complex validated arrays, consider creating small DTO classes
+or using PHPDoc `@var` annotations at the method level
 
 2. **Consistent Pattern**: Apply the same pattern used in `getRaceStrategy` to all methods:
 
@@ -613,5 +620,5 @@ The remaining errors are concentrated in methods that process validated request 
 
 ---
 
-**Batch 2 Status**: 🟡 In Progress (60% Complete)  
+**Batch 2 Status**: 🟡 In Progress (60% Complete)
 **Next Review**: After completing AdvisoryController fixes

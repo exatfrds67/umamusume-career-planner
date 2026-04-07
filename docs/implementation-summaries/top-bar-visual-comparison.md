@@ -1,7 +1,7 @@
 # Top Bar Visual Comparison
 
-**Date**: 2026-02-09  
-**Component**: Application Header & Status Bar  
+**Date**: 2026-02-09
+**Component**: Application Header & Status Bar
 **Related**: top-bar-enhancement-summary.md
 
 ---

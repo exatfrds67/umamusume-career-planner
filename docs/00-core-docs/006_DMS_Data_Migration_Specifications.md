@@ -6,7 +6,7 @@
 **Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.4.0, 30 models, 51 migrations
+**Status**: Current - Aligned to codebase v2.4.0, 40 models, 67 migrations
 
 ---
 
@@ -26,7 +26,9 @@
 
 ## 1. Introduction
 
-This document provides technical specifications for data migration into the Umamusume Career Planner system. It covers format detection, field mapping, validation, and transformation rules implemented in the current codebase.
+This document provides technical specifications for data migration into the Umamusume Career Planner
+system. It covers format detection, field mapping, validation, and transformation rules implemented
+in the current codebase.
 
 ### 1.1 Scope
 
@@ -58,10 +60,15 @@ mindmap
 
 ### 1.2 Source References
 
-- **Service Layer**: `app/Services/DataMigrationService.php`, `app/Services/DataImportService.php`, `app/Services/DataExportService.php`, `app/Services/DataOperationHistoryService.php`, `app/Services/BackupService.php`, `app/Services/SnapshotService.php`
-- **Related PRDs**: [PRD-001](../prds/PRD-001_Character_Management.md), [PRD-007](../prds/PRD-007_External_Integration.md)
-- **Related Specs**: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md), [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
-- **Related Flows**: [FLOW-001](../flows/FLOW-001_Character_Management_System.md), [SEQ-015](../sequences/SEQ-015_Data_Migration_Snapshot_to_Live.md)
+- **Service Layer**: `app/Services/DataMigrationService.php`, `app/Services/DataImportService.php`,
+`app/Services/DataExportService.php`, `app/Services/DataOperationHistoryService.php`,
+`app/Services/BackupService.php`, `app/Services/SnapshotService.php`
+- **Related PRDs**: [PRD-001](../prds/PRD-001_Character_Management.md),
+[PRD-007](../prds/PRD-007_External_Integration.md)
+- **Related Specs**: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md),
+[SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
+- **Related Flows**: [FLOW-001](../flows/FLOW-001_Character_Management_System.md),
+[SEQ-015](../sequences/SEQ-015_Data_Migration_Snapshot_to_Live.md)
 
 ---
 
@@ -72,19 +79,19 @@ mindmap
 ```mermaid
 flowchart TD
     Input[Uploaded File]
-    
+
     Input --> Detect{Format Detection}
-    
+
     Detect -->|JSON Structure| JSON{JSON Type}
     Detect -->|CSV/TSV| CSV[CSV Adapter]
     Detect -->|Unknown| Heuristic[Heuristic Parser]
-    
+
     JSON -->|trainee_name, stat_speed| V1JSON[v1_json Adapter]
     JSON -->|career_run, scenario| V1JSON
     JSON -->|schema_version present| Standard[Standard JSON]
-    
+
     CSV -->|Header mapping| CSVParse[CSV Parser]
-    
+
     V1JSON --> Transform[Transformation Pipeline]
     Standard --> Transform
     CSVParse --> Transform
@@ -111,15 +118,15 @@ public function detectLegacyFormat(array $data): string
     if (isset($data['trainee_name']) || isset($data['stat_speed'])) {
         return 'v1_json';
     }
-    
+
     if (isset($data['career_run']) || isset($data['scenario'])) {
         return 'v1_json';
     }
-    
+
     if (isset($data['schema_version'])) {
         return 'standard_json';
     }
-    
+
     return 'custom';
 }
 ```text
@@ -137,7 +144,7 @@ erDiagram
     IMPORT_SOURCE ||--o{ TRAINING_SESSION : creates
     IMPORT_SOURCE ||--o{ SKILL : creates
     IMPORT_SOURCE ||--o{ SUPPORT_CARD : creates
-    
+
     CHARACTER {
         bigint id PK
         string name
@@ -146,7 +153,7 @@ erDiagram
         int energy_level
         string mood_status
     }
-    
+
     CAREER {
         bigint id PK
         bigint character_id FK
@@ -155,7 +162,7 @@ erDiagram
         string status
         json final_stats
     }
-    
+
     TRAINING_SESSION {
         bigint id PK
         bigint career_id FK
@@ -163,7 +170,7 @@ erDiagram
         string training_type
         json stat_gains
     }
-    
+
     SKILL {
         bigint id PK
         string name
@@ -171,7 +178,7 @@ erDiagram
         string rarity
         int base_sp_cost
     }
-    
+
     SUPPORT_CARD {
         bigint id PK
         string name
@@ -219,7 +226,7 @@ flowchart LR
         L6[sp / total_sp]
         L7[turn / current_turn]
     end
-    
+
     subgraph Canonical[Canonical Fields]
         C1[speed]
         C2[stamina]
@@ -229,7 +236,7 @@ flowchart LR
         C6[total_sp_available]
         C7[turn_number]
     end
-    
+
     L1 --> C1
     L2 --> C2
     L3 --> C3
@@ -276,18 +283,18 @@ flowchart LR
 ```mermaid
 flowchart TD
     Data[Import Data]
-    
+
     Data --> Check{schema_version present?}
-    
+
     Check -->|Yes| Parse[Parse Version]
     Check -->|No| Legacy[Assume v1.0]
-    
+
     Parse --> Compare{Version < Current?}
     Legacy --> Migrate
-    
+
     Compare -->|Yes| Migrate[Apply Migrations]
     Compare -->|No| Valid[Validate Schema]
-    
+
     Migrate --> Valid
     Valid --> Import[Execute Import]
 ```
@@ -299,7 +306,7 @@ flowchart TD
 | 1.0 | 2025-01-01 | Initial schema |
 | 1.1 | 2025-06-01 | Added scenario_type enum |
 | 2.0 | 2026-01-14 | Unified canonical field names |
-| 2.4 | 2026-02-22 | 30 models, 51 migrations, extended target entities |
+| 2.4 | 2026-02-22 | 40 models, 67 migrations, extended target entities |
 
 ### 5.3 Migration Rules by Version
 
@@ -311,12 +318,12 @@ private function migrateSchema(array $data, string $fromVersion): array
         // Add scenario_type if missing
         $data['scenario_type'] = $data['scenario_type'] ?? 'ura_finale';
     }
-    
+
     if (version_compare($fromVersion, '2.0', '<')) {
         // Rename legacy fields to canonical
         $data = $this->applyCanonicalFieldNames($data);
     }
-    
+
     return $data;
 }
 ```text
@@ -330,7 +337,7 @@ private function migrateSchema(array $data, string $fromVersion): array
 ```mermaid
 flowchart LR
     Raw[Raw Data]
-    
+
     Raw --> S1[1. Format Detection]
     S1 --> S2[2. Schema Migration]
     S2 --> S3[3. Field Mapping]
@@ -361,11 +368,11 @@ public function transform(array $rawData): array
 {
     // 1. Detect format
     $format = $this->detectLegacyFormat($rawData);
-    
+
     // 2. Apply schema migrations
     $version = $rawData['schema_version'] ?? '1.0';
     $data = $this->migrateSchema($rawData, $version);
-    
+
     // 3-4. Field mapping and type conversion
     $data = [
         'name' => (string) ($data['name'] ?? $data['trainee_name'] ?? ''),
@@ -375,19 +382,19 @@ public function transform(array $rawData): array
         'guts' => (int) ($data['guts'] ?? $data['gut'] ?? 0),
         'wit' => (int) ($data['wit'] ?? $data['int'] ?? $data['wis'] ?? 0),
     ];
-    
+
     // 5. Normalize enums
     $data['scenario_type'] = $this->normalizeScenarioType($data['scenario_type'] ?? null);
     $data['status'] = $this->normalizeStatus($data['status'] ?? null);
-    
+
     // 6. Apply defaults
     $data = array_merge($this->getDefaults(), $data);
-    
+
     // 7. Clamp stat values
     foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
         $data[$stat] = max(0, min(1200, $data[$stat]));
     }
-    
+
     return $data;
 }
 ```text
@@ -401,17 +408,17 @@ public function transform(array $rawData): array
 ```mermaid
 flowchart TD
     Data[Transformed Data]
-    
+
     Data --> L1{Layer 1: Schema}
     L1 -->|Pass| L2{Layer 2: Business Rules}
     L1 -->|Fail| E1[Schema Errors]
-    
+
     L2 -->|Pass| L3{Layer 3: Integrity}
     L2 -->|Fail| E2[Business Rule Errors]
-    
+
     L3 -->|Pass| Valid[Valid Data]
     L3 -->|Fail| E3[Integrity Errors]
-    
+
     E1 --> Report[Error Report]
     E2 --> Report
     E3 --> Report
@@ -431,7 +438,7 @@ flowchart TD
 
 | Rule | Description | Implementation |
 | --- | --- | --- |
-| Turn-Stage Consistency | Turn number matches career stage | Junior: 1-24, Classic: 25-48, Senior: 49-78 |
+| Turn-Stage Consistency | Turn number matches career stage | Junior: 1-24, Classic: 25-48, Senior: 49-72, URA Finals: 73-78 |
 | Skill Prerequisites | Required skills acquired first | Check acquisition order |
 | SP Budget | Total SP spent ≤ available | Sum validation |
 | Unique Constraints | No duplicate names/keys | Database unique checks |
@@ -444,12 +451,12 @@ public function validateRecord(array $record): ValidationResult
 {
     $errors = [];
     $warnings = [];
-    
+
     // Schema validation
     if (empty($record['name'])) {
         $errors[] = ['field' => 'name', 'message' => 'Name is required'];
     }
-    
+
     // Stat range validation
     foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
         $value = $record[$stat] ?? 0;
@@ -461,7 +468,7 @@ public function validateRecord(array $record): ValidationResult
             ];
         }
     }
-    
+
     // Scenario type validation
     $validScenarios = ['ura_finale', 'unity_cup', 'climax', 'grand_live'];
     if (!in_array($record['scenario_type'] ?? '', $validScenarios)) {
@@ -470,7 +477,7 @@ public function validateRecord(array $record): ValidationResult
             'message' => 'Unknown scenario type, defaulting to ura_finale'
         ];
     }
-    
+
     return new ValidationResult($errors, $warnings);
 }
 ```text
@@ -546,25 +553,25 @@ sequenceDiagram
     participant Service as MigrationService
     participant Validator
     participant DB as Database
-    
+
     User->>UI: Upload file
     UI->>Service: detectFormat(file)
     Service-->>UI: Format detected
-    
+
     UI->>Service: parseAndTransform(file)
     Service->>Validator: validateBatch(records)
     Validator-->>Service: ValidationResult
     Service-->>UI: Preview with validation
-    
+
     User->>UI: Confirm import
     UI->>Service: executeMigration(records)
-    
+
     loop For each batch
         Service->>DB: INSERT batch
         DB-->>Service: Result
         Service->>UI: Progress update
     end
-    
+
     Service-->>UI: Final report
     UI-->>User: Display results
 ```
@@ -583,15 +590,15 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     Migration[Migration Execution]
-    
+
     Migration --> Track[Track batch IDs]
     Track --> Execute[Execute batches]
-    
+
     Execute --> Success{All successful?}
-    
+
     Success -->|Yes| Complete[Complete migration]
     Success -->|No| Rollback[Rollback by batch ID]
-    
+
     Rollback --> Delete[DELETE WHERE batch_id = ?]
     Delete --> Report[Generate rollback report]
 ```text
@@ -621,7 +628,7 @@ php artisan migrate:rollback {migration_id}
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.4.0 | 2026-02-22 | Development Team | Extended target entities (17 types), schema v2.4, added BackupService/SnapshotService refs, 30 models |
+| 2.4.0 | 2026-02-22 | Development Team | Extended target entities (17 types), schema v2.4, added BackupService/SnapshotService refs, 40 models |
 | 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to match current codebase implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with canonical field names |

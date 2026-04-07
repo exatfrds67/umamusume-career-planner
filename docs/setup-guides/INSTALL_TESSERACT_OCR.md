@@ -1,6 +1,6 @@
 # Tesseract OCR Installation Guide for Windows
 
-**Date:** January 20, 2026  
+**Date:** January 20, 2026
 **System:** Windows with PHP 8.4.11
 
 ---
@@ -373,7 +373,8 @@ IMAGE_SECURITY_SCAN_ENABLED=true
 2. **Test Laravel Integration**
 
    ```powershell
-   php artisan tinker --execute="echo app(\App\Services\TesseractService::class)->isAvailable() ? 'Available' : 'Not Available';"
+   php artisan tinker --execute="echo app(\App\Services\TesseractService::class)->isAvailable() ?
+   'Available' : 'Not Available';"
    ```
 
 3. **Run Tests**

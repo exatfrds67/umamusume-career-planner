@@ -1,14 +1,15 @@
 # Phase 3: Training System Integration - Implementation Plan
 
-**Date**: January 25, 2026  
-**Status**: 🔄 IN PROGRESS  
+**Date**: January 25, 2026
+**Status**: 🔄 IN PROGRESS
 **Priority**: P0 (Critical for complete external API integration)
 
 ---
 
 ## Overview
 
-Integrate imported support cards with the training system to calculate bonuses, track friendship levels, record skill hints, and provide accurate training predictions.
+Integrate imported support cards with the training system to calculate bonuses, track friendship
+levels, record skill hints, and provide accurate training predictions.
 
 ---
 
@@ -153,7 +154,7 @@ CREATE TABLE support_deck_cards (
 **Database Schema Update**:
 
 ```sql
-ALTER TABLE skill_acquisitions 
+ALTER TABLE skill_acquisitions
 ADD COLUMN hint_level INT DEFAULT 0 CHECK (hint_level BETWEEN 0 AND 2),
 ADD COLUMN hint_sources JSON NULL COMMENT 'Array of support card IDs that provided hints',
 ADD COLUMN sp_discount_applied INT DEFAULT 0 COMMENT 'SP discount from hints (0-40%)';

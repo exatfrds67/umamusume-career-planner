@@ -2,8 +2,8 @@
 
 ## Uma Musume Career Planner
 
-**Document Version:** 2.0  
-**Date:** 2026-01-03  
+**Document Version:** 2.0
+**Date:** 2026-01-03
 **Status:** Draft
 
 ---
@@ -21,7 +21,8 @@
 
 ## 1. Introduction
 
-Welcome to the **Uma Musume Career Planner**, your comprehensive tool for planning, tracking, and analyzing your training runs in *Uma Musume: Pretty Derby*.
+Welcome to the **Uma Musume Career Planner**, your comprehensive tool for planning, tracking, and
+analyzing your training runs in *Uma Musume: Pretty Derby*.
 
 This manual guides you through using the application, managing your training plans, and understanding the data provided.
 
@@ -74,14 +75,14 @@ flowchart TB
         L3["Works offline"]
         L4["Risk: Browser cache clear"]
     end
-    
+
     subgraph Account["🟣 Account Mode"]
         A1["Login required"]
         A2["Cloud sync"]
         A3["Access anywhere"]
         A4["Secure backup"]
     end
-    
+
     Local -->|"Convert"| Account
 ```
 
@@ -115,7 +116,7 @@ flowchart TD
         List["📋 Plan List<br/>Your Training Logs"]
         Filters["🔍 Filters<br/>Status, Strategy"]
     end
-    
+
     Stats --> List
     Recent --> List
     Filters --> List
@@ -142,7 +143,7 @@ sequenceDiagram
     participant Dashboard
     participant Form
     participant Storage
-    
+
     User->>Dashboard: Click "Create Plan"
     Dashboard->>Form: Open creation form
     User->>Form: Enter title
@@ -173,7 +174,7 @@ flowchart LR
         Skills["⭐ Skills<br/>Skill Management"]
         Turns["📈 Turns<br/>Progress Tracking"]
     end
-    
+
     General --> Attributes --> Skills --> Turns
 ```text
 
@@ -191,14 +192,14 @@ flowchart TD
     Search["🔍 Search Skill<br/>(English or Japanese)"]
     Select["📋 Select from List"]
     Add["➕ Add to Plan"]
-    
+
     Search --> Select --> Add
-    
+
     Add --> Status{"Set Status"}
     Status --> Suggested["💭 Suggested<br/>Plan to get"]
     Status --> Acquired["✅ Acquired<br/>Already bought"]
     Status --> Skipped["❌ Skipped<br/>Decided against"]
-    
+
     Acquired --> Turn["Enter Turn Number"]
 ```
 
@@ -242,14 +243,14 @@ flowchart LR
         E2["Click Export"]
         E3["Download .json file"]
     end
-    
+
     subgraph Import["Import Process"]
         I1["Go to Import page"]
         I2["Upload .json file"]
         I3["Review & Confirm"]
         I4["Data restored"]
     end
-    
+
     E3 -.->|"Transfer file"| I2
 ```
 
@@ -277,7 +278,7 @@ sequenceDiagram
     participant Server
     participant Database
     participant LocalStorage
-    
+
     User->>User: Log in
     User->>LocalData: Find local plan
     User->>LocalData: Click "Convert to Account"
@@ -305,13 +306,13 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     Issue["Issue Encountered"]
-    
+
     Issue --> Type{"What type?"}
-    
+
     Type -->|"Connection"| Conn["Connection Lost"]
     Type -->|"Data"| Data["Missing Data"]
     Type -->|"Search"| Search["Skill Not Found"]
-    
+
     Conn --> ConnFix["Wait for reconnect<br/>Draft auto-saved"]
     Data --> DataFix["Check browser<br/>Same browser?<br/>Incognito?"]
     Search --> SearchFix["Try Japanese name<br/>Check spelling"]
@@ -357,7 +358,7 @@ When your internet connection drops:
 ```mermaid
 flowchart LR
     Help["Need Help?"]
-    
+
     Help --> Docs["📚 Documentation<br/>Read the docs"]
     Help --> FAQ["❓ FAQ<br/>Common questions"]
     Help --> GitHub["🐙 GitHub<br/>Report bugs"]

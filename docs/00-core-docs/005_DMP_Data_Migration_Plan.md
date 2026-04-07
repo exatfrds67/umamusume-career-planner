@@ -6,7 +6,7 @@
 **Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.4.0, 30 Eloquent models, 51 migrations
+**Status**: Current - Aligned with codebase v2.4.0, 40 Eloquent models, 67 migrations
 
 ---
 
@@ -26,7 +26,10 @@
 
 ## 1. Purpose
 
-This Data Migration Plan defines the strategy for migrating data from legacy sources and external imports into the current Umamusume Career Planner schema. It covers detection, conversion, validation, conflict resolution, and rollback procedures implemented in the `DataMigrationService` and `DataImportService`.
+This Data Migration Plan defines the strategy for migrating data from legacy sources and external
+imports into the current Umamusume Career Planner schema. It covers detection, conversion,
+validation, conflict resolution, and rollback procedures implemented in the `DataMigrationService`
+and `DataImportService`.
 
 ---
 
@@ -73,7 +76,7 @@ Legacy Applications
 | `ucp_careers` | Career run tracking | Valid scenario types |
 | `ucp_training_sessions` | Training session history | Foreign key to careers |
 | `ucp_skills` | Skill catalog | Unique skill identifiers |
-| `ucp_skill_hints` | Hint tracking for SP reduction | Max 5 hint levels per skill (40% max discount) |
+| `ucp_skill_hints` | Independent entity table tracking hints linking `character_id` to `skill_id` (not inline columns) | Max 5 hint levels per skill (40% max discount) |
 | `ucp_skill_acquisitions` | Skills acquired per career | Turn number validation |
 | `ucp_skill_builds` | Skill build templates | Named skill set combinations |
 | `ucp_support_cards` | Support card inventory | Valid rarity and type |
@@ -94,7 +97,9 @@ Legacy Applications
 
 Current target schema version: `2.4`
 
-All imports include `schema_version` field for forward compatibility and migration tracking. The database currently has **51 migrations** managing **30 Eloquent models** across the `ucp_` prefixed tables.
+All imports include `schema_version` field for forward compatibility and migration tracking. The
+database currently has **67 migrations** managing **40 Eloquent models** across the `ucp_` prefixed
+tables.
 
 ---
 
@@ -415,7 +420,7 @@ For OCR-based data intake:
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.4.0 | 2026-02-22 | Development Team | Updated table counts (20 target tables), schema v2.4, 51 migrations, 30 models, added DataOperationHistoryService/BackupService/SnapshotService |
+| 2.4.0 | 2026-02-22 | Development Team | Updated table counts (20 target tables), schema v2.4, 67 migrations, 40 models, added DataOperationHistoryService/BackupService/SnapshotService |
 | 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync |
 | 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with current implementation |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |

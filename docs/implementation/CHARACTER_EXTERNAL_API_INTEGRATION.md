@@ -1,12 +1,14 @@
 # Character Creation External API Integration
 
-**Status**: ✅ Implemented  
-**Date**: 2026-01-25  
+**Status**: ✅ Implemented
+**Date**: 2026-01-25
 **Feature**: External API Integration for Character Creation
 
 ## Overview
 
-Implemented full integration of external API (umapyoi.net) data into the character creation workflow at `/characters/create`. Users can now search and import real game data directly from the external API to prefill character information including stats, aptitudes, and images.
+Implemented full integration of external API (umapyoi.net) data into the character creation workflow
+at `/characters/create`. Users can now search and import real game data directly from the external
+API to prefill character information including stats, aptitudes, and images.
 
 ## Implementation Summary
 

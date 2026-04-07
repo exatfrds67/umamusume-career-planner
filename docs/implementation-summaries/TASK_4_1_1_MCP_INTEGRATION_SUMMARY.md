@@ -286,17 +286,17 @@ public function healthCheck(): array
     foreach ($this->servers as $name => $config) {
         // Perform health check
         $checkResult = $this->performHealthCheck($name, $config);
-        
+
         // Update health tracking
-        $this->updateServerHealth($name, $checkResult['status'], 
+        $this->updateServerHealth($name, $checkResult['status'],
                                   $checkResult['status'] === 'healthy');
-        
+
         // Attempt reconnection if needed
         if ($this->needsReconnection($name)) {
             $this->attemptReconnection($name, $config);
         }
     }
-    
+
     return $results;
 }
 ```
@@ -393,26 +393,26 @@ MCP_DEBUG=false
 return [
     'enabled' => env('MCP_ENABLED', true),
     'debug' => env('MCP_DEBUG', false),
-    
+
     'servers' => [
         // AI and Agent Services
         'strands-agents' => [...],
         'agentcore-mcp-server' => [...],
-        
+
         // AWS Infrastructure Services
         'awspricing' => [...],
         'awsknowledge' => [...],
         'awsapi' => [...],
-        
+
         // Data and Context Services
         'context7' => [...],
         'fetch' => [...],
         'memory' => [...],
-        
+
         // Optional Services
         'figma' => [...],
     ],
-    
+
     'health_check_interval' => 300,
     'connection_timeout' => 10,
     'max_concurrent_calls' => 5,
@@ -541,4 +541,3 @@ The MCP integration is now ready for use in hybrid AI service architecture (Task
 ---
 
 **Validates**: Requirements 56.1, 56.2
-

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 3.4.0
-**Date**: February 22, 2026
+**Document Version**: 3.4.1
+**Date**: March 10, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current – Aligned with v2.2.0 and Global English Server Mechanics (February 2026)
+**Status**: Current – Aligned with v2.2.0 and Global English Server Mechanics (March 2026)
 
 ---
 
@@ -26,7 +26,10 @@
 
 ## 1. Purpose
 
-This glossary defines all core terminology used in the Umamusume Pretty Derby Career Planner project, aligned with the v2.2.0 codebase (30 models, 8 enums, 70+ services, 571 routes, 3,316+ tests) and the **Global English server** gameplay and translations (as of February 2026). Use this glossary as the authoritative reference for all documentation, code, and user interface.
+This glossary defines all core terminology used in the Umamusume Pretty Derby Career Planner
+project, aligned with the v2.2.0 codebase (40 models, 8 enums, 70+ services, 571 routes, 3,316+
+tests) and the **Global English server** gameplay and translations (as of March 2026). Use this
+glossary as the authoritative reference for all documentation, code, and user interface.
 
 ---
 
@@ -34,42 +37,73 @@ This glossary defines all core terminology used in the Umamusume Pretty Derby Ca
 
 ### 2.1 Core Stats
 
-- **Stat**: Speed; **Japanese**: スピード; **Definition**: Maximum running speed; determines overall race velocity.; **Range**: 0-1200; **Priority**: ★★★★★
-- **Stat**: Stamina; **Japanese**: スタミナ; **Definition**: HP & effective stamina; enables staying power over longer distances and through race events.; **Range**: 0-1200; **Priority**: ★★★★
-- **Stat**: Power; **Japanese**: パワー; **Definition**: Acceleration and ability to navigate around opponents, especially during race transitions and late bursts.; **Range**: 0-1200; **Priority**: ★★★
-- **Stat**: Guts; **Japanese**: 根性; **Definition**: Affects race **position holding**, resistance to position loss in navigation battles; contributes to final sprint and recovers stamina under force-out conditions (not just "last spurt strength").; **Range**: 0-1200; **Priority**: ★★
-- **Stat**: Wit; **Japanese**: 賢さ; **Definition**: Influences **skill activation rate**, likelihood to **avoid "kakari" status** (stamina penalty), and general race event triggers; good Wit is more important than pure stat for race stability.; **Range**: 0-1200; **Priority**: ★★★
+- **Stat**: Speed; **Japanese**: スピード; **Definition**: Maximum running speed; determines overall
+race velocity.; **Range**: 0-1200; **Priority**: ★★★★★
+- **Stat**: Stamina; **Japanese**: スタミナ; **Definition**: HP & effective stamina; enables staying
+power over longer distances and through race events.; **Range**: 0-1200; **Priority**: ★★★★
+- **Stat**: Power; **Japanese**: パワー; **Definition**: Acceleration and ability to navigate around
+opponents, especially during race transitions and late bursts.; **Range**: 0-1200; **Priority**: ★★★
+- **Stat**: Guts; **Japanese**: 根性; **Definition**: Affects race **position holding**, resistance to
+position loss in navigation battles; contributes to final sprint and recovers stamina under force-
+out conditions (not just "last spurt strength").; **Range**: 0-1200; **Priority**: ★★
+- **Stat**: Wit; **Japanese**: 賢さ; **Definition**: Influences **skill activation rate**, likelihood
+to **avoid "kakari" status** (stamina penalty), and general race event triggers; good Wit is more
+important than pure stat for race stability.; **Range**: 0-1200; **Priority**: ★★★
 
 ### Stat Grade Scale
 
-- **Grade**: SS; **Value Range**: 1100-1200; **Effectiveness**: Elite tier
-- **Grade**: S; **Value Range**: 950-1099; **Effectiveness**: Excellent
-- **Grade**: A; **Value Range**: 850-949; **Effectiveness**: Good
-- **Grade**: B+; **Value Range**: 750-849; **Effectiveness**: Above average
-- **Grade**: B; **Value Range**: 650-749; **Effectiveness**: Average
-- **Grade**: C+; **Value Range**: 550-649; **Effectiveness**: Below average
-- **Grade**: C; **Value Range**: 450-549; **Effectiveness**: Poor
-- **Grade**: D+; **Value Range**: 350-449; **Effectiveness**: Very poor
-- **Grade**: D; **Value Range**: 250-349; **Effectiveness**: Minimal
-- **Grade**: E; **Value Range**: 150-249; **Effectiveness**: Negligible
-- **Grade**: F; **Value Range**: 0-149; **Effectiveness**: None
+Stat-value presentation tiers in this documentation are illustrative planner labels, not
+authoritative in-game grade names. Prefer numeric breakpoints and current UI labels when documenting
+stat displays.
 
+- **Grade**: S; **Value Range**: 1000+; **Effectiveness**: Excellent
+- **Grade**: A; **Value Range**: 800-999; **Effectiveness**: Good
+- **Grade**: B; **Value Range**: 600-799; **Effectiveness**: Average
+- **Grade**: C; **Value Range**: 400-599; **Effectiveness**: Below average
+- **Grade**: D; **Value Range**: 200-399; **Effectiveness**: Poor
+- **Grade**: E; **Value Range**: 100-199; **Effectiveness**: Negligible
+- **Grade**: F; **Value Range**: 0-99; **Effectiveness**: None
+- **Grade**: G; **Value Range**: Lowest tier; **Effectiveness**: Minimal
+
+> **Note:** The grade ranges shown here are internal planner approximations for quick reference. For Global English server competitive play, the practical target for core stats is often 1200, especially for Speed-heavy builds. Documentation should avoid implying a canonical in-game "SS" stat grade. The maximum aptitude grade is S.
+>
 > **Note:** Wit (Wisdom/Intelligence) not only increases skill activation chance, it directly affects the chance to avoid the "kakari" mishap (which increases stamina drain and prevents skill use during it).
+
+### Stat Priority Guidance
+
+- **Sprint / Mile**: Speed and Power are usually the highest priorities; Wit becomes the next major
+reliability stat once pace and acceleration are covered.
+- **Medium**: Speed remains the primary stat, but Stamina becomes more important and Wit stays
+relevant for skill consistency.
+- **Long**: Stamina and Speed are the core requirements; Guts becomes much more valuable for the
+final phase than it is in short races.
+- **Champions Meeting / PvP**: Treat 1200 Speed and strong distance-appropriate Stamina as baseline
+targets, then invest heavily in Wit for reliable skill activation.
+
+> **Note:** These are community-derived planning guidelines for the Global English server meta and should be treated as contextual advice, not fixed rules for every build.
 
 ### 2.2 Aptitudes
 
-- **Term**: Aptitude; **Japanese**: 適性; **In-Game Label (EN)**: Aptitude; **Description**: Character compatibility for **distance, surface, and running style**.; **Categories**: Distance, Surface, Style
-- **Term**: Distance Aptitude; **Japanese**: 距離適性; **In-Game Label (EN)**: Distance; **Description**: Preferred race lengths: Sprint, Mile, Medium, Long as per JP/EN global.; **Categories**: Sprint: <1400m, Mile: 1401-1800m, Medium: 1801-2400m, Long: 2401m+
-- **Term**: Surface Aptitude; **Japanese**: バ場適性; **In-Game Label (EN)**: Surface; **Description**: Preferred ground: Turf or Dirt; **Categories**: Turf, Dirt
-- **Term**: Running Style Aptitude; **Japanese**: 脚質適性; **In-Game Label (EN)**: Style; **Description**: Preferred position in races (see below); **Categories**: Front, Pace, Late, End
+- **Term**: Aptitude; **Japanese**: 適性; **In-Game Label (EN)**: Aptitude; **Description**: Character
+compatibility for **distance, surface, and running style**.; **Categories**: Distance, Surface,
+Style
+- **Term**: Distance Aptitude; **Japanese**: 距離適性; **In-Game Label (EN)**: Distance;
+**Description**: Preferred race lengths: Sprint, Mile, Medium, Long as per JP/EN global.;
+**Categories**: Sprint: <1400m, Mile: 1401-1800m, Medium: 1801-2400m, Long: 2401m+
+- **Term**: Surface Aptitude; **Japanese**: バ場適性; **In-Game Label (EN)**: Surface; **Description**:
+Preferred ground: Turf or Dirt; **Categories**: Turf, Dirt
+- **Term**: Running Style Aptitude; **Japanese**: 脚質適性; **In-Game Label (EN)**: Style;
+**Description**: Preferred position in races (see below); **Categories**: Front, Pace, Late, End
 
 ### Clarification
 
-Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance and placement** when mismatched. Optimal aptitude is strongly recommended.
+Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance and placement**
+when mismatched. Optimal aptitude is strongly recommended.
 
 ### Aptitude Ratings & Effectiveness
 
-- **Rating**: S; **Japanese**: S; **Effectiveness**: 105-110%; **Description**: Maximum compatibility (S is the highest grade)
+- **Rating**: S; **Japanese**: S; **Effectiveness**: 105-110%; **Description**: Maximum
+compatibility (S is the highest grade)
 - **Rating**: A; **Japanese**: A; **Effectiveness**: 100%; **Description**: Good compatibility (baseline)
 - **Rating**: B; **Japanese**: B; **Effectiveness**: 90%; **Description**: Adequate compatibility
 - **Rating**: C; **Japanese**: C; **Effectiveness**: 80%; **Description**: Below average
@@ -83,10 +117,14 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 2.3 Running Styles
 
-- **Term (JP)**: 逃げ; **Label (EN)**: Front; **Standard Community Naming**: "Front"; **In-Game Behaviour**: Lead early, stay in front
-- **Term (JP)**: 先行; **Label (EN)**: Pace; **Standard Community Naming**: "Pace"; **In-Game Behaviour**: Stay near leaders, chase from front
-- **Term (JP)**: 差し; **Label (EN)**: Late; **Standard Community Naming**: "Late"; **In-Game Behaviour**: Travel mid-pack, surge near end
-- **Term (JP)**: 追込; **Label (EN)**: End; **Standard Community Naming**: "End"; **In-Game Behaviour**: Linger far back, sprint at finish
+- **Term (JP)**: 逃げ; **Label (EN)**: Front; **Standard Community Naming**: "Front"; **In-Game
+Behaviour**: Lead early, stay in front
+- **Term (JP)**: 先行; **Label (EN)**: Pace; **Standard Community Naming**: "Pace"; **In-Game
+Behaviour**: Stay near leaders, chase from front
+- **Term (JP)**: 差し; **Label (EN)**: Late; **Standard Community Naming**: "Late"; **In-Game
+Behaviour**: Travel mid-pack, surge near end
+- **Term (JP)**: 追込; **Label (EN)**: End; **Standard Community Naming**: "End"; **In-Game
+Behaviour**: Linger far back, sprint at finish
 
 > **Note:** "Runaway" is a rare passive, not a base style.
 
@@ -100,27 +138,35 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 ### 2.5 Career Stages
 
 - **Stage**: Junior Year; **Japanese**: ジュニア級; **Turn Range**: 1–24; **Description**: Basic training foundation
-- **Stage**: Classic Year; **Japanese**: クラシック級; **Turn Range**: 25–48; **Description**: Competitive growth and new races
+- **Stage**: Classic Year; **Japanese**: クラシック級; **Turn Range**: 25–48; **Description**: Competitive
+growth and new races
 - **Stage**: Senior Year; **Japanese**: シニア級; **Turn Range**: 49–72; **Description**: Peak and high-level racing
 - **Stage**: URA Finals; **Japanese**: URAファイナルズ; **Turn Range**: 73–78; **Description**: Finals series
 
+> **Note:** As of March 2026, the Global English server scenarios covered by this project are URA Finals and Unity Cup. Additional Japanese-server scenarios should only be added to core documentation after they release globally.
+
 ### 2.6 Skill System
 
-- **Term**: Skill Point (SP); **Japanese**: スキルポイント; **Global Mechanic (EN)**: Earned via races/events, spent to purchase skills
-- **Term**: Skill Hint; **Japanese**: ヒント; **Global Mechanic (EN)**: Discount for skill SP cost; **5 hint levels with progressive discounts: Level 1 = 10%, Level 2 = 20%, Level 3 = 30%, Level 4 = 35%, Level 5 = 40% (maximum)**; applies when buying the skill
-- **Term**: Skill Evolution; **Japanese**: 進化; **Global Mechanic (EN)**: Upgrade of some (not all) Normal → Rare skills under set conditions
+- **Term**: Skill Point (SP); **Japanese**: スキルポイント; **Global Mechanic (EN)**: Earned via
+races/events, spent to purchase skills
+- **Term**: Skill Hint; **Japanese**: ヒント; **Global Mechanic (EN)**: Discount for skill SP cost; **5
+hint levels with progressive discounts: Level 1 = 10%, Level 2 = 20%, Level 3 = 30%, Level 4 = 35%,
+Level 5 = 40% (maximum)**; applies when buying the skill
+- **Term**: Skill Evolution; **Japanese**: 進化; **Global Mechanic (EN)**: Upgrade of some (not all)
+Normal → Rare skills under set conditions
 - **Term**: Skill Rarity; **Japanese**: レアリティ; **Global Mechanic (EN)**: Normal (white), Rare (gold), Unique (rainbow)
 
 ### Skill Types (Community)
 
-- Speed, Stamina, Power, Recovery, Unique, "Effect on Opponent" (often referred to as "debuffs" in guides, but not in-game as a formal type)
+- Speed, Stamina, Power, Recovery, Unique, "Effect on Opponent" (often referred to as "debuffs" in
+guides, but not in-game as a formal type)
 
 > **Note:** The game lacks a formal "Debuff" skill category; many skills can apply negative effects to rivals.
 > Skill hints only affect the initial SP purchase price, not ongoing effects.
 
 ### 2.7 Training Actions
 
-### Available at each turn (Career Mode)
+#### Available at each turn (Career Mode)
 
 - **Train**: Increase specific stat (Speed/Stamina/Power/Guts/Wit)
 - **Race**: Compete to earn fans and SP, progress story
@@ -139,24 +185,31 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 2.9 Legacy and Bonds
 
-- **Legacy Effect**: Bonuses granted to new trainees when selecting two legacy Uma Musume in setup (after retiring a career run). These grant bonus stats and sometimes skills to new runs.
-- **Bond/Bonding**: Represents support card "friendship" (bond) level; higher bond unlocks improved training bonuses and special events. Distinct from raw support card stats.
-- **Inspiration Event**: One of three inheritance checkpoints in a career run: career start, Year 2 late March, and Year 3 late March. Parent sparks are applied at these points.
-- **Spark**: Inheritance bonus category. Blue = stat bonus, Pink = skill inheritance, Green = growth-rate bonus, White = SP bonus.
-- **Friendship Training**: In this application's planner logic, the boosted friendship state becomes active when 3 or more support cards simultaneously reach Bond 80 or higher.
+- **Legacy Effect**: Bonuses granted to new trainees when selecting two legacy Uma Musume in setup
+(after retiring a career run). These grant bonus stats and sometimes skills to new runs.
+- **Bond/Bonding**: Represents support card "friendship" (bond) level; higher bond unlocks improved
+training bonuses and special events. Distinct from raw support card stats.
+- **Inspiration Event**: One of three inheritance checkpoints in a career run: career start, Year 2
+late March, and Year 3 late March. Parent sparks are applied at these points.
+- **Spark**: Inheritance bonus category. Blue = stat bonus, Pink = skill inheritance, Green =
+growth-rate bonus, White = SP bonus.
+- **Friendship Training**: Boosted training state associated with support cards that meet the
+relevant bond threshold and appear in the applicable training context. Documentation should describe
+it as context-specific rather than requiring a fixed global count unless a specific implementation
+rule is being documented.
 
 ### Bond Milestones
 
 - **Level**: 0-79; **Reward**: Standard support-card bonuses and bond-building events
 - **Level**: 80+; **Reward**: Card becomes rainbow-ready for friendship checks
-- **Planner Threshold**: 3 cards at 80+; **Reward**: Friendship Training status becomes active in training predictions and AI advice
 
 ### 2.10 Conditions
 
 - **Term**: Condition; **Definition**: Temporary status effect (positive or negative) affecting stats or training
 - **Term**: Positive Condition; **Definition**: Beneficial effect (e.g., "Focused", "Energized")
 - **Term**: Negative Condition; **Definition**: Detrimental effect (e.g., "Fatigued", "Injured")
-- **Term**: Kakari; **Definition**: Negative condition that increases stamina consumption and prevents skill activation; higher Wit reduces chance of this occurring
+- **Term**: Kakari; **Definition**: Negative condition that increases stamina consumption and
+prevents skill activation; higher Wit reduces chance of this occurring
 
 ---
 
@@ -164,17 +217,29 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 3.1 Core Entities
 
-- **Term**: Character; **Canonical Field**: `ucp_characters`; **Definition**: Uma Musume trainee (player-controlled); **Storage**: Database
-- **Term**: Career Run / Plan; **Canonical Field**: `ucp_careers`; **Definition**: A single "career mode" progression; **Storage**: DB/localStore
-- **Term**: Turn; **Canonical Field**: `turn_number`; **Definition**: One half-month career action window (Early or Late); 72 turns span a full 3-year career; **Storage**: DB/localStore
-- **Term**: Support Deck; **Canonical Field**: `ucp_support_decks`; **Definition**: Set of 6 support cards for training; **Storage**: Database
-- **Term**: Support Card Definition; **Canonical Field**: `ucp_support_card_definitions`; **Definition**: Canonical support card definition from external sources; **Storage**: Database
-- **Term**: Skill Build; **Canonical Field**: `ucp_skill_builds`; **Definition**: Saved skill loadout configuration for a career; **Storage**: Database
-- **Term**: Run Snapshot; **Canonical Field**: `ucp_run_snapshots`; **Definition**: Point-in-time career state snapshot for undo/restore; **Storage**: Database
-- **Term**: Advisory Recommendation; **Canonical Field**: `ucp_advisory_recommendations`; **Definition**: AI-generated training/race/skill recommendation; **Storage**: Database
-- **Term**: Critical Alert; **Canonical Field**: `ucp_critical_alerts`; **Definition**: System-generated alert for critical career situations; **Storage**: Database
-- **Term**: Prediction Accuracy; **Canonical Field**: `ucp_prediction_accuracy`; **Definition**: Tracking of AI prediction vs actual outcome; **Storage**: Database
-- **Term**: Legacy; **Canonical Field**: `legacy_*`; **Definition**: Data from completed runs used to boost new trainees; **Storage**: Database
+- **Term**: Character; **Canonical Field**: `ucp_characters`; **Definition**: Uma Musume trainee
+(player-controlled); **Storage**: Database
+- **Term**: Career Run; **Canonical Field**: `ucp_careers`; **Definition**: A single career-mode
+progression record or browser-local run payload, depending on storage mode; **Storage**: Account
+mode DB / Local mode browser storage
+- **Term**: Turn; **Canonical Field**: `turn_number`; **Definition**: One half-month career action
+window (Early or Late); 72 turns span a full 3-year career; **Storage**: DB/localStore
+- **Term**: Support Deck; **Canonical Field**: `ucp_support_decks`; **Definition**: Set of 6 support
+cards for training; **Storage**: Database
+- **Term**: Support Card Definition; **Canonical Field**: `ucp_support_card_definitions`;
+**Definition**: Canonical support card definition from external sources; **Storage**: Database
+- **Term**: Skill Build; **Canonical Field**: `ucp_skill_builds`; **Definition**: Saved skill
+loadout configuration for a career; **Storage**: Database
+- **Term**: Run Snapshot; **Canonical Field**: `ucp_run_snapshots`; **Definition**: Point-in-time
+career state snapshot for undo/restore; **Storage**: Database
+- **Term**: Advisory Recommendation; **Canonical Field**: `ucp_advisory_recommendations`;
+**Definition**: AI-generated training/race/skill recommendation; **Storage**: Database
+- **Term**: Critical Alert; **Canonical Field**: `ucp_critical_alerts`; **Definition**: System-
+generated alert for critical career situations; **Storage**: Database
+- **Term**: Prediction Accuracy; **Canonical Field**: `ucp_prediction_accuracy`; **Definition**:
+Tracking of AI prediction vs actual outcome; **Storage**: Database
+- **Term**: Legacy; **Canonical Field**: `legacy_*`; **Definition**: Data from completed runs used
+to boost new trainees; **Storage**: Database
 
 ### See also: Factor, Bond, Skill Hint under Game Terminology
 
@@ -201,7 +266,8 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 ### 3.4 Admin Panel
 
 - **Term**: Admin Panel; **Definition**: Protected administrative interface for system management (`Admin/` controllers)
-- **Term**: Database Maintenance; **Definition**: Admin tool for database optimization and cleanup (`DatabaseMaintenanceService`)
+- **Term**: Database Maintenance; **Definition**: Admin tool for database optimization and cleanup
+(`DatabaseMaintenanceService`)
 - **Term**: Log Reader; **Definition**: Admin tool for viewing application logs (`LogReaderService`)
 - **Term**: System Health; **Definition**: Admin dashboard showing system status (`SystemHealthService`)
 - **Term**: Queue Monitor; **Definition**: Admin interface for monitoring background job processing (via Horizon)
@@ -214,15 +280,23 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 4.1 Architecture Components
 
-- **Term**: Eloquent Model; **Abbreviation**: -; **Definition**: Laravel ORM model representing database table (30 models in system)
-- **Term**: Livewire Component; **Abbreviation**: -; **Definition**: Server-driven reactive UI component (e.g., `AdvisoryPanel`)
-- **Term**: Service Layer; **Abbreviation**: -; **Definition**: Business logic abstraction (70+ services in `app/Services/`)
+- **Term**: Eloquent Model; **Abbreviation**: -; **Definition**: Laravel ORM model representing
+database table (40 models in system)
+- **Term**: Livewire Component; **Abbreviation**: -; **Definition**: Server-driven reactive UI
+component (e.g., `AdvisoryPanel`)
+- **Term**: Service Layer; **Abbreviation**: -; **Definition**: Business logic abstraction (70+
+services in `app/Services/`)
 - **Term**: Form Request; **Abbreviation**: -; **Definition**: Laravel validation class for HTTP requests
-- **Term**: Repository; **Abbreviation**: -; **Definition**: Data access pattern abstracting database queries (e.g., `CharacterRepositoryInterface`, `EloquentCharacterRepository`)
-- **Term**: Enum; **Abbreviation**: -; **Definition**: PHP 8.1+ enumeration for type-safe constants (8 enums: `AlertType`, `CareerPhase`, `Mood`, `Priority`, `RaceDistance`, `RecommendationType`, `RunningStyle`, `StorageMode`)
-- **Term**: Value Object; **Abbreviation**: -; **Definition**: Immutable object representing a domain concept (in `app/ValueObjects/`)
+- **Term**: Repository; **Abbreviation**: -; **Definition**: Data access pattern abstracting
+database queries (e.g., `CharacterRepositoryInterface`, `EloquentCharacterRepository`)
+- **Term**: Enum; **Abbreviation**: -; **Definition**: PHP 8.1+ enumeration for type-safe constants
+(8 enums: `AlertType`, `CareerPhase`, `Mood`, `Priority`, `RaceDistance`, `RecommendationType`,
+`RunningStyle`, `StorageMode`)
+- **Term**: Value Object; **Abbreviation**: -; **Definition**: Immutable object representing a
+domain concept (in `app/ValueObjects/`)
 - **Term**: Collection; **Abbreviation**: -; **Definition**: Custom Laravel collection class (in `app/Collections/`)
-- **Term**: Event/Listener; **Abbreviation**: -; **Definition**: Laravel event system for decoupled processing (in `app/Events/`, `app/Listeners/`)
+- **Term**: Event/Listener; **Abbreviation**: -; **Definition**: Laravel event system for decoupled
+processing (in `app/Events/`, `app/Listeners/`)
 - **Term**: Job; **Abbreviation**: -; **Definition**: Queued background task (in `app/Jobs/`)
 - **Term**: Policy; **Abbreviation**: -; **Definition**: Laravel authorization policy (in `app/Policies/`)
 - **Term**: Notification; **Abbreviation**: -; **Definition**: Laravel notification class (in `app/Notifications/`)
@@ -241,15 +315,18 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 - **Technology**: Redis; **Version**: 7+ (via WSL); **Layer**: Cache/Queue; **Purpose**: Caching and background jobs
 - **Technology**: Pest; **Version**: v4; **Layer**: Testing; **Purpose**: PHP testing framework
 - **Technology**: PHPUnit; **Version**: v12; **Layer**: Testing; **Purpose**: Testing engine (underlying)
-- **Technology**: pest-plugin-browser; **Version**: 4.0; **Layer**: Browser Testing; **Purpose**: Browser-based test automation
+- **Technology**: pest-plugin-browser; **Version**: 4.0; **Layer**: Browser Testing; **Purpose**:
+Browser-based test automation
 - **Technology**: Playwright; **Version**: 1.58; **Layer**: E2E Testing; **Purpose**: End-to-end browser testing
 - **Technology**: Larastan; **Version**: v3; **Layer**: Code Quality; **Purpose**: Static analysis for Laravel
 - **Technology**: Laravel Pint; **Version**: v1; **Layer**: Code Formatting; **Purpose**: PSR-12 code style fixer
 - **Technology**: Neuron AI; **Version**: v2.11; **Layer**: AI Framework; **Purpose**: AI agent orchestration
-- **Technology**: neuron-laravel; **Version**: v0.3.4; **Layer**: AI Integration; **Purpose**: Laravel integration for Neuron
+- **Technology**: neuron-laravel; **Version**: v0.3.4; **Layer**: AI Integration; **Purpose**:
+Laravel integration for Neuron
 - **Technology**: Laravel Sanctum; **Version**: v4; **Layer**: Auth; **Purpose**: API token authentication
 - **Technology**: Laravel Horizon; **Version**: v5; **Layer**: Queue Monitoring; **Purpose**: Redis queue dashboard
-- **Technology**: Laravel Telescope; **Version**: Latest; **Layer**: Debugging; **Purpose**: Request/job/query monitoring
+- **Technology**: Laravel Telescope; **Version**: Latest; **Layer**: Debugging; **Purpose**:
+Request/job/query monitoring
 - **Technology**: Laravel Boost; **Version**: v1.8; **Layer**: Dev Tooling; **Purpose**: MCP development server
 
 ### 4.3 Database Conventions
@@ -263,7 +340,9 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 4.4 Validation Rules
 
-- **Rule Type**: Stat Range; **Example**: 0-1200; **Description**: Hard max, no values above 1200 allowed
+- **Rule Type**: Stat Range; **Example**: Gameplay values can exceed 1200; **Description**: Do not
+treat 1200 as a universal hard maximum in documentation. Distinguish gameplay soft-cap behavior from
+storage-layer validation rules.
 - **Rule Type**: Turn Range; **Example**: 1-78; **Description**: Valid turn numbers
 - **Rule Type**: Energy Range; **Example**: 0-100; **Description**: Energy level percentage
 - **Rule Type**: Deck Size; **Example**: 6 cards; **Description**: Exactly 6 cards (5 owned + 1 borrowed)
@@ -276,8 +355,10 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 ### 5.1 AI System
 
 - **Term**: AI Provider; **Abbreviation**: -; **Definition**: Backend service for AI inference (Ollama, AWS Bedrock)
-- **Term**: Neuron AI; **Abbreviation**: -; **Definition**: AI agent orchestration framework (v2.11 with neuron-laravel v0.3.4)
-- **Term**: AI Agent; **Abbreviation**: -; **Definition**: Specialized AI for specific tasks (Training Advisor, Race Strategy)
+- **Term**: Neuron AI; **Abbreviation**: -; **Definition**: AI agent orchestration framework (v2.11
+with neuron-laravel v0.3.4)
+- **Term**: AI Agent; **Abbreviation**: -; **Definition**: Specialized AI for specific tasks
+(Training Advisor, Race Strategy)
 - **Term**: AI Conversation; **Abbreviation**: -; **Definition**: Persisted chat session (`ucp_ai_conversations`)
 - **Term**: AI Cost; **Abbreviation**: -; **Definition**: Per-token usage cost tracking (`ucp_ai_costs`)
 - **Term**: AI Metrics; **Abbreviation**: -; **Definition**: Performance and usage analytics (`ucp_ai_metrics`)
@@ -290,14 +371,21 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 5.2 Neuron Agents
 
-Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Responses/` and support classes in `app/Neuron/Support/`. Service layer wrappers are in `app/Services/Neuron/`.
+Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Responses/` and
+support classes in `app/Neuron/Support/`. Service layer wrappers are in `app/Services/Neuron/`.
 
-- **Agent**: Base Agent; **Class**: `BaseAgent`; **Purpose**: Abstract base class for all Neuron agents; **Response Type**: -
-- **Agent**: Training Advisor Agent; **Class**: `TrainingAdvisorAgent`; **Purpose**: Recommends optimal training selections; **Response Type**: `TrainingAdviceResponse`
-- **Agent**: Race Strategy Agent; **Class**: `RaceStrategyAgent`; **Purpose**: Analyzes race requirements and strategy; **Response Type**: `RaceStrategyResponse`
-- **Agent**: Skill Recommendation Agent; **Class**: `SkillRecommendationAgent`; **Purpose**: Suggests skill acquisition priorities; **Response Type**: `SkillRecommendationResponse`
-- **Agent**: Career Planning Agent; **Class**: `CareerPlanningAgent`; **Purpose**: Provides long-term strategic guidance; **Response Type**: `CareerPlanningResponse`
-- **Agent**: MCP Demo Agent; **Class**: `McpDemoAgent`; **Purpose**: Demonstration agent for MCP tool integration; **Response Type**: -
+- **Agent**: Base Agent; **Class**: `BaseAgent`; **Purpose**: Abstract base class for all Neuron
+agents; **Response Type**: -
+- **Agent**: Training Advisor Agent; **Class**: `TrainingAdvisorAgent`; **Purpose**: Recommends
+optimal training selections; **Response Type**: `TrainingAdviceResponse`
+- **Agent**: Race Strategy Agent; **Class**: `RaceStrategyAgent`; **Purpose**: Analyzes race
+requirements and strategy; **Response Type**: `RaceStrategyResponse`
+- **Agent**: Skill Recommendation Agent; **Class**: `SkillRecommendationAgent`; **Purpose**:
+Suggests skill acquisition priorities; **Response Type**: `SkillRecommendationResponse`
+- **Agent**: Career Planning Agent; **Class**: `CareerPlanningAgent`; **Purpose**: Provides long-
+term strategic guidance; **Response Type**: `CareerPlanningResponse`
+- **Agent**: MCP Demo Agent; **Class**: `McpDemoAgent`; **Purpose**: Demonstration agent for MCP
+tool integration; **Response Type**: -
 
 ### Neuron Support Classes
 
@@ -320,8 +408,10 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 - **Term**: MCP Tool; **Abbreviation**: -; **Definition**: Executable function exposed to AI agents
 - **Term**: MCP Tool Usage; **Abbreviation**: -; **Definition**: Tracking of tool invocations (`ucp_mcp_tool_usage`)
 - **Term**: MCP Health; **Abbreviation**: -; **Definition**: Server availability monitoring (`ucp_mcp_server_health`)
-- **Term**: Laravel MCP; **Abbreviation**: -; **Definition**: Official Laravel MCP package (`laravel/mcp v0`) for server-side tool exposure
-- **Term**: MCP Monitoring; **Abbreviation**: -; **Definition**: Service for tracking MCP server health, tool usage, and agent performance
+- **Term**: Laravel MCP; **Abbreviation**: -; **Definition**: Official Laravel MCP package
+(`laravel/mcp v0`) for server-side tool exposure
+- **Term**: MCP Monitoring; **Abbreviation**: -; **Definition**: Service for tracking MCP server
+health, tool usage, and agent performance
 
 ### MCP Server Types
 
@@ -329,6 +419,17 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 - **Server**: Filesystem; **Type**: Local; **Purpose**: Document and file access
 - **Server**: Fetch; **Type**: Local; **Purpose**: HTTP resource retrieval
 - **Server**: Custom; **Type**: Remote; **Purpose**: Domain-specific tools (optional)
+
+### MCP Orchestration Agents
+- **CareerStrategyAgent**: Optimizes overall career path
+- **HintFarmingStrategyAgent**: Plans hint acquisition and discount maximization
+- **LongTermDevelopmentAgent**: Manages multi-career progression and factor inheritance
+- **PerformanceAnalyticsAgent**: Analyzes stats, trends, and race outcomes
+- **ResourceManagementAgent**: Optimizes SP and energy budget
+- **SkillBuildPlanningAgent**: Designs synergistic skill set compositions
+- **SPBudgetManagementAgent**: Specific SP allocation strategies
+- **SummerCampOptimizationAgent**: Summer camp event strategy (turns 37-40, 61-64)
+- **TrainingOptimizationAgent**: Evaluates and suggests optimal training sessions
 
 ### 5.4 External APIs
 
@@ -339,18 +440,23 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### External API Sources
 
-- **API**: umapyoi.net; **Purpose**: Primary game data (characters, support cards, news); **Client Class**: `UmapyoiApiClient`; **Status**: Active
-- **API**: UmamusumeDB.com; **Purpose**: Fallback data (skills, races); **Client Class**: `UmamusumeDBApiClient`; **Status**: Active
-- **API**: GameTora; **Purpose**: Supplementary data via web scraping; **Client Class**: `GameToraScraperService`; **Status**: Active
+- **API**: umapyoi.net; **Purpose**: Primary game data (characters, support cards, news); **Client
+Class**: `UmapyoiApiClient`; **Status**: Active
+- **API**: UmamusumeDB.com; **Purpose**: Fallback data (skills, races); **Client Class**:
+`UmamusumeDBApiClient`; **Status**: Deprecated
+- **API**: GameTora; **Purpose**: Supplementary data via web scraping; **Client Class**:
+`GameToraScraperService`; **Status**: Active
 
 ### 5.5 OCR System
 
-- **Term**: OCR; **Abbreviation**: Optical Character Recognition; **Definition**: Technology for extracting text from images
+- **Term**: OCR; **Abbreviation**: Optical Character Recognition; **Definition**: Technology for
+extracting text from images
 - **Term**: OCR Extraction; **Abbreviation**: -; **Definition**: Result of OCR processing (`ucp_ocr_extractions`)
 - **Term**: GD Library; **Abbreviation**: GD; **Definition**: PHP image processing library for preprocessing
 - **Term**: Tesseract; **Abbreviation**: -; **Definition**: Open-source OCR engine
 - **Term**: Confidence Score; **Abbreviation**: -; **Definition**: OCR accuracy metric (0-100%)
-- **Term**: Preprocessing; **Abbreviation**: -; **Definition**: Image enhancement before OCR (resize, grayscale, threshold)
+- **Term**: Preprocessing; **Abbreviation**: -; **Definition**: Image enhancement before OCR
+(resize, grayscale, threshold)
 
 ### OCR Data Types
 
@@ -365,10 +471,15 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 6.1 Storage Modes
 
-- **Term**: Local Mode; **Definition**: Browser localStorage-based storage; **Identifier**: UUID; **Offline Support**: Full
-- **Term**: Account Mode; **Definition**: Database-backed cloud storage; **Identifier**: Integer ID; **Offline Support**: Requires connectivity for save
-- **Term**: Storage Badge; **Definition**: Visual indicator of current mode; **Identifier**: Icon + label; **Offline Support**: N/A
-- **Term**: StorageMode Enum; **Definition**: PHP enum (`App\Enums\StorageMode`) for type-safe storage mode handling; **Identifier**: `Local` / `Account` values; **Offline Support**: N/A
+- **Term**: Local Mode; **Definition**: Browser-local storage mode using client-managed identifiers
+and state; **Identifier**: UUID-oriented/client-managed identifiers; **Offline Support**: Strong
+local-only support, but not feature-parity with all account-backed operations
+- **Term**: Account Mode; **Definition**: Database-backed cloud storage; **Identifier**: Integer ID;
+**Offline Support**: Requires connectivity for save
+- **Term**: Storage Badge; **Definition**: Visual indicator of current mode; **Identifier**: Icon +
+label; **Offline Support**: N/A
+- **Term**: StorageMode Enum; **Definition**: PHP enum (`App\Enums\StorageMode`) for type-safe
+storage mode handling; **Identifier**: `Local` / `Account` values; **Offline Support**: N/A
 
 ### 6.2 Import/Export
 
@@ -390,7 +501,8 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 - **Term**: Legacy Format; **Definition**: Data structure from previous application versions
 - **Term**: Field Mapping; **Definition**: Translation between legacy and canonical field names
-- **Term**: Conflict Resolution; **Definition**: Strategy for handling duplicate records (skip, overwrite, merge, rename)
+- **Term**: Conflict Resolution; **Definition**: Strategy for handling duplicate records (skip,
+overwrite, merge, rename)
 - **Term**: Validation Layer; **Definition**: Three-tier validation (schema, business rules, integrity)
 - **Term**: Rollback; **Definition**: Reverting to previous state after failed migration
 
@@ -472,7 +584,8 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 8.3 Game-Specific Acronyms
 
-- **Acronym**: URA; **Full Term**: Uma Musume Racing Association; **Japanese**: ウマ娘競走協会; **Context**: Final championship series
+- **Acronym**: URA; **Full Term**: Uma Musume Racing Association; **Japanese**: ウマ娘競走協会;
+**Context**: Final championship series
 - **Acronym**: G1, G2, G3; **Full Term**: Grade 1, 2, 3; **Japanese**: -; **Context**: Race classification tiers
 - **Acronym**: HP; **Full Term**: Hit Points; **Japanese**: -; **Context**: Stamina/health in-game
 - **Acronym**: LB; **Full Term**: Limit Break; **Japanese**: 凸; **Context**: Support card upgrade level
@@ -483,19 +596,43 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 9.1 Terminology Standards
 
-- **Standard**: **Canonical Field Names**; **Description**: Official database column names take precedence over UI labels
+- **Standard**: **Canonical Field Names**; **Description**: Official database column names take
+precedence over UI labels
 - **Standard**: **Consistency**; **Description**: Same term used consistently across docs, code, and UI
-- **Standard**: **Case Sensitivity**; **Description**: Follow codebase conventions (camelCase for code, Title Case for UI)
+- **Standard**: **Case Sensitivity**; **Description**: Follow codebase conventions (camelCase for
+code, Title Case for UI)
 - **Standard**: **Deprecation**; **Description**: Deprecated terms marked explicitly with replacement
 
 ### 9.2 Version History
 
-- **Version**: 3.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated to February 22, 2026; expanded core entities table with 6 new model references (SupportCardDefinition, SkillBuild, RunSnapshot, AdvisoryRecommendation, CriticalAlert, PredictionAccuracy); expanded architecture components with Repository, Enum, ValueObject, Collection, Event/Listener, Job, Policy, Notification entries; updated Neuron Agents section with actual codebase classes (BaseAgent, McpDemoAgent, response types, support classes, service layer); added GameTora to external API sources; added StorageMode enum reference; added Laravel MCP and MCP Monitoring terms; updated codebase stats (30 models, 8 enums, 70+ services, 571 routes, 3,316+ tests)
-- **Version**: 3.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated to February 2026; updated technology stack (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, Chart.js 4, Larastan v3, Laravel Pint v1, Sanctum v4, Horizon v5, Telescope, Boost v1.8, pest-plugin-browser 4.0, Playwright 1.58); updated PHP runtime to 8.4.11; updated AI provider models; removed MariaDB reference
-- **Version**: 3.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Updated to v2.2.0; corrected aptitude grades (S is maximum, SS does NOT exist); updated hint system to 5 levels (10%/20%/30%/35%/40%); aligned with game-accurate mechanics from Global English Server
-- **Version**: 3.1.0; **Date**: 2026-01-23; **Author**: Development Team (with user corrections & source references); **Changes**: Updated per Global (English) server mechanics; clarified Guts/Wit, updated running style English labels, added Training, Legacy, and Bond definitions, and explicitly excluded JP-version-only features per community and official docs
-- **Version**: 3.0.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Comprehensive expansion aligned with v2.0.0; added AI, MCP, OCR, and external integration terminology; restructured into logical categories; added tables for visual clarity
-- **Version**: 2.1; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated terms to match current codebase and configs
+- **Version**: 3.4.1; **Date**: 2026-03-10; **Author**: Development Team; **Changes**: Clarified
+planner stat-grade ranges as illustrative only; added contextual stat-priority guidance; reaffirmed
+URA Finals and Unity Cup as the current Global English server scenarios in core docs
+- **Version**: 3.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated to
+February 22, 2026; expanded core entities table with 6 new model references (SupportCardDefinition,
+SkillBuild, RunSnapshot, AdvisoryRecommendation, CriticalAlert, PredictionAccuracy); expanded
+architecture components with Repository, Enum, ValueObject, Collection, Event/Listener, Job, Policy,
+Notification entries; updated Neuron Agents section with actual codebase classes (BaseAgent,
+McpDemoAgent, response types, support classes, service layer); added GameTora to external API
+sources; added StorageMode enum reference; added Laravel MCP and MCP Monitoring terms; updated
+codebase stats (40 models, 8 enums, 70+ services, 571 routes, 3,316+ tests)
+- **Version**: 3.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated to
+February 2026; updated technology stack (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, Chart.js
+4, Larastan v3, Laravel Pint v1, Sanctum v4, Horizon v5, Telescope, Boost v1.8, pest-plugin-browser
+4.0, Playwright 1.58); updated PHP runtime to 8.4.11; updated AI provider models; removed MariaDB
+reference
+- **Version**: 3.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Updated to
+v2.2.0; corrected aptitude grades (S is maximum, SS does NOT exist); updated hint system to 5 levels
+(10%/20%/30%/35%/40%); aligned with game-accurate mechanics from Global English Server
+- **Version**: 3.1.0; **Date**: 2026-01-23; **Author**: Development Team (with user corrections &
+source references); **Changes**: Updated per Global (English) server mechanics; clarified Guts/Wit,
+updated running style English labels, added Training, Legacy, and Bond definitions, and explicitly
+excluded JP-version-only features per community and official docs
+- **Version**: 3.0.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Comprehensive
+expansion aligned with v2.0.0; added AI, MCP, OCR, and external integration terminology;
+restructured into logical categories; added tables for visual clarity
+- **Version**: 2.1; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated terms
+to match current codebase and configs
 - **Version**: 2.0; **Date**: 2026-01-12; **Author**: Development Team; **Changes**: Consolidated glossary
 - **Version**: 1.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial glossary
 
@@ -508,12 +645,14 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 9.4 Related Sources
 
-- [Umamusume: Pretty Derby (mobile game) - Umamusume Wiki](https://umamusu.wiki/Umamusume%3A_Pretty_Derby_%28mobile_game%29)
+- [Umamusume: Pretty Derby (mobile game) - Umamusume
+Wiki](https://umamusu.wiki/Umamusume%3A_Pretty_Derby_%28mobile_game%29)
 - [Stats Guide (Game8)](https://game8.co/games/Umamusume-Pretty-Derby/archives/535820)
 - [Frontline Gaming Japan](https://www.frontlinejp.net/2024/07/24/a-quick-look-at-umamusume-pretty-derby/)
 - [PCGamesN stats guide](https://www.pcgamesn.com/umamusume-pretty-derby/stats)
 - [Polygon Basics Guide](https://www.polygon.com/guides/611183/uma-musume-tips-tricks-beginner-before-you-start)
-- [Reddit: Global vs. JP mechanics](https://www.reddit.com//r/UmamusumeGame/comments/1q5qjze/any_accurate_resources_for_the_game_mechanics_in/)
+- [Reddit: Global vs. JP mechanics](https://www.reddit.com//r/UmamusumeGame/comments/1q5qjze/any_acc
+urate_resources_for_the_game_mechanics_in/)
 - [Game:Career Mode - Umamusume Wiki](https://umamusu.wiki/Game%3ACareer_Mode)
 - [Fandom Game page](https://umamusume.fandom.com/wiki/Game)
 
@@ -539,4 +678,6 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ---
 
-### This glossary is the authoritative reference for both code and gameplay terminology as used in the Umamusume Career Planner, strictly aligned to the Global English server and common usage (February 22, 2026)
+### This glossary is the authoritative reference for both code and gameplay terminology as used in
+the Umamusume Career Planner, strictly aligned to the Global English server and common usage
+(February 22, 2026)

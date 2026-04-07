@@ -2,8 +2,8 @@
 
 ## Uma Musume Career Planner
 
-**Document Version:** 2.0  
-**Date:** 2026-01-03  
+**Document Version:** 2.0
+**Date:** 2026-01-03
 **Status:** Draft
 
 ---
@@ -24,13 +24,18 @@
 
 ## 1. Executive Summary
 
-This System Integration Plan outlines the strategy for integrating the disparate components of the Uma Musume Career Planner—specifically the convergence of the Laravel backend, Livewire server-side reactivity, Alpine.js client-side interactivity, and dual-mode storage (Database vs. LocalStorage)—into a unified, stable application.
+This System Integration Plan outlines the strategy for integrating the disparate components of the
+Uma Musume Career Planner—specifically the convergence of the Laravel backend, Livewire server-side
+reactivity, Alpine.js client-side interactivity, and dual-mode storage (Database vs.
+LocalStorage)—into a unified, stable application.
 
 ### 1.1 Integration Objectives
 
 1. **Unified Reactivity:** Ensure seamless state synchronization between Livewire (server) and Alpine.js (client)
-2. **Storage Abstraction:** Validate that the application behaves identically whether data is stored in MySQL (Account Mode) or LocalStorage (Local Mode)
-3. **Legacy Consolidation:** Successfully integrate business logic from legacy systems (calculators, datasets) into the new Service Layer
+2. **Storage Abstraction:** Validate that the application behaves identically whether data is stored
+in MySQL (Account Mode) or LocalStorage (Local Mode)
+3. **Legacy Consolidation:** Successfully integrate business logic from legacy systems (calculators,
+datasets) into the new Service Layer
 4. **Resilience:** Ensure the system handles connection loss gracefully, preserving user data via local drafts
 5. **Proper coordination** between browser storage and server database
 
@@ -82,24 +87,24 @@ flowchart TB
         Alpine["Alpine.js<br/>Components"]
         LWClient["Livewire<br/>Client"]
         LS["localStorage"]
-        
+
         Alpine <--> LWClient
         Alpine <--> LS
     end
-    
+
     LWClient <-->|"Wire Protocol"| LWServer
-    
+
     subgraph Server["🖥️ Server Layer"]
         LWServer["Livewire<br/>Server"]
         Services["Service<br/>Layer"]
         Models["Eloquent<br/>Models"]
-        
+
         LWServer <--> Services
         Services <--> Models
     end
-    
+
     Models <--> DB[(Database)]
-    
+
     style Browser fill:#e1f5fe
     style Server fill:#f3e5f5
 ```
@@ -142,16 +147,17 @@ flowchart LR
         LRS["LocalRunStorage<br/>Interface"]
         IEA["Import/Export<br/>Adapters"]
     end
-    
+
     WP --> |"HTTP/WebSocket"| Server
     LRS --> |"JSON Serialization"| Browser
     IEA --> |"File Format Translation"| Models
-    
+
     style Interfaces fill:#fff3e0
 ```
 
 1. **Wire Protocol:** The communication channel between the browser and Laravel/Livewire
-2. **LocalRunStorage Interface:** The contract allowing the frontend to read/write complex object graphs to browser storage
+2. **LocalRunStorage Interface:** The contract allowing the frontend to read/write complex object
+graphs to browser storage
 3. **Import/Export Adapters:** The translation layer between external file formats (JSON/CSV) and internal models
 
 ---
@@ -169,9 +175,9 @@ flowchart TB
     P3["Phase 3: Client-Server Bridge<br/>Week 4-5"]
     P4["Phase 4: Storage Mode Unification<br/>Week 5-6"]
     P5["Phase 5: E2E Testing & Polish<br/>Week 6-7"]
-    
+
     P1 --> P2 --> P3 --> P4 --> P5
-    
+
     style P1 fill:#c8e6c9
     style P2 fill:#bbdefb
     style P3 fill:#f8bbd9
@@ -270,23 +276,23 @@ sequenceDiagram
     participant SVC as Service Layer
     participant MDL as Eloquent Model
     participant DB as Database
-    
+
     LW->>SVC: Request data
     SVC->>MDL: Query with scopes
     MDL->>DB: SQL Query
     DB-->>MDL: Result set
     MDL-->>SVC: Hydrated models
     SVC-->>LW: Processed data
-    
+
     Note over LW,DB: Model Loading Flow
-    
+
     LW->>SVC: Save changes
     SVC->>MDL: Update attributes
     MDL->>DB: INSERT/UPDATE
     DB-->>MDL: Confirmation
     MDL-->>SVC: Saved model
     SVC-->>LW: Success response
-    
+
     Note over LW,DB: Model Persistence Flow
 ```
 
@@ -304,13 +310,13 @@ sequenceDiagram
 class PlanEdit extends Component
 {
     public CareerRun $plan;
-    
+
     public function mount(int $id): void
     {
         $this->plan = CareerRun::with(['skills', 'turns', 'goals'])
             ->findOrFail($id);
     }
-    
+
     public function save(): void
     {
         $this->validate();
@@ -328,7 +334,7 @@ sequenceDiagram
     participant Alpine as Alpine.js
     participant LW as Livewire
     participant Server
-    
+
     User->>Alpine: Click action
     Alpine->>Alpine: Update local state
     Alpine->>LW: $wire.method()
@@ -336,7 +342,7 @@ sequenceDiagram
     Server-->>LW: Response + DOM diff
     LW->>Alpine: Update entangled state
     Alpine->>User: UI Update
-    
+
     Note over Alpine,LW: State flows both directions
 ```
 
@@ -356,12 +362,12 @@ sequenceDiagram
     x-on:plan-saved.window="open = false"
 >
     <button x-on:click="open = true">Edit</button>
-    
+
     <div x-show="open" x-cloak>
         <form wire:submit="save">
             <input wire:model.blur="plan.title" x-on:input="dirty = true">
-            
-            <button 
+
+            <button
                 type="submit"
                 wire:loading.attr="disabled"
                 x-bind:disabled="!dirty"
@@ -382,23 +388,23 @@ flowchart LR
         LWState["Component State"]
         LWDraft["Draft Manager"]
     end
-    
+
     subgraph Alpine["Alpine.js"]
         Store["Alpine Store"]
         Watcher["State Watcher"]
     end
-    
+
     subgraph Storage["localStorage"]
         Drafts["uma_drafts"]
         LocalRuns["uma_local_runs"]
         Prefs["uma_preferences"]
     end
-    
+
     LWState -->|"@entangle"| Store
     Store -->|"Auto-save"| Drafts
     Watcher -->|"Persist"| LocalRuns
     Store -->|"Read/Write"| Prefs
-    
+
     Drafts -->|"Recovery"| LWDraft
     LocalRuns -->|"Load"| Store
 ```
@@ -417,7 +423,7 @@ flowchart LR
 document.addEventListener('alpine:init', () => {
     Alpine.store('localRuns', {
         runs: JSON.parse(localStorage.getItem('uma_local_runs') || '{"runs":[]}').runs,
-        
+
         save(run) {
             const index = this.runs.findIndex(r => r.uuid === run.uuid);
             if (index >= 0) {
@@ -427,7 +433,7 @@ document.addEventListener('alpine:init', () => {
             }
             this.persist();
         },
-        
+
         persist() {
             localStorage.setItem('uma_local_runs', JSON.stringify({
                 schema_version: '1.0',
@@ -461,7 +467,7 @@ sequenceDiagram
     participant LW as Livewire
     participant SVC as Service
     participant DB as Database
-    
+
     User->>Alpine: Click "Create Plan"
     Alpine->>Alpine: open = true
     User->>LW: Fill form (wire:model)
@@ -531,7 +537,7 @@ sequenceDiagram
     participant Alpine as Alpine.js
     participant Store as Alpine Store
     participant LS as localStorage
-    
+
     User->>Alpine: Click "Create Plan"
     Alpine->>Alpine: open = true (Local mode)
     User->>Alpine: Fill form
@@ -597,14 +603,14 @@ flowchart TB
         A3 --> A4["Eloquent Model"]
         A4 --> A5[(MySQL Database)]
     end
-    
+
     subgraph Local["Local Mode"]
         L1["User Action"] --> L2["Alpine.js"]
         L2 --> L3["Alpine Store"]
         L3 --> L4["JSON Serialization"]
         L4 --> L5[(localStorage)]
     end
-    
+
     style Account fill:#e8f5e9
     style Local fill:#fff3e0
 ```
@@ -630,22 +636,22 @@ flowchart TB
         DevDB[(SQLite)]
         DevCache["Array Cache"]
     end
-    
+
     subgraph CI["GitHub Actions CI"]
         CIApp["Laravel App"]
         CIDB[(MySQL 8.0)]
         CICache["Redis"]
     end
-    
+
     subgraph Staging["Staging Environment"]
         StagingApp["Laravel App"]
         StagingDB[(MySQL 8.0)]
         StagingCache["Redis"]
     end
-    
+
     Dev -->|"Push"| CI
     CI -->|"Deploy"| Staging
-    
+
     style Dev fill:#e3f2fd
     style CI fill:#f3e5f5
     style Staging fill:#e8f5e9
@@ -676,16 +682,16 @@ pie title Test Data Distribution
 flowchart TD
     Start["PlanEditor receives ID"]
     Check{ID Type?}
-    
+
     Start --> Check
     Check -->|"Numeric"| Account["CareerRun::find(id)"]
     Check -->|"UUID"| Local["LocalRunStorageService->find(uuid)"]
-    
+
     Account --> Unified["Unified Plan Interface"]
     Local --> Unified
-    
+
     Unified --> Editor["Render Editor UI"]
-    
+
     style Account fill:#e8f5e9
     style Local fill:#fff3e0
 ```text
@@ -699,27 +705,28 @@ flowchart TD
 
 ### 7.2 Livewire & Alpine Handshake
 
-**Requirement:** Modal visibility and complex UI states (Tabs) must sync without server roundtrips where possible, but sync when data changes.
+**Requirement:** Modal visibility and complex UI states (Tabs) must sync without server roundtrips
+where possible, but sync when data changes.
 
 ```mermaid
 sequenceDiagram
     participant User
     participant Alpine as Alpine.js
     participant LW as Livewire
-    
+
     User->>Alpine: Click Tab 2
     Alpine->>Alpine: activeTab = 2
     Note right of Alpine: No server request
-    
+
     User->>Alpine: Click Tab 3
     Alpine->>Alpine: activeTab = 3
     Note right of Alpine: No server request
-    
+
     User->>Alpine: Click "Save"
     Alpine->>LW: $wire.save()
     LW->>LW: Process & persist
     LW-->>Alpine: Update entangled state
-    
+
     Note over Alpine,LW: Server only contacted on data changes
 ```
 
@@ -739,20 +746,20 @@ sequenceDiagram
     participant Alpine as Alpine.js
     participant LS as localStorage
     participant LW as Livewire
-    
+
     User->>Alpine: Edit form data
     Alpine->>Alpine: Watcher detects change
     Alpine->>LS: Save to localStorage.drafts
-    
+
     Note over User,LW: Connection drops
-    
+
     User->>User: Reload page
     LW->>LW: Component hydrates
     LW->>LS: Check localStorage.drafts
     LS-->>LW: Draft data found
     LW->>LW: Populate properties
     LW->>User: Show recovered data
-    
+
     Note over User,LW: Data preserved!
 ```text
 
@@ -772,7 +779,7 @@ sequenceDiagram
     participant LW as Livewire
     participant SVC as SkillService
     participant DB as Database
-    
+
     User->>Alpine: Type "Speed"
     Alpine->>Alpine: Debounce 300ms
     Alpine->>LW: wire:model.live
@@ -797,25 +804,25 @@ flowchart LR
         Laravel["Laravel 12"]
         Livewire["Livewire 3"]
     end
-    
+
     subgraph JS["JS Dependencies"]
         NPM["NPM"]
         Alpine["Alpine.js"]
         Tailwind["TailwindCSS v4"]
         Vite["Vite"]
     end
-    
+
     subgraph VCS["Version Control"]
         Git["Git"]
         GitHub["GitHub"]
         CI["GitHub Actions"]
     end
-    
+
     Composer --> Laravel --> Livewire
     NPM --> Alpine
     NPM --> Tailwind
     NPM --> Vite
-    
+
     Git --> GitHub --> CI
 ```text
 
@@ -830,17 +837,17 @@ Integration defects will be tracked via GitHub Issues with the label `integratio
 ```mermaid
 flowchart TD
     Bug["Integration Bug Found"]
-    
+
     Bug --> S1{"Severity?"}
-    
+
     S1 -->|"Data corruption/loss"| Sev1["🔴 Severity 1<br/>Critical"]
     S1 -->|"UI State desync"| Sev2["🟠 Severity 2<br/>High"]
     S1 -->|"Visual glitches"| Sev3["🟡 Severity 3<br/>Medium"]
-    
+
     Sev1 --> Fix1["Immediate fix required"]
     Sev2 --> Fix2["Fix in current sprint"]
     Sev3 --> Fix3["Fix in next sprint"]
-    
+
     style Sev1 fill:#ffcdd2
     style Sev2 fill:#ffe0b2
     style Sev3 fill:#fff9c4
@@ -863,7 +870,7 @@ flowchart LR
     Review["Code Review"]
     Main["Main Branch"]
     Deploy["Deploy"]
-    
+
     Dev --> Branch --> PR --> CI
     CI -->|"Pass"| Review
     CI -->|"Fail"| Dev
@@ -886,14 +893,14 @@ flowchart TD
         C3["✅ Connection loss does not<br/>result in data loss"]
         C4["✅ UI components render correctly<br/>with data from both sources"]
     end
-    
+
     C1 --> Complete
     C2 --> Complete
     C3 --> Complete
     C4 --> Complete
-    
+
     Complete["🎉 Integration Complete"]
-    
+
     style Complete fill:#c8e6c9
 ```
 

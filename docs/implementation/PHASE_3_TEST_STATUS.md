@@ -1,11 +1,13 @@
 # Phase 3 - Training System Integration: Test Status
 
-**Date**: 2026-01-25  
-**Status**: Tests Created, Schema Issues Identified  
+**Date**: 2026-01-25
+**Status**: Tests Created, Schema Issues Identified
 
 ## Summary
 
-Unit tests have been created for all training services, but they are currently failing due to database schema mismatches between the code and migrations. The services themselves are implemented correctly, but the database schema needs to be updated to match the service expectations.
+Unit tests have been created for all training services, but they are currently failing due to
+database schema mismatches between the code and migrations. The services themselves are implemented
+correctly, but the database schema needs to be updated to match the service expectations.
 
 ## Tests Created
 

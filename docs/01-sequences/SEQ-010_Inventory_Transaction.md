@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001]
 
 ---
@@ -25,7 +25,9 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the inventory transaction workflow in the Umamusume Career Planner application, covering support card material management, skill point (SP) transactions, item usage, and currency tracking with atomic operations.
+This sequence diagram documents the inventory transaction workflow in the Umamusume Career Planner
+application, covering support card material management, skill point (SP) transactions, item usage,
+and currency tracking with atomic operations.
 
 ### 1.2 Scope
 
@@ -40,9 +42,9 @@ This sequence diagram documents the inventory transaction workflow in the Umamus
 
 **Related Artifacts:**
 
-- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
-- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
-- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
+- PRD: [PRD-001](../02-prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md)
 
 ### 1.3 Business Context
 
@@ -122,15 +124,15 @@ sequenceDiagram
     UI->>Controller: POST /inventory/transaction
     Controller->>Controller: Authorize user
     Controller->>InventorySvc: executeTransaction(type, items, amount)
-    
+
     InventorySvc->>Validator: validateTransaction(type, items, amount)
-    
+
     Validator->>DB: Check current balance
     DB-->>Validator: Current inventory state
-    
+
     Validator->>Validator: Validate sufficient materials
     Validator->>Validator: Validate transaction rules
-    
+
     alt Validation Failed
         Validator-->>InventorySvc: ValidationException
         InventorySvc-->>Controller: 422 Validation Error
@@ -138,17 +140,17 @@ sequenceDiagram
         UI-->>User: Display error message
     else Validation Passed
         Validator-->>InventorySvc: Validation success
-        
+
         InventorySvc->>DB: BEGIN TRANSACTION
-        
+
         InventorySvc->>DB: LOCK inventory row FOR UPDATE
         DB-->>InventorySvc: Row locked
-        
+
         InventorySvc->>InventorySvc: Calculate new balances
-        
+
         InventorySvc->>DB: UPDATE inventory SET balance = new_balance
         DB-->>InventorySvc: Update result
-        
+
         alt Update Failed
             InventorySvc->>DB: ROLLBACK
             InventorySvc-->>Controller: 500 Server Error
@@ -158,12 +160,12 @@ sequenceDiagram
             InventorySvc->>DB: INSERT inventory_transactions
             InventorySvc->>Audit: Log transaction
             Audit->>DB: INSERT audit_log
-            
+
             InventorySvc->>DB: COMMIT TRANSACTION
-            
+
             InventorySvc->>Events: Dispatch InventoryUpdated
             Events->>Events: Queue event listeners
-            
+
             InventorySvc-->>Controller: Transaction success
             Controller-->>UI: 200 OK + new balances
             UI->>UI: Update reactive properties
@@ -221,7 +223,7 @@ class InventoryService
         private TransactionValidator $validator,
         private AuditLogger $auditLogger,
     ) {}
-    
+
     public function executeTransaction(
         Career $career,
         string $transactionType,
@@ -231,10 +233,10 @@ class InventoryService
         return DB::transaction(function () use ($career, $transactionType, $items, $amount) {
             // 1. Validate transaction
             $this->validator->validate($career, $transactionType, $items, $amount);
-            
+
             // 2. Lock inventory row
             $inventory = $this->lockInventory($career);
-            
+
             // 3. Calculate new balances
             $newBalances = $this->calculateBalances(
                 $inventory,
@@ -242,15 +244,15 @@ class InventoryService
                 $items,
                 $amount
             );
-            
+
             // 4. Check for negative balances
             if ($this->hasNegativeBalance($newBalances)) {
                 throw new InsufficientBalanceException("Insufficient balance for transaction");
             }
-            
+
             // 5. Update inventory
             $inventory->update($newBalances);
-            
+
             // 6. Record transaction
             $transaction = $this->recordTransaction(
                 $career,
@@ -259,7 +261,7 @@ class InventoryService
                 $amount,
                 $newBalances
             );
-            
+
             // 7. Audit log
             $this->auditLogger->log($career->user_id, 'inventory_transaction', [
                 'transaction_id' => $transaction->id,
@@ -269,10 +271,10 @@ class InventoryService
                 'before' => $inventory->getOriginal(),
                 'after' => $newBalances,
             ]);
-            
+
             // 8. Dispatch event
             event(new InventoryUpdated($career, $transaction));
-            
+
             return new TransactionResult(
                 success: true,
                 transaction: $transaction,
@@ -280,14 +282,14 @@ class InventoryService
             );
         });
     }
-    
+
     private function lockInventory(Career $career): Inventory
     {
         return Inventory::where('career_id', $career->id)
             ->lockForUpdate()
             ->firstOrFail();
     }
-    
+
     private function calculateBalances(
         Inventory $inventory,
         string $transactionType,
@@ -295,7 +297,7 @@ class InventoryService
         int $amount
     ): array {
         $balances = $inventory->toArray();
-        
+
         match ($transactionType) {
             'sp_earn' => $balances['skill_points'] += $amount,
             'sp_spend' => $balances['skill_points'] -= $amount,
@@ -304,31 +306,31 @@ class InventoryService
             'item_add' => $balances['items'][$items[0]] = ($balances['items'][$items[0]] ?? 0) + $amount,
             'item_use' => $balances['items'][$items[0]] -= $amount,
         };
-        
+
         return $balances;
     }
-    
+
     private function hasNegativeBalance(array $balances): bool
     {
         if ($balances['skill_points'] < 0) {
             return true;
         }
-        
+
         foreach ($balances['materials'] ?? [] as $material => $count) {
             if ($count < 0) {
                 return true;
             }
         }
-        
+
         foreach ($balances['items'] ?? [] as $item => $count) {
             if ($count < 0) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     private function recordTransaction(
         Career $career,
         string $transactionType,
@@ -366,28 +368,28 @@ class TransactionValidator
         if (!in_array($transactionType, $this->getAllowedTypes())) {
             throw new InvalidTransactionTypeException("Invalid transaction type: {$transactionType}");
         }
-        
+
         // 2. Validate amount
         if ($amount <= 0 && in_array($transactionType, ['sp_earn', 'material_add', 'item_add'])) {
             throw new InvalidAmountException("Amount must be positive for add transactions");
         }
-        
+
         if ($amount >= 0 && in_array($transactionType, ['sp_spend', 'material_consume', 'item_use'])) {
             throw new InvalidAmountException("Amount must be negative for consume transactions");
         }
-        
+
         // 3. Validate items array
         if (empty($items) && in_array($transactionType, ['material_add', 'material_consume', 'item_add', 'item_use'])) {
             throw new InvalidItemsException("Items array cannot be empty for material/item transactions");
         }
-        
+
         // 4. Check current balance
         $inventory = Inventory::where('career_id', $career->id)->first();
-        
+
         if (!$inventory) {
             throw new InventoryNotFoundException("Inventory not found for career {$career->id}");
         }
-        
+
         match ($transactionType) {
             'sp_spend' => $this->validateSPBalance($inventory, $amount),
             'material_consume' => $this->validateMaterialBalance($inventory, $items[0], $amount),
@@ -395,7 +397,7 @@ class TransactionValidator
             default => null,
         };
     }
-    
+
     private function validateSPBalance(Inventory $inventory, int $amount): void
     {
         if ($inventory->skill_points < abs($amount)) {
@@ -404,31 +406,31 @@ class TransactionValidator
             );
         }
     }
-    
+
     private function validateMaterialBalance(Inventory $inventory, string $material, int $amount): void
     {
         $materials = $inventory->materials ?? [];
         $available = $materials[$material] ?? 0;
-        
+
         if ($available < abs($amount)) {
             throw new InsufficientMaterialException(
                 "Insufficient {$material}. Required: " . abs($amount) . ", Available: {$available}"
             );
         }
     }
-    
+
     private function validateItemBalance(Inventory $inventory, string $item, int $amount): void
     {
         $items = $inventory->items ?? [];
         $available = $items[$item] ?? 0;
-        
+
         if ($available < abs($amount)) {
             throw new InsufficientItemException(
                 "Insufficient {$item}. Required: " . abs($amount) . ", Available: {$available}"
             );
         }
     }
-    
+
     private function getAllowedTypes(): array
     {
         return [
@@ -593,7 +595,7 @@ sequenceDiagram
 
     User->>UI: Submit transaction
     UI->>Service: executeTransaction(...)
-    
+
     alt Validation Error
         Service-->>UI: ValidationException
         UI->>UI: Display error message
@@ -695,7 +697,7 @@ DB::transaction(function () use ($career) {
     $inventory = Inventory::where('career_id', $career->id)
         ->lockForUpdate()
         ->first();
-    
+
     // Then lock career if needed
     $career = Career::where('id', $career->id)
         ->lockForUpdate()
@@ -711,9 +713,9 @@ DB::transaction(function () use ($career) {
 
 | Document | Description |
 | --- | --- |
-| [PRD-001](../prds/PRD-001_Character_Management.md) | Product requirements for character management |
-| [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
-| [FLOW-001](../flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
+| [PRD-001](../02-prds/PRD-001_Character_Management.md) | Product requirements for character management |
+| [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
+| [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
 
 ### 8.2 Related Sequences
 
@@ -726,7 +728,7 @@ DB::transaction(function () use ($career) {
 
 | Document | Description |
 | --- | --- |
-| [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
+| [DBD-009](../00-core-docs/009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
 
@@ -763,4 +765,6 @@ DB::transaction(function () use ($career) {
 
 ---
 
-*This sequence diagram reflects the current implementation of the inventory transaction workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/InventoryService.php`, `app/Services/TransactionValidator.php`, and related files.*
+*This sequence diagram reflects the current implementation of the inventory transaction workflow as
+of v2.0.0. For the most up-to-date information, refer to the source code in
+`app/Services/InventoryService.php`, `app/Services/TransactionValidator.php`, and related files.*

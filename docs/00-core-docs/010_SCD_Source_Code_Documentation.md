@@ -26,7 +26,9 @@
 
 ## 1. Introduction
 
-This document provides a comprehensive map of the source code structure for the Umamusume Pretty Derby Career Planner. It serves as a guide for developers navigating the Laravel 12 codebase, focusing on the Service Layer, Neuron AI agents, MCP integration, and Livewire components.
+This document provides a comprehensive map of the source code structure for the Umamusume Pretty
+Derby Career Planner. It serves as a guide for developers navigating the Laravel 12 codebase,
+focusing on the Service Layer, Neuron AI agents, MCP integration, and Livewire components.
 
 ### 1.1 Architecture Overview
 
@@ -37,32 +39,32 @@ flowchart TB
         Livewire["Livewire Components"]
         Alpine["Alpine.js"]
     end
-    
+
     subgraph Application["Application Layer"]
         Controllers["Controllers"]
         Services["Services"]
         FormRequests["Form Requests"]
     end
-    
+
     subgraph AI["AI & MCP Layer"]
         Neuron["Neuron Agents"]
         AIServices["AI Services"]
         MCPServices["MCP Services"]
     end
-    
+
     subgraph Domain["Domain Layer"]
         Models["Eloquent Models"]
         Enums["Enums"]
         Repositories["Repositories"]
     end
-    
+
     subgraph Infrastructure["Infrastructure Layer"]
         Database[(MySQL)]
         Cache["Redis Cache"]
         Storage["File Storage"]
         ExternalAPIs["External APIs"]
     end
-    
+
     Blade --> Livewire
     Livewire --> Alpine
     Livewire --> Services
@@ -75,7 +77,7 @@ flowchart TB
     Models --> Database
     Services --> Cache
     Services --> ExternalAPIs
-    
+
     style Presentation fill:#e3f2fd
     style Application fill:#f3e5f5
     style AI fill:#fff3e0
@@ -92,25 +94,25 @@ flowchart TB
 ```mermaid
 flowchart TD
     Root["/"]
-    
+
     Root --> App["app/"]
     Root --> Config["config/"]
     Root --> Database["database/"]
     Root --> Resources["resources/"]
     Root --> Routes["routes/"]
     Root --> Tests["tests/"]
-    
+
     App --> Models["Models/"]
     App --> Services["Services/"]
     App --> Http["Http/"]
     App --> Livewire["Livewire/"]
     App --> Neuron["Neuron/"]
     App --> Repositories["Repositories/"]
-    
+
     Services --> AIServices["AI/"]
     Services --> MCPServices["MCP/"]
     Services --> ExternalAPI["ExternalAPI/"]
-    Services --> OCRServices["OCR/"]
+    Services --> TesseractServices["TesseractService"]
     Services --> DataServices["Data/"]
 ```
 
@@ -120,7 +122,8 @@ flowchart TD
 umamusume-career-planner/
 ├── app/
 │   ├── Collections/        # Custom Collection Classes
-│   ├── Enums/              # PHP 8.1+ Enums (8 enums: AlertType, CareerPhase, Mood, Priority, RaceDistance, RecommendationType, RunningStyle, StorageMode)
+│   ├── Enums/              # PHP 8.1+ Enums (8 enums: AlertType, CareerPhase, Mood, Priority,
+RaceDistance, RecommendationType, RunningStyle, StorageMode)
 │   ├── Events/             # Domain Events
 │   ├── Helpers/            # Helper Utilities
 │   ├── Http/
@@ -131,7 +134,7 @@ umamusume-career-planner/
 │   ├── Listeners/          # Event Listeners
 │   ├── Livewire/           # Livewire Components (AdvisoryPanel)
 │   ├── MCP/                # MCP Server Definitions
-│   ├── Models/             # Eloquent Models (30 models)
+│   ├── Models/             # Eloquent Models (40 models)
 │   ├── Neuron/             # Neuron AI Agents
 │   │   ├── Agents/         # Agent Implementations (6 agents)
 │   │   ├── Responses/      # Typed Agent Responses (4 response classes)
@@ -161,7 +164,7 @@ umamusume-career-planner/
 │   └── external-apis.php   # External API Configuration
 ├── database/
 │   ├── factories/          # Model Factories (30)
-│   ├── migrations/         # Schema Definitions (51 migrations)
+│   ├── migrations/         # Schema Definitions (67 migrations)
 │   └── seeders/            # Data Seeders
 ├── resources/
 │   ├── css/                # Tailwind CSS
@@ -175,6 +178,15 @@ umamusume-career-planner/
     └── Unit/               # Unit Tests
     (3,316+ tests, 11,563+ assertions across 300+ test files)
 ```text
+
+#### Livewire Usage Scope
+
+Livewire 4 is used selectively for focused interactive surfaces rather than as the dominant UI
+pattern across all screens. This document lists representative examples rather than a full
+inventory.
+
+For architectural guidance, see `001_SDP_Software_Development_Plan.md` (UI architecture section).
+For the definitive current component list, use `app/Livewire/` in the repository.
 
 ---
 
@@ -197,7 +209,7 @@ classDiagram
         +aptitudes() HasMany
         +factors() HasMany
     }
-    
+
     class Career {
         +int id
         +int character_id
@@ -209,7 +221,7 @@ classDiagram
         +trainingSessions() HasMany
         +races() HasMany
     }
-    
+
     class TrainingSession {
         +int id
         +int career_id
@@ -218,7 +230,7 @@ classDiagram
         +json stat_gains
         +career() BelongsTo
     }
-    
+
     class Skill {
         +int id
         +string name
@@ -229,7 +241,7 @@ classDiagram
         +acquisitions() HasMany
         +hints() HasMany
     }
-    
+
     class SupportCard {
         +int id
         +string name
@@ -238,14 +250,14 @@ classDiagram
         +int limit_break_level
         +json bonuses
     }
-    
+
     Character "1" --> "*" Career
     Career "1" --> "*" TrainingSession
     Character "*" --> "*" Skill
     Character "*" --> "*" SupportCard
 ```
 
-### 3.2 Enums (8 Total)
+### 3.2 Enums (12 Total)
 
 ```mermaid
 classDiagram
@@ -255,7 +267,7 @@ classDiagram
         Warning
         Info
     }
-    
+
     class CareerPhase {
         <<enumeration>>
         Junior
@@ -263,7 +275,7 @@ classDiagram
         Senior
         UraFinale
     }
-    
+
     class Mood {
         <<enumeration>>
         Great : +4%
@@ -273,7 +285,7 @@ classDiagram
         Awful : -4%
         +modifier() int
     }
-    
+
     class Priority {
         <<enumeration>>
         Low
@@ -281,7 +293,7 @@ classDiagram
         High
         Critical
     }
-    
+
     class RaceDistance {
         <<enumeration>>
         Sprint
@@ -289,7 +301,7 @@ classDiagram
         Medium
         Long
     }
-    
+
     class RecommendationType {
         <<enumeration>>
         Training
@@ -297,7 +309,7 @@ classDiagram
         Skill
         Career
     }
-    
+
     class RunningStyle {
         <<enumeration>>
         FrontRunner
@@ -305,7 +317,7 @@ classDiagram
         LateSurger
         EndCloser
     }
-    
+
     class StorageMode {
         <<enumeration>>
         Local
@@ -321,30 +333,30 @@ classDiagram
 
 ```mermaid
 flowchart TD
-    subgraph CoreServices["Core Domain Services (55+)"]
-        CharacterService["CharacterService"]
-        CareerService["CareerService"]
+    subgraph CoreServices["Core Domain Services (representative set)"]
+        CharacterStateService["CharacterStateService"]
+        CareerService["CareerRunService"]
         TrainingService["TrainingService"]
-        RaceService["RaceService"]
+        RaceConditionService["RaceConditionService"]
         SkillService["SkillService"]
-        SupportCardService["SupportCardService"]
+        SupportCardService["SupportDeckService"]
         FactorService["FactorService"]
         SnapshotService["SnapshotService"]
         GameMechanicsEngine["GameMechanicsEngine"]
         DeckManagementService["DeckManagementService"]
     end
-    
+
     subgraph AIServices["AI Services (20)"]
         HybridAIService["HybridAIService"]
         OllamaService["OllamaService"]
         BedrockService["BedrockService"]
-        AIAdvisoryService["AIAdvisoryService"]
+        HybridAdvisoryService["HybridAIService"]
         CostTrackingService["CostTrackingService"]
         ConversationHistoryService["ConversationHistoryService"]
         AIDashboardService["AIDashboardService"]
         VectorStoreService["VectorStoreService"]
     end
-    
+
     subgraph NeuronServices["Neuron Services (5)"]
         NeuronAIService["NeuronAIService"]
         TrainingAdvisorService["TrainingAdvisorService"]
@@ -352,7 +364,7 @@ flowchart TD
         SkillRecommendationService["SkillRecommendationService"]
         CareerPlanningService["CareerPlanningService"]
     end
-    
+
     subgraph MCPServices["MCP Services (42)"]
         MCPClientService["MCPClientService"]
         MCPMonitoringService["MCPMonitoringService"]
@@ -361,15 +373,15 @@ flowchart TD
         AgentCoreService["AgentCoreService"]
         SubagentCoordinationService["SubagentCoordinationService"]
     end
-    
+
     subgraph DataServices["Data Management Services"]
         DataImportService["DataImportService"]
         DataExportService["DataExportService"]
         DataMigrationService["DataMigrationService"]
         BackupService["BackupService"]
-        LocalStorageService["LocalStorageService"]
+        LocalStorageService["local-storage-manager.js / offline-storage.js"]
     end
-    
+
     subgraph ExternalServices["External Integration (25)"]
         UmapyoiApiClient["UmapyoiApiClient"]
         UmamusumeDBApiClient["UmamusumeDBApiClient"]
@@ -377,13 +389,13 @@ flowchart TD
         ExternalDataService["ExternalDataService"]
         GracefulDegradationService["GracefulDegradationService"]
     end
-    
+
     subgraph AdminServices["Admin Services (3)"]
         SystemHealthService["SystemHealthService"]
         DatabaseMaintenanceService["DatabaseMaintenanceService"]
         LogReaderService["LogReaderService"]
     end
-    
+
     subgraph PerformanceServices["Performance & Monitoring (8)"]
         ApmService["ApmService"]
         ApiPerformanceMonitoringService["ApiPerformanceMonitoringService"]
@@ -391,7 +403,7 @@ flowchart TD
         PerformanceAlertingService["PerformanceAlertingService"]
         RedisCacheOptimizationService["RedisCacheOptimizationService"]
     end
-    
+
     CoreServices --> AIServices
     CoreServices --> NeuronServices
     AIServices --> MCPServices
@@ -403,19 +415,19 @@ flowchart TD
 
 ### 4.2 Core Service Implementations
 
-#### CharacterService
+#### CharacterStateService
 
 ```php
 namespace App\Services;
 
-class CharacterService
+class CharacterStateService
 {
     public function __construct(
         private CharacterRepository $repository,
-        private FactorInheritanceService $factorService,
+        private FactorService $factorService,
         private CacheManager $cache
     ) {}
-    
+
     public function create(array $data): Character
     {
         $character = $this->repository->create($data);
@@ -423,7 +435,7 @@ class CharacterService
         $this->cache->forget("user.{$data['user_id']}.characters");
         return $character;
     }
-    
+
     public function updateStats(Character $character, array $stats): Character
     {
         $validated = $this->validateStatRanges($stats);
@@ -431,10 +443,10 @@ class CharacterService
         event(new StatsUpdated($character));
         return $character->fresh();
     }
-    
+
     private function validateStatRanges(array $stats): array
     {
-        return collect($stats)->map(fn($value) => 
+        return collect($stats)->map(fn($value) =>
             max(0, min(1200, (int) $value))
         )->toArray();
     }
@@ -453,28 +465,28 @@ class TrainingPredictionService
         private StatGainCalculator $gainCalculator,
         private CacheManager $cache
     ) {}
-    
+
     public function getPredictions(Character $character): array
     {
         $cacheKey = "predictions.{$character->id}";
-        
+
         return $this->cache->remember($cacheKey, 300, function () use ($character) {
             $facilities = TrainingType::cases();
             $predictions = [];
-            
+
             foreach ($facilities as $facility) {
                 $predictions[] = $this->calculatePrediction($character, $facility);
             }
-            
+
             return $this->rankPredictions($predictions);
         });
     }
-    
+
     private function calculatePrediction(Character $character, TrainingType $type): array
     {
         $baseGains = $this->gainCalculator->calculate($character, $type);
         $bonuses = $this->bonusCalculator->calculate($character->supportDeck, $type);
-        
+
         return [
             'training_type' => $type->value,
             'stat_gains' => $this->applyBonuses($baseGains, $bonuses),
@@ -502,13 +514,13 @@ flowchart TD
         CareerAgent["CareerPlanningAgent"]
         McpDemo["McpDemoAgent"]
     end
-    
+
     subgraph Tools["Agent Tools (3)"]
         StatsTool["CharacterStatsTool"]
         RaceTool["RaceDataTool"]
         SkillTool["SkillDataTool"]
     end
-    
+
     subgraph NeuronServices["Neuron Services (5)"]
         NeuronAIService["NeuronAIService"]
         TrainingAdvisorService["TrainingAdvisorService"]
@@ -516,19 +528,19 @@ flowchart TD
         SkillRecommendationService["SkillRecommendationService"]
         CareerPlanningService["CareerPlanningService"]
     end
-    
+
     subgraph Providers["AI Providers"]
         Ollama["Ollama (Local)"]
         Bedrock["AWS Bedrock (Cloud)"]
     end
-    
+
     subgraph Responses["Typed Responses (4)"]
         TrainingAdvResp["TrainingAdviceResponse"]
         RaceStratResp["RaceStrategyResponse"]
         SkillRecResp["SkillRecommendationResponse"]
         CareerPlanResp["CareerPlanningResponse"]
     end
-    
+
     BaseAgent --> TrainingAgent
     BaseAgent --> RaceAgent
     BaseAgent --> SkillAgent
@@ -536,7 +548,7 @@ flowchart TD
     TrainingAgent --> StatsTool
     RaceAgent --> RaceTool
     SkillAgent --> SkillTool
-    
+
     Agents --> NeuronServices
     Agents --> Providers
     Agents --> Responses
@@ -553,7 +565,7 @@ use NeuronAI\SystemPrompt;
 class TrainingAdvisorAgent extends Agent
 {
     protected string $name = 'Training Advisor';
-    
+
     public function instructions(): string
     {
         return <<<PROMPT
@@ -563,7 +575,7 @@ class TrainingAdvisorAgent extends Agent
         Consider stat priorities, energy management, and upcoming race requirements.
         PROMPT;
     }
-    
+
     protected function tools(): array
     {
         return [
@@ -572,7 +584,7 @@ class TrainingAdvisorAgent extends Agent
             new SkillDataTool(),
         ];
     }
-    
+
     public function provider(): AIProvider
     {
         return app(HybridAIService::class)->getProvider();
@@ -588,7 +600,7 @@ sequenceDiagram
     participant MCP as MCP Client
     participant Server as MCP Server
     participant Tool as External Tool
-    
+
     Agent->>MCP: Request tool execution
     MCP->>MCP: Check tool permissions
     MCP->>Server: Connect to server
@@ -621,7 +633,7 @@ return [
             'enabled' => true,
         ],
     ],
-    
+
     'monitoring' => [
         'enabled' => true,
         'log_requests' => true,
@@ -640,13 +652,13 @@ class HybridAIService
     public function __construct(
         private OllamaService $ollama,
         private BedrockService $bedrock,
-        private AICostTracker $costTracker
+        private CostTrackingService $costTracker
     ) {}
-    
+
     public function generate(string $prompt, array $options = []): AIResponse
     {
         $complexity = $this->assessComplexity($prompt);
-        
+
         if ($this->shouldUseLocal($complexity, $options)) {
             try {
                 return $this->ollama->generate($prompt, $options);
@@ -654,23 +666,23 @@ class HybridAIService
                 Log::warning('Ollama unavailable, falling back to Bedrock');
             }
         }
-        
+
         $response = $this->bedrock->generate($prompt, $options);
         $this->costTracker->track($response);
-        
+
         return $response;
     }
-    
+
     private function shouldUseLocal(int $complexity, array $options): bool
     {
         if ($options['force_cloud'] ?? false) {
             return false;
         }
-        
+
         if (!$this->ollama->isAvailable()) {
             return false;
         }
-        
+
         return $complexity <= config('ai.local_complexity_threshold', 70);
     }
 }
@@ -682,7 +694,8 @@ class HybridAIService
 
 ### 5.3.1 Overview
 
-Performance and monitoring services provide Application Performance Monitoring (APM), regression detection, and optimization capabilities.
+Performance and monitoring services provide Application Performance Monitoring (APM), regression
+detection, and optimization capabilities.
 
 ```mermaid
 flowchart TD
@@ -696,22 +709,22 @@ flowchart TD
         RedisOpt["RedisCacheOptimizationService"]
         Historical["HistoricalTrackingService"]
     end
-    
+
     APM --> APIPerf
     APM --> QueryOpt
     APIPerf --> PerfRegression
     PerfRegression --> PerfAlerting
     QueryOpt --> RedisOpt
     RedisOpt --> APICaching
-    
+
     style APM fill:#fff3e0
     style PerfAlerting fill:#ffcdd2
 ```
 
 ### 5.3.2 ApmService
 
-**Location**: `app/Services/ApmService.php`  
-**Purpose**: Central Application Performance Monitoring coordination  
+**Location**: `app/Services/ApmService.php`
+**Purpose**: Central Application Performance Monitoring coordination
 **Database**: Stores metrics in `ucp_performance_metrics` table
 
 ```php
@@ -728,7 +741,7 @@ class ApmService
             'captured_at' => now(),
         ]);
     }
-    
+
     public function captureException(Throwable $e, array $context = []): void
     {
         Log::error($e->getMessage(), [
@@ -737,7 +750,7 @@ class ApmService
             'context' => $context,
         ]);
     }
-    
+
     public function startTransaction(string $name): Transaction
     {
         return new Transaction($name, microtime(true));
@@ -756,7 +769,7 @@ class ApmService
 
 ### 5.3.3 ApiPerformanceMonitoringService
 
-**Location**: `app/Services/ApiPerformanceMonitoringService.php`  
+**Location**: `app/Services/ApiPerformanceMonitoringService.php`
 **Purpose**: Track API endpoint latency, errors, and throughput
 
 ```php
@@ -774,12 +787,12 @@ class ApiPerformanceMonitoringService
             'endpoint' => $endpoint,
             'status' => $statusCode,
         ]);
-        
+
         if ($statusCode >= 400) {
             $this->apm->captureMetric('api.error', 1, ['endpoint' => $endpoint]);
         }
     }
-    
+
     public function getEndpointMetrics(string $endpoint, Carbon $since): array
     {
         return [
@@ -789,7 +802,7 @@ class ApiPerformanceMonitoringService
             'throughput' => $this->calculateThroughput($endpoint, $since),
         ];
     }
-    
+
     public function detectAnomalies(): Collection
     {
         // Detects endpoints exceeding 2 standard deviations from baseline
@@ -809,7 +822,7 @@ class ApiPerformanceMonitoringService
 
 ### 5.3.4 QueryOptimizationService
 
-**Location**: `app/Services/QueryOptimizationService.php`  
+**Location**: `app/Services/QueryOptimizationService.php`
 **Purpose**: Analyze database queries, detect N+1 problems, suggest index optimizations
 
 ```php
@@ -820,7 +833,7 @@ class QueryOptimizationService
     public function analyzeQuery(string $sql): array
     {
         $explain = DB::select("EXPLAIN {$sql}");
-        
+
         return [
             'type' => $explain[0]->type,
             'possible_keys' => $explain[0]->possible_keys,
@@ -830,32 +843,32 @@ class QueryOptimizationService
             'needs_optimization' => $this->needsOptimization($explain[0]),
         ];
     }
-    
+
     public function detectNPlusOne(): Collection
     {
         // Analyzes query logs for N+1 patterns
         $queries = DB::getQueryLog();
         $patterns = [];
-        
+
         foreach ($queries as $query) {
             if ($this->isNPlusOnePattern($query)) {
                 $patterns[] = $query;
             }
         }
-        
+
         return collect($patterns);
     }
-    
+
     public function suggestIndexes(): array
     {
         // Suggests indexes based on slow query analysis
         $slowQueries = $this->getSlowQueries();
         $suggestions = [];
-        
+
         foreach ($slowQueries as $query) {
             $suggestions[] = $this->analyzeForIndexes($query);
         }
-        
+
         return $suggestions;
     }
 }
@@ -872,7 +885,7 @@ class QueryOptimizationService
 
 ### 5.3.5 PerformanceAlertingService
 
-**Location**: `app/Services/PerformanceAlertingService.php`  
+**Location**: `app/Services/PerformanceAlertingService.php`
 **Purpose**: Threshold monitoring and alert dispatch
 
 ```php
@@ -883,20 +896,20 @@ class PerformanceAlertingService
     public function checkThresholds(): void
     {
         $metrics = $this->apm->getMetrics(now()->subMinutes(5));
-        
+
         foreach ($metrics as $metric) {
             if ($this->exceedsThreshold($metric)) {
                 $this->sendAlert($metric);
             }
         }
     }
-    
+
     public function sendAlert(PerformanceMetric $metric): void
     {
         Notification::route('mail', config('apm.alert_email'))
             ->notify(new PerformanceAlertNotification($metric));
     }
-    
+
     public function configureAlerts(array $thresholds): void
     {
         foreach ($thresholds as $metric => $threshold) {
@@ -910,6 +923,8 @@ class PerformanceAlertingService
 
 - `checkThresholds(): void` - Check all metrics against thresholds
 - `sendAlert(PerformanceMetric $metric): void` - Dispatch alert notification
+
+> **Note**: `PerformanceMetric` is an internal DTO/Telemetry representation, not a domain Eloquent model. Metrics are typically dispatched to an external APM or Redis cache rather than a persistent database table.
 - `configureAlerts(array $thresholds): void` - Update alert thresholds
 - `getActiveAlerts(): Collection` - Retrieve current alerts
 
@@ -958,25 +973,25 @@ flowchart TD
     subgraph Entry["Entry Point"]
         AppJS["resources/js/app.js"]
     end
-    
+
     subgraph Alpine["Alpine.js"]
         Init["Alpine Init"]
         Stores["Alpine Stores"]
         Components["Alpine Components"]
     end
-    
+
     subgraph StoresList["Stores"]
         CharacterStore["$store.characters"]
         PreferencesStore["$store.preferences"]
         NotificationsStore["$store.notifications"]
     end
-    
+
     subgraph Events["Global Events"]
         Toast["toast"]
         CharacterUpdated["character-updated"]
         TrainingComplete["training-complete"]
     end
-    
+
     AppJS --> Init
     Init --> Stores
     Init --> Components
@@ -1044,7 +1059,7 @@ flowchart LR
         Training["/training"]
         AI["/ai-advisor"]
     end
-    
+
     subgraph API["API Routes (api.php)"]
         APICharacters["/api/characters"]
         APIPredictions["/api/predictions"]
@@ -1083,7 +1098,7 @@ flowchart LR
 
 ### 7.3 Service Method Reference
 
-#### CharacterService - Method Reference
+#### CharacterStateService - Method Reference
 
 | Method | Parameters | Returns | Description |
 | --- | --- | --- | --- |
@@ -1132,7 +1147,7 @@ mindmap
 
 | Context | Convention | Example |
 | --- | --- | --- |
-| PHP Classes | PascalCase | `CharacterService`, `TrainingAdvisorAgent` |
+| PHP Classes | PascalCase | `CharacterStateService`, `TrainingAdvisorAgent` |
 | PHP Methods | camelCase | `getPredictions`, `calculateBonus` |
 | PHP Constants | UPPER_SNAKE | `MAX_STAT_VALUE`, `API_TIMEOUT` |
 | Database Tables | snake_case (plural, prefixed) | `ucp_characters`, `ucp_skills` |
@@ -1163,7 +1178,7 @@ mindmap
 - **Pest v4** (with PHPUnit v12 backend)
 - **pest-plugin-browser v4.0** for browser testing via Playwright 1.58
 - Browser tests live in `tests/Browser/`
-- **3,316+ tests** with **11,563+ assertions** across **300+ test files**
+- **364 test files** across unit, feature, browser, API, and integration coverage
 - **571 total routes** covered by feature and integration tests
 
 ### 9.2 Test Distribution
@@ -1182,7 +1197,7 @@ pie title Test Coverage Distribution
 tests/
 ├── Unit/
 │   ├── Services/
-│   │   ├── CharacterServiceTest.php
+│   │   ├── CharacterStateServiceTest.php
 │   │   ├── TrainingPredictionServiceTest.php
 │   │   └── SkillServiceTest.php
 │   ├── Calculators/
@@ -1220,9 +1235,9 @@ use App\Models\Character;
 test('calculates training predictions for all facilities', function () {
     $character = Character::factory()->create();
     $service = app(TrainingPredictionService::class);
-    
+
     $predictions = $service->getPredictions($character);
-    
+
     expect($predictions)->toHaveCount(6)
         ->and($predictions[0])->toHaveKeys([
             'training_type',
@@ -1235,9 +1250,9 @@ test('calculates training predictions for all facilities', function () {
 test('ranks predictions by recommendation score', function () {
     $character = Character::factory()->withGoals(['speed' => 1000])->create();
     $service = app(TrainingPredictionService::class);
-    
+
     $predictions = $service->getPredictions($character);
-    
+
     expect($predictions[0]['training_type'])->toBe('speed');
 });
 ```

@@ -1,7 +1,7 @@
 # Sidebar Minimize Visual Reference
 
-**Document Version**: 1.0.0  
-**Date**: February 8, 2026  
+**Document Version**: 1.0.0
+**Date**: February 8, 2026
 **Related**: [sidebar-minimize-implementation-plan.md](./sidebar-minimize-implementation-plan.md)
 
 ---
@@ -364,4 +364,3 @@ x-show="!$store.sidebar.minimized" <!-- Collapse icon -->
 
 *This visual reference complements the implementation plan and provides clear visual guidance for developers and
 designers.*
-

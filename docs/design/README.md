@@ -1,13 +1,15 @@
 # Design Documentation Index
 
-**Last Updated**: February 22, 2026  
+**Last Updated**: February 22, 2026
 **Status**: Active Design Phase
 
 ---
 
 ## Overview
 
-This directory contains comprehensive design documentation for the Umamusume Career Planner, including game alignment analysis, component specifications, data flow mapping, and implementation planning.
+This directory contains comprehensive design documentation for the Umamusume Career Planner,
+including game alignment analysis, component specifications, data flow mapping, and implementation
+planning.
 
 ---
 
@@ -181,7 +183,8 @@ Organized by category:
 
 ### Research Documents
 
-- [../research/game-mechanics-research-report.md](../research/game-mechanics-research-report.md) - Verified game mechanics from authoritative sources
+- [../research/game-mechanics-research-report.md](../research/game-mechanics-research-report.md) -
+Verified game mechanics from authoritative sources
 
 ### Wireframe Documents
 
@@ -201,8 +204,10 @@ Organized by category:
 
 ### Core Documentation
 
-- [../00-core-docs/004_SDS_Software_Design_Specifications.md](../00-core-docs/004_SDS_Software_Design_Specifications.md) - System architecture
-- [../00-core-docs/017_SUM_Software_User_Manual.md](../00-core-docs/017_SUM_Software_User_Manual.md) - User documentation
+- [../00-core-docs/004_SDS_Software_Design_Specifications.md](../00-core-
+docs/004_SDS_Software_Design_Specifications.md) - System architecture
+- [../00-core-docs/017_SUM_Software_User_Manual.md](../00-core-docs/017_SUM_Software_User_Manual.md)
+- User documentation
 
 ---
 
@@ -362,8 +367,8 @@ When adding new design documentation:
 
 ## Document Control
 
-**Maintained By**: Development Team  
-**Review Cycle**: Weekly during active development  
+**Maintained By**: Development Team
+**Review Cycle**: Weekly during active development
 **Next Review**: 2026-02-15 (after Phase 1 completion)
 
 **Version History**:
@@ -374,4 +379,5 @@ When adding new design documentation:
 
 ---
 
-*This index reflects the current design documentation for Umamusume Career Planner v2.0.0. All documents are aligned with implemented features and design system guidelines.*
+*This index reflects the current design documentation for Umamusume Career Planner v2.0.0. All
+documents are aligned with implemented features and design system guidelines.*

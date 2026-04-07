@@ -24,7 +24,9 @@
 
 ## 1. Executive Summary
 
-This document provides a comprehensive verification table for all technologies referenced in the Umamusume Career Planner project documentation. All technologies have been verified for current availability, compatibility, and pricing as of January 12, 2026.
+This document provides a comprehensive verification table for all technologies referenced in the
+Umamusume Career Planner project documentation. All technologies have been verified for current
+availability, compatibility, and pricing as of January 12, 2026.
 
 ### Key Findings
 
@@ -228,4 +230,5 @@ This document provides a comprehensive verification table for all technologies r
 
 ---
 
-*This document serves as the authoritative reference for all technology verification status in the Umamusume Career Planner project.*
+*This document serves as the authoritative reference for all technology verification status in the
+Umamusume Career Planner project.*

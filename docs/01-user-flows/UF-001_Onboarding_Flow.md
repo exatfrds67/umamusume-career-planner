@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.4.0
+**Date**: March 10, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [SRS], [BRS]
 
 **Source Specifications**:
@@ -13,12 +13,13 @@
 
 **Related Artifacts**:
 
-- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
-- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
-- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
-- Tech Flow: [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
-- Wireframes: [WF-001](../wireframes/WF-001_Dashboard_Overview.md), [WF-002](../wireframes/WF-002_Character_Creation_Wizard.md)
-- User Manual: [D17](../D17_SUM_Software_User_Manual.md#2-getting-started)
+- PRD: [PRD-001](../02-prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md)
+- Tech Flow: [TECH-FLOW-001](../01-tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
+- Wireframes: [WF-001](../01-wireframes/WF-001_Dashboard_Overview.md),
+[WF-002](../01-wireframes/WF-002_Character_Creation_Wizard.md)
+- User Manual: [017_SUM](../00-core-docs/017_SUM_Software_User_Manual.md#2-getting-started)
 
 ---
 
@@ -38,20 +39,46 @@
 
 ### 1.1 Purpose
 
-The onboarding flow introduces new users to the Umamusume Career Planner application, guiding them through initial setup, storage mode selection, and their first career configuration. This flow prioritizes quick time-to-value while providing optional educational content for users who want deeper understanding.
+The onboarding flow introduces new users to the Umamusume Career Planner application, guiding them
+through initial setup, storage mode selection, and their first career configuration. This flow
+prioritizes quick time-to-value while providing optional educational content for users who want
+deeper understanding.
 
 ### 1.2 Scope
 
 | Aspect | Description |
 | --- | --- |
 | **Entry Point** | First-time application launch or post-registration landing |
-| **Exit Point** | Dashboard with active career run or tutorial completion |
+| **Exit Point** | Dashboard-style landing surface with either a local active run context or an authenticated persisted run context, depending on storage mode |
 | **Duration** | 5-15 minutes (depending on tutorial engagement) |
 | **User Type** | New users, both authenticated and guest |
 
-### 1.3 Business Context
+### 1.3 Storage Mode Support
 
-**Business Goal**: Minimize friction to first meaningful action (creating a career run) while educating users on key features.
+- `StorageMode::LOCAL`: browser-local setup is available without authentication and remains the
+lowest-friction onboarding path.
+- `StorageMode::ACCOUNT`: authenticated setup supports account-backed persistence and later access
+to account-only features.
+- Local onboarding assumes a modern browser with `localStorage` enabled. If browser storage is
+unavailable, users should be guided to Account mode.
+
+### 1.4 Navigation Surface
+
+This document uses conceptual labels such as Welcome Screen, Storage Mode Selection, and Dashboard
+Tutorial for the user journey. Route names and component details should be treated as illustrative
+unless they are confirmed in the current route surface.
+
+### 1.5 Storage Transition Note
+
+The onboarding tip that Local runs can be converted later should be read together with the storage
+transition flow. Current Local-to-Account conversion is not a blanket migration for every local
+entity type; the current server-side conversion path primarily persists local character payload
+wrappers.
+
+### 1.6 Business Context
+
+**Business Goal**: Minimize friction to first meaningful action (creating a career run) while
+educating users on key features.
 
 **Success Metrics**:
 
@@ -68,43 +95,43 @@ The onboarding flow introduces new users to the Umamusume Career Planner applica
 ```mermaid
 flowchart TD
     Start([Launch App]) --> FirstTime{First Time User?}
-    
+
     FirstTime -->|No| CheckAuth{Authenticated?}
     FirstTime -->|Yes| Welcome[Welcome Screen]
-    
+
     CheckAuth -->|Yes| Dashboard[Dashboard]
     CheckAuth -->|No| LocalData[Local Data Check]
-    
+
     LocalData --> HasLocal{Has Local Runs?}
-    HasLocal -->|Yes| LocalDash[Local Dashboard]
+    HasLocal -->|Yes| LocalDash[Local run landing surface]
     HasLocal -->|No| Welcome
-    
+
     Welcome --> TutorialToggle[Tutorial Toggle]
     TutorialToggle --> StorageMode[Storage Mode Selection]
-    
+
     StorageMode --> ModeChoice{Choose Mode}
-    
+
     ModeChoice -->|Local Mode| LocalSetup[Initialize Local Storage]
     ModeChoice -->|Account Mode| AuthFlow[Account Creation Flow]
-    
+
     LocalSetup --> InitialSetup[Initial Setup]
     AuthFlow --> InitialSetup
-    
+
     InitialSetup --> SetUsername[Set User Name]
     SetUsername --> SelectAvatar[Select Avatar]
     SelectAvatar --> Preferences[Set Preferences]
-    
+
     Preferences --> OnboardComplete[Onboarding Complete]
     OnboardComplete --> DashTutorial{Enable Tutorial?}
-    
+
     DashTutorial -->|Yes| InteractiveTour[Interactive Dashboard Tour]
     DashTutorial -->|No| Dashboard
-    
+
     InteractiveTour --> Dashboard
-    
+
     Dashboard --> End([User Ready])
     LocalDash --> End
-    
+
     style Start fill:#e3f2fd
     style End fill:#c8e6c9
     style Welcome fill:#fff3e0
@@ -116,43 +143,43 @@ flowchart TD
 ```mermaid
 stateDiagram-v2
     [*] --> AppLaunch
-    
+
     AppLaunch --> CheckUserState: Load App
-    
+
     CheckUserState --> WelcomeScreen: First Time
     CheckUserState --> CheckSession: Returning User
-    
+
     CheckSession --> Dashboard: Has Session
     CheckSession --> LocalCheck: No Session
-    
+
     LocalCheck --> LocalDashboard: Has Local Data
     LocalCheck --> WelcomeScreen: No Local Data
-    
+
     WelcomeScreen --> TutorialPrompt
     TutorialPrompt --> StorageSelection: User Choice
-    
+
     StorageSelection --> LocalMode: Select Local
     StorageSelection --> AccountMode: Select Account
-    
+
     LocalMode --> InitializeLocal: Setup Storage
     AccountMode --> Registration: Show Auth
-    
+
     Registration --> CreateAccount
     CreateAccount --> VerifyEmail
     VerifyEmail --> InitializeAccount
-    
+
     InitializeLocal --> UserSetup
     InitializeAccount --> UserSetup
-    
+
     UserSetup --> SetProfile
     SetProfile --> SetPreferences
     SetPreferences --> OnboardingComplete
-    
+
     OnboardingComplete --> DashboardTour: Tutorial Enabled
     OnboardingComplete --> Dashboard: Tutorial Skipped
-    
+
     DashboardTour --> Dashboard: Tour Complete
-    
+
     Dashboard --> [*]: Ready
     LocalDashboard --> [*]: Ready
 ```
@@ -180,11 +207,11 @@ stateDiagram-v2
 | Disable Tutorial | Uncheck tutorial toggle | Storage Mode Selection |
 | Click "Get Started" | Proceed to next step | Storage Mode Selection |
 
-**Implementation Reference**:
+**Navigation Note**:
 
-- Route: `/welcome`
-- Livewire Component: `App\Livewire\Onboarding\WelcomeScreen`
-- Blade View: `resources/views/livewire/onboarding/welcome-screen.blade.php`
+- Welcome and onboarding labels in this document are conceptual UX states.
+- If implementation-backed entry points change, keep the user-flow wording conceptual unless the
+route surface is verified.
 
 ---
 
@@ -211,7 +238,8 @@ stateDiagram-v2
 │  │ [SELECT LOCAL]         │  │ [SELECT ACCOUNT]       │   │
 │  └────────────────────────┘  └────────────────────────┘   │
 │                                                             │
-│  💡 Tip: You can convert Local runs to Account later!      │
+│  💡 Tip: You can convert Local runs to Account later (see  │
+│     UF-009 for scope and conversion limits).               │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -229,13 +257,15 @@ stateDiagram-v2
 **Business Rule**:
 
 - Default selection: Local Mode (lowest friction)
-- Conversion path available: Local → Account (one-way migration)
+- Conversion path available: Local browser-managed character and run data can be promoted into
+Account-backed records through the storage transition flow, subject to current conversion support
+and validation rules
 
-**Implementation Reference**:
+**Implementation Note**:
 
-- Service: `App\Services\StorageModeService`
-- Enum: `App\Enums\StorageMode`
-- Configuration: `config/storage.php`
+- Storage-mode behavior should follow the storage-aware character and transition documents rather
+than older service or config assumptions.
+- Conversion availability does not imply full parity between Local and Account features before migration.
 
 ---
 
@@ -261,11 +291,11 @@ class LocalStorageManager {
             created_at: new Date().toISOString(),
             preferences: this.getDefaultPreferences(),
         };
-        
+
         localStorage.setItem(namespace, JSON.stringify(userData));
         return userData;
     }
-    
+
     getDefaultPreferences() {
         return {
             theme: 'system',
@@ -321,28 +351,28 @@ class AccountRegistration extends Component
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
-    
+
     protected array $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|min:8|regex:/[A-Z]/|regex:/[0-9]/',
         'password_confirmation' => 'required|same:password',
     ];
-    
+
     public function register(RegistrationService $service)
     {
         $this->validate();
-        
+
         $user = $service->register([
             'name' => $this->name,
             'email' => $this->email,
             'password' => $this->password,
         ]);
-        
+
         $service->sendVerificationEmail($user);
-        
+
         session()->flash('success', 'Registration successful! Please check your email.');
-        
+
         return redirect()->route('onboarding.setup');
     }
 }
@@ -356,7 +386,7 @@ sequenceDiagram
     participant App
     participant Email
     participant Database
-    
+
     User->>App: Submit Registration
     App->>Database: Create User (unverified)
     App->>Email: Send Verification Link
@@ -534,6 +564,8 @@ protected $fillable = [
 
 **Purpose**: Highlight key dashboard features through interactive walkthrough.
 
+The dashboard tour is optional and can be replayed later from Help/Settings.
+
 **Tour Stops**:
 
 | Stop | Component | Description | Duration |
@@ -600,34 +632,34 @@ flowchart TD
     D1{First Time User?}
     D1 -->|Yes| D2{Enable Tutorial?}
     D1 -->|No| End1[Skip Onboarding]
-    
+
     D2 -->|Yes| TutorialOn[Tutorial Enabled]
     D2 -->|No| TutorialOff[Tutorial Disabled]
-    
+
     TutorialOn --> D3{Storage Mode?}
     TutorialOff --> D3
-    
+
     D3 -->|Local| LocalPath[Local Setup Path]
     D3 -->|Account| AccountPath[Account Setup Path]
-    
+
     LocalPath --> D4{Has localStorage?}
     D4 -->|Yes| LocalInit[Initialize Local]
     D4 -->|No| Error1[Show Error: Enable localStorage]
-    
+
     AccountPath --> D5{Valid Email?}
     D5 -->|Yes| CreateAccount[Create Account]
     D5 -->|No| Error2[Show Error: Invalid Email]
-    
+
     CreateAccount --> D6{Email Verified?}
     D6 -->|Yes| Setup[Initial Setup]
     D6 -->|No| Wait[Wait for Verification]
-    
+
     LocalInit --> Setup
-    
+
     Setup --> D7{Show Tour?}
     D7 -->|Yes| Tour[Dashboard Tour]
     D7 -->|No| Dashboard[Go to Dashboard]
-    
+
     Tour --> Dashboard
     Dashboard --> End2[Onboarding Complete]
 ```
@@ -680,17 +712,17 @@ flowchart TD
 ```mermaid
 flowchart TD
     Error[Error Encountered] --> Type{Error Type}
-    
+
     Type -->|localStorage Quota| E1[localStorage Full]
     Type -->|Network| E2[Connection Lost]
     Type -->|Validation| E3[Invalid Input]
     Type -->|Email| E4[Email Issues]
-    
+
     E1 --> R1[Suggest Account Mode<br/>or Clear Data]
     E2 --> R2[Enable Offline Mode<br/>Retry Later]
     E3 --> R3[Show Validation Errors<br/>Highlight Fields]
     E4 --> R4[Resend Verification<br/>Check Spam]
-    
+
     R1 --> Resolve[User Action]
     R2 --> Resolve
     R3 --> Resolve
@@ -716,6 +748,32 @@ flowchart TD
 | Avatar upload fails | Upload to server | Use preset avatar | Default avatar |
 | Tour script fails | Load Shepherd.js | Skip tour | Redirect to dashboard |
 
+### 6.4 Offline and Empty-State Guidance
+
+- Local mode onboarding can continue offline with browser-local setup.
+- Account mode registration or sign-in requires connectivity.
+- If no local data exists yet, onboarding should continue normally rather than implying recovery or migration options.
+- If a user starts in Local mode and later wants account-backed persistence, the next step is the
+storage transition flow rather than an automatic background sync.
+
+### 6.5 Loading and Processing States
+
+The onboarding journey should visibly communicate processing states for:
+
+- account registration submission
+- verification email resend
+- avatar upload
+- final setup completion
+
+Recommended UX wording:
+
+- "Creating your account..."
+- "Sending verification email..."
+- "Uploading avatar..."
+- "Finishing setup..."
+
+Buttons should enter a disabled loading state while the action is in progress to prevent duplicate submissions.
+
 ---
 
 ## 7. Related Flows
@@ -728,7 +786,7 @@ After onboarding completion, users proceed to:
 | --- | --- | --- |
 | Career Setup | [UF-002](UF-002_Career_Setup_Flow.md) | User clicks "Create Career" from dashboard |
 | Dashboard Tour | [UF-001](UF-001_Onboarding_Flow.md#36-step-6-interactive-dashboard-tour-optional) | User chooses to view tour |
-| Settings Configuration | [D17](../D17_SUM_Software_User_Manual.md#13-settings--preferences) | User accesses settings |
+| Settings Configuration | [017_SUM](../00-core-docs/017_SUM_Software_User_Manual.md#13-settings--preferences) | User accesses settings |
 
 ### 7.2 Alternative Entry Points
 
@@ -738,6 +796,13 @@ After onboarding completion, users proceed to:
 | Local Data Exists | User has localStorage data | Skip welcome, show local dashboard |
 | OAuth Registration | User registers via Google/GitHub | Skip email verification step |
 
+### 7.3 Storage-Aware References
+
+- [UF-002_Career_Setup_Flow.md](UF-002_Career_Setup_Flow.md)
+- [UF-009_Storage_Mode_Transition_Flow.md](UF-009_Storage_Mode_Transition_Flow.md)
+- [TECH-FLOW-001](../01-tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
+- [SEQ-001](../01-sequences/SEQ-001_Character_Creation_Sequence.md)
+
 ### 7.3 Integration Points
 
 ```mermaid
@@ -745,12 +810,12 @@ flowchart LR
     Onboarding[Onboarding Flow] --> Auth[Authentication System]
     Onboarding --> Storage[Storage Service]
     Onboarding --> Preferences[Preferences Manager]
-    
+
     Auth --> Session[Session Management]
     Storage --> Local[localStorage API]
     Storage --> DB[(Database)]
     Preferences --> UserProfile[User Profile Service]
-    
+
     Session --> Dashboard[Dashboard]
     Local --> Dashboard
     DB --> Dashboard
@@ -763,6 +828,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.0 | 2026-03-10 | Development Team | Clarified modern-browser/localStorage prerequisite for Local onboarding; linked Local-to-Account tip directly to UF-009 conversion scope; documented that dashboard tour is optional and replayable from Help/Settings |
 | 2.3.0 | 2026-02-22 | Development Team | Updated Livewire namespace to Livewire 4 conventions (`App\Livewire` not `App\Http\Livewire`); updated version and dates |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); corrected aptitude grade system (S is maximum, no SS); updated skill hint discount system (5 levels: 10%/20%/30%/35%/40%); added stat soft cap mechanics (1200 with diminishing returns above) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added storage mode selection; updated technical implementation details; added comprehensive error handling |
@@ -773,14 +839,15 @@ flowchart LR
 
 ## References
 
-- [Software Development Plan (SDP)](../D01_SDP_Software_Development_Plan.md)
-- [Business Requirements Specifications (BRS)](../D02_BRS_Business_Requirements_Specifications.md)
-- [Software Requirements Specifications (SRS)](../D03_SRS_Software_Requirement_Specifications.md)
-- [Software User Manual (SUM)](../D17_SUM_Software_User_Manual.md)
-- [SPEC-001: Character Management Technical](../specs/SPEC-001_Character_Management_Technical.md)
-- [FLOW-001: Character Management System](../flows/FLOW-001_Character_Management_System.md)
-- [WF-001: Dashboard Overview](../wireframes/WF-001_Dashboard_Overview.md)
+- [001_SDP](../00-core-docs/001_SDP_Software_Development_Plan.md)
+- [002_BRS](../00-core-docs/002_BRS_Business_Requirements_Specifications.md)
+- [003_SRS](../00-core-docs/003_SRS_Software_Requirement_Specifications.md)
+- [017_SUM](../00-core-docs/017_SUM_Software_User_Manual.md)
+- [SPEC-001: Character Management Technical](../02-specs/SPEC-001_Character_Management_Technical.md)
+- [FLOW-001: Character Management System](../01-flows/FLOW-001_Character_Management_System.md)
+- [WF-001: Dashboard Overview](../01-wireframes/WF-001_Dashboard_Overview.md)
 
 ---
 
-*This user flow reflects the current onboarding implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current onboarding implementation as of version 2.4.0. For the latest
+updates, refer to the online documentation.*

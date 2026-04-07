@@ -2,15 +2,19 @@
 
 ## Uma Musume Career Planner
 
-**Document Version:** 2.0  
-**Date:** 2026-01-03  
+**Document Version:** 2.0
+**Date:** 2026-01-03
 **Status:** Active
 
 ---
 
 ## 1. Executive Summary
 
-This System Development Plan outlines the approach for consolidating five legacy Uma Musume tracking applications into a unified, feature-rich platform called the **Uma Musume Career Planner**. The system enables players of Uma Musume: Pretty Derby to track, manage, and analyze their career progression through a modern web application built on Laravel 12+, Livewire 3, Alpine.js, and TailwindCSS v4.
+This System Development Plan outlines the approach for consolidating five legacy Uma Musume tracking
+applications into a unified, feature-rich platform called the **Uma Musume Career Planner**. The
+system enables players of Uma Musume: Pretty Derby to track, manage, and analyze their career
+progression through a modern web application built on Laravel 12+, Livewire 3, Alpine.js, and
+TailwindCSS v4.
 
 ### 1.1 Project Objectives
 

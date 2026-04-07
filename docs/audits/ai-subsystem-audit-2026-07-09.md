@@ -12,7 +12,9 @@
 
 ### Purpose
 
-This is a follow-up audit of the AI subsystem. It verifies remediation of prior findings, identifies new issues, and assesses the current state of the Ollama + Bedrock + MCP + Neuron stack including **embedded AI components on user-facing pages** and **backend logging**.
+This is a follow-up audit of the AI subsystem. It verifies remediation of prior findings, identifies
+new issues, and assesses the current state of the Ollama + Bedrock + MCP + Neuron stack including
+**embedded AI components on user-facing pages** and **backend logging**.
 
 ### Systems Audited
 
@@ -68,7 +70,8 @@ Compared to prior audit: **+246 tests**, **+932 assertions** (91% growth).
 ### Dashboard API Response Summary
 
 - **MCP Servers**: 9 tracked (8 healthy, 1 disabled: figma)
-- **Agents**: 5 configured (Career Strategy, Resource Management, Performance Analytics, Summer Camp Optimization, Training Optimization)
+- **Agents**: 5 configured (Career Strategy, Resource Management, Performance Analytics, Summer Camp
+Optimization, Training Optimization)
 - **Requests (24h)**: 0 — no live AI traffic recorded
 - **Cost (24h)**: $0.00
 - **Conversations**: 0
@@ -104,17 +107,28 @@ Compared to prior audit: **+246 tests**, **+932 assertions** (91% growth).
 
 ### 2.2 NEW CRITICAL: AdvisoryPanel Not Mounted in Production Views — REMEDIATED
 
-- **Component**: `app/Livewire/AdvisoryPanel.php` (651 lines PHP) + `resources/views/livewire/advisory-panel.blade.php` (482+ lines Blade)
-- **Status**: **FIXED** (2026-07-09). `<livewire:advisory-panel />` mounted on `resources/views/training/show.blade.php` and `resources/views/plans/edit.blade.php`.
+- **Component**: `app/Livewire/AdvisoryPanel.php` (651 lines PHP) +
+`resources/views/livewire/advisory-panel.blade.php` (482+ lines Blade)
+- **Status**: **FIXED** (2026-07-09). `<livewire:advisory-panel />` mounted on
+`resources/views/training/show.blade.php` and `resources/views/plans/edit.blade.php`.
 - **Impact**: Users can now see AI-powered training recommendations in-context on the training and plan editing pages.
-- **Recommendation**: Mount `<livewire:advisory-panel />` on career run edit/training pages. Consider adding it to `resources/views/layouts/app.blade.php` with conditional rendering.
+- **Recommendation**: Mount `<livewire:advisory-panel />` on career run edit/training pages.
+Consider adding it to `resources/views/layouts/app.blade.php` with conditional rendering.
 
 ### 2.3 NEW: No AI Components Embedded on User Pages
 
 - **Components Audited**: 13 Blade components in `resources/views/components/ai/`:
-  - `chat-interface`, `message-bubble`, `agent-selector`, `agent-progress-tracker`, `provider-selector`, `server-status-indicator`, `tool-usage-indicator`, `tool-execution-monitor`, `workflow-visualization`, `performance-metrics`, `recommendation-card`, `recommendation-card-example`, `critical-alert-badge`
-- **Finding**: `<x-ai.chat-interface>` is used **only** in `resources/views/ai/chat.blade.php`. `<x-ai.recommendation-card>` is used **only** in `recommendation-card-example.blade.php` (a demo file). No AI components appear on training views, character detail pages, career run pages, or any other user-facing template.
-- **Impact**: All 13 AI Blade components exist but only 1 (`chat-interface`) is used in production, and only on the dedicated chat page. The recommendation cards, critical alerts, and other UI elements designed for in-context AI assistance are unused.
+  - `chat-interface`, `message-bubble`, `agent-selector`, `agent-progress-tracker`, `provider-
+  selector`, `server-status-indicator`, `tool-usage-indicator`, `tool-execution-monitor`, `workflow-
+  visualization`, `performance-metrics`, `recommendation-card`, `recommendation-card-example`,
+  `critical-alert-badge`
+- **Finding**: `<x-ai.chat-interface>` is used **only** in `resources/views/ai/chat.blade.php`.
+`<x-ai.recommendation-card>` is used **only** in `recommendation-card-example.blade.php` (a demo
+file). No AI components appear on training views, character detail pages, career run pages, or any
+other user-facing template.
+- **Impact**: All 13 AI Blade components exist but only 1 (`chat-interface`) is used in production,
+and only on the dedicated chat page. The recommendation cards, critical alerts, and other UI
+elements designed for in-context AI assistance are unused.
 
 ### 2.4 STILL OPEN: Security Vulnerabilities
 
@@ -129,7 +143,8 @@ Compared to prior audit: **+246 tests**, **+932 assertions** (91% growth).
 #### SEC-004 (HIGH): AdvisoryController Error/Trace Exposure — REMEDIATED
 
 - **Files**: `app/Http/Controllers/Api/AdvisoryController.php`
-- **Status**: **FIXED** (2026-07-09). All 6 `$e->getTraceAsString()` instances replaced with `report($e)`. Log context now only includes `'error' => $e->getMessage()`.
+- **Status**: **FIXED** (2026-07-09). All 6 `$e->getTraceAsString()` instances replaced with
+`report($e)`. Log context now only includes `'error' => $e->getMessage()`.
 
 ### 2.5 STILL OPEN: Architectural Issues
 
@@ -143,12 +158,14 @@ Compared to prior audit: **+246 tests**, **+932 assertions** (91% growth).
 
 - **File**: `app/Services/AI/AIPerformanceMonitor.php`
 - **Status**: Unchanged. Metrics stored in cache with `METRICS_TTL = 3600` (1 hour).
-- **Impact**: All performance history lost on cache clear/restart. Dashboard API showing 0 requests is consistent with this finding — no persistent metrics.
+- **Impact**: All performance history lost on cache clear/restart. Dashboard API showing 0 requests
+is consistent with this finding — no persistent metrics.
 
 #### ARCH-005: Budget Enforcement — Advisory Only
 
 - **File**: `app/Services/AI/CostTrackingService.php`
-- **Status**: Unchanged. `getBudgetStatus()` returns status labels (`exceeded`, `critical`, `warning`, `healthy`) but no code path blocks requests.
+- **Status**: Unchanged. `getBudgetStatus()` returns status labels (`exceeded`, `critical`,
+`warning`, `healthy`) but no code path blocks requests.
 - **Default Budget**: $100/month hardcoded in constructor.
 - **Impact**: Runaway Bedrock costs possible with no circuit breaker.
 
@@ -156,7 +173,9 @@ Compared to prior audit: **+246 tests**, **+932 assertions** (91% growth).
 
 #### CODE-001: CostTrackingService Uses Raw DB Queries — REMEDIATED
 
-- **Status**: **FIXED** (2026-07-09). Created `AiCost` Eloquent model (`app/Models/AiCost.php`) with proper fillable, casts, and relationships. All 9 `DB::table('ucp_ai_costs')` calls replaced with `AiCost::query()`.
+- **Status**: **FIXED** (2026-07-09). Created `AiCost` Eloquent model (`app/Models/AiCost.php`) with
+proper fillable, casts, and relationships. All 9 `DB::table('ucp_ai_costs')` calls replaced with
+`AiCost::query()`.
 
 #### CODE-002: HybridAIService user_id Fallback — REMEDIATED
 
@@ -165,7 +184,8 @@ Compared to prior audit: **+246 tests**, **+932 assertions** (91% growth).
 
 #### FR-18: Message Rating Not Persisted — REMEDIATED
 
-- **Status**: **FIXED** (2026-07-09). `rateMessage()` now maps rating values to `quality_rating` (int) and `is_helpful` (bool), persisting them to `ConversationMessage` via Eloquent `update()`.
+- **Status**: **FIXED** (2026-07-09). `rateMessage()` now maps rating values to `quality_rating`
+(int) and `is_helpful` (bool), persisting them to `ConversationMessage` via Eloquent `update()`.
 
 ---
 
@@ -203,7 +223,8 @@ Compared to prior audit: **+246 tests**, **+932 assertions** (91% growth).
 | `AgentRoutingService` constants | 15s | 30s |
 | `NeuronAIService` complexity-based | 10-30s | N/A |
 
-**Recommendation**: Standardize timeouts. The effective Ollama timeout is 30s (from `.env`) but `set_time_limit(120)` allows 4x that. Either align `.env` to 120s or `set_time_limit` to 30s.
+**Recommendation**: Standardize timeouts. The effective Ollama timeout is 30s (from `.env`) but
+`set_time_limit(120)` allows 4x that. Either align `.env` to 120s or `set_time_limit` to 30s.
 
 ---
 
@@ -261,7 +282,9 @@ Based on prior audit gap analysis, these are still missing:
 
 ### 5.3 New Documentation Issue
 
-- **AdvisoryPanel Integration Guide** — No documentation exists for how/where to mount the Livewire AdvisoryPanel in production views. The component is fully documented internally (PHPDoc, WCAG notes) but there's no integration guide for frontend developers.
+- **AdvisoryPanel Integration Guide** — No documentation exists for how/where to mount the Livewire
+AdvisoryPanel in production views. The component is fully documented internally (PHPDoc, WCAG notes)
+but there's no integration guide for frontend developers.
 
 ---
 
@@ -396,7 +419,8 @@ Based on prior audit gap analysis, these are still missing:
 6. **Embedded Component Audit**: Grep search across all Blade templates for AI component usage
 7. **Documentation Review**: Inventoried AI-related docs, compared against prior audit gaps
 8. **Prior Audit Delta**: Cross-referenced all 17 prior findings for remediation status
-9. **Chrome DevTools**: Attempted browser automation (blocked by existing browser session); used HTTP smoke tests as alternative
+9. **Chrome DevTools**: Attempted browser automation (blocked by existing browser session); used
+HTTP smoke tests as alternative
 
 ## Appendix C: Key Metrics Comparison
 
@@ -416,7 +440,9 @@ Based on prior audit gap analysis, these are still missing:
 
 ## Summary
 
-The AI subsystem has seen significant improvement since the February 2026 audit: test coverage nearly doubled, 12 of 17 prior findings were fixed (including 5 remediated on 2026-07-09), and MCP integration has matured with 9 servers tracked. One critical issue requires immediate attention:
+The AI subsystem has seen significant improvement since the February 2026 audit: test coverage
+nearly doubled, 12 of 17 prior findings were fixed (including 5 remediated on 2026-07-09), and MCP
+integration has matured with 9 servers tracked. One critical issue requires immediate attention:
 
 1. **AWS credentials** remain exposed in `.env` and have not been rotated in 5+ months
 
@@ -429,7 +455,8 @@ The following items were **remediated on 2026-07-09**:
 - **P0-2/FR-21**: AdvisoryPanel mounted on `training/show` and `plans/edit` production views
 - **P1-5**: OLLAMA_TIMEOUT aligned to 120s across `.env` and config
 
-The remaining open items (fake streaming, budget enforcement, metrics persistence) represent architectural debt that should be addressed in upcoming sprints.
+The remaining open items (fake streaming, budget enforcement, metrics persistence) represent
+architectural debt that should be addressed in upcoming sprints.
 
 ---
 

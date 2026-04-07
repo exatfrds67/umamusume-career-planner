@@ -9,7 +9,8 @@
 
 ## Executive Summary
 
-A comprehensive recursive scan of `resources/views/**/*.blade.php` has revealed **40+ files** with inline JavaScript that were missed in Phases 1-4. These files fall into three main categories:
+A comprehensive recursive scan of `resources/views/**/*.blade.php` has revealed **40+ files** with
+inline JavaScript that were missed in Phases 1-4. These files fall into three main categories:
 
 1. **Reusable Components** (18 files) - Need component-based extraction
 2. **Page Views** (15 files) - Need page-specific extraction
@@ -23,35 +24,54 @@ These components contain inline Alpine.js logic and need special handling for re
 
 ### Analytics Components (3 files)
 
-- **File**: `components/analytics/stat-progression-chart.blade.php`; **Lines Est.**: ~100; **Complexity**: High; **Features**: Chart.js integration, data transformation
-- **File**: `components/analytics/trend-analysis-chart.blade.php`; **Lines Est.**: ~150; **Complexity**: High; **Features**: Chart.js, trend calculations, animations
-- **File**: `components/analytics/comparison-table.blade.php`; **Lines Est.**: ~120; **Complexity**: Medium; **Features**: Sorting, filtering, comparison logic
+- **File**: `components/analytics/stat-progression-chart.blade.php`; **Lines Est.**: ~100;
+**Complexity**: High; **Features**: Chart.js integration, data transformation
+- **File**: `components/analytics/trend-analysis-chart.blade.php`; **Lines Est.**: ~150;
+**Complexity**: High; **Features**: Chart.js, trend calculations, animations
+- **File**: `components/analytics/comparison-table.blade.php`; **Lines Est.**: ~120; **Complexity**:
+Medium; **Features**: Sorting, filtering, comparison logic
 
 **Action**: Extract to `resources/js/components/analytics/`
 
 ### AI Components (8 files)
 
-- **File**: `components/ai/tool-execution-monitor.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium; **Features**: Real-time monitoring, status updates
-- **File**: `components/ai/tool-usage-indicator.blade.php`; **Lines Est.**: ~40; **Complexity**: Low; **Features**: Usage tracking, visual indicators
-- **File**: `components/ai/workflow-visualization.blade.php`; **Lines Est.**: ~100; **Complexity**: High; **Features**: Workflow rendering, state management
-- **File**: `components/ai/server-status-indicator.blade.php`; **Lines Est.**: ~60; **Complexity**: Medium; **Features**: Server health checks, status display
-- **File**: `components/ai/provider-selector.blade.php`; **Lines Est.**: ~50; **Complexity**: Medium; **Features**: Provider selection, configuration
-- **File**: `components/ai/performance-metrics.blade.php`; **Lines Est.**: ~70; **Complexity**: Medium; **Features**: Metrics calculation, display
-- **File**: `components/ai/agent-selector.blade.php`; **Lines Est.**: ~90; **Complexity**: Medium; **Features**: Agent selection, filtering
-- **File**: `components/ai/agent-progress-tracker.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium; **Features**: Progress tracking, updates
+- **File**: `components/ai/tool-execution-monitor.blade.php`; **Lines Est.**: ~80; **Complexity**:
+Medium; **Features**: Real-time monitoring, status updates
+- **File**: `components/ai/tool-usage-indicator.blade.php`; **Lines Est.**: ~40; **Complexity**:
+Low; **Features**: Usage tracking, visual indicators
+- **File**: `components/ai/workflow-visualization.blade.php`; **Lines Est.**: ~100; **Complexity**:
+High; **Features**: Workflow rendering, state management
+- **File**: `components/ai/server-status-indicator.blade.php`; **Lines Est.**: ~60; **Complexity**:
+Medium; **Features**: Server health checks, status display
+- **File**: `components/ai/provider-selector.blade.php`; **Lines Est.**: ~50; **Complexity**:
+Medium; **Features**: Provider selection, configuration
+- **File**: `components/ai/performance-metrics.blade.php`; **Lines Est.**: ~70; **Complexity**:
+Medium; **Features**: Metrics calculation, display
+- **File**: `components/ai/agent-selector.blade.php`; **Lines Est.**: ~90; **Complexity**: Medium;
+**Features**: Agent selection, filtering
+- **File**: `components/ai/agent-progress-tracker.blade.php`; **Lines Est.**: ~80; **Complexity**:
+Medium; **Features**: Progress tracking, updates
 
 **Action**: Extract to `resources/js/components/ai/`
 
 ### Interactive Components (7 files)
 
-- **File**: `components/line-chart.blade.php`; **Lines Est.**: ~60; **Complexity**: High; **Features**: Chart.js, dynamic data
-- **File**: `components/class-pyramid.blade.php`; **Lines Est.**: ~50; **Complexity**: Medium; **Features**: Grade visualization
-- **File**: `components/spirit-burst-gauge.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium; **Features**: Gauge animation, state
-- **File**: `components/team-member-selector.blade.php`; **Lines Est.**: ~60; **Complexity**: Medium; **Features**: Selection logic, validation
-- **File**: `components/slide-panel.blade.php`; **Lines Est.**: ~40; **Complexity**: Low; **Features**: Panel animation, state
-- **File**: `components/quick-actions.blade.php`; **Lines Est.**: ~50; **Complexity**: Low; **Features**: Action menu, keyboard shortcuts
-- **File**: `components/password-input.blade.php`; **Lines Est.**: ~30; **Complexity**: Low; **Features**: Toggle visibility
-- **File**: `components/facility-management.blade.php`; **Lines Est.**: ~70; **Complexity**: Medium; **Features**: Facility upgrades, state
+- **File**: `components/line-chart.blade.php`; **Lines Est.**: ~60; **Complexity**: High;
+**Features**: Chart.js, dynamic data
+- **File**: `components/class-pyramid.blade.php`; **Lines Est.**: ~50; **Complexity**: Medium;
+**Features**: Grade visualization
+- **File**: `components/spirit-burst-gauge.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium;
+**Features**: Gauge animation, state
+- **File**: `components/team-member-selector.blade.php`; **Lines Est.**: ~60; **Complexity**:
+Medium; **Features**: Selection logic, validation
+- **File**: `components/slide-panel.blade.php`; **Lines Est.**: ~40; **Complexity**: Low;
+**Features**: Panel animation, state
+- **File**: `components/quick-actions.blade.php`; **Lines Est.**: ~50; **Complexity**: Low;
+**Features**: Action menu, keyboard shortcuts
+- **File**: `components/password-input.blade.php`; **Lines Est.**: ~30; **Complexity**: Low;
+**Features**: Toggle visibility
+- **File**: `components/facility-management.blade.php`; **Lines Est.**: ~70; **Complexity**: Medium;
+**Features**: Facility upgrades, state
 
 **Action**: Extract to `resources/js/components/`
 
@@ -63,37 +83,46 @@ These are page-level views that need page-specific extraction.
 
 ### Import/Export/Migration (4 files)
 
-- **File**: `import/index.blade.php`; **Lines Est.**: ~150; **Complexity**: High; **Features**: File upload, validation, preview
-- **File**: `export/index.blade.php`; **Lines Est.**: ~120; **Complexity**: High; **Features**: Export options, format selection
-- **File**: `migration/index.blade.php`; **Lines Est.**: ~100; **Complexity**: Medium; **Features**: Migration wizard, data transfer
+- **File**: `import/index.blade.php`; **Lines Est.**: ~150; **Complexity**: High; **Features**: File
+upload, validation, preview
+- **File**: `export/index.blade.php`; **Lines Est.**: ~120; **Complexity**: High; **Features**:
+Export options, format selection
+- **File**: `migration/index.blade.php`; **Lines Est.**: ~100; **Complexity**: Medium; **Features**:
+Migration wizard, data transfer
 - **File**: `historical/index.blade.php`; **Lines Est.**: ~60; **Complexity**: Low; **Features**: Cache management
 
 **Action**: Extract to `resources/js/pages/{import,export,migration,historical}/`
 
 ### External Data & Browsing (1 file)
 
-- **File**: `external-data/browse.blade.php`; **Lines Est.**: ~200; **Complexity**: High; **Features**: Data browsing, filtering, API calls
+- **File**: `external-data/browse.blade.php`; **Lines Est.**: ~200; **Complexity**: High;
+**Features**: Data browsing, filtering, API calls
 
 **Action**: Extract to `resources/js/pages/external-data/`
 
 ### Skills & Support Cards (3 files)
 
-- **File**: `skills/partials/planner.blade.php`; **Lines Est.**: ~150; **Complexity**: High; **Features**: Skill planning, SP calculations
-- **File**: `support-cards/deck-management.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium; **Features**: Deck CRUD operations
+- **File**: `skills/partials/planner.blade.php`; **Lines Est.**: ~150; **Complexity**: High;
+**Features**: Skill planning, SP calculations
+- **File**: `support-cards/deck-management.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium;
+**Features**: Deck CRUD operations
 - **File**: `races/targets.blade.php`; **Lines Est.**: ~100; **Complexity**: Medium; **Features**: Race target selection
 
 **Action**: Extract to `resources/js/pages/{skills,support-cards,races}/`
 
 ### Profile & Security (1 file)
 
-- **File**: `profile/partials/security-tab.blade.php`; **Lines Est.**: ~60; **Complexity**: Medium; **Features**: Account deletion modal
+- **File**: `profile/partials/security-tab.blade.php`; **Lines Est.**: ~60; **Complexity**: Medium;
+**Features**: Account deletion modal
 
 **Action**: Extract to `resources/js/pages/profile/partials/`
 
 ### Test & Demo (2 files)
 
-- **File**: `test/remember-me-demo.blade.php`; **Lines Est.**: ~40; **Complexity**: Low; **Features**: Remember me checkbox demo
-- **File**: `components/activity-timeline.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium; **Features**: Timeline rendering, filtering
+- **File**: `test/remember-me-demo.blade.php`; **Lines Est.**: ~40; **Complexity**: Low;
+**Features**: Remember me checkbox demo
+- **File**: `components/activity-timeline.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium;
+**Features**: Timeline rendering, filtering
 
 **Action**: Extract to `resources/js/{test,components}/`
 
@@ -126,11 +155,13 @@ These files already use the proper `window.pageData` pattern and have extracted 
 - **File**: `layouts/app.blade.php`; **Purpose**: Theme initialization; **Action**: Keep inline (performance critical)
 - **File**: `layouts/guest.blade.php`; **Purpose**: Theme initialization; **Action**: Keep inline (performance critical)
 
-**Reason**: These contain synchronous theme initialization to prevent FOUC (Flash of Unstyled Content). Moving to external files would cause visual flicker.
+**Reason**: These contain synchronous theme initialization to prevent FOUC (Flash of Unstyled
+Content). Moving to external files would cause visual flicker.
 
 ### Structural Data (2 files)
 
-- **File**: `components/breadcrumb.blade.php`; **Purpose**: JSON-LD structured data; **Action**: Keep inline (SEO requirement)
+- **File**: `components/breadcrumb.blade.php`; **Purpose**: JSON-LD structured data; **Action**:
+Keep inline (SEO requirement)
 - **File**: `test-api.blade.php`; **Purpose**: CDN script tag; **Action**: Keep inline (external dependency)
 
 **Reason**: JSON-LD must be inline for search engines. CDN scripts are external dependencies.
@@ -291,4 +322,5 @@ For components that may appear multiple times on a page:
 
 ## Status: 🔍 **AUDIT COMPLETE - READY FOR PHASE 5 EXECUTION**
 
-**Recommendation**: Begin with Phase 5A (Analytics Components) as they are high-value, high-complexity targets that will establish patterns for the remaining components.
+**Recommendation**: Begin with Phase 5A (Analytics Components) as they are high-value, high-
+complexity targets that will establish patterns for the remaining components.

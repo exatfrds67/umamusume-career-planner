@@ -84,9 +84,9 @@ Added three new tests for curated metadata preservation:
 
 ## Requirements Satisfied
 
-✅ **Requirement 3.1**: Keep existing API fetching logic  
-✅ **Requirement 3.2**: Add merge logic that preserves curated metadata  
-✅ **Requirement 3.4**: Ensure gametora skills don't overwrite curated fields  
+✅ **Requirement 3.1**: Keep existing API fetching logic
+✅ **Requirement 3.2**: Add merge logic that preserves curated metadata
+✅ **Requirement 3.4**: Ensure gametora skills don't overwrite curated fields
 
 ## Testing Results
 

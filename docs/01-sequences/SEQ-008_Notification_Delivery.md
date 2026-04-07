@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -25,13 +25,15 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the notification delivery workflow in the Umamusume Career Planner application, covering WebSocket real-time updates, in-app notifications, email delivery, and user preference management.
+This sequence diagram documents the notification delivery workflow in the Umamusume Career Planner
+application, covering in-app notifications, queued delivery, email delivery, and user preference
+management.
 
 ### 1.2 Scope
 
 **Covers:**
 
-- Real-time WebSocket notifications via Laravel Reverb
+- In-app and queued notification delivery
 - In-app notification center
 - Email notification delivery
 - User notification preferences
@@ -41,10 +43,10 @@ This sequence diagram documents the notification delivery workflow in the Umamus
 
 **Related Artifacts:**
 
-- PRD: [PRD-007](../prds/PRD-007_External_Integration.md)
-- SPEC: [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
-- Flow: [FLOW-007](../flows/FLOW-007_External_Integration_System.md)
-- Tech Flow: [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
+- PRD: [PRD-007](../02-prds/PRD-007_External_Integration.md)
+- SPEC: [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md)
+- Flow: [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md)
+- Tech Flow: [TECH-FLOW-007](../01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
 
 ### 1.3 Business Context
 
@@ -58,7 +60,7 @@ The notification system enables users to:
 
 **Success Criteria:**
 
-- WebSocket delivery within 100ms
+- Notification state available on next refresh / poll cycle
 - Email delivery within 5 minutes for non-urgent
 - Preference changes applied immediately
 - Quiet hours respected for all channels
@@ -72,40 +74,30 @@ The notification system enables users to:
 
 | Component | Type | Responsibility |
 | --- | --- | --- |
-| **Event Trigger** | Application | System events that generate notifications |
-| **NotificationService** | Domain Service | Notification orchestration and routing |
-| **NotificationRepository** | Infrastructure | Notification persistence |
-| **WebSocketService** | Infrastructure | Laravel Reverb real-time broadcasting |
-| **EmailService** | Infrastructure | Email delivery via queue |
-| **UserPreferencesService** | Domain Service | User notification settings management |
-| **Database** | Infrastructure | MySQL/MariaDB persistence layer |
-| **Queue** | Infrastructure | Redis job queue |
-| **Cache** | Infrastructure | Redis notification cache |
+| **Domain Trigger** | Application | Training, race, and alert flows that decide a notification should exist |
+| **NotificationService** | Domain Service | Reads, marks, deletes, and creates user notification records |
+| **NotificationController** | API Controller | Exposes notification center and unread bell endpoints |
+| **Laravel Notifications** | Framework Channel | Persists queued database notifications for users |
+| **PushNotificationService** | Infrastructure Service | Stores push subscriptions and quiet-hour preferences |
+| **Queue** | Infrastructure | Processes queued notification classes |
+| **Database** | Infrastructure | Stores `notifications` and `push_subscriptions` records |
 
 ### 2.2 Component Locations
 
 ```text
-
 app/
-├── Events/
-│   ├── CharacterUpdated.php
-│   ├── TrainingCompleted.php
-│   ├── RaceCompleted.php
-│   └── AchievementUnlocked.php
+├── Http/Controllers/Api/
+│   └── NotificationController.php
+├── Notifications/
+│   ├── CriticalAlertNotification.php
+│   ├── RaceReadyNotification.php
+│   └── TrainingReminderNotification.php
 ├── Services/
 │   ├── NotificationService.php
-│   ├── WebSocketService.php
-│   ├── EmailService.php
-│   └── UserPreferencesService.php
-├── Notifications/
-│   ├── CharacterStatUpdateNotification.php
-│   ├── RaceReminderNotification.php
-│   ├── TrainingSuggestionNotification.php
-│   └── AchievementNotification.php
+│   └── Notifications/
+│       └── PushNotificationService.php
 └── Models/
-    ├── Notification.php
-    └── NotificationPreference.php
-
+    └── PushSubscription.php
 ```
 
 ---
@@ -117,642 +109,265 @@ app/
 ```mermaid
 sequenceDiagram
     actor User
-    participant Event as System Event
+    participant Trigger as Domain Trigger
     participant NotifSvc as NotificationService
-    participant PrefSvc as UserPreferencesService
-    participant WS as WebSocketService
-    participant Email as EmailService
-    participant Queue as Redis Queue
-    participant DB as Database
-    participant Cache as Redis Cache
+    participant Queue
+    participant DB as Database Notifications
+    participant API as NotificationController
+    participant Browser
 
-    Note over Event,Cache: NOTIFICATION TRIGGER
-    Event->>NotifSvc: Event dispatched
-    NotifSvc->>NotifSvc: Identify affected users
-    NotifSvc->>PrefSvc: Get user preferences
-    PrefSvc->>Cache: Check cached preferences
-    
-    alt Preferences Cached
-        Cache-->>PrefSvc: Cached preferences
-    else Cache Miss
-        PrefSvc->>DB: Load preferences
-        DB-->>PrefSvc: User preferences
-        PrefSvc->>Cache: Store preferences (1h TTL)
-    end
-    
-    PrefSvc-->>NotifSvc: User preferences
-    
-    NotifSvc->>NotifSvc: Check quiet hours
-    NotifSvc->>NotifSvc: Determine delivery channels
-    
-    par WebSocket Delivery
-        alt WebSocket Enabled
-            NotifSvc->>WS: Broadcast notification
-            WS->>WS: Publish to user channel
-            WS-->>User: Real-time update
-        end
-    and In-App Notification
-        alt In-App Enabled
-            NotifSvc->>DB: INSERT notification
-            DB-->>NotifSvc: Notification ID
-        end
-    and Email Delivery
-        alt Email Enabled & Not Quiet Hours
-            NotifSvc->>Queue: Queue email job
-            Queue->>Email: Process email job
-            Email->>Email: Render email template
-            Email->>Email: Send via SMTP
-            Email-->>Queue: Email sent
-        end
-    end
-    
-    NotifSvc->>DB: Update delivery status
-    NotifSvc-->>Event: Notification complete
+    Trigger->>NotifSvc: Decide notification should be sent
+    NotifSvc->>Queue: Queue Laravel notification
+    Queue->>DB: Persist notification payload
+    DB-->>Queue: Notification stored
 
-    Note over User,Cache: USER INTERACTION
-    User->>User: Click notification
-    User->>DB: Mark as read
-    DB->>Cache: Invalidate notification cache
-    DB-->>User: Updated notification list
-```text
+    Browser->>API: GET /api/notifications/unread
+    API->>NotifSvc: getUnreadForBell(user)
+    NotifSvc->>DB: Load unread notifications
+    DB-->>NotifSvc: Notification rows
+    NotifSvc-->>API: Bell payload
+    API-->>Browser: JSON unread count + items
+    Browser-->>User: Render updated bell / list
+
+    User->>API: POST mark-as-read / delete
+    API->>NotifSvc: mutate notification state
+    NotifSvc->>DB: Update or delete record
+    DB-->>API: Success
+    API-->>Browser: Updated state response
+```
 
 ### 3.2 Timeline Breakdown
 
-| Phase | Duration | Description |
+| Phase | Typical Timing | Description |
 | --- | --- | --- |
-| **Event Dispatch** | ~10ms | System event triggered |
-| **Preference Loading** | ~50ms | Load user notification settings |
-| **Channel Routing** | ~20ms | Determine delivery channels |
-| **WebSocket Broadcast** | ~100ms | Real-time delivery to client |
-| **Database Insert** | ~50ms | Persist in-app notification |
-| **Email Queueing** | ~30ms | Add to email queue |
-| **Email Processing** | ~2-5s | Async email delivery |
-| **Total (WebSocket)** | ~200ms | Real-time notification |
-| **Total (Email)** | ~5s | Email delivery |
+| **Notification dispatch** | Request-time + queue handoff | Domain flow schedules a notification |
+| **Database persistence** | Queue worker dependent | Laravel notification stored in `notifications` |
+| **Bell refresh** | Next refresh / poll cycle | Browser asks API for unread notifications |
+| **Mark as read** | Single API round trip | Notification row updated for the user |
 
 ---
 
 ## 4. Detailed Interactions
 
-### 4.1 Notification Service Orchestration
+### 4.1 Notification Service Reads and Mutations
 
 **Request Flow:**
 
-```
-System Event → NotificationService → Channel Router → Delivery Services
 ```text
+Browser/API → NotificationController → NotificationService → Database notifications
+```
 
 **Service Implementation:**
 
 ```php
-// NotificationService.php
 class NotificationService
 {
-    public function __construct(
-        private UserPreferencesService $preferences,
-        private WebSocketService $websocket,
-        private EmailService $email,
-        private NotificationRepository $repository,
-    ) {}
-    
-    public function send(NotificationEvent $event): void
+    public function getUnreadForBell(User $user, int $limit = 10): array
     {
-        $users = $this->identifyAffectedUsers($event);
-        
-        foreach ($users as $user) {
-            $this->sendToUser($user, $event);
-        }
-    }
-    
-    private function sendToUser(User $user, NotificationEvent $event): void
-    {
-        $preferences = $this->preferences->get($user);
-        
-        // Check quiet hours
-        if ($this->isQuietHours($user, $preferences)) {
-            if ($event->priority !== NotificationPriority::Urgent) {
-                Log::info("Notification delayed due to quiet hours", [
-                    'user_id' => $user->id,
-                    'event' => get_class($event),
-                ]);
-                $this->scheduleForLater($user, $event, $preferences);
-                return;
-            }
-        }
-        
-        // Route to enabled channels
-        $channels = $this->determineChannels($event, $preferences);
-        
-        foreach ($channels as $channel) {
-            $this->deliverToChannel($user, $event, $channel);
-        }
-    }
-    
-    private function determineChannels(
-        NotificationEvent $event,
-        NotificationPreferences $preferences
-    ): array {
-        $channels = [];
-        
-        // WebSocket (always enabled for real-time updates)
-        $channels[] = 'websocket';
-        
-        // In-app notification center
-        if ($preferences->inApp) {
-            $channels[] = 'in_app';
-        }
-        
-        // Email
-        if ($preferences->email && $this->shouldSendEmail($event, $preferences)) {
-            $channels[] = 'email';
-        }
-        
-        return $channels;
-    }
-    
-    private function deliverToChannel(
-        User $user,
-        NotificationEvent $event,
-        string $channel
-    ): void {
-        match ($channel) {
-            'websocket' => $this->deliverViaWebSocket($user, $event),
-            'in_app' => $this->deliverInApp($user, $event),
-            'email' => $this->deliverViaEmail($user, $event),
-        };
-    }
-}
-```
+        $unread = $user->unreadNotifications()
+            ->take($limit)
+            ->get()
+            ->map(fn (DatabaseNotification $notification) => [
+                'id' => $notification->id,
+                'icon' => $notification->data['icon'] ?? '🔔',
+                'title' => $notification->data['title'] ?? 'Notification',
+                'message' => $notification->data['message'] ?? '',
+                'action_url' => $notification->data['action_url'] ?? '',
+                'priority' => $notification->data['priority'] ?? 'normal',
+                'time_ago' => $notification->created_at?->diffForHumans(),
+            ]);
 
-### 4.2 WebSocket Real-Time Delivery
-
-**WebSocket Service:**
-
-```php
-// WebSocketService.php
-class WebSocketService
-{
-    public function broadcast(User $user, NotificationEvent $event): void
-    {
-        $channel = "user.{$user->id}";
-        
-        broadcast(new NotificationBroadcast(
-            channel: $channel,
-            event: $event->eventName,
-            data: $event->toArray(),
-            priority: $event->priority->value,
-        ))->toOthers();
-    }
-}
-```text
-
-**WebSocket Event:**
-
-```php
-// NotificationBroadcast.php
-class NotificationBroadcast implements ShouldBroadcast
-{
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-    
-    public function __construct(
-        public string $channel,
-        public string $event,
-        public array $data,
-        public string $priority,
-    ) {}
-    
-    public function broadcastOn(): array
-    {
         return [
-            new PrivateChannel($this->channel),
-        ];
-    }
-    
-    public function broadcastAs(): string
-    {
-        return 'notification';
-    }
-    
-    public function broadcastWith(): array
-    {
-        return [
-            'event' => $this->event,
-            'data' => $this->data,
-            'priority' => $this->priority,
-            'timestamp' => now()->toIso8601String(),
+            'notifications' => $unread,
+            'unread_count' => $user->unreadNotifications()->count(),
         ];
     }
 }
 ```
 
-### 4.3 In-App Notification Persistence
-
-**Repository Implementation:**
+### 4.2 API Delivery to the Notification Bell
 
 ```php
-// NotificationRepository.php
-class NotificationRepository
+class NotificationController extends Controller
 {
-    public function create(User $user, NotificationEvent $event): Notification
+    public function unread(Request $request): JsonResponse
     {
-        return Notification::create([
-            'user_id' => $user->id,
-            'type' => $event->type->value,
-            'title' => $event->title,
-            'message' => $event->message,
-            'data' => $event->data,
-            'priority' => $event->priority->value,
-            'read_at' => null,
-            'delivered_at' => now(),
-        ]);
-    }
-    
-    public function markAsRead(Notification $notification): void
-    {
-        $notification->update(['read_at' => now()]);
-        
-        // Invalidate cache
-        Cache::forget("notifications.user.{$notification->user_id}.unread_count");
-    }
-    
-    public function getUnread(User $user, int $limit = 10): Collection
-    {
-        return Notification::where('user_id', $user->id)
-            ->whereNull('read_at')
-            ->orderBy('created_at', 'desc')
-            ->limit($limit)
-            ->get();
-    }
-    
-    public function getUnreadCount(User $user): int
-    {
-        $cacheKey = "notifications.user.{$user->id}.unread_count";
-        
-        return Cache::remember($cacheKey, 300, function () use ($user) {
-            return Notification::where('user_id', $user->id)
-                ->whereNull('read_at')
-                ->count();
-        });
-    }
-}
-```text
+        $user = $request->user();
 
-### 4.4 Email Notification Delivery
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
 
-**Email Service:**
-
-```php
-// EmailService.php
-class EmailService
-{
-    public function send(User $user, NotificationEvent $event): void
-    {
-        dispatch(new SendNotificationEmail($user, $event));
-    }
-}
-```
-
-**Email Job:**
-
-```php
-// SendNotificationEmail.php
-class SendNotificationEmail implements ShouldQueue
-{
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    
-    public int $tries = 3;
-    public int $timeout = 120;
-    
-    public function __construct(
-        private User $user,
-        private NotificationEvent $event,
-    ) {}
-    
-    public function handle(): void
-    {
-        $notification = $this->buildNotification();
-        
-        Mail::to($this->user->email)
-            ->send($notification);
-        
-        Log::info('Email notification sent', [
-            'user_id' => $this->user->id,
-            'event' => get_class($this->event),
-        ]);
-    }
-    
-    private function buildNotification(): Mailable
-    {
-        return match ($this->event->type) {
-            NotificationType::RaceReminder => new RaceReminderEmail($this->user, $this->event),
-            NotificationType::TrainingSuggestion => new TrainingSuggestionEmail($this->user, $this->event),
-            NotificationType::AchievementUnlocked => new AchievementEmail($this->user, $this->event),
-            default => new GenericNotificationEmail($this->user, $this->event),
-        };
-    }
-    
-    public function failed(\Throwable $exception): void
-    {
-        Log::error('Email notification failed', [
-            'user_id' => $this->user->id,
-            'event' => get_class($this->event),
-            'error' => $exception->getMessage(),
-        ]);
-    }
-}
-```text
-
-### 4.5 User Preferences Management
-
-**Preferences Service:**
-
-```php
-// UserPreferencesService.php
-class UserPreferencesService
-{
-    public function get(User $user): NotificationPreferences
-    {
-        $cacheKey = "notification_preferences.{$user->id}";
-        
-        return Cache::remember($cacheKey, 3600, function () use ($user) {
-            $prefs = $user->notificationPreferences;
-            
-            return new NotificationPreferences(
-                inApp: $prefs->in_app ?? true,
-                email: $prefs->email ?? false,
-                quietHoursEnabled: $prefs->quiet_hours_enabled ?? false,
-                quietHoursStart: $prefs->quiet_hours_start ?? '22:00',
-                quietHoursEnd: $prefs->quiet_hours_end ?? '08:00',
-                raceReminders: $prefs->race_reminders ?? true,
-                trainingSuggestions: $prefs->training_suggestions ?? true,
-                achievements: $prefs->achievements ?? true,
-            );
-        });
-    }
-    
-    public function update(User $user, array $preferences): void
-    {
-        $user->notificationPreferences()->updateOrCreate(
-            ['user_id' => $user->id],
-            $preferences
-        );
-        
-        // Invalidate cache
-        Cache::forget("notification_preferences.{$user->id}");
-    }
-}
-```
-
-**Quiet Hours Check:**
-
-```php
-private function isQuietHours(User $user, NotificationPreferences $preferences): bool
-{
-    if (!$preferences->quietHoursEnabled) {
-        return false;
-    }
-    
-    $timezone = $user->timezone ?? 'UTC';
-    $now = now($timezone);
-    
-    $start = Carbon::parse($preferences->quietHoursStart, $timezone);
-    $end = Carbon::parse($preferences->quietHoursEnd, $timezone);
-    
-    // Handle overnight quiet hours (e.g., 22:00 - 08:00)
-    if ($start->greaterThan($end)) {
-        return $now->greaterThanOrEqualTo($start) || $now->lessThan($end);
-    }
-    
-    return $now->between($start, $end);
-}
-```text
-
-### 4.6 Notification Types and Triggers
-
-**Notification Event Types:**
-
-```php
-// NotificationEvent.php
-abstract class NotificationEvent
-{
-    public function __construct(
-        public NotificationType $type,
-        public NotificationPriority $priority,
-        public string $title,
-        public string $message,
-        public array $data = [],
-    ) {}
-    
-    abstract public function toArray(): array;
-}
-```
-
-**Event Examples:**
-
-```php
-// RaceReminderEvent.php
-class RaceReminderEvent extends NotificationEvent
-{
-    public function __construct(
-        public Career $career,
-        public Race $race,
-        public int $daysUntil,
-    ) {
-        parent::__construct(
-            type: NotificationType::RaceReminder,
-            priority: NotificationPriority::Normal,
-            title: "Race Reminder: {$race->name}",
-            message: "Race in {$daysUntil} days. Readiness: {$this->calculateReadiness()}%",
-            data: [
-                'career_id' => $career->id,
-                'race_id' => $race->id,
-                'days_until' => $daysUntil,
-            ],
+        return response()->json(
+            $this->notificationService->getUnreadForBell($user, limit: 10)
         );
     }
-    
-    public function toArray(): array
+}
+```
+
+### 4.3 Queued Database Notification Persistence
+
+The active notification classes in the codebase are queued Laravel notifications that currently
+write to the `database` channel.
+
+```php
+class TrainingReminderNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function via(object $notifiable): array
+    {
+        return ['database'];
+    }
+
+    public function toArray(object $notifiable): array
     {
         return [
-            'career' => [
-                'id' => $this->career->id,
-                'name' => $this->career->character->name,
-            ],
-            'race' => [
-                'id' => $this->race->id,
-                'name' => $this->race->name,
-                'grade' => $this->race->grade,
-            ],
-            'days_until' => $this->daysUntil,
-            'readiness' => $this->calculateReadiness(),
+            'type' => 'training_reminder',
+            'icon' => '🏃',
+            'title' => 'Training Reminder',
+            'message' => 'Turn reminder with suggested training context.',
+            'priority' => 'normal',
         ];
     }
-    
-    private function calculateReadiness(): int
+}
+```
+
+### 4.4 Push Subscription Preferences
+
+Push subscription metadata is handled separately from database notifications and stores endpoint-
+level preferences plus quiet-hour rules.
+
+> **Note**: Push notifications are delivered through the browser’s Push API (`PushManager.subscribe()`)
+> after the user grants notification permission. The browser receives push messages from the server
+> via the Web Push Protocol and displays them as native OS notifications, even when the application
+> tab is in the background.
+
+```php
+class PushNotificationService
+{
+    public function updatePreferences(User $user, string $endpoint, array $preferences): bool
     {
-        // Implementation from RaceAnalysisService
-        return app(RaceAnalysisService::class)
-            ->calculateReadiness($this->career, $this->race);
+        $subscription = PushSubscription::query()
+            ->where('user_id', $user->id)
+            ->where('endpoint', $endpoint)
+            ->first();
+
+        if (! $subscription) {
+            return false;
+        }
+
+        $subscription->update([
+            'notification_preferences' => $preferences,
+        ]);
+
+        return true;
     }
 }
-```text
+```
+
+### 4.5 Notification Types and Triggers
+
+| Notification Type | Trigger Source | Persistence Channel | Delivery Surface |
+| --- | --- | --- | --- |
+| **Training Reminder** | Career/training flow | Database notification | Bell dropdown, notification center |
+| **Race Ready** | Race availability flow | Database notification | Bell dropdown, notification center |
+| **Critical Alert** | Admin/system alert flow | Database notification | Bell dropdown, notification center |
+| **Push Subscription Event** | User device registration | `push_subscriptions` table | Browser/device preferences |
 
 ---
 
 ## 5. Data Structures
 
-### 5.1 Notification Model
+### 5.1 Notification Payload Shape
 
 ```json
 {
-  "id": 42,
-  "user_id": 1,
-  "type": "race_reminder",
+  "id": "database-notification-uuid",
+  "type": "training_reminder",
+  "icon": "🏃",
+  "title": "Training Reminder",
+  "message": "Turn 12: Time to train your character!",
+  "detail": "Suggested: Speed training",
+  "action_url": "/careers/157",
+  "action_label": "View Career",
   "priority": "normal",
-  "title": "Race Reminder: Kanto Okami Cup",
-  "message": "Race in 3 days. Readiness: 85%",
-  "data": {
-    "career_id": 157,
-    "race_id": 12,
-    "days_until": 3,
-    "readiness": 85
-  },
-  "read_at": null,
-  "delivered_at": "2026-01-24T10:00:00Z",
-  "created_at": "2026-01-24T10:00:00Z"
+  "read": false
 }
 ```
 
-### 5.2 User Notification Preferences
+### 5.2 Push Subscription Preferences
 
 ```json
 {
-  "user_id": 1,
-  "in_app": true,
-  "email": false,
-  "quiet_hours_enabled": true,
-  "quiet_hours_start": "22:00",
-  "quiet_hours_end": "08:00",
   "race_reminders": true,
-  "training_suggestions": true,
-  "achievements": true,
-  "stat_updates": false
-}
-```text
-
-### 5.3 WebSocket Broadcast Payload
-
-```json
-{
-  "event": "notification",
-  "data": {
-    "type": "character_updated",
-    "priority": "low",
-    "title": "Stats Updated",
-    "message": "Training completed: Speed +48",
-    "data": {
-      "career_id": 157,
-      "stat_changes": {
-        "speed": 48,
-        "stamina": 5,
-        "power": 3
-      }
-    },
-    "timestamp": "2026-01-24T10:00:00Z"
-  }
+  "training_alerts": true,
+  "sync_notifications": true,
+  "quiet_hours_start": "22:00",
+  "quiet_hours_end": "08:00"
 }
 ```
 
-### 5.4 Email Notification Template Data
+### 5.3 Notification API Response
 
 ```json
 {
-  "user": {
-    "name": "John Doe",
-    "email": "john@example.com"
-  },
-  "notification": {
-    "type": "race_reminder",
-    "title": "Race Reminder: Kanto Okami Cup",
-    "message": "Your character is ready for the upcoming G1 race!",
-    "cta_text": "View Race Details",
-    "cta_url": "https://app.example.com/careers/157/races/12"
-  },
-  "race": {
-    "name": "Kanto Okami Cup",
-    "grade": "G1",
-    "distance": "2400m",
-    "days_until": 3
-  },
-  "character": {
-    "name": "Special Week",
-    "current_stats": {
-      "speed": 850,
-      "stamina": 720,
-      "power": 680
-    },
-    "readiness": 85
-  }
+  "notifications": [
+    {
+      "id": "database-notification-uuid",
+      "icon": "🏇",
+      "title": "Race Available",
+      "message": "A race is ready for your current career.",
+      "action_url": "/careers/157",
+      "priority": "high",
+      "time_ago": "2 minutes ago"
+    }
+  ],
+  "unread_count": 1
 }
-```text
+```
 
 ---
 
 ## 6. Error Handling
 
-### 6.1 Validation Errors
+### 6.1 API Error Conditions
 
-| Error Code | Condition | HTTP Status | User Message |
-| --- | --- | --- | --- |
-| `NOTIF_001` | Invalid notification type | 422 | "Invalid notification type" |
-| `NOTIF_002` | User not found | 404 | "User not found" |
-| `NOTIF_003` | Notification not found | 404 | "Notification not found" |
-| `NOTIF_004` | Invalid preference value | 422 | "Invalid preference value" |
-| `NOTIF_005` | Invalid quiet hours format | 422 | "Quiet hours must be in HH:MM format" |
+| Condition | HTTP Status | User Message |
+| --- | --- | --- |
+| Unauthenticated notification request | 401 | "Unauthenticated." |
+| Notification not found for mark/delete | 404 | "Notification not found." |
+| Missing push subscription on preference update | 404-style service failure | Preference update returns `false` |
 
-### 6.2 Error Recovery Flow
+### 6.2 Recovery Flow
 
 ```mermaid
 sequenceDiagram
+    participant API as NotificationController
     participant Service as NotificationService
-    participant WS as WebSocketService
-    participant Email as EmailService
-    participant Queue
-    
-    Service->>WS: Broadcast notification
-    
-    alt WebSocket Success
-        WS-->>Service: Delivered
-    else WebSocket Failure
-        WS-->>Service: Connection error
-        Service->>Service: Log warning, continue
-    end
-    
-    Service->>Email: Queue email
-    
-    alt Email Queue Success
-        Email->>Queue: Job queued
-        Queue-->>Email: Job ID
-    else Email Queue Failure
-        Queue-->>Email: Queue error
-        Email->>Email: Retry with backoff
-        
-        alt Retry Success
-            Email->>Queue: Job queued
-        else Max Retries
-            Email->>Service: Email failed
-            Service->>Service: Log error
-        end
+    participant DB as Database
+    participant Browser
+
+    Browser->>API: Request unread notifications
+    API->>Service: getUnreadForBell(user)
+
+    alt Authenticated user
+        Service->>DB: Load unread notifications
+        DB-->>Service: Results
+        Service-->>API: Payload
+        API-->>Browser: 200 JSON
+    else Missing auth
+        API-->>Browser: 401 JSON error
     end
 ```
 
-### 6.3 Delivery Retry Strategy
+### 6.3 Retry Characteristics
 
-| Channel | Retry Attempts | Backoff | Max Age |
-| --- | --- | --- | --- |
-| WebSocket | 0 (real-time only) | N/A | Immediate |
-| In-App | 0 (persistent) | N/A | Indefinite |
-| Email | 3 | Exponential (1min, 5min, 15min) | 1 hour |
+| Operation | Retry Strategy |
+| --- | --- |
+| Queued notification class | Queue worker retry policy if configured for the job |
+| Bell refresh API | Client retries by reloading or next poll cycle |
+| Push preference updates | User retries after correcting endpoint or auth state |
 
 ---
 
@@ -760,82 +375,31 @@ sequenceDiagram
 
 ### 7.1 Performance Metrics
 
-| Operation | Target | Current | Status |
-| --- | --- | --- | --- |
-| WebSocket broadcast | <100ms | ~80ms | ✅ Met |
-| In-app notification save | <50ms | ~40ms | ✅ Met |
-| Email queue | <30ms | ~25ms | ✅ Met |
-| Email delivery | <5s | ~3.5s | ✅ Met |
-| Preference load (cached) | <10ms | ~5ms | ✅ Met |
-| Unread count query | <50ms | ~30ms | ✅ Met |
+| Operation | Target | Status |
+| --- | --- | --- |
+| Unread count query | < 50ms on indexed reads | Active target |
+| Notification list page | Read-focused paginated query | Active target |
+| Mark as read | Single record mutation | Active target |
+| Queue-backed notification persistence | Worker-dependent but asynchronous | Active target |
 
 ### 7.2 Optimization Strategies
 
-**Implemented:**
-
-- Preference caching (1-hour TTL)
-- Unread count caching (5-minute TTL)
-- Async email delivery via queues
-- WebSocket connection pooling
-- Batch notification insertion
-
-**Code Example:**
-
-```php
-// Batch notification creation
-DB::transaction(function () use ($users, $event) {
-    $notifications = $users->map(fn($user) => [
-        'user_id' => $user->id,
-        'type' => $event->type->value,
-        'title' => $event->title,
-        'message' => $event->message,
-        'data' => json_encode($event->data),
-        'priority' => $event->priority->value,
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
-    
-    Notification::insert($notifications->toArray());
-});
-```text
+- Keep bell payloads small by limiting unread items.
+- Use paginated reads for the full notification center.
+- Let queued Laravel notifications handle persistence outside user-facing requests when possible.
+- Store push preferences per subscription to avoid recomputing device rules.
 
 ### 7.3 Database Query Analysis
 
-**Query Count for Notification Delivery:**
+- Unread bell: one unread-notifications query plus unread count.
+- Mark as read: one targeted notification lookup and one update.
+- Delete: one targeted notification lookup and one delete.
 
-- Preference load: 1 query (cached)
-- In-app notification save: 1 query (insert)
-- Email queue: 1 query (job insert)
-- WebSocket: 0 queries (real-time broadcast)
+### 7.4 Data Storage Strategy
 
-**Total Queries:** 2-3 queries per notification
-
-**Index Usage:**
-
-```sql
--- Critical indexes for notifications
-CREATE INDEX idx_notifications_user_unread ON ucp_notifications(user_id, read_at);
-CREATE INDEX idx_notifications_created ON ucp_notifications(created_at DESC);
-CREATE INDEX idx_notification_prefs_user ON ucp_notification_preferences(user_id);
-```
-
-### 7.4 Cache Strategy
-
-**Cache Keys:**
-
-- Preferences: `notification_preferences.{user_id}`
-- Unread count: `notifications.user.{user_id}.unread_count`
-- TTL: 1 hour for preferences, 5 minutes for unread count
-
-**Cache Invalidation:**
-
-```php
-// Invalidate on preference update
-Cache::forget("notification_preferences.{$user->id}");
-
-// Invalidate on notification read
-Cache::forget("notifications.user.{$user->id}.unread_count");
-```text
+- `notifications` stores user-facing database notifications.
+- `push_subscriptions` stores per-endpoint push metadata and preference JSON.
+- Browser clients fetch fresh state through the API rather than subscribing to WebSocket channels.
 
 ---
 
@@ -845,10 +409,10 @@ Cache::forget("notifications.user.{$user->id}.unread_count");
 
 | Document | Description |
 | --- | --- |
-| [PRD-007](../prds/PRD-007_External_Integration.md) | Product requirements for external integration |
-| [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
-| [FLOW-007](../flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
-| [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md) | Technical flow diagrams |
+| [PRD-007](../02-prds/PRD-007_External_Integration.md) | Product requirements for external integration |
+| [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
+| [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
+| [TECH-FLOW-007](../01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md) | Technical flow diagrams |
 
 ### 8.2 Related Sequences
 
@@ -862,7 +426,7 @@ Cache::forget("notifications.user.{$user->id}.unread_count");
 
 | Config File | Description |
 | --- | --- |
-| `config/broadcasting.php` | Laravel Reverb WebSocket configuration |
+| `app/Http/Controllers/Api/NotificationController.php` | Notification API surface for unread/list/read/delete flows |
 | `config/mail.php` | Email delivery configuration |
 | `config/queue.php` | Queue driver configuration |
 
@@ -874,7 +438,9 @@ Cache::forget("notifications.user.{$user->id}.unread_count");
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added WebSocket broadcasting, email delivery, user preferences, quiet hours, detailed sequence flows, performance metrics, and aligned with current Laravel 12 architecture |
+| 2.3.0 | 2026-03-10 | Development Team | Added clarification that push notifications are delivered via browser Push API after user consent (section 4.4) |
+| 2.1.0 | 2026-03-08 | Development Team | Re-aligned with current implementation: database notifications, unread polling endpoints, push subscription preferences, and queue-backed delivery surfaces |
+| 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation baseline |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
@@ -897,8 +463,11 @@ Cache::forget("notifications.user.{$user->id}.unread_count");
 - PSR-12 Coding Standards
 - Mermaid Diagram Standards
 - IEEE 830 SRS Format
-- WebSocket Protocol Standards
+- Laravel Notifications and Queue Standards
 
 ---
 
-*This sequence diagram reflects the current implementation of the notification delivery workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/NotificationService.php`, `app/Services/WebSocketService.php`, and related files.*
+*This sequence diagram reflects the current notification workflow on the `develop` branch. For the
+most up-to-date information, refer to the source code in `app/Services/NotificationService.php`,
+`app/Http/Controllers/Api/NotificationController.php`, and
+`app/Services/Notifications/PushNotificationService.php`.*

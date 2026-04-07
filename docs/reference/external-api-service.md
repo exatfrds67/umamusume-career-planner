@@ -456,7 +456,7 @@ if (!$result['success']) {
         'error' => $result['error'],
         'attempted_sources' => $result['metadata']['attempted_sources'] ?? [],
     ]);
-    
+
     // Use cached data or show error to user
 }
 ```text

@@ -5,7 +5,7 @@
 Fixed 157 failing tests across Unit, Feature, and Integration test suites. The main issues were:
 
 1. **Model Configuration Issues** - Timestamp and table name mismatches
-2. **Data Consistency Issues** - Incomplete stat arrays and field name mismatches  
+2. **Data Consistency Issues** - Incomplete stat arrays and field name mismatches
 3. **Test Data Issues** - Tests not providing all required fields
 
 ## Fixes Applied
@@ -70,7 +70,7 @@ speed, stamina, power, guts, wit).
 The codebase has an inconsistency between "wisdom" and "wit" for the intelligence stat:
 
 - Database schema uses "wit"
-- Character model expects "wit"  
+- Character model expects "wit"
 - Some tests were using "wisdom"
 
 **Recommendation**: Standardize on "wit" throughout the codebase and update any remaining references to "wisdom".

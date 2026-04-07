@@ -436,7 +436,7 @@ $result = $facade->getCharacters();
 if (!$result['success']) {
     // Log error
     Log::error('Failed to fetch characters', ['error' => $result['error']]);
-    
+
     // Provide fallback or user message
     return response()->json([
         'message' => 'Unable to fetch character data. Please try again later.',

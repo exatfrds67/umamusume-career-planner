@@ -40,7 +40,8 @@
 ## Overview
 
 Uma Musume: Pretty Derby career runs span **72 turns** across three in-game years.
-Effective career planning requires knowing when mandatory races occur, when to schedule optional races for fan acquisition,
+Effective career planning requires knowing when mandatory races occur, when to schedule optional
+races for fan acquisition,
 and when to reserve turns for intensive training before key events.
 
 Failing to meet fan count thresholds before mandatory races causes the career to end early,

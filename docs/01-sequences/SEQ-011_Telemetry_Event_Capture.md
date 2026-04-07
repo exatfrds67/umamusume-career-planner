@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -26,7 +26,10 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the telemetry and analytics event capture workflow in the Umamusume Career Planner application, covering client-side event tracking, server-side logging, performance monitoring, AI cost tracking, and game-accurate event capture aligned with Global English Server mechanics.
+This sequence diagram documents the telemetry and analytics event capture workflow in the Umamusume
+Career Planner application, covering client-side event tracking, server-side logging, performance
+monitoring, AI cost tracking, and game-accurate event capture aligned with Global English Server
+mechanics.
 
 ### 1.2 Scope
 
@@ -47,10 +50,10 @@ This sequence diagram documents the telemetry and analytics event capture workfl
 
 **Related Artifacts:**
 
-- PRD: [PRD-007](../prds/PRD-007_External_Integration.md)
-- SPEC: [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
-- Flow: [FLOW-007](../flows/FLOW-007_External_Integration_System.md)
-- Tech Flow: [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
+- PRD: [PRD-007](../02-prds/PRD-007_External_Integration.md)
+- SPEC: [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md)
+- Flow: [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md)
+- Tech Flow: [TECH-FLOW-007](../01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
 
 ### 1.3 Business Context
 
@@ -84,7 +87,7 @@ Telemetry enables:
 | **TelemetryService** | Domain Service | Event collection and batching |
 | **GameEventTracker** | Domain Service | Game-specific event tracking |
 | **PerformanceMonitor** | Infrastructure | Performance metrics tracking |
-| **AICostTracker** | Domain Service | AI usage and cost logging |
+| **CostTrackingService** | Domain Service | AI usage and cost logging |
 | **MCPMonitoringService** | Domain Service | MCP tool usage tracking |
 | **AuditLogger** | Infrastructure | Security and compliance logging |
 | **Database** | Infrastructure | MySQL/MariaDB event storage |
@@ -102,7 +105,7 @@ app/
 │   │   ├── EventBatcher.php
 │   │   └── GameEventTracker.php
 │   ├── AI/
-│   │   └── AICostTracker.php
+│   │   └── CostTrackingService.php
 │   ├── MCP/
 │   │   └── MCPMonitoringService.php
 │   └── Security/
@@ -132,7 +135,7 @@ sequenceDiagram
     participant Controller
     participant TelemetrySvc as TelemetryService
     participant GameTracker as GameEventTracker
-    participant AITracker as AICostTracker
+    participant AITracker as CostTrackingService
     participant MCPMonitor as MCPMonitoringService
     participant Audit as AuditLogger
     participant Queue as Redis Queue
@@ -144,7 +147,7 @@ sequenceDiagram
     User->>Frontend: Perform action
     Frontend->>Frontend: Track event
     Frontend->>Frontend: Add to event buffer
-    
+
     alt Buffer Full or Interval
         Frontend->>Controller: POST /api/telemetry/batch
         Controller->>TelemetrySvc: processBatch(events)
@@ -223,10 +226,10 @@ class TelemetryCollector {
         this.eventBuffer = [];
         this.batchSize = 10;
         this.flushInterval = 5000; // 5 seconds
-        
+
         this.startFlushTimer();
     }
-    
+
     track(eventName, properties = {}) {
         const event = {
             name: eventName,
@@ -235,20 +238,20 @@ class TelemetryCollector {
             session_id: this.getSessionId(),
             page_url: window.location.href,
         };
-        
+
         this.eventBuffer.push(event);
-        
+
         if (this.eventBuffer.length >= this.batchSize) {
             this.flush();
         }
     }
-    
+
     async flush() {
         if (this.eventBuffer.length === 0) return;
-        
+
         const batch = [...this.eventBuffer];
         this.eventBuffer = [];
-        
+
         try {
             await fetch('/api/telemetry/batch', {
                 method: 'POST',
@@ -264,11 +267,11 @@ class TelemetryCollector {
             this.eventBuffer.unshift(...batch);
         }
     }
-    
+
     startFlushTimer() {
         setInterval(() => this.flush(), this.flushInterval);
     }
-    
+
     getSessionId() {
         let sessionId = sessionStorage.getItem('telemetry_session_id');
         if (!sessionId) {
@@ -302,17 +305,17 @@ class TelemetryService
         private EventValidator $validator,
         private Queue $queue,
     ) {}
-    
+
     public function processBatch(array $events): void
     {
         $validated = collect($events)->filter(function ($event) {
             return $this->validator->validate($event);
         });
-        
+
         if ($validated->isEmpty()) {
             return;
         }
-        
+
         // Queue for async processing
         ProcessTelemetryBatch::dispatch($validated->toArray());
     }
@@ -339,26 +342,26 @@ class EventValidator
         'career_milestone',
         'stat_breakpoint_reached',
     ];
-    
+
     public function validate(array $event): bool
     {
         if (!isset($event['name']) || !in_array($event['name'], $this->allowedEvents)) {
             Log::warning('Invalid event name', ['event' => $event]);
             return false;
         }
-        
+
         if (!isset($event['timestamp'])) {
             Log::warning('Missing timestamp', ['event' => $event]);
             return false;
         }
-        
+
         // Validate timestamp is recent (within 1 hour)
         $timestamp = Carbon::parse($event['timestamp']);
         if ($timestamp->diffInHours(now()) > 1) {
             Log::warning('Stale event', ['event' => $event, 'age_hours' => $timestamp->diffInHours(now())]);
             return false;
         }
-        
+
         return true;
     }
 }
@@ -373,14 +376,14 @@ class EventValidator
 class ProcessTelemetryBatch implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    
+
     public int $tries = 3;
     public int $timeout = 120;
-    
+
     public function __construct(
         private array $events,
     ) {}
-    
+
     public function handle(): void
     {
         DB::transaction(function () {
@@ -395,24 +398,24 @@ class ProcessTelemetryBatch implements ShouldQueue
                     'created_at' => now(),
                 ];
             });
-            
+
             TelemetryEvent::insert($records->toArray());
-            
+
             // Update APM metrics
             $this->updateAPMMetrics($records);
         });
     }
-    
+
     private function updateAPMMetrics(Collection $records): void
     {
         $eventCounts = $records->groupBy('event_name')->map->count();
-        
+
         foreach ($eventCounts as $eventName => $count) {
             // Send to APM system (e.g., New Relic, Datadog)
             // APM::increment("telemetry.events.{$eventName}", $count);
         }
     }
-    
+
     public function failed(\Throwable $exception): void
     {
         Log::error('Telemetry batch processing failed', [
@@ -428,8 +431,8 @@ class ProcessTelemetryBatch implements ShouldQueue
 **Cost Tracker Service:**
 
 ```php
-// AICostTracker.php
-class AICostTracker
+// CostTrackingService.php
+class CostTrackingService
 {
     public function track(
         string $provider,
@@ -439,7 +442,7 @@ class AICostTracker
         ?int $userId = null
     ): void {
         $cost = $this->calculateCost($provider, $model, $inputTokens, $outputTokens);
-        
+
         AIUsageLog::create([
             'user_id' => $userId ?? auth()->id(),
             'provider' => $provider,
@@ -449,12 +452,12 @@ class AICostTracker
             'cost_usd' => $cost,
             'created_at' => now(),
         ]);
-        
+
         // Update APM metrics
         // APM::gauge('ai.cost.daily', $this->getDailyCost());
         // APM::increment('ai.requests', 1, ['provider' => $provider]);
     }
-    
+
     private function calculateCost(
         string $provider,
         string $model,
@@ -464,26 +467,26 @@ class AICostTracker
         if ($provider === 'ollama') {
             return 0.00; // Local processing is free
         }
-        
+
         // AWS Bedrock pricing
         $pricing = config("ai.providers.bedrock.pricing.{$model}", [
             'input' => 3.00,  // per 1M tokens
             'output' => 15.00, // per 1M tokens
         ]);
-        
+
         $inputCost = ($inputTokens / 1_000_000) * $pricing['input'];
         $outputCost = ($outputTokens / 1_000_000) * $pricing['output'];
-        
+
         return round($inputCost + $outputCost, 6);
     }
-    
+
     public function getDailyCost(int $userId): float
     {
         return AIUsageLog::where('user_id', $userId)
             ->whereDate('created_at', today())
             ->sum('cost_usd');
     }
-    
+
     public function getMonthlyCost(int $userId): float
     {
         return AIUsageLog::where('user_id', $userId)
@@ -520,15 +523,16 @@ class MCPMonitoringService
                 'invocation_count' => DB::raw('invocation_count + 1'),
                 'success_count' => $success ? DB::raw('success_count + 1') : DB::raw('success_count'),
                 'error_count' => !$success ? DB::raw('error_count + 1') : DB::raw('error_count'),
-                'avg_latency_ms' => DB::raw("(avg_latency_ms * invocation_count + {$latencyMs}) / (invocation_count + 1)"),
+                'avg_latency_ms' => DB::raw("(avg_latency_ms * invocation_count + {$latencyMs}) / (invocation_count
+                + 1)"),
             ]
         );
-        
+
         // Update APM metrics
         // APM::histogram('mcp.tool.latency', $latencyMs, ['tool' => $toolName]);
         // APM::increment('mcp.tool.invocations', 1, ['tool' => $toolName, 'success' => $success]);
     }
-    
+
     public function getToolMetrics(string $toolName, int $days = 7): array
     {
         return MCPToolUsage::where('tool_name', $toolName)
@@ -540,8 +544,8 @@ class MCPMonitoringService
             ->map(fn($record) => [
                 'date' => $record->usage_date,
                 'invocations' => $record->invocation_count,
-                'success_rate' => $record->invocation_count > 0 
-                    ? ($record->success_count / $record->invocation_count) * 100 
+                'success_rate' => $record->invocation_count > 0
+                    ? ($record->success_count / $record->invocation_count) * 100
                     : 0,
                 'avg_latency_ms' => $record->avg_latency_ms,
             ])
@@ -572,14 +576,14 @@ class AuditLogger
             'created_at' => now(),
         ]);
     }
-    
+
     public function logLogin(User $user): void
     {
         $this->log('user.login', $user->id, [
             'login_method' => 'password',
         ]);
     }
-    
+
     public function logDataExport(User $user, string $format, int $recordCount): void
     {
         $this->log('data.export', $user->id, [
@@ -587,7 +591,7 @@ class AuditLogger
             'record_count' => $recordCount,
         ]);
     }
-    
+
     public function logProfileUpdate(User $user, array $changes): void
     {
         $this->log('user.profile.update', $user->id, [
@@ -611,7 +615,7 @@ class GameEventTracker
 {
     /**
      * Track training selection and completion
-     * 
+     *
      * Game Mechanics (Verified):
      * - Training types: Speed, Stamina, Power, Guts, Wit
      * - Facility levels: 1-5 (2.0× max multiplier at level 5)
@@ -638,10 +642,10 @@ class GameEventTracker
             'turn_number' => $data['turn_number'],
             'career_id' => $data['career_id'],
         ];
-        
+
         ProcessGameEventBatch::dispatch([$event]);
     }
-    
+
     /**
      * Bond mechanics (Verified Jan 2026):
      * - Base bond gain: +7 per training
@@ -667,10 +671,10 @@ class GameEventTracker
 {
     /**
      * Track race entry and completion
-     * 
+     *
      * Game Mechanics (Verified):
      * - Race grades: G1, G2, G3, OP (Open)
-     * - Distance categories: Sprint (1000-1400m), Mile (1401-1800m), 
+     * - Distance categories: Sprint (1000-1400m), Mile (1401-1800m),
      *                        Medium (1801-2400m), Long (2401m+)
      * - Track conditions: Firm, Good, Soft, Heavy
      * - Weather types: Sunny, Cloudy, Rainy, Snowy
@@ -697,10 +701,10 @@ class GameEventTracker
             'turn_number' => $data['turn_number'],
             'career_id' => $data['career_id'],
         ];
-        
+
         ProcessGameEventBatch::dispatch([$event]);
     }
-    
+
     /**
      * Track condition impact calculation (Verified Jan 2026)
      */
@@ -720,7 +724,7 @@ class GameEventTracker
                 'stamina_drain' => 2, // +2% per second
             ],
         ];
-        
+
         return $penalties[$condition] ?? $penalties['firm'];
     }
 }
@@ -736,7 +740,7 @@ class GameEventTracker
 {
     /**
      * Track skill acquisition
-     * 
+     *
      * Game Mechanics (Verified):
      * - Hint levels: 1-5 (NOT 1-2 as previously documented)
      * - Discount per hint level:
@@ -768,10 +772,10 @@ class GameEventTracker
             'turn_number' => $data['turn_number'],
             'career_id' => $data['career_id'],
         ];
-        
+
         ProcessGameEventBatch::dispatch([$event]);
     }
-    
+
     /**
      * Calculate hint discount (Verified Jan 2026)
      * Levels 1-3: 10% each
@@ -789,7 +793,7 @@ class GameEventTracker
             default => 0,
         };
     }
-    
+
     /**
      * Track skill hint received
      */
@@ -804,7 +808,7 @@ class GameEventTracker
             'turn_number' => $data['turn_number'],
             'career_id' => $data['career_id'],
         ];
-        
+
         ProcessGameEventBatch::dispatch([$event]);
     }
 }
@@ -820,7 +824,7 @@ class GameEventTracker
 {
     /**
      * Track career milestones
-     * 
+     *
      * Game Mechanics (Verified):
      * - Total turns: ~70-78 (varies by scenario)
      * - Years: Junior → Classic → Senior
@@ -848,10 +852,10 @@ class GameEventTracker
             'career_id' => $data['career_id'],
             'details' => $data['details'] ?? [],
         ];
-        
+
         ProcessGameEventBatch::dispatch([$event]);
     }
-    
+
     /**
      * Track turn progression
      */
@@ -867,7 +871,7 @@ class GameEventTracker
             ],
         ]);
     }
-    
+
     /**
      * Track year transition
      */
@@ -883,7 +887,7 @@ class GameEventTracker
             ],
         ]);
     }
-    
+
     /**
      * Track class promotion
      */
@@ -900,14 +904,14 @@ class GameEventTracker
             ],
         ]);
     }
-    
+
     /**
      * Track stat breakpoint reached
      */
     public function trackStatBreakpoint(int $careerId, string $stat, int $value, int $turnNumber): void
     {
         $breakpoint = $this->getBreakpointReached($value);
-        
+
         if ($breakpoint) {
             $this->trackCareerMilestone([
                 'milestone_type' => 'stat_breakpoint_reached',
@@ -922,7 +926,7 @@ class GameEventTracker
             ]);
         }
     }
-    
+
     /**
      * Get class fan threshold (Verified Jan 2026)
      */
@@ -941,7 +945,7 @@ class GameEventTracker
             default => 0,
         };
     }
-    
+
     /**
      * Get stat breakpoint (Verified Jan 2026)
      */
@@ -952,7 +956,7 @@ class GameEventTracker
         if ($value >= 901) return 901;
         return null;
     }
-    
+
     /**
      * Get breakpoint significance
      */
@@ -1229,7 +1233,7 @@ sequenceDiagram
     participant Worker
 
     Frontend->>Controller: POST /api/telemetry/batch
-    
+
     alt Validation Error
         Controller-->>Frontend: 422 Validation Error
         Frontend->>Frontend: Log error, drop batch
@@ -1319,10 +1323,10 @@ class CleanupTelemetryData extends Command
     {
         $telemetryCutoff = now()->subDays(90);
         $gameEventCutoff = now()->subYear();
-        
+
         TelemetryEvent::where('created_at', '<', $telemetryCutoff)->delete();
         GameEvent::where('created_at', '<', $gameEventCutoff)->delete();
-        
+
         $this->info('Telemetry and game event data cleanup complete');
     }
 }
@@ -1345,10 +1349,10 @@ class CleanupTelemetryData extends Command
 
 | Document | Description |
 | --- | --- |
-| [PRD-007](../prds/PRD-007_External_Integration.md) | Product requirements for external integration |
-| [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
-| [FLOW-007](../flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
-| [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md) | Technical flow diagrams |
+| [PRD-007](../02-prds/PRD-007_External_Integration.md) | Product requirements for external integration |
+| [SPEC-007](../02-specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
+| [FLOW-007](../01-flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
+| [TECH-FLOW-007](../01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md) | Technical flow diagrams |
 
 ### 9.2 Related Sequences
 
@@ -1410,4 +1414,8 @@ class CleanupTelemetryData extends Command
 
 ---
 
-*This sequence diagram reflects the current implementation of the telemetry event capture workflow as of v2.2.0, with game mechanics verified against the Global English Server (January 2026). For the most up-to-date information, refer to the source code in `app/Services/Telemetry/TelemetryService.php`, `app/Services/Telemetry/GameEventTracker.php`, `app/Jobs/ProcessTelemetryBatch.php`, and related files.*
+*This sequence diagram reflects the current implementation of the telemetry event capture workflow
+as of v2.2.0, with game mechanics verified against the Global English Server (January 2026). For the
+most up-to-date information, refer to the source code in
+`app/Services/Telemetry/TelemetryService.php`, `app/Services/Telemetry/GameEventTracker.php`,
+`app/Jobs/ProcessTelemetryBatch.php`, and related files.*

@@ -1,7 +1,7 @@
 # Phase 3: Training System Integration - Progress Report
 
-**Date**: January 25, 2026  
-**Status**: 🔄 IN PROGRESS - Database & Service Layer Complete  
+**Date**: January 25, 2026
+**Status**: 🔄 IN PROGRESS - Database & Service Layer Complete
 **Progress**: 50% (3 of 6 tasks complete)
 
 ---
@@ -235,7 +235,8 @@ Final Stat Gain = Base Stat Gain × (1 + Final Bonus / 100)
 
 ## ⚠️ Known Issues
 
-1. **Test Failures**: Some existing tests failing due to missing `external_source_id` column in Character model (unrelated to Phase 3 work)
+1. **Test Failures**: Some existing tests failing due to missing `external_source_id` column in
+Character model (unrelated to Phase 3 work)
 2. **Frontend Not Yet Implemented**: UI components for deck management and training predictions need to be created
 
 ---
@@ -261,7 +262,7 @@ Final Stat Gain = Base Stat Gain × (1 + Final Bonus / 100)
 
 ---
 
-**Estimated Time Remaining**: ~7 hours  
-**Complexity**: Medium-High  
-**Blockers**: None  
+**Estimated Time Remaining**: ~7 hours
+**Complexity**: Medium-High
+**Blockers**: None
 **Dependencies**: Phase 2 (Support Card Management) ✅ Complete

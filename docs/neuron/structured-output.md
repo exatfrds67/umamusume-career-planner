@@ -23,7 +23,7 @@ class Person
         #[SchemaProperty(description: 'The person full name', required: true)]
         #[NotBlank]
         public string $name,
-        
+
         #[SchemaProperty(description: 'The person age', required: true)]
         public int $age,
     ) {}
@@ -116,11 +116,11 @@ class Address
         #[SchemaProperty(description: 'Street address', required: true)]
         #[NotBlank]
         public string $street,
-        
+
         #[SchemaProperty(description: 'ZIP code', required: true)]
         #[NotBlank]
         public string $zipCode,
-        
+
         #[SchemaProperty(description: 'City name', required: false)]
         public ?string $city = null,
     ) {}
@@ -132,7 +132,7 @@ class Person
         #[SchemaProperty(description: 'Person name', required: true)]
         #[NotBlank]
         public string $name,
-        
+
         #[SchemaProperty(description: 'Person address', required: true)]
         public Address $address,
     ) {}
@@ -149,7 +149,7 @@ class Person
     public function __construct(
         #[SchemaProperty(description: 'Person name', required: true)]
         public string $name,
-        
+
         #[SchemaProperty(description: 'List of tags', required: false)]
         public array $tags = [],
     ) {}
@@ -168,7 +168,7 @@ class Person
     public function __construct(
         #[SchemaProperty(description: 'Person name', required: true)]
         public string $name,
-        
+
         /**
          * @var Tag[]
          */
@@ -184,7 +184,7 @@ class Tag
         #[SchemaProperty(description: 'Tag name', required: true)]
         #[NotBlank]
         public string $name,
-        
+
         #[SchemaProperty(description: 'Tag color', required: false)]
         public ?string $color = null,
     ) {}

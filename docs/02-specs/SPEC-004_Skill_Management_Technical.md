@@ -1,9 +1,9 @@
 # SPEC-004: Skill Management System - Technical Specification
 
-**Document Version**: 2.3.0  
-**Date**: 2026-02-22  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Complete - Implementation verified  
+**Document Version**: 2.3.1
+**Date**: 2026-03-11
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Complete - Implementation verified
 **Classification**: Internal - Development Team
 
 ---
@@ -13,30 +13,32 @@
 | Attribute | Value |
 | --- | --- |
 | **Document ID** | SPEC-004 |
-| **Related PRD** | [PRD-004: Skill Management](../prds/PRD-004_Skill_Management.md) |
-| **Architecture Version** | v2.3.0 |
+| **Related PRD** | [PRD-004: Skill Management](../02-prds/PRD-004_Skill_Management.md) |
+| **Architecture Version** | v2.3.1 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-02-22 |
+| **Last Reviewed** | 2026-03-11 |
 
 ### Related Documents
 
 **Requirements & Design**:
 
-- [SRS Section 3.4: Skill Management](../003_SRS_Software_Requirement_Specifications.md#34-skill-management)
-- [SDS Section 4.4: Skill Management Architecture](../004_SDS_Software_Design_Specifications.md#44-skill-management-module)
+- [SRS Section 3.4: Skill Management](../00-core-
+docs/003_SRS_Software_Requirement_Specifications.md#34-skill-management)
+- [SDS Section 4.4: Skill Management Architecture](../00-core-
+docs/004_SDS_Software_Design_Specifications.md#44-skill-management-module)
 
 **Data & Integration**:
 
-- [DBD Section 5.4: Skill Tables](../009_DBD_Database_Documentation.md#54-skill-tables)
-- [API Section 4.4: Skill Endpoints](../010_API_API_Documentation.md#44-skill-endpoints)
+- [DBD Section 5.4: Skill Tables](../00-core-docs/009_DBD_Database_Documentation.md#54-skill-tables)
+- [API Section 4.4: Skill Endpoints](../00-core-docs/010_API_API_Documentation.md#44-skill-endpoints)
 
 **Visual Documentation**:
 
-- [FLOW-004: Skill Management System](../flows/FLOW-004_Skill_Management_System.md)
-- [SEQ-003: Skill Acquisition and Upgrade](../sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
-- [WF-008: Skill Shop Interface](../wireframes/WF-008_Skill_Shop_Interface.md)
-- [WF-009: Skill Loadout Manager](../wireframes/WF-009_Skill_Loadout_Manager.md)
-- [UF-005: Skill Management Flow](../user-flows/UF-005_Skill_Management_Flow.md)
+- [FLOW-004: Skill Management System](../01-flows/FLOW-004_Skill_Management_System.md)
+- [SEQ-003: Skill Acquisition and Upgrade](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- [WF-008: Skill Shop Interface](../01-wireframes/WF-008_Skill_Shop_Interface.md)
+- [WF-009: Skill Loadout Manager](../01-wireframes/WF-009_Skill_Loadout_Manager.md)
+- [UF-005: Skill Management Flow](../01-user-flows/UF-005_Skill_Management_Flow.md)
 
 ---
 
@@ -65,7 +67,10 @@
 
 ### 1.1 Module Purpose
 
-The Skill Management System handles the complete lifecycle of skills in character development, including cataloging available skills, tracking acquisition during career runs, managing cost reductions through hints, and handling skill evolution mechanics. Skills are critical performance modifiers that activate during races based on specific conditions.
+The Skill Management System handles the complete lifecycle of skills in character development,
+including cataloging available skills, tracking acquisition during career runs, managing cost
+reductions through hints, and handling skill evolution mechanics. Skills are critical performance
+modifiers that activate during races based on specific conditions.
 
 **Core Responsibilities**:
 
@@ -112,6 +117,15 @@ Strategic skill acquisition directly impacts race performance and career success
 - Support card skill provision (SPEC-005)
 - Character stat modifications (SPEC-001)
 - Training hint generation (SPEC-002)
+
+**Planner Feature Note**: Scenario-specific cost modifiers documented in this SPEC are planner-side
+balancing features for comparative planning workflows. They should not be interpreted as exact in-
+game SP formulas unless a future source-backed mechanic explicitly confirms them.
+
+**Storage Boundary**: Skill catalog browsing may be available in both storage modes, but hint
+progression and skill acquisition persistence require an active account-backed career context. Local
+mode should be treated as read-only planning unless a separate local persistence contract is
+explicitly defined.
 
 ### 1.4 Technology Stack
 
@@ -163,21 +177,21 @@ graph TB
     API --> FormRequest
     FormRequest --> SkillSvc
     Livewire --> SkillSvc
-    
+
     SkillSvc --> CostCalc
     SkillSvc --> EvolutionSvc
     SkillSvc --> RecommendSvc
-    
+
     RecommendSvc --> NeuronAI
-    
+
     SkillSvc --> SkillModel
     SkillSvc --> Acquisition
     SkillSvc --> Hint
     EvolutionSvc --> Evolution
-    
+
     SkillModel --> DB
     SkillModel --> Cache
-    
+
     SkillSvc --> External
 ```text
 
@@ -240,9 +254,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Skill Entity
- * 
+ *
  * Represents a skill definition in the game database.
- * 
+ *
  * @property int $id
  * @property string $name
  * @property string|null $name_jp
@@ -267,6 +281,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Skill extends Model
 {
     use HasFactory;
+
+    /**
+     * Unique-skill metadata fields model known character-specific progression hooks
+     * such as star-based upgrades and maximum levels. They are planner-oriented
+     * reference fields and may be extended as more verified unique-skill data is
+     * added to the catalog.
+     */
 
     protected $table = 'ucp_skills';
 
@@ -438,7 +459,7 @@ enum SkillRarity: string
     case Normal = 'normal';
     case Rare = 'rare';
     case Unique = 'unique';
-    
+
     public function getBaseCostMultiplier(): float
     {
         return match($this) {
@@ -482,14 +503,14 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Skill Search Service
- * 
+ *
  * Provides advanced filtering and search capabilities for skills.
  */
 class SkillSearchService
 {
     /**
      * Search skills with filters
-     * 
+     *
      * @param array $filters
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
@@ -556,7 +577,7 @@ class SkillSearchService
         // Sorting
         $sortBy = $filters['sort_by'] ?? 'name';
         $sortOrder = $filters['sort_order'] ?? 'asc';
-        
+
         $query->orderBy($sortBy, $sortOrder);
 
         return $query->paginate($filters['per_page'] ?? 20);
@@ -564,7 +585,7 @@ class SkillSearchService
 
     /**
      * Get skills relevant for race context
-     * 
+     *
      * @param array $raceContext
      * @return \Illuminate\Support\Collection
      */
@@ -596,23 +617,23 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Skill Hint Entity
- * 
+ *
  * Tracks hint levels that reduce skill acquisition costs.
- * 
+ *
  * Game-Accurate Hint System (5 levels):
  * - Level 1: 10% discount
  * - Level 2: 20% discount
  * - Level 3: 30% discount
  * - Level 4: 35% discount
  * - Level 5: 40% discount (MAXIMUM)
- * 
+ *
  * Levels 1-3 provide 10% each, levels 4-5 provide 5% each.
- * 
+ *
  * Additional Discount Sources:
  * - "Fast Learner" condition
  * - Skill Sparks
  * - Hint Books
- * 
+ *
  * @property int $id
  * @property int $character_id
  * @property int $skill_id
@@ -671,7 +692,7 @@ class SkillHint extends Model
 
     /**
      * Get discount percentage based on hint level
-     * 
+     *
      * Game-accurate progression:
      * - Levels 1-3: +10% each (10%, 20%, 30%)
      * - Levels 4-5: +5% each (35%, 40%)
@@ -688,7 +709,7 @@ class SkillHint extends Model
             default => 0,
         };
     }
-    
+
     /**
      * Check if at maximum hint level
      */
@@ -712,12 +733,12 @@ use App\Models\{Skill, SkillHint, Character};
 
 /**
  * SP Cost Calculator
- * 
+ *
  * Calculates final skill acquisition costs with hint discounts.
- * 
+ *
  * Game-Accurate Hint Discount System:
  * - Level 1: 10% discount
- * - Level 2: 20% discount  
+ * - Level 2: 20% discount
  * - Level 3: 30% discount
  * - Level 4: 35% discount
  * - Level 5: 40% discount (MAXIMUM)
@@ -739,6 +760,10 @@ class SkillAnalysisService
 
     /**
      * Scenario-specific discount modifiers
+        *
+        * These are planner-specific balancing values used for recommendation and
+        * comparison workflows. They are not asserted here as exact game-native SP
+        * mechanics.
      */
     private const SCENARIO_MODIFIERS = [
         'ura_finale' => 1.0,
@@ -750,7 +775,7 @@ class SkillAnalysisService
 
     /**
      * Calculate final SP cost for skill acquisition
-     * 
+     *
      * @param Skill $skill
      * @param Character $character
      * @param SkillHint|null $hint
@@ -780,7 +805,7 @@ class SkillAnalysisService
 
     /**
      * Calculate costs for multiple skills
-     * 
+     *
      * @param array $skillIds
      * @param Character $character
      * @return array
@@ -816,7 +841,7 @@ class SkillAnalysisService
 
     /**
      * Get maximum affordable skills within SP budget
-     * 
+     *
      * @param Character $character
      * @param int $availableSP
      * @param array $skillIds
@@ -862,9 +887,9 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Skill Acquisition Entity
- * 
+ *
  * Pivot record linking characters to acquired skills.
- * 
+ *
  * @property int $id
  * @property int $career_id
  * @property int $character_id
@@ -938,7 +963,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Skill Evolution Service
- * 
+ *
  * Manages skill evolution from normal to rare versions.
  */
 class SkillEvolutionService
@@ -949,7 +974,7 @@ class SkillEvolutionService
 
     /**
      * Evolve a skill to its rare version
-     * 
+     *
      * @param Character $character
      * @param Skill $baseSkill
      * @param Skill $targetSkill
@@ -1029,7 +1054,7 @@ class SkillEvolutionService
 
     /**
      * Validate evolution prerequisites
-     * 
+     *
      * @param Character $character
      * @param Skill $baseSkill
      * @param Skill $targetSkill
@@ -1073,7 +1098,7 @@ class SkillEvolutionService
 
     /**
      * Get available evolutions for character
-     * 
+     *
      * @param Character $character
      * @return \Illuminate\Support\Collection
      */
@@ -1087,7 +1112,7 @@ class SkillEvolutionService
 
         foreach ($ownedSkills as $acquisition) {
             $skill = $acquisition->skill;
-            
+
             foreach ($skill->evolutions as $evolution) {
                 // Check if already owned
                 $alreadyOwned = SkillAcquisition::where('character_id', $character->id)
@@ -1140,7 +1165,7 @@ use Illuminate\Support\Facades\{DB, Cache};
 
 /**
  * Skill Management Service
- * 
+ *
  * Handles skill-related business operations.
  */
 class SkillService
@@ -1154,7 +1179,7 @@ class SkillService
 
     /**
      * Acquire a skill for character
-     * 
+     *
      * @param Character $character
      * @param int $skillId
      * @param int $careerRunId
@@ -1221,7 +1246,7 @@ class SkillService
 
     /**
      * Add skill hint to character
-     * 
+     *
      * @param int $characterId
      * @param int $skillId
      * @param int $level
@@ -1260,7 +1285,7 @@ class SkillService
 
     /**
      * Get skills available for acquisition
-     * 
+     *
      * @param Character $character
      * @param array $filters
      * @return \Illuminate\Support\Collection
@@ -1282,7 +1307,7 @@ class SkillService
 
     /**
      * Get skills with costs for character
-     * 
+     *
      * @param Character $character
      * @param array $skillIds
      * @return array
@@ -1294,7 +1319,7 @@ class SkillService
 
     /**
      * Sync skill definitions from external API
-     * 
+     *
      * @return int
      */
     public function syncSkillDefinitions(): int
@@ -1329,7 +1354,7 @@ class SkillService
 
     /**
      * Validate skill is not already owned
-     * 
+     *
      * @param Character $character
      * @param Skill $skill
      * @return void
@@ -1556,7 +1581,7 @@ CREATE TABLE ucp_skills (
     effects JSON NULL COMMENT 'Skill effects and values',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (evolution_from_id) REFERENCES ucp_skills(id) ON DELETE SET NULL,
     INDEX idx_skill_type (skill_type),
     INDEX idx_rarity (rarity),
@@ -1580,7 +1605,7 @@ CREATE TABLE ucp_skill_hints (
     source_type VARCHAR(50) NOT NULL COMMENT 'training, event, race, support_card',
     source_id BIGINT UNSIGNED NULL COMMENT 'ID of source entity',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE CASCADE,
     FOREIGN KEY (skill_id) REFERENCES ucp_skills(id) ON DELETE CASCADE,
     UNIQUE KEY unique_character_skill (character_id, skill_id),
@@ -1608,7 +1633,7 @@ CREATE TABLE ucp_skill_acquisitions (
     first_hint_at TIMESTAMP NULL COMMENT 'NEW: When first hint was received',
     last_hint_at TIMESTAMP NULL COMMENT 'NEW: When last hint was received',
     acquired_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (career_id) REFERENCES ucp_careers(id) ON DELETE CASCADE,
     FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE CASCADE,
     FOREIGN KEY (skill_id) REFERENCES ucp_skills(id) ON DELETE CASCADE,
@@ -1703,7 +1728,7 @@ class SkillRecommendationService
 
     /**
      * Get AI recommendations for skills
-     * 
+     *
      * @param Character $character
      * @param int $careerRunId
      * @param RaceDefinition|null $upcomingRace
@@ -1747,7 +1772,7 @@ class SkillRecommendationService
 
     /**
      * Build AI context
-     * 
+     *
      * @param Character $character
      * @param CareerRun $career
      * @param \Illuminate\Support\Collection $skills
@@ -1763,7 +1788,7 @@ class SkillRecommendationService
         ?array $raceContext
     ): string {
         $currentSkills = $character->skills->pluck('name')->join(', ') ?: 'None';
-        
+
         $skillsJson = json_encode($skills->map(function ($skill) use ($costs) {
             return [
                 'id' => $skill->id,
@@ -1773,18 +1798,19 @@ class SkillRecommendationService
             ];
         })->values());
 
-        $raceInfo = $raceContext ? 
+        $raceInfo = $raceContext ?
             "Upcoming Race: {$raceContext['race_name']} ({$raceContext['distance']}m, {$raceContext['surface']})" :
             "No specific race targeted";
 
         return <<<CONTEXT
         Character: {$character->name}
-        Stats: Speed {$character->current_stats['speed']}, Stamina {$character->current_stats['stamina']}, Power {$character->current_stats['power']}
+        Stats: Speed {$character->current_stats['speed']}, Stamina {$character->current_stats['stamina']},
+        Power {$character->current_stats['power']}
         Available SP: {$career->skill_points}
         Current Skills: {$currentSkills}
-        
+
         {$raceInfo}
-        
+
         Available Skills: {$skillsJson}
         CONTEXT;
     }
@@ -2088,31 +2114,31 @@ test('calculates cost with hint discount correctly', function () {
     $skill = Skill::factory()->make(['base_sp_cost' => 120]);
     $character = Character::factory()->make(['scenario_type' => 'ura_finale']);
     $hint = new SkillHint(['level' => 2]); // 20% discount
-    
+
     $calculator = app(SkillAnalysisService::class);
     $cost = $calculator->calculateFinalCost($skill, $character, $hint);
-    
+
     expect($cost)->toBe(96); // 120 * 0.8
 });
 
-test('applies scenario modifiers correctly', function () {
+test('applies planner scenario modifiers correctly', function () {
     $skill = Skill::factory()->make(['base_sp_cost' => 100]);
     $character = Character::factory()->make(['scenario_type' => 'make_cup_debut']);
-    
+
     $calculator = app(SkillAnalysisService::class);
     $cost = $calculator->calculateFinalCost($skill, $character, null);
-    
-    expect($cost)->toBe(90); // 100 * 0.9 (10% discount)
+
+    expect($cost)->toBe(90); // Planner-specific 10% scenario discount
 });
 
 test('hint level 5 caps at 40 percent discount', function () {
     $skill = Skill::factory()->make(['base_sp_cost' => 100]);
     $character = Character::factory()->make();
     $hint = new SkillHint(['level' => 5]);
-    
+
     $calculator = app(SkillAnalysisService::class);
     $cost = $calculator->calculateFinalCost($skill, $character, $hint);
-    
+
     expect($cost)->toBe(60); // 100 * 0.6 (40% max discount)
 });
 
@@ -2120,10 +2146,10 @@ test('minimum cost is 1 SP', function () {
     $skill = Skill::factory()->make(['base_sp_cost' => 10]);
     $character = Character::factory()->make(['scenario_type' => 'project_larc']);
     $hint = new SkillHint(['level' => 5]);
-    
+
     $calculator = app(SkillAnalysisService::class);
     $cost = $calculator->calculateFinalCost($skill, $character, $hint);
-    
+
     expect($cost)->toBeGreaterThanOrEqual(1);
 });
 
@@ -2134,12 +2160,12 @@ test('skill matches distance conditions correctly', function () {
             'surface' => ['turf'],
         ],
     ]);
-    
+
     $context = [
         'distance_type' => 'medium',
         'surface' => 'turf',
     ];
-    
+
     expect($skill->matchesConditions($context))->toBeTrue();
 });
 
@@ -2149,11 +2175,11 @@ test('skill rejects mismatched conditions', function () {
             'distance' => ['sprint'],
         ],
     ]);
-    
+
     $context = [
         'distance_type' => 'long',
     ];
-    
+
     expect($skill->matchesConditions($context))->toBeFalse();
 });
 ```text
@@ -2168,24 +2194,24 @@ test('user can acquire skill with sufficient SP', function () {
     $character = Character::factory()->for($user)->create();
     $career = CareerRun::factory()->for($character)->create(['skill_points' => 200]);
     $skill = Skill::factory()->create(['base_sp_cost' => 100]);
-    
+
     $response = $this->actingAs($user)
         ->postJson("/api/v1/characters/{$character->id}/skills/acquire", [
             'skill_id' => $skill->id,
             'career_run_id' => $career->id,
             'use_hint' => false,
         ]);
-    
+
     $response->assertStatus(201)
         ->assertJsonPath('data.cost_paid', 100)
         ->assertJsonPath('data.remaining_sp', 100);
-    
+
     $this->assertDatabaseHas('ucp_skill_acquisitions', [
         'character_id' => $character->id,
         'skill_id' => $skill->id,
         'sp_cost_paid' => 100,
     ]);
-    
+
     $career->refresh();
     expect($career->skill_points)->toBe(100);
 });
@@ -2195,13 +2221,13 @@ test('user cannot acquire skill with insufficient SP', function () {
     $character = Character::factory()->for($user)->create();
     $career = CareerRun::factory()->for($character)->create(['skill_points' => 50]);
     $skill = Skill::factory()->create(['base_sp_cost' => 100]);
-    
+
     $response = $this->actingAs($user)
         ->postJson("/api/v1/characters/{$character->id}/skills/acquire", [
             'skill_id' => $skill->id,
             'career_run_id' => $career->id,
         ]);
-    
+
     $response->assertStatus(422)
         ->assertJsonPath('error_code', 'SKILL_INSUFFICIENT_SP');
 });
@@ -2211,7 +2237,7 @@ test('hint reduces skill cost correctly', function () {
     $character = Character::factory()->for($user)->create();
     $career = CareerRun::factory()->for($character)->create(['skill_points' => 200]);
     $skill = Skill::factory()->create(['base_sp_cost' => 120]);
-    
+
     // Add hint
     SkillHint::create([
         'character_id' => $character->id,
@@ -2219,14 +2245,14 @@ test('hint reduces skill cost correctly', function () {
         'level' => 3, // 30% discount
         'source_type' => 'training',
     ]);
-    
+
     $response = $this->actingAs($user)
         ->postJson("/api/v1/characters/{$character->id}/skills/acquire", [
             'skill_id' => $skill->id,
             'career_run_id' => $career->id,
             'use_hint' => true,
         ]);
-    
+
     $response->assertStatus(201)
         ->assertJsonPath('data.cost_paid', 84); // 120 * 0.7
 });
@@ -2236,7 +2262,7 @@ test('user cannot acquire already owned skill', function () {
     $character = Character::factory()->for($user)->create();
     $career = CareerRun::factory()->for($character)->create(['skill_points' => 200]);
     $skill = Skill::factory()->create();
-    
+
     // Already owned
     SkillAcquisition::create([
         'career_id' => $career->id,
@@ -2244,13 +2270,13 @@ test('user cannot acquire already owned skill', function () {
         'skill_id' => $skill->id,
         'sp_cost_paid' => 100,
     ]);
-    
+
     $response = $this->actingAs($user)
         ->postJson("/api/v1/characters/{$character->id}/skills/acquire", [
             'skill_id' => $skill->id,
             'career_run_id' => $career->id,
         ]);
-    
+
     $response->assertStatus(422)
         ->assertJsonPath('error_code', 'SKILL_ALREADY_OWNED');
 });
@@ -2261,13 +2287,13 @@ test('user cannot acquire another users character skills', function () {
     $character = Character::factory()->for($user2)->create();
     $career = CareerRun::factory()->for($character)->create();
     $skill = Skill::factory()->create();
-    
+
     $response = $this->actingAs($user1)
         ->postJson("/api/v1/characters/{$character->id}/skills/acquire", [
             'skill_id' => $skill->id,
             'career_run_id' => $career->id,
         ]);
-    
+
     $response->assertStatus(403);
 });
 
@@ -2275,14 +2301,14 @@ test('skill evolution works correctly', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
     $career = CareerRun::factory()->for($character)->create(['skill_points' => 200]);
-    
+
     $baseSkill = Skill::factory()->create(['base_sp_cost' => 120]);
     $evolvedSkill = Skill::factory()->create([
         'base_sp_cost' => 180,
         'rarity' => 'rare',
         'evolution_from_id' => $baseSkill->id,
     ]);
-    
+
     // Own base skill
     SkillAcquisition::create([
         'career_id' => $career->id,
@@ -2290,7 +2316,7 @@ test('skill evolution works correctly', function () {
         'skill_id' => $baseSkill->id,
         'sp_cost_paid' => 96, // Paid with hint
     ]);
-    
+
     // Add hint for evolved skill
     SkillHint::create([
         'character_id' => $character->id,
@@ -2298,22 +2324,22 @@ test('skill evolution works correctly', function () {
         'level' => 2, // 20% discount
         'source_type' => 'training',
     ]);
-    
+
     $response = $this->actingAs($user)
         ->postJson("/api/v1/characters/{$character->id}/skills/evolve", [
             'base_skill_id' => $baseSkill->id,
             'target_skill_id' => $evolvedSkill->id,
             'career_run_id' => $career->id,
         ]);
-    
+
     $response->assertStatus(200);
-    
+
     // Base skill removed
     $this->assertDatabaseMissing('ucp_skill_acquisitions', [
         'character_id' => $character->id,
         'skill_id' => $baseSkill->id,
     ]);
-    
+
     // Evolved skill acquired
     $this->assertDatabaseHas('ucp_skill_acquisitions', [
         'character_id' => $character->id,
@@ -2326,12 +2352,12 @@ test('skill search filters work correctly', function () {
     Skill::factory()->create(['skill_type' => 'speed', 'rarity' => 'normal']);
     Skill::factory()->create(['skill_type' => 'stamina', 'rarity' => 'rare']);
     Skill::factory()->create(['skill_type' => 'speed', 'rarity' => 'rare']);
-    
+
     $user = User::factory()->create();
-    
+
     $response = $this->actingAs($user)
         ->getJson('/api/v1/skills?skill_type=speed&rarity=rare');
-    
+
     $response->assertStatus(200)
         ->assertJsonCount(1, 'data');
 });
@@ -2345,13 +2371,13 @@ test('skill search filters work correctly', function () {
 test('evolution service handles full workflow', function () {
     $character = Character::factory()->create();
     $career = CareerRun::factory()->for($character)->create(['skill_points' => 300]);
-    
+
     $baseSkill = Skill::factory()->create(['base_sp_cost' => 100]);
     $evolvedSkill = Skill::factory()->create([
         'base_sp_cost' => 180,
         'evolution_from_id' => $baseSkill->id,
     ]);
-    
+
     // Acquire base skill
     SkillAcquisition::create([
         'career_id' => $career->id,
@@ -2359,13 +2385,13 @@ test('evolution service handles full workflow', function () {
         'skill_id' => $baseSkill->id,
         'sp_cost_paid' => 80,
     ]);
-    
+
     $service = app(SkillEvolutionService::class);
     $acquisition = $service->evolveSkill($character, $baseSkill, $evolvedSkill, $career->id);
-    
+
     expect($acquisition->skill_id)->toBe($evolvedSkill->id)
         ->and($acquisition->is_evolution)->toBeTrue();
-    
+
     $career->refresh();
     expect($career->skill_points)->toBeLessThan(300);
 });
@@ -2373,19 +2399,19 @@ test('evolution service handles full workflow', function () {
 test('available evolutions are calculated correctly', function () {
     $character = Character::factory()->create();
     $career = CareerRun::factory()->for($character)->create();
-    
+
     $skill1 = Skill::factory()->create(['base_sp_cost' => 100]);
     $evolution1 = Skill::factory()->create([
         'base_sp_cost' => 150,
         'evolution_from_id' => $skill1->id,
     ]);
-    
+
     $skill2 = Skill::factory()->create(['base_sp_cost' => 120]);
     $evolution2 = Skill::factory()->create([
         'base_sp_cost' => 180,
         'evolution_from_id' => $skill2->id,
     ]);
-    
+
     // Own both base skills
     SkillAcquisition::create([
         'career_id' => $career->id,
@@ -2393,17 +2419,17 @@ test('available evolutions are calculated correctly', function () {
         'skill_id' => $skill1->id,
         'sp_cost_paid' => 80,
     ]);
-    
+
     SkillAcquisition::create([
         'career_id' => $career->id,
         'character_id' => $character->id,
         'skill_id' => $skill2->id,
         'sp_cost_paid' => 96,
     ]);
-    
+
     $service = app(SkillEvolutionService::class);
     $evolutions = $service->getAvailableEvolutions($character);
-    
+
     expect($evolutions)->toHaveCount(2);
 });
 
@@ -2423,12 +2449,12 @@ test('external skill sync updates database', function () {
             ]
         ], 200),
     ]);
-    
+
     $service = app(SkillService::class);
     $syncedCount = $service->syncSkillDefinitions();
-    
+
     expect($syncedCount)->toBe(1);
-    
+
     $this->assertDatabaseHas('ucp_skills', [
         'id' => 1001,
         'name' => 'Lane Guidance',
@@ -2448,12 +2474,12 @@ test('AI provides valid skill recommendations', function () {
     ]);
     $career = CareerRun::factory()->for($character)->create(['skill_points' => 500]);
     $race = RaceDefinition::factory()->create(['distance_type' => 'medium']);
-    
+
     Skill::factory()->count(10)->create();
-    
+
     $service = app(SkillRecommendationService::class);
     $recommendations = $service->getRecommendations($character, $career->id, $race);
-    
+
     expect($recommendations)->toHaveKeys(['recommendations', 'total_cost', 'strategy_note'])
         ->and($recommendations['recommendations'])->not->toBeEmpty()
         ->and($recommendations['total_cost'])->toBeLessThanOrEqual(500);
@@ -2467,17 +2493,17 @@ test('AI provides valid skill recommendations', function () {
 
 test('skill search completes within performance target', function () {
     Skill::factory()->count(500)->create();
-    
+
     $user = User::factory()->create();
-    
+
     $startTime = microtime(true);
-    
+
     $response = $this->actingAs($user)
         ->getJson('/api/v1/skills?search=speed&rarity=normal');
-    
+
     $endTime = microtime(true);
     $executionTime = ($endTime - $startTime) * 1000;
-    
+
     $response->assertStatus(200);
     expect($executionTime)->toBeLessThan(50); // 50ms target
 });
@@ -2485,15 +2511,15 @@ test('skill search completes within performance target', function () {
 test('bulk cost calculation is performant', function () {
     $character = Character::factory()->create();
     $skillIds = Skill::factory()->count(100)->create()->pluck('id')->toArray();
-    
+
     $calculator = app(SkillAnalysisService::class);
-    
+
     $startTime = microtime(true);
     $calculator->calculateBulkCosts($skillIds, $character);
     $endTime = microtime(true);
-    
+
     $executionTime = ($endTime - $startTime) * 1000;
-    
+
     expect($executionTime)->toBeLessThan(30); // 30ms target
 });
 ```text
@@ -2529,7 +2555,7 @@ class SkillFactory extends Factory
             ]),
         ];
     }
-    
+
     public function normal(): self
     {
         return $this->state(fn (array $attributes) => [
@@ -2537,7 +2563,7 @@ class SkillFactory extends Factory
             'base_sp_cost' => $this->faker->numberBetween(80, 150),
         ]);
     }
-    
+
     public function rare(): self
     {
         return $this->state(fn (array $attributes) => [
@@ -2545,7 +2571,7 @@ class SkillFactory extends Factory
             'base_sp_cost' => $this->faker->numberBetween(150, 250),
         ]);
     }
-    
+
     public function unique(): self
     {
         return $this->state(fn (array $attributes) => [
@@ -2553,7 +2579,7 @@ class SkillFactory extends Factory
             'base_sp_cost' => $this->faker->numberBetween(200, 350),
         ]);
     }
-    
+
     public function evolution(Skill $baseSkill): self
     {
         return $this->state(fn (array $attributes) => [
@@ -2588,7 +2614,7 @@ class SkillHintFactory extends Factory
             ]),
         ];
     }
-    
+
     public function maxLevel(): self
     {
         return $this->state(fn (array $attributes) => [
@@ -2666,7 +2692,7 @@ class SkillHintFactory extends Factory
 
 ### Appendix D: SP Earning Guide
 
-**Training Sessions**: 5-10 SP per session  
+**Training Sessions**: 5-10 SP per session
 **Race Victories**:
 
 - G1: 45-50 SP
@@ -2674,7 +2700,7 @@ class SkillHintFactory extends Factory
 - G3: 20-30 SP
 - OP: 10-20 SP
 
-**Events**: 10-30 SP (scenario-dependent)  
+**Events**: 10-30 SP (scenario-dependent)
 **Total Available per Career**: ~800-1200 SP
 
 ### Appendix E: Hint Acquisition Methods
@@ -2691,6 +2717,7 @@ class SkillHintFactory extends Factory
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.3.1 | 2026-03-11 | Development Team | Clarified scenario modifiers as planner-side features, added storage-mode boundaries for catalog access vs account-backed persistence, and documented unique-skill metadata fields as planner-oriented references. |
 | 2.3.0 | 2026-02-22 | Development Team | Updated service names (SkillAnalysisService, SkillEvolutionService, Neuron\SkillRecommendationService, ExternalDataService), Neuron AI v2.11, PHP 8.2+, marked implementation complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate 5-level hint system (10%/20%/30%/35%/40%), added Fast Learner/Skill Sparks/Hint Books as discount sources |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete testing strategy, AI integration, comprehensive calculators |
@@ -2709,10 +2736,10 @@ class SkillHintFactory extends Factory
 
 ---
 
-**Document Control**  
-**Maintained By**: Backend Development Team  
-**Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-03-07  
+**Document Control**
+**Maintained By**: Backend Development Team
+**Review Frequency**: Bi-weekly during active development
+**Next Review Date**: 2026-03-07
 **Distribution**: Development Team, QA Team, Product Management, Game Design Team
 
 ---

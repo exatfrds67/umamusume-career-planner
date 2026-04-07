@@ -1,9 +1,9 @@
 # Support Card Strategy Guide
 
-**Document Version**: 1.0.0  
-**Date**: 2026-02-23  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Complete  
+**Document Version**: 1.0.0
+**Date**: 2026-02-23
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Complete
 **Audience**: Career Planners (Beginner to Intermediate)
 
 ---
@@ -23,7 +23,10 @@
 
 ## 1. Introduction
 
-Support cards are the **primary force multiplier** in Umamusume Pretty Derby. Each card in your deck amplifies stat gains during training and provides special effects. This guide explains how to maximize their benefits through strategic bond management, deck composition, and scenario-specific selection.
+Support cards are the **primary force multiplier** in Umamusume Pretty Derby. Each card in your deck
+amplifies stat gains during training and provides special effects. This guide explains how to
+maximize their benefits through strategic bond management, deck composition, and scenario-specific
+selection.
 
 **Key Concepts You'll Learn:**
 
@@ -75,7 +78,9 @@ Your deck contains **exactly 6 support cards:**
 - **5 owned cards**: Cards in your collection
 - **1 borrowed card**: A friend's card (once you unlock friend support)
 
-This composition should be treated as your baseline planning assumption. While deck edits may be technically possible in some flows, changing cards mid-run resets bond progress and usually delays friendship timing enough to be a net loss.
+This composition should be treated as your baseline planning assumption. While deck edits may be
+technically possible in some flows, changing cards mid-run resets bond progress and usually delays
+friendship timing enough to be a net loss.
 
 ---
 
@@ -83,7 +88,8 @@ This composition should be treated as your baseline planning assumption. While d
 
 ### 3.1 Understanding Bond Levels
 
-**Bond** is the relationship level between your Umamusume and each support card trainer. It represents how well your character knows and trusts the trainer.
+**Bond** is the relationship level between your Umamusume and each support card trainer. It
+represents how well your character knows and trusts the trainer.
 
 **Bond Range**: 0 → 100 (maximum)
 
@@ -104,7 +110,10 @@ This composition should be treated as your baseline planning assumption. While d
 
 ### 3.2 Friendship Training: The +20% Multiplier
 
-When a support card reaches **bond level 80 or higher**, it becomes **rainbow-ready**. In this application's planner logic, Friendship Training is treated as active when **3 or more support cards** simultaneously reach bond 80+, unlocking a **1.2x multiplier** (20% bonus) to modeled stat gains.
+When a support card reaches **bond level 80 or higher**, it becomes **rainbow-ready**. In this
+application's planner logic, Friendship Training is treated as active when **3 or more support
+cards** simultaneously reach bond 80+, unlocking a **1.2x multiplier** (20% bonus) to modeled stat
+gains.
 
 **Example:**
 
@@ -126,7 +135,8 @@ Bonus: +2.14 additional points
 
 ### 3.3 Friendship Training Activation Requirements
 
-Friendship training requires **3 or more support cards** to have bond ≥ 80 simultaneously. When this threshold is met in the planner:
+Friendship training requires **3 or more support cards** to have bond ≥ 80 simultaneously. When this
+threshold is met in the planner:
 
 - The training prediction layer marks friendship as **ACTIVE**
 - Total stat gain boost uses the planner's modeled **1.2x friendship multiplier**
@@ -134,7 +144,9 @@ Friendship training requires **3 or more support cards** to have bond ≥ 80 sim
 
 **Strategic Implication:**
 
-Focus on consistently using the same 3–5 core support cards throughout your career. By turn 60–80, you'll have 3+ cards in the 80+ bond range, triggering friendship training for a significant late-game power spike.
+Focus on consistently using the same 3–5 core support cards throughout your career. By turn 60–80,
+you'll have 3+ cards in the 80+ bond range, triggering friendship training for a significant late-
+game power spike.
 
 ---
 
@@ -142,7 +154,8 @@ Focus on consistently using the same 3–5 core support cards throughout your ca
 
 ### 4.1 The +5% Per-Card Bonus
 
-Beyond individual card bonuses, **every support card in your deck contributes a flat +5% bonus** to the training type it specializes in, regardless of bond level. This bonus stacks with other effects.
+Beyond individual card bonuses, **every support card in your deck contributes a flat +5% bonus** to
+the training type it specializes in, regardless of bond level. This bonus stacks with other effects.
 
 ### Example: Speed Training with a Full Deck
 
@@ -227,7 +240,8 @@ Each support card can be limit broken 0–4 times, increasing its bonus multipli
 - **3 Limit Breaks**: +30% to card bonus (1.3x)
 - **4 Limit Breaks**: +40% to card bonus (1.4x)
 
-**Strategic Tip**: Prioritize limit breaking your 3–5 core support cards. These cards will be in your deck for many runs, so investing in their limit breaks provides the best return on investment.
+**Strategic Tip**: Prioritize limit breaking your 3–5 core support cards. These cards will be in
+your deck for many runs, so investing in their limit breaks provides the best return on investment.
 
 ---
 
@@ -235,7 +249,8 @@ Each support card can be limit broken 0–4 times, increasing its bonus multipli
 
 ### 6.1 URA Finale Strategy
 
-**Context**: URA Finale is a **pure training scenario** focused on maximizing stat growth. Races are secondary; your goal is optimal stat development.
+**Context**: URA Finale is a **pure training scenario** focused on maximizing stat growth. Races are
+secondary; your goal is optimal stat development.
 
 **Recommended Approach:**
 
@@ -409,6 +424,7 @@ For more technical details on support card mechanics, see:
 
 - [SPEC-005: Support Card Management Technical Specification](../02-specs/SPEC-005_Support_Card_Management_Technical.md)
 - [UF-006: Support Deck Building User Flow](../01-user-flows/UF-006_Support_Deck_Building_Flow.md)
-- [SRS Section 3.5: Support Card Management](../00-core-docs/003_SRS_Software_Requirement_Specifications.md#35-support-card-management)
+- [SRS Section 3.5: Support Card Management](../00-core-
+docs/003_SRS_Software_Requirement_Specifications.md#35-support-card-management)
 
 For AI-powered deck recommendations, use the **Deck Advisor** in the character creation wizard.

@@ -73,14 +73,14 @@ class MyWorkflow extends Workflow
                     // Initial processing
                     return new Event('process', ['data' => $result]);
                 }),
-                
+
             Node::make('process')
                 ->handle(function (Event $event) {
                     // Main processing
                     $data = $event->getData('data');
                     return new Event('complete', ['result' => $processed]);
                 }),
-                
+
             Node::make('complete')
                 ->handle(function (Event $event) {
                     // Finalization
@@ -103,12 +103,12 @@ Nodes are the building blocks of workflows. Each node:
 Node::make('analyze_document')
     ->handle(function (Event $event) {
         $document = $event->getData('document');
-        
+
         // Use an agent within the workflow
         $analysis = AnalyzerAgent::make()->chat(
             new UserMessage("Analyze: {$document}")
         );
-        
+
         return new Event('review', [
             'document' => $document,
             'analysis' => $analysis->getContent()
@@ -140,7 +140,7 @@ Pause workflow for human review:
 Node::make('review')
     ->handle(function (Event $event) {
         $analysis = $event->getData('analysis');
-        
+
         // Pause and wait for human approval
         return $this->interrupt('approval_needed', [
             'analysis' => $analysis,
@@ -151,11 +151,11 @@ Node::make('review')
 Node::make('after_approval')
     ->handle(function (Event $event) {
         $approved = $event->getData('approved');
-        
+
         if ($approved) {
             return new Event('proceed', $event->getAllData());
         }
-        
+
         return new Event('reject', $event->getAllData());
     })
 ```
@@ -184,15 +184,15 @@ Node::make('process')
     ->handle(function (Event $event) {
         // Stream progress updates
         $this->stream('Processing step 1...');
-        
+
         // Do work
         $result1 = $this->processStep1();
-        
+
         $this->stream('Processing step 2...');
         $result2 = $this->processStep2();
-        
+
         $this->stream('Complete!');
-        
+
         return new Event('complete', ['results' => [$result1, $result2]]);
     })
 ```text
@@ -205,12 +205,12 @@ Workflows can use any Neuron component:
 Node::make('research')
     ->handle(function (Event $event) {
         $topic = $event->getData('topic');
-        
+
         // Use RAG agent
         $research = ResearchRAG::make()->chat(
             new UserMessage("Research: {$topic}")
         );
-        
+
         return new Event('summarize', [
             'research' => $research->getContent()
         ]);
@@ -219,12 +219,12 @@ Node::make('research')
 Node::make('summarize')
     ->handle(function (Event $event) {
         $research = $event->getData('research');
-        
+
         // Use different agent for summarization
         $summary = SummaryAgent::make()->chat(
             new UserMessage("Summarize: {$research}")
         );
-        
+
         return new Event('complete', [
             'summary' => $summary->getContent()
         ]);
@@ -240,7 +240,7 @@ Node::make('classify')
     ->handle(function (Event $event) {
         $text = $event->getData('text');
         $category = $this->classifyText($text);
-        
+
         // Branch based on category
         return match($category) {
             'urgent' => new Event('urgent_handler', $event->getAllData()),
@@ -259,15 +259,15 @@ Node::make('iterate')
     ->handle(function (Event $event) {
         $items = $event->getData('items');
         $processed = $event->getData('processed', []);
-        
+
         if (empty($items)) {
             return new Event('complete', ['results' => $processed]);
         }
-        
+
         $current = array_shift($items);
         $result = $this->processItem($current);
         $processed[] = $result;
-        
+
         // Loop back to process next item
         return new Event('iterate', [
             'items' => $items,
@@ -312,14 +312,14 @@ class DocumentWorkflow extends Workflow
         return [
             Node::make('upload')
                 ->handle(fn(Event $e) => new Event('extract', $e->getAllData())),
-                
+
             Node::make('extract')
                 ->handle(function (Event $event) {
                     $file = $event->getData('file');
                     $text = $this->extractText($file);
                     return new Event('analyze', ['text' => $text]);
                 }),
-                
+
             Node::make('analyze')
                 ->handle(function (Event $event) {
                     $analysis = AnalyzerAgent::make()->chat(
@@ -329,7 +329,7 @@ class DocumentWorkflow extends Workflow
                         'analysis' => $analysis->getContent()
                     ]);
                 }),
-                
+
             Node::make('approved')
                 ->handle(function (Event $event) {
                     $this->saveToDatabase($event->getAllData());
@@ -343,4 +343,3 @@ class DocumentWorkflow extends Workflow
 ---
 
 **Source:** <https://docs.neuron-ai.dev/workflow/getting-started>
-

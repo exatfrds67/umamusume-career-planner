@@ -24,9 +24,9 @@ WCAG 2.2 AA compliance.
 ### Fixed Code (CORRECT)
 
 ```blade
-<section x-show="currentStep === 1" x-transition 
-    class="card rounded-lg" 
-    role="region" 
+<section x-show="currentStep === 1" x-transition
+    class="card rounded-lg"
+    role="region"
     aria-labelledby="step-1-heading"
     aria-live="polite"
     aria-label="Step 1 of 4: Trainee and Scenario Selection">
@@ -76,10 +76,10 @@ WCAG 2.2 AA compliance.
     <label for="trainee-search" class="form-label text-sm font-medium">
         Search <span class="text-gray-400">(optional)</span>
     </label>
-    <input 
+    <input
         id="trainee-search"
-        type="text" 
-        x-model="filters.query" 
+        type="text"
+        x-model="filters.query"
         placeholder="Search by trainee name"
         aria-describedby="trainee-search-help"
         class="form-input"
@@ -116,14 +116,14 @@ WCAG 2.2 AA compliance.
 
 ```blade
 <label for="name" class="form-label font-medium">
-    Character Name 
+    Character Name
     <span class="text-red-500" aria-label="required">*</span>
     <span class="text-xs text-gray-500">(required)</span>
 </label>
-<input 
-    id="name" 
-    x-model="formData.name" 
-    class="form-input" 
+<input
+    id="name"
+    x-model="formData.name"
+    class="form-input"
     required
     aria-required="true"
     aria-invalid="false"
@@ -182,7 +182,7 @@ button:focus,
 
 ```blade
 <button type="button" @click="selectTrainee(trainee)"
-    class="text-left p-4 rounded-lg border-2 transition-all 
+    class="text-left p-4 rounded-lg border-2 transition-all
            hover:bg-gray-50 dark:hover:bg-gray-700/50
            focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2
            focus-visible:outline-none"
@@ -220,12 +220,13 @@ button:focus,
 <div class="relative">
     <!-- Selection indicator badge -->
     <template x-if="formData.trainee && formData.trainee.id === trainee.id">
-        <div class="absolute top-2 right-2 inline-flex items-center gap-1 
+        <div class="absolute top-2 right-2 inline-flex items-center gap-1
                     px-2 py-1 bg-primary-500 text-white rounded-full text-xs font-semibold"
              role="status"
              aria-live="polite">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0
+                011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
             </svg>
             <span>Selected</span>
         </div>
@@ -233,7 +234,7 @@ button:focus,
 
     <!-- Main button with multi-modal feedback -->
     <button type="button" @click="selectTrainee(trainee)"
-        class="text-left w-full p-4 rounded-lg border-2 transition-all 
+        class="text-left w-full p-4 rounded-lg border-2 transition-all
                hover:shadow-md focus-visible:ring-2 focus-visible:ring-primary-500"
         :class="formData.trainee && formData.trainee.id === trainee.id ?
             'border-primary-500 bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-500 ring-offset-1' :
@@ -262,10 +263,11 @@ button:focus,
 
 ```blade
 <!-- Desktop Sidebar Stepper (lg+ screens) -->
-<aside class="hidden lg:block fixed left-0 top-0 h-full w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-40 pt-20">
+<aside class="hidden lg:block fixed left-0 top-0 h-full w-56 bg-white dark:bg-gray-900 border-r
+border-gray-200 dark:border-gray-800 shadow-sm z-40 pt-20">
     <nav class="space-y-2 p-4" role="navigation" aria-label="Wizard steps">
         <template x-for="(step, index) in stepNames" :key="index">
-            <button 
+            <button
                 type="button"
                 @click="goToStep(index + 1)"
                 class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left group"
@@ -274,28 +276,30 @@ button:focus,
                     'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
                 :aria-current="currentStep === index + 1 ? 'step' : false"
                 :aria-label="`Step ${index + 1}: ${step} ${currentStep === index + 1 ? '(current)' : ''}`">
-                
+
                 <!-- Step number circle -->
-                <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors"
+                <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-
+                colors"
                      :class="currentStep === index + 1 ?
                         'bg-primary-500 text-white' :
                         currentStep > index + 1 ?
                         'bg-green-500 text-white' :
                         'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'">
-                    
+
                     <!-- Checkmark for completed steps -->
                     <template x-if="currentStep > index + 1">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0
+                            011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                         </svg>
                     </template>
-                    
+
                     <!-- Step number for current/future steps -->
                     <template x-if="currentStep <= index + 1">
                         <span x-text="index + 1"></span>
                     </template>
                 </div>
-                
+
                 <!-- Step label -->
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium truncate" x-text="step"></p>
@@ -348,7 +352,7 @@ button:focus,
                  :aria-label="`Progress: ${currentStep} of 4 steps complete`">
             </div>
         </div>
-        
+
         <!-- Step indicator text -->
         <p class="text-center text-sm font-medium text-gray-900 dark:text-white">
             <span class="font-semibold text-primary-600 dark:text-primary-300" x-text="currentStep"></span>
@@ -382,7 +386,7 @@ isValidating: false,
 async validateStep(step) {
     this.isValidating = true;
     this.validationErrors = {};
-    
+
     try {
         switch (step) {
             case 1:
@@ -403,7 +407,7 @@ async validateStep(step) {
                 // Deck validation
                 break;
         }
-        
+
         return Object.keys(this.validationErrors).length === 0;
     } finally {
         this.isValidating = false;
@@ -434,8 +438,11 @@ nextStep() {
          aria-live="polite"
          aria-atomic="true">
         <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 text-red-500 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            <svg class="w-5 h-5 text-red-500 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-
+            hidden="true">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414
+                1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414
+                10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
             </svg>
             <div class="flex-1">
                 <h3 class="font-medium text-red-900 dark:text-red-100 mb-2">Please fix the following errors:</h3>
@@ -500,6 +507,6 @@ nextStep() {
 
 ---
 
-**Total Changes**: ~8 major fixes across HTML, CSS, and Alpine.js  
-**Estimated Time**: 2-3 hours implementation + testing  
+**Total Changes**: ~8 major fixes across HTML, CSS, and Alpine.js
+**Estimated Time**: 2-3 hours implementation + testing
 **Breaking Changes**: None (all changes are additive/improved)

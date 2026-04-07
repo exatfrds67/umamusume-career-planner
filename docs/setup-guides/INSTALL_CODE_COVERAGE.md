@@ -1,6 +1,6 @@
 # Code Coverage Driver Installation Guide
 
-**Date:** January 20, 2026  
+**Date:** January 20, 2026
 **System:** Windows with PHP 8.4.11 NTS x64
 
 ---
@@ -269,10 +269,10 @@ Update `phpunit.xml` to disable code coverage:
          failOnWarning="true">
     <!-- ... testsuites ... -->
     <!-- ... source ... -->
-    
+
     <!-- COVERAGE DISABLED - Install PCOV or Xdebug to enable -->
     <!-- <coverage>...</coverage> -->
-    
+
     <!-- ... logging ... -->
     <!-- ... php ... -->
 </phpunit>
@@ -362,4 +362,3 @@ php artisan test
 - ✅ No warnings
 - ✅ Clean test output
 - ✅ Optional: Coverage reports available
-

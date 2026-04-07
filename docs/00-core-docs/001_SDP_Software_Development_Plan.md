@@ -30,27 +30,36 @@
 
 ## 1. Executive Summary
 
-This Software Development Plan (SDP) describes the development strategy, milestones, and execution status for the Umamusume Pretty Derby Career Planner application. The system is built on **Laravel 12+** with **PHP 8.2+** (runtime 8.4.11), **Livewire 4**, **Alpine.js 3**, **TailwindCSS v4**, and integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities via **Neuron AI v2.11**.
+This Software Development Plan (SDP) describes the development strategy, milestones, and execution
+status for the Umamusume Pretty Derby Career Planner application. The system is built on **Laravel
+12+** with **PHP 8.2+** (runtime 8.4.11), **Livewire 4**, **Alpine.js 3**, **TailwindCSS v4**, and
+integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities via **Neuron AI
+v2.11**.
 
-The application consolidates features from six legacy tracking applications into a unified platform, enabling players to track character progression, manage training sessions, plan race strategies, and optimize skill builds through AI-powered recommendations.
+The application consolidates features from six legacy tracking applications into a unified platform,
+enabling players to track character progression, manage training sessions, plan race strategies, and
+optimize skill builds through AI-powered recommendations.
 
 ### 1.2 Current Codebase Metrics
 
 - **Metric**: Registered Routes; **Value**: 571
 - **Metric**: Test Cases; **Value**: 3,316+
 - **Metric**: Assertions; **Value**: 11,563+
-- **Metric**: Eloquent Models; **Value**: 30
-- **Metric**: Services; **Value**: 70+
-- **Metric**: Enums; **Value**: 8
-- **Metric**: Livewire Components; **Value**: AdvisoryPanel
-- **Metric**: Neuron AI Services; **Value**: 5 (CareerPlanning, NeuronAI, RaceStrategy, SkillRecommendation, TrainingAdvisor)
+- **Metric**: Eloquent Models; **Value**: 40
+- **Metric**: Services; **Value**: 191
+- **Metric**: Enums; **Value**: 12
+- **Metric**: Livewire Components; **Value**: 9
+- **Metric**: Neuron AI Agents/Services; **Value**: Multiple specialized agents and wrapper
+services; see 000_IMPLEMENTATION_VERIFICATION_MATRIX.md for current counts
 
 ### 1.3 Project Objectives
 
 - **Objective**: Consolidate 6 legacy applications; **Status**: Complete; **Target**: Single unified platform
-- **Objective**: Dual storage modes (Local/Account); **Status**: Complete; **Target**: Full offline support
+- **Objective**: Dual storage modes (Local/Account); **Status**: Complete; **Target**: Browser-local
+usage for supported local-mode workflows plus authenticated database-backed account workflows
 - **Objective**: AI advisory system integration; **Status**: Complete; **Target**: Hybrid Ollama + Bedrock via Neuron AI
-- **Objective**: MCP integration and orchestration; **Status**: Complete; **Target**: Laravel MCP with tools, agents, monitoring
+- **Objective**: MCP integration and orchestration; **Status**: Complete; **Target**: Laravel MCP
+with tools, agents, monitoring
 - **Objective**: Admin panel; **Status**: Complete; **Target**: Database, logs, queues, users, settings
 - **Objective**: WCAG AA accessibility compliance; **Status**: In Progress; **Target**: 100% compliance
 - **Objective**: Performance targets (FCP < 1.5s); **Status**: In Progress; **Target**: All pages optimized
@@ -78,7 +87,7 @@ This SDP provides:
 - Dual storage modes (localStorage and database)
 - Import/export and data migration workflows
 - OCR screenshot processing pipeline
-- PWA offline functionality
+- Browser-local offline-capable workflows for supported local-mode features
 - Accessibility compliance (WCAG AA)
 
 #### Out of Scope
@@ -125,6 +134,8 @@ The project follows an **iterative delivery model** with short milestones:
 
 - **Layer**: PHP Runtime; **Technology**: PHP; **Version**: 8.2+ (runtime 8.4.11)
 - **Layer**: Frontend Reactivity; **Technology**: Livewire; **Version**: 4
+
+> **Frontend Reactivity Strategy**: Livewire 4 is used selectively for focused interactive surfaces rather than as the dominant UI pattern for every screen. Controllers, Blade views, Alpine.js, and targeted Livewire components should be described according to actual usage per feature.
 - **Layer**: Client Interactivity; **Technology**: Alpine.js; **Version**: 3
 - **Layer**: Styling; **Technology**: TailwindCSS; **Version**: v4
 - **Layer**: Build Tool; **Technology**: Vite; **Version**: 7
@@ -178,15 +189,21 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 4.2 Core Modules
 
-- **Module**: Character Management; **Description**: Character lifecycle, stats, aptitudes; **Related Specs**: SPEC-001, FLOW-001
-- **Module**: Training Optimization; **Description**: Predictions, support cards, hints; **Related Specs**: SPEC-002, FLOW-002
+- **Module**: Character Management; **Description**: Character lifecycle, stats, aptitudes;
+**Related Specs**: SPEC-001, FLOW-001
+- **Module**: Training Optimization; **Description**: Predictions, support cards, hints; **Related
+Specs**: SPEC-002, FLOW-002
 - **Module**: Race Strategy; **Description**: Preparation, strategy, predictions; **Related Specs**: SPEC-003, FLOW-003
 - **Module**: Skill Management; **Description**: Acquisition, hints, evolution; **Related Specs**: SPEC-004, FLOW-004
 - **Module**: Support Card Management; **Description**: Deck composition, bonuses; **Related Specs**: SPEC-005, FLOW-005
-- **Module**: AI Advisory; **Description**: Intelligent recommendations via Neuron AI; **Related Specs**: SPEC-006, FLOW-006
-- **Module**: External Integration; **Description**: APIs, OCR, WebSocket; **Related Specs**: SPEC-007, FLOW-007
-- **Module**: MCP Integration; **Description**: Laravel MCP tools, agents, orchestration, monitoring; **Related Specs**: -
-- **Module**: Admin Panel; **Description**: Database management, logs, queue monitor, user management, system settings; **Related Specs**: -
+- **Module**: AI Advisory; **Description**: Intelligent recommendations via Neuron AI; **Related
+Specs**: SPEC-006, FLOW-006
+- **Module**: External Integration; **Description**: APIs, OCR, sync status tracking; **Related
+Specs**: SPEC-007, FLOW-007
+- **Module**: MCP Integration; **Description**: Laravel MCP tools, agents, orchestration,
+monitoring; **Related Specs**: -
+- **Module**: Admin Panel; **Description**: Database management, logs, queue monitor, user
+management, system settings; **Related Specs**: -
 
 ---
 
@@ -213,11 +230,16 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 5.2 Phase Details
 
-- **Phase**: Phase 2; **Duration**: Weeks 5-8; **Status**: Complete; **Key Deliverables**: Character, training, race, skill systems
-- **Phase**: Phase 3; **Duration**: Weeks 9-12; **Status**: Complete; **Key Deliverables**: AI agents, hybrid AI services, MCP
-- **Phase**: Phase 4; **Duration**: Weeks 13-16; **Status**: Complete; **Key Deliverables**: Import/export, backup, OCR pipeline
-- **Phase**: Phase 5; **Duration**: Weeks 17-20; **Status**: In Progress; **Key Deliverables**: APM, caching, fallback workflows
-- **Phase**: Phase 6; **Duration**: Weeks 21-24; **Status**: In Progress; **Key Deliverables**: PWA, accessibility, UI polish
+- **Phase**: Phase 2; **Duration**: Weeks 5-8; **Status**: Complete; **Key Deliverables**:
+Character, training, race, skill systems
+- **Phase**: Phase 3; **Duration**: Weeks 9-12; **Status**: Complete; **Key Deliverables**: AI
+agents, hybrid AI services, MCP
+- **Phase**: Phase 4; **Duration**: Weeks 13-16; **Status**: Complete; **Key Deliverables**:
+Import/export, backup, OCR pipeline
+- **Phase**: Phase 5; **Duration**: Weeks 17-20; **Status**: In Progress; **Key Deliverables**: APM,
+caching, fallback workflows
+- **Phase**: Phase 6; **Duration**: Weeks 21-24; **Status**: In Progress; **Key Deliverables**: PWA,
+accessibility, UI polish
 
 ---
 
@@ -225,13 +247,13 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.1 Phase 1: Foundation (Complete)
 
-### Objectives
+#### Objectives
 
 - Establish project foundation and development environment
 - Implement core database schema and models
 - Configure development tooling and CI/CD
 
-### Deliverables
+#### Deliverables
 
 - **Deliverable**: Environment configuration; **Status**: ✅ Complete; **Notes**: Dev, staging, production
 - **Deliverable**: Base migrations; **Status**: ✅ Complete; **Notes**: 18 tables per D09
@@ -240,13 +262,13 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.2 Phase 2: Core Gameplay (Complete)
 
-### Objectives - Phase 2
+#### Objectives - Phase 2
 
 - Implement character and career run management
 - Build training session and prediction systems
 - Create race, skill, and support card modules
 
-### Deliverables - Phase 2
+#### Deliverables - Phase 2
 
 - **Deliverable**: Training sessions and predictions; **Status**: ✅ Complete; **Related Spec**: SPEC-002
 - **Deliverable**: Race strategy system; **Status**: ✅ Complete; **Related Spec**: SPEC-003
@@ -256,13 +278,13 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.3 Phase 3: AI and Integration (Complete)
 
-### Objectives - Phase 3
+#### Objectives - Phase 3
 
 - Implement AI advisory system with hybrid architecture
 - Integrate external data sources
 - Build MCP dashboards for AI management
 
-### Deliverables - Phase 3
+#### Deliverables - Phase 3
 
 - **Deliverable**: Hybrid AI services (Ollama + Bedrock); **Status**: ✅ Complete; **Related Spec**: SPEC-006
 - **Deliverable**: MCP integration and dashboards; **Status**: ✅ Complete; **Related Spec**: FLOW-006
@@ -271,13 +293,13 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.4 Phase 4: Data Management (Complete)
 
-### Objectives - Phase 4
+#### Objectives - Phase 4
 
 - Build comprehensive import/export workflows
 - Implement backup and restore functionality
 - Create OCR processing pipeline
 
-### Deliverables - Phase 4
+#### Deliverables - Phase 4
 
 - **Deliverable**: Export to JSON/CSV/Excel; **Status**: ✅ Complete; **Related Doc**: D06
 - **Deliverable**: Data migration workflows; **Status**: ✅ Complete; **Related Doc**: D05
@@ -286,19 +308,19 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.5 Phase 5: Performance and Reliability (In Progress)
 
-### Objectives - Phase 5
+#### Objectives - Phase 5
 
 - Implement APM and performance monitoring
 - Optimize caching strategies
 - Build fallback and degradation workflows
 
-### Deliverables - Phase 5
+#### Deliverables - Phase 5
 
 - **Deliverable**: Cache monitoring and invalidation; **Status**: 🔄 In Progress; **Target**: Week 19
 - **Deliverable**: Fallback and degradation workflows; **Status**: 🔄 In Progress; **Target**: Week 20
 - **Deliverable**: Performance regression testing; **Status**: ⏳ Pending; **Target**: Week 20
 
-### Performance Targets
+#### Performance Targets
 
 - **Metric**: First Contentful Paint; **Target**: < 1.5 seconds; **Current**: ~1.7s
 - **Metric**: Time to Interactive; **Target**: < 3 seconds; **Current**: ~3.1s
@@ -306,13 +328,13 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.6 Phase 6: UX and Accessibility (In Progress)
 
-### Objectives - Phase 6
+#### Objectives - Phase 6
 
-- Complete PWA offline functionality
+- Complete browser-local offline-capable workflows for supported local-mode features
 - Achieve WCAG AA compliance
 - Polish UI and user experience
 
-### Deliverables - Phase 6
+#### Deliverables - Phase 6
 
 - **Deliverable**: Accessibility pages and keyboard shortcuts; **Status**: 🔄 In Progress; **Target**: Week 23
 - **Deliverable**: UI polish and refinement; **Status**: ⏳ Pending; **Target**: Week 24
@@ -382,11 +404,16 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 9.1 Risk Register
 
-- **Risk ID**: R-002; **Risk**: External API instability; **Probability**: Medium; **Impact**: Medium; **Mitigation**: Cache + fallback services in `app/Services/ExternalAPI`
-- **Risk ID**: R-003; **Risk**: OCR accuracy issues; **Probability**: Medium; **Impact**: Medium; **Mitigation**: Preprocessing, parser validation, manual correction
-- **Risk ID**: R-004; **Risk**: localStorage quota limits; **Probability**: Low; **Impact**: High; **Mitigation**: Quota warnings, IndexedDB migration path
-- **Risk ID**: R-005; **Risk**: Legacy data incompatibility; **Probability**: Low; **Impact**: Medium; **Mitigation**: Version exports, migration adapters
-- **Risk ID**: R-006; **Risk**: Accessibility regression; **Probability**: Low; **Impact**: High; **Mitigation**: Automated axe-core tests in CI
+- **Risk ID**: R-002; **Risk**: External API instability; **Probability**: Medium; **Impact**:
+Medium; **Mitigation**: Cache + fallback services in `app/Services/ExternalAPI`
+- **Risk ID**: R-003; **Risk**: OCR accuracy issues; **Probability**: Medium; **Impact**: Medium;
+**Mitigation**: Preprocessing, parser validation, manual correction
+- **Risk ID**: R-004; **Risk**: localStorage quota limits; **Probability**: Low; **Impact**: High;
+**Mitigation**: Quota warnings, IndexedDB migration path
+- **Risk ID**: R-005; **Risk**: Legacy data incompatibility; **Probability**: Low; **Impact**:
+Medium; **Mitigation**: Version exports, migration adapters
+- **Risk ID**: R-006; **Risk**: Accessibility regression; **Probability**: Low; **Impact**: High;
+**Mitigation**: Automated axe-core tests in CI
 
 ### 9.2 Risk Matrix
 
@@ -429,7 +456,8 @@ The project follows an **iterative delivery model** with short milestones:
 ### 10.1 Testing Strategy
 
 - **Test Type**: Feature Tests; **Tool**: Pest v4; **Coverage Target**: 80%+
-- **Test Type**: E2E Tests; **Tool**: Playwright 1.58 / pest-plugin-browser 4.0; **Coverage Target**: Critical paths 100%
+- **Test Type**: E2E Tests; **Tool**: Playwright 1.58 / pest-plugin-browser 4.0; **Coverage
+Target**: Critical paths 100%
 - **Test Type**: Accessibility; **Tool**: axe-core; **Coverage Target**: WCAG AA 100%
 - **Test Type**: Visual Regression; **Tool**: Playwright; **Coverage Target**: Key pages
 
@@ -521,10 +549,15 @@ Each task is complete when:
 
 ### 13.1 Revision History
 
-- **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Added codebase metrics (571 routes, 3,316+ tests, 30 models, 70+ services); added MCP Integration and Admin Panel modules; updated Neuron AI service details (5 services)
-- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated tech stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI, Playwright, Larastan, Pint, Laravel Boost references
+- **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Added
+codebase metrics (571 routes, 3,316+ tests, 40 models, 70+ services); added MCP Integration and
+Admin Panel modules; updated Neuron AI service details (5 services)
+- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated tech
+stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI,
+Playwright, Larastan, Pint, Laravel Boost references
 - **Version**: 2.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Aligned with codebase v2.2.0
-- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated phases to match current implementation
+- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated
+phases to match current implementation
 - **Version**: 2.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Prior plan revision
 - **Version**: 1.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial draft
 
@@ -541,4 +574,5 @@ Each task is complete when:
 
 ---
 
-### This SDP reflects the current implementation status and near-term priorities as of February 22, 2026. Updates are made at each phase milestone or when significant changes occur
+### This SDP reflects the current implementation status and near-term priorities as of February 22,
+2026. Updates are made at each phase milestone or when significant changes occur

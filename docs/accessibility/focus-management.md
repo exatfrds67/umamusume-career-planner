@@ -172,7 +172,7 @@ accessibilitySystem.unregisterShortcut('Ctrl+K');
 ```html
 <!-- Modal with focus trap -->
 <div id="my-modal" class="modal" x-data="{ open: false }">
-    <div x-show="open" 
+    <div x-show="open"
          @open-modal.window="open = true; $nextTick(() => window.accessibilitySystem.trapFocus('#my-modal'))"
          @close-modal.window="open = false; window.accessibilitySystem.releaseFocus()">
         <!-- Modal content -->
@@ -191,7 +191,7 @@ accessibilitySystem.unregisterShortcut('Ctrl+K');
         <input id="name" type="text" aria-invalid="false" aria-describedby="name-error">
         <span id="name-error" class="form-error" hidden>Name is required</span>
     </div>
-    
+
     <button type="submit">Submit</button>
 </form>
 
@@ -200,18 +200,18 @@ function handleSubmit() {
     // Validate form
     const nameInput = document.getElementById('name');
     const nameError = document.getElementById('name-error');
-    
+
     if (!nameInput.value) {
         // Mark as invalid
         nameInput.setAttribute('aria-invalid', 'true');
         nameError.hidden = false;
-        
+
         // Focus first error
         window.accessibilitySystem.focusFirstError('#my-form');
-        
+
         return;
     }
-    
+
     // Submit form
 }
 </script>
@@ -264,11 +264,11 @@ test('all interactive elements have focus indicators', () => {
     const interactiveElements = container.querySelectorAll(
         'button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
-    
+
     interactiveElements.forEach(el => {
         el.focus();
         expect(document.activeElement).toBe(el);
-        
+
         const styles = window.getComputedStyle(el, ':focus-visible');
         expect(styles.outlineWidth).not.toBe('0px');
     });
@@ -278,9 +278,9 @@ test('all interactive elements have focus indicators', () => {
 test('skip links work correctly', () => {
     const { getByText } = render(App);
     const skipLink = getByText('Skip to main content');
-    
+
     fireEvent.click(skipLink);
-    
+
     const mainContent = document.getElementById('main-content');
     expect(document.activeElement).toBe(mainContent);
 });
@@ -288,37 +288,37 @@ test('skip links work correctly', () => {
 // Test keyboard shortcuts
 test('keyboard shortcuts work', () => {
     const { getByRole } = render(App);
-    
+
     // Test Alt+A to open accessibility settings
     fireEvent.keyDown(document, { key: 'a', altKey: true });
-    
+
     expect(getByRole('dialog', { name: /accessibility settings/i })).toBeInTheDocument();
 });
 
 // Test focus trap
 test('focus trap works in modals', () => {
     const { getByRole, getAllByRole } = render(App);
-    
+
     // Open modal
     const openButton = getByRole('button', { name: /open modal/i });
     fireEvent.click(openButton);
-    
+
     const modal = getByRole('dialog');
     const focusableElements = modal.querySelectorAll(
         'button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
-    
+
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
-    
+
     // Focus should be on first element
     expect(document.activeElement).toBe(firstElement);
-    
+
     // Tab from last element should cycle to first
     lastElement.focus();
     fireEvent.keyDown(document, { key: 'Tab' });
     expect(document.activeElement).toBe(firstElement);
-    
+
     // Shift+Tab from first element should cycle to last
     firstElement.focus();
     fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });

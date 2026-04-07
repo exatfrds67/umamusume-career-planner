@@ -152,11 +152,11 @@ Tool::make('query_users', 'Query user database')
     ))
     ->setCallable(function (?string $email = null) {
         $query = User::query();
-        
+
         if ($email) {
             $query->where('email', $email);
         }
-        
+
         return $query->get()->toArray();
     })
 ```text
@@ -204,4 +204,3 @@ This shows:
 ---
 
 **Source:** <https://docs.neuron-ai.dev/components/tools>
-
