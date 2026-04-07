@@ -1,13 +1,14 @@
 @props([
     'lastTip' => 'Based on your current stats, focusing on Speed training would be optimal. Your character is showing good potential for distance races.',
     'tipTimestamp' => null,
+    'tipReasoning' => null,
 ])
 
 @php
     $timestamp = $tipTimestamp ?? now()->subMinutes(15);
 @endphp
 
-<div {{ $attributes->merge(['class' => 'glass-card rounded-xl overflow-hidden h-full flex flex-col']) }}>
+<div {{ $attributes->merge(['class' => 'glass-card rounded-xl overflow-hidden h-full flex flex-col']) }} x-data="{ showReasoning: false, showFollowUp: false }">
     {{-- Header --}}
     <div class="px-5 py-3 border-b border-neutral-100 dark:border-neutral-700/50 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
@@ -42,21 +43,47 @@
                 <p class="text-sm text-neutral-700 dark:text-neutral-200 leading-relaxed">
                     {{ $lastTip }}
                 </p>
+                @if (filled($tipReasoning))
+                    <div class="mt-2">
+                        <button type="button"
+                            class="text-xs font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                            @click="showReasoning = !showReasoning"
+                            :aria-expanded="showReasoning.toString()"
+                            aria-controls="advisor-tip-reasoning">
+                            Why?
+                        </button>
+                        <div id="advisor-tip-reasoning" x-show="showReasoning" x-collapse class="mt-2">
+                            <p class="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                                {{ $tipReasoning }}
+                            </p>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="mt-3">
+                    <button type="button"
+                        class="text-xs font-semibold text-primary-700 hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-200"
+                        @click="showFollowUp = !showFollowUp"
+                        :aria-expanded="showFollowUp.toString()"
+                        aria-controls="dashboard-ai-follow-up-controls">
+                        <span x-text="showFollowUp ? 'Hide follow-up options' : 'Ask follow-up'"></span>
+                    </button>
+                </div>
             </div>
         </div>
         
         {{-- Contextual Suggestions (Simulating chat logic) --}}
-        <div class="pl-9 space-y-2">
+        <div id="dashboard-ai-follow-up-controls" class="pl-9 space-y-2" x-show="showFollowUp" x-collapse>
              <div class="flex flex-wrap gap-2">
                      <a href="{{ route('ai.chat', ['topic' => 'training']) }}" 
-                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 hover:border-primary-300 dark:hover:border-primary-700 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-xs">
+                         class="btn btn-primary btn-sm inline-flex items-center gap-1.5">
                     <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     Analyze Training
                 </a>
                      <a href="{{ route('ai.chat', ['topic' => 'race']) }}" 
-                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 hover:border-secondary-300 dark:hover:border-secondary-700 hover:text-secondary-600 dark:hover:text-secondary-400 transition-colors text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-xs">
+                         class="btn btn-secondary btn-sm inline-flex items-center gap-1.5">
                     <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-8a2 2 0 012-2h14a2 2 0 012 2v8M3 21h18M5 21v-8a2 2 0 012-2h14a2 2 0 012 2v8m-2 0h.01M12 17h.01M12 11H8m8 0h-2" />
                     </svg>
@@ -67,7 +94,7 @@
     </div>
 
     {{-- Footer Actions --}}
-    <div class="p-3 bg-white dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-700/50 shrink-0">
+    <div class="p-3 bg-white dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-700/50 shrink-0" x-show="showFollowUp" x-collapse>
         <form action="{{ route('ai.chat') }}" method="GET" class="relative">
             <label for="dashboard-ai-message" class="sr-only">Ask the AI advisor a question</label>
             <input type="text" 

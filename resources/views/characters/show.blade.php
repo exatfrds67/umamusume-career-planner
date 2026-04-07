@@ -196,6 +196,33 @@
                         </div>
                     </div>
                 </section>
+
+                <section id="career-plan-visualizer" class="card rounded-lg" role="region" aria-labelledby="career-plan-heading">
+                    <header class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
+                        <div>
+                            <h2 id="career-plan-heading" class="text-lg font-bold text-neutral-900 dark:text-white">AI Career Plan</h2>
+                            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Generate a game-aware turn timeline using the current character state, skills, and races.</p>
+                        </div>
+                        <a href="{{ route('ai.chat') }}" class="btn btn-sm btn-secondary" aria-label="Open AI chat for career planning follow-up">
+                            Open AI Chat
+                        </a>
+                    </header>
+                    <div class="card-body">
+                        <x-training-timeline
+                            :character-id="$character->id"
+                            :total-turns="$character->scenario_type === 'unity_cup' ? 78 : 72"
+                            :current-turn="$latestCareerPlan?->current_turn ?? $character->current_turn"
+                            :initial-plan="$latestCareerPlan?->plan"
+                            :initial-plan-meta="$latestCareerPlan ? [
+                                'id' => $latestCareerPlan->id,
+                                'goal' => $latestCareerPlan->goal,
+                                'is_locked' => $latestCareerPlan->is_locked,
+                                'current_turn' => $latestCareerPlan->current_turn,
+                            ] : null"
+                        />
+                    </div>
+                </section>
+
                 <!-- Support Deck -->
                 <section class="card rounded-lg" role="region" aria-labelledby="support-deck-heading">
                     <header
@@ -403,6 +430,19 @@
                             'guts' => $character->getStat('guts'),
                             'wit' => $character->getStat('wit'),
                         ]" size="sm" />
+                    </div>
+                </section>
+
+                <!-- Synergy Score -->
+                <section class="card rounded-lg" role="region" aria-labelledby="synergy-score-heading">
+                    <header class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
+                        <h2 id="synergy-score-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Synergy Score</h2>
+                        <a href="{{ route('characters.synergy', $character) }}" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
+                            View Full Analysis &rarr;
+                        </a>
+                    </header>
+                    <div class="card-body py-3">
+                        <livewire:synergy-build-planner :characterId="$character->id" :isCompact="true" />
                     </div>
                 </section>
 

@@ -158,7 +158,8 @@ final readonly class Recommendation
         foreach ($this->expectedOutcomes as $key => $value) {
             $keyStr = is_string($key) ? $key : (string) $key;
             if (is_array($value)) {
-                $lines[] = ucfirst(str_replace('_', ' ', $keyStr)).': '.implode(', ', $value);
+                $stringValues = array_values(array_map(static fn (mixed $item): string => is_scalar($item) ? (string) $item : '', $value));
+                $lines[] = ucfirst(str_replace('_', ' ', $keyStr)).': '.implode(', ', $stringValues);
             } else {
                 $valueStr = is_scalar($value) ? (string) $value : '';
                 $lines[] = ucfirst(str_replace('_', ' ', $keyStr)).': '.$valueStr;

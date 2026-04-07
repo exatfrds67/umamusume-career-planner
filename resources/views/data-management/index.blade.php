@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Data Management Hub')
+@section('title', 'Data Management')
 
 @section('content')
     {{-- Breadcrumb Navigation --}}
@@ -8,191 +8,150 @@
 
     <div class="container mx-auto px-4 py-8 page-stack" x-data="dataManagementHub()">
         {{-- Page Header --}}
-        <div class="page-hero">
-            <div class="page-hero__content">
-            <div>
-                <div class="page-hero__eyebrow">
-                    <span>Operations Center</span>
-                </div>
-            <h1 class="page-hero__title">Data Management Hub</h1>
-            <p class="page-hero__body text-sm sm:text-base">
-                Unified interface for importing, exporting, migrating, and backing up your career data.
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Data Management</h1>
+            <p class="text-neutral-500 dark:text-neutral-400 mt-2 max-w-2xl text-lg">
+                Import, export, migrate, and backup your career data in one unified dashboard. Choose an operation below to get started.
             </p>
         </div>
-            <div class="page-hero__meta">
-                <span class="hero-chip">Import</span>
-                <span class="hero-chip">Export</span>
-                <span class="hero-chip">Backup</span>
-            </div>
-            </div>
-        </div>
 
-        {{-- Quick Stats Dashboard --}}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" role="region" aria-label="Data summary statistics">
-            <div class="metric-card metric-card--primary">
-                <div class="metric-card__body">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 shrink-0" aria-hidden="true">
-                        <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Characters</p>
-                        <p class="text-xl font-bold text-neutral-900 dark:text-white" x-text="quickStats.total_characters" aria-live="polite">0</p>
-                    </div>
-                </div>
-                </div>
-            </div>
-            <div class="metric-card metric-card--secondary">
-                <div class="metric-card__body">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 shrink-0" aria-hidden="true">
-                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Careers</p>
-                        <p class="text-xl font-bold text-neutral-900 dark:text-white" x-text="quickStats.total_careers" aria-live="polite">0</p>
-                    </div>
-                </div>
-                </div>
-            </div>
-            <div class="metric-card metric-card--warning">
-                <div class="metric-card__body">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 shrink-0" aria-hidden="true">
-                        <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Backups</p>
-                        <p class="text-xl font-bold text-neutral-900 dark:text-white" x-text="quickStats.total_backups" aria-live="polite">0</p>
-                    </div>
-                </div>
-                </div>
-            </div>
-            <div class="metric-card metric-card--success">
-                <div class="metric-card__body">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 shrink-0" aria-hidden="true">
-                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Success Rate</p>
-                        <p class="text-xl font-bold text-green-600 dark:text-green-400" x-text="statistics.success_rate + '%'" aria-live="polite">0%</p>
-                    </div>
-                </div>
-                </div>
-            </div>
-        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {{-- Main Column: Actions Layout --}}
+            <div class="lg:col-span-2 space-y-8">
+                
+                {{-- Quick Actions Grid --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {{-- Import Data Card --}}
+                    <a href="{{ route('import.index') }}" class="group relative bg-white dark:bg-neutral-800 p-6 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900">
+                        <div class="mb-4">
+                            <span class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">Import Data</h3>
+                        <p class="text-neutral-500 dark:text-neutral-400 text-sm">Bring your outside data into the planner. Supports CSV, JSON, and structured text formats.</p>
+                    </a>
 
-        {{-- Tab Navigation --}}
-        <div class="tab-surface">
-            <div class="border-b border-neutral-200 dark:border-neutral-700">
-                <nav class="flex -mb-px overflow-x-auto" role="tablist" aria-label="Data management tabs">
-                    <button type="button" role="tab" id="tab-btn-overview" aria-controls="tabpanel-overview"
-                        :aria-selected="activeTab === 'overview'" :tabindex="activeTab === 'overview' ? 0 : -1"
-                        @click="activeTab = 'overview'"
-                        :class="activeTab === 'overview' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'"
-                        class="flex items-center gap-2 whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors">
-                        <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        Overview
-                    </button>
-                    <button type="button" role="tab" id="tab-btn-import" aria-controls="tabpanel-import"
-                        :aria-selected="activeTab === 'import'" :tabindex="activeTab === 'import' ? 0 : -1"
-                        @click="activeTab = 'import'"
-                        :class="activeTab === 'import' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'"
-                        class="flex items-center gap-2 whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors">
-                        <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        Import
-                    </button>
-                    <button type="button" role="tab" id="tab-btn-export" aria-controls="tabpanel-export"
-                        :aria-selected="activeTab === 'export'" :tabindex="activeTab === 'export' ? 0 : -1"
-                        @click="activeTab = 'export'"
-                        :class="activeTab === 'export' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'"
-                        class="flex items-center gap-2 whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors">
-                        <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
-                        Export
-                    </button>
-                    <button type="button" role="tab" id="tab-btn-migration" aria-controls="tabpanel-migration"
-                        :aria-selected="activeTab === 'migration'" :tabindex="activeTab === 'migration' ? 0 : -1"
-                        @click="activeTab = 'migration'"
-                        :class="activeTab === 'migration' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'"
-                        class="flex items-center gap-2 whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors">
-                        <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                        Migration
-                    </button>
-                    <button type="button" role="tab" id="tab-btn-backup" aria-controls="tabpanel-backup"
-                        :aria-selected="activeTab === 'backup'" :tabindex="activeTab === 'backup' ? 0 : -1"
-                        @click="activeTab = 'backup'"
-                        :class="activeTab === 'backup' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'"
-                        class="flex items-center gap-2 whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors">
-                        <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                        Backup
-                    </button>
-                    <button type="button" role="tab" id="tab-btn-history" aria-controls="tabpanel-history"
-                        :aria-selected="activeTab === 'history'" :tabindex="activeTab === 'history' ? 0 : -1"
-                        @click="activeTab = 'history'"
-                        :class="activeTab === 'history' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
-                            'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'"
-                        class="flex items-center gap-2 whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors">
-                        <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        History
-                    </button>
-                </nav>
+                    {{-- Export Data Card --}}
+                    <a href="{{ route('export.index') }}" class="group relative bg-white dark:bg-neutral-800 p-6 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900">
+                        <div class="mb-4">
+                            <span class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Export Data</h3>
+                        <p class="text-neutral-500 dark:text-neutral-400 text-sm">Download your career runs and character data for external analysis or sharing.</p>
+                    </a>
+
+                    {{-- Migrate Legacy Card --}}
+                    <a href="{{ route('migration.index') }}" class="group relative bg-white dark:bg-neutral-800 p-6 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900">
+                        <div class="mb-4">
+                            <span class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-1 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Migrate Legacy Data</h3>
+                        <p class="text-neutral-500 dark:text-neutral-400 text-sm">Convert older umamusume data formats to support our current schema.</p>
+                    </a>
+
+                    {{-- Backup Card --}}
+                    <a href="{{ route('backup.index') }}" class="group relative bg-white dark:bg-neutral-800 p-6 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-purple-500 dark:hover:border-purple-500 hover:shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900">
+                        <div class="mb-4">
+                            <span class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Create Backup</h3>
+                        <p class="text-neutral-500 dark:text-neutral-400 text-sm">Secure your progress with manual or automated database snapshots to prevent data loss.</p>
+                    </a>
+                </div>
+
+                {{-- Render History in the Main Column --}}
+                <div class="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm">
+                    <div class="p-6 pb-2 border-b border-neutral-200 dark:border-neutral-800">
+                        <h2 class="text-xl font-bold text-neutral-900 dark:text-white">Recent Activity History</h2>
+                    </div>
+                    <div class="p-6">
+                        @include('data-management.partials.history')
+                    </div>
+                </div>
+
             </div>
 
-            {{-- Tab Content --}}
-            <div class="p-6">
-                {{-- Overview Tab --}}
-                <div role="tabpanel" id="tabpanel-overview" aria-labelledby="tab-btn-overview"
-                    x-show="activeTab === 'overview'" x-transition>
-                    @include('data-management.partials.overview')
+            {{-- Sidebar Column: Overview Stats --}}
+            <div class="space-y-6">
+                <div class="bg-neutral-50 dark:bg-neutral-900/50 rounded-xl p-6 border border-neutral-200 dark:border-neutral-800">
+                    <h2 class="font-bold text-neutral-900 dark:text-white mb-4">Storage Overview</h2>
+                    
+                    <ul class="space-y-4">
+                        <li class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
+                                    <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                </div>
+                                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Total Characters</span>
+                            </div>
+                            <span class="text-lg font-bold text-neutral-900 dark:text-white" x-text="quickStats.total_characters">0</span>
+                        </li>
+                        <li class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                                    <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                    </svg>
+                                </div>
+                                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Total Careers</span>
+                            </div>
+                            <span class="text-lg font-bold text-neutral-900 dark:text-white" x-text="quickStats.total_careers">0</span>
+                        </li>
+                        <li class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                                    <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                                    </svg>
+                                </div>
+                                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Total Backups</span>
+                            </div>
+                            <span class="text-lg font-bold text-neutral-900 dark:text-white" x-text="quickStats.total_backups">0</span>
+                        </li>
+                    </ul>
                 </div>
 
-                {{-- Import Tab --}}
-                <div role="tabpanel" id="tabpanel-import" aria-labelledby="tab-btn-import"
-                    x-show="activeTab === 'import'" x-cloak x-transition>
-                    @include('data-management.partials.import')
+                {{-- Record Operations Breakdown --}}
+                <div class="bg-neutral-50 dark:bg-neutral-900/50 rounded-xl p-6 border border-neutral-200 dark:border-neutral-800">
+                    <h2 class="font-bold text-neutral-900 dark:text-white mb-4">Operations Health</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm text-neutral-500 dark:text-neutral-400">Success Rate</span>
+                                <span class="text-sm font-medium text-green-600 dark:text-green-400" x-text="statistics.success_rate + '%'">0%</span>
+                            </div>
+                            <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" :style="'width: ' + statistics.success_rate + '%'"></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400">Total Records</p>
+                                <p class="text-xl font-bold text-neutral-900 dark:text-white mt-1" x-text="statistics.records_processed">0</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400">Failed Ops</p>
+                                <p class="text-xl font-bold text-red-600 dark:text-red-400 mt-1" x-text="statistics.failed_operations">0</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {{-- Export Tab --}}
-                <div role="tabpanel" id="tabpanel-export" aria-labelledby="tab-btn-export"
-                    x-show="activeTab === 'export'" x-cloak x-transition>
-                    @include('data-management.partials.export')
-                </div>
-
-                {{-- Migration Tab --}}
-                <div role="tabpanel" id="tabpanel-migration" aria-labelledby="tab-btn-migration"
-                    x-show="activeTab === 'migration'" x-cloak x-transition>
-                    @include('data-management.partials.migration')
-                </div>
-
-                {{-- Backup Tab --}}
-                <div role="tabpanel" id="tabpanel-backup" aria-labelledby="tab-btn-backup"
-                    x-show="activeTab === 'backup'" x-cloak x-transition>
-                    @include('data-management.partials.backup')
-                </div>
-
-                {{-- History Tab --}}
-                <div role="tabpanel" id="tabpanel-history" aria-labelledby="tab-btn-history"
-                    x-show="activeTab === 'history'" x-cloak x-transition>
-                    @include('data-management.partials.history')
-                </div>
             </div>
         </div>
 
-        {{-- Ongoing Operations Panel --}}
+        {{-- Ongoing Operations Panel (Unmodified) --}}
         <div x-show="ongoingOperations.length > 0" x-transition
             class="fixed bottom-4 right-4 w-96 bg-white dark:bg-neutral-800 rounded-lg shadow-xl border border-neutral-200 dark:border-neutral-700 z-50">
             <div class="p-4 border-b border-neutral-200 dark:border-neutral-700">

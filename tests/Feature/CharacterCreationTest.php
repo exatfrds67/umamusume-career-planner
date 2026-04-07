@@ -4,7 +4,44 @@ use App\Models\Character;
 use App\Models\GameCharacter;
 use App\Models\User;
 use App\Services\ExternalAPI\UmapyoiApiClient;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+
+function validCharacterPayload(array $overrides = []): array
+{
+    $basePayload = [
+        'name' => 'Test Character',
+        'scenario_type' => 'ura_finale',
+        'stats' => [
+            'speed' => 500,
+            'stamina' => 400,
+            'power' => 300,
+            'guts' => 200,
+            'wit' => 350,
+        ],
+        'aptitudes' => [
+            'distance' => [
+                'sprint' => 'A',
+                'mile' => 'B',
+                'medium' => 'C',
+                'long' => 'D',
+            ],
+            'surface' => [
+                'turf' => 'A',
+                'dirt' => 'B',
+            ],
+            'style' => [
+                'front_runner' => 'A',
+                'pace_chaser' => 'B',
+                'late_surger' => 'C',
+                'end_closer' => 'D',
+            ],
+        ],
+    ];
+
+    return array_replace_recursive($basePayload, $overrides);
+}
 
 test('character creation page can be accessed', function () {
     $user = User::factory()->create();
@@ -110,6 +147,16 @@ test('character can be created with valid data', function () {
 
     $character = Character::where('name', '=', 'Test Character', 'and')->first(['*']);
     expect($character)->not->toBeNull();
+
+    $this->assertDatabaseHas('ucp_careers', [
+        'character_id' => $character?->id,
+        'user_id' => $user->id,
+        'scenario_type' => 'ura_finale',
+        'status' => 'active',
+        'current_phase' => 'junior',
+    ]);
+
+    expect($character->currentCareer)->not->toBeNull();
     expect($character->getStat('speed'))->toBe(500);
     expect($character->getStat('stamina'))->toBe(400);
     expect($character->aptitudes)->toHaveCount(10); // 4 distance + 2 surface + 4 style
@@ -160,6 +207,58 @@ test('character can be created with template avatar url', function () {
         'avatar_url' => '/images/trainee_images/silence-suzuka.png',
         'game_character_id' => $gameCharacter->id,
     ]);
+});
+
+test('character can be created with custom uploaded avatar image', function () {
+    Storage::fake('public');
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post(route('characters.store'), validCharacterPayload([
+        'name' => 'Custom Avatar Character',
+        'avatar_url' => 'custom_upload',
+        'avatar_upload' => UploadedFile::fake()->image('custom-avatar.png', 400, 400),
+    ]));
+
+    $response->assertSessionHasNoErrors();
+    $response->assertRedirect();
+
+    $character = Character::query()->where('name', 'Custom Avatar Character')->first();
+
+    expect($character)->not->toBeNull();
+
+    $storedAvatarUrl = $character->getRawOriginal('avatar_url');
+    expect($storedAvatarUrl)->toStartWith('/storage/avatars/uploads/'.$character->id.'/');
+    expect($storedAvatarUrl)->not->toBe('custom_upload');
+
+    $storedAvatarPath = ltrim(str_replace('/storage/', '', $storedAvatarUrl), '/');
+    Storage::disk('public')->assertExists($storedAvatarPath);
+});
+
+test('custom upload requires file payload when custom avatar is selected', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post(route('characters.store'), validCharacterPayload([
+        'name' => 'Missing Upload Character',
+        'avatar_url' => 'custom_upload',
+    ]));
+
+    $response->assertSessionHasErrors('avatar_upload');
+});
+
+test('character can be created without avatar and keeps stored avatar url empty', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post(route('characters.store'), validCharacterPayload([
+        'name' => 'No Avatar Character',
+    ]));
+
+    $response->assertSessionHasNoErrors();
+    $response->assertRedirect();
+
+    $character = Character::query()->where('name', 'No Avatar Character')->first();
+
+    expect($character)->not->toBeNull();
+    expect($character->getRawOriginal('avatar_url'))->toBeNull();
 });
 
 test('character prefill endpoint exposes normalized avatar url fields', function () {

@@ -33,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \App\Models\Character::observe(\App\Observers\CharacterSynergyObserver::class);
+
         View::composer('*', \App\View\Composers\TopBarComposer::class);
         $this->configureRateLimiting();
     }

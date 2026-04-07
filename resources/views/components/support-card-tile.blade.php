@@ -16,15 +16,28 @@
         'wit' => 'Wit',
         'friend' => 'Friend',
     ];
-    $typeColors = [
-        'speed' => 'blue',
-        'stamina' => 'green',
-        'power' => 'red',
-        'guts' => 'orange',
-        'wit' => 'purple',
-        'friend' => 'pink',
+    // F-02: Use complete static class strings so Tailwind JIT includes them in the production build.
+    $gradientMap = [
+        'speed'   => 'from-blue-400 to-blue-600',
+        'stamina' => 'from-green-400 to-green-600',
+        'power'   => 'from-red-400 to-red-600',
+        'guts'    => 'from-orange-400 to-orange-600',
+        'wit'     => 'from-purple-400 to-purple-600',
+        'friend'  => 'from-pink-400 to-pink-600',
     ];
-    $primaryColor = $typeColors[$card->card_type] ?? 'gray';
+    $trainingColorMap = [
+        'speed'   => 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
+        'stamina' => 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400',
+        'power'   => 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
+        'guts'    => 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
+        'wit'     => 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400',
+        'friend'  => 'bg-pink-50 dark:bg-pink-900/20 text-pink-700 dark:text-pink-400',
+    ];
+    // F-14: Map raw DB values to safe display labels so corrupt strings never reach the UI.
+    $serverLabels = ['both' => 'Both', 'en' => 'EN', 'jp' => 'JP', 'gbh' => 'GBH'];
+    $gradient      = $gradientMap[$card->card_type] ?? 'from-neutral-400 to-neutral-600';
+    $trainingColors = $trainingColorMap[$card->card_type] ?? 'bg-neutral-50 dark:bg-neutral-900/20 text-neutral-700 dark:text-neutral-400';
+    $serverLabel   = $serverLabels[strtolower($card->server_availability ?? '')] ?? ucfirst($card->server_availability ?? '');
 @endphp
 
 <a href="{{ route('support-cards.show', $card) }}"
@@ -32,11 +45,11 @@
     aria-label="{{ $card->name }} - {{ $card->rarity }} {{ ucfirst($card->card_type) }} card{{ $card->meta_tier ? ', Tier ' . $card->meta_tier : '' }}">
     {{-- Card Image/Placeholder --}}
     <div
-        class="relative aspect-video bg-linear-to-br from-{{ $primaryColor }}-400 to-{{ $primaryColor }}-600">
+        class="relative aspect-[4/3] bg-linear-to-br {{ $gradient }}">
         @if ($card->artwork_url)
             <img src="{{ $card->artwork_url }}" alt="" loading="lazy" decoding="async"
                 width="400" height="225"
-                class="w-full h-full object-cover">
+                class="w-full h-full object-cover object-top">
         @else
             <div class="absolute inset-0 flex items-center justify-center">
                 <svg class="w-20 h-20 text-white opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -65,10 +78,12 @@
     {{-- Card Info --}}
     <div class="p-4 flex flex-col grow">
         <div class="mb-2">
-            <h3
-                class="text-sm font-semibold text-neutral-900 dark:text-white line-clamp-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                {{ $card->name }}
-            </h3>
+            <x-tooltip :content="$card->name">
+                <h3
+                    class="text-sm font-semibold text-neutral-900 dark:text-white line-clamp-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    {{ $card->name }}
+                </h3>
+            </x-tooltip>
             @if ($card->character_name)
                 <p class="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-1">
                     {{ $card->character_name }}
@@ -79,7 +94,7 @@
         {{-- Type Badge + Tier inline --}}
         <div class="flex items-center gap-2 mb-3">
             <x-support-card-type-badge :type="$card->card_type" />
-            <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
+            <span class="text-xs font-semibold px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
                 Tier {{ $card->meta_tier }}
             </span>
         </div>
@@ -90,8 +105,8 @@
                 @foreach (['speed' => 'Spd', 'stamina' => 'Sta', 'power' => 'Pow', 'guts' => 'Gut', 'wit' => 'Wit'] as $stat => $abbr)
                     @php $val = $card->{$stat . '_bonus'}; @endphp
                     <div class="text-center rounded py-1 {{ $val > 0 ? 'bg-primary-50 dark:bg-primary-900/30' : 'bg-neutral-50 dark:bg-neutral-700/50' }}" role="listitem">
-                        <div class="text-[10px] text-neutral-500 dark:text-neutral-400 leading-none mb-0.5">{{ $abbr }}</div>
-                        <div class="font-semibold leading-none {{ $val > 0 ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-400 dark:text-neutral-500' }}">
+                        <div class="text-xs text-neutral-500 dark:text-neutral-400 leading-none mb-0.5">{{ $abbr }}</div>
+                        <div class="text-xs font-bold leading-none {{ $val > 0 ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-400 dark:text-neutral-500' }}">
                             {{ $val > 0 ? '+' . $val : '0' }}
                         </div>
                     </div>
@@ -99,7 +114,7 @@
             </div>
         @else
             {{-- Training type emphasis when no stat data --}}
-            <div class="flex items-center gap-1.5 text-xs mb-2 px-2 py-1.5 rounded bg-{{ $primaryColor }}-50 dark:bg-{{ $primaryColor }}-900/20 text-{{ $primaryColor }}-700 dark:text-{{ $primaryColor }}-400">
+            <div class="flex items-center gap-1.5 text-xs mb-2 px-2 py-1.5 rounded {{ $trainingColors }}">
                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -109,7 +124,7 @@
 
         {{-- Training Bonuses (compact row, only if any > 0) --}}
         @if ($trainingBonuses->isNotEmpty())
-            <div class="flex flex-wrap gap-1 text-[10px] mb-2">
+            <div class="flex flex-wrap gap-1 text-xs mb-2">
                 @foreach ($trainingBonuses as $label => $val)
                     <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400">
                         {{ $label }} +{{ $val }}{{ in_array($label, ['Train', 'Event', 'Recover']) ? '%' : '' }}
@@ -120,7 +135,7 @@
 
         {{-- Usage Rate & Win Rate (if available) --}}
         @if ($card->usage_rate || $card->win_rate_contribution)
-            <div class="flex gap-2 text-[10px] mb-2">
+            <div class="flex gap-2 text-xs mb-2">
                 @if ($card->usage_rate)
                     <span class="text-neutral-500 dark:text-neutral-400">
                         Use: <span class="font-medium text-neutral-700 dark:text-neutral-300">{{ number_format($card->usage_rate, 1) }}%</span>
@@ -136,7 +151,7 @@
 
         {{-- Skill Hints (first 3 as compact pills) --}}
         @if (!empty($card->skill_hints_provided) && is_array($card->skill_hints_provided) && count($card->skill_hints_provided) > 0)
-            <div class="flex flex-wrap gap-1 text-[10px] mb-2">
+            <div class="flex flex-wrap gap-1 text-xs mb-2">
                 @foreach (array_slice($card->skill_hints_provided, 0, 3) as $skill)
                     <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-medium">
                         {{ $skill }}
@@ -150,7 +165,7 @@
 
         {{-- Unique Effects Preview (first effect only) --}}
         @if (!empty($card->unique_effects) && is_array($card->unique_effects) && count($card->unique_effects) > 0)
-            <p class="text-[10px] text-blue-600 dark:text-blue-400 line-clamp-1 italic mb-2">
+            <p class="text-xs text-blue-600 dark:text-blue-400 line-clamp-1 italic mb-2">
                 {{ $card->unique_effects[0] }}
             </p>
         @endif
@@ -161,20 +176,20 @@
         {{-- Always-visible status bar --}}
         <div class="flex flex-wrap items-center gap-1.5 pt-2 mt-auto border-t border-neutral-100 dark:border-neutral-700/50">
             {{-- Server Availability --}}
-            <span class="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
+            <span class="inline-flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
                 <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {{ ucfirst($card->server_availability) }}
+                {{ $serverLabel }}
             </span>
             {{-- Active / Inactive --}}
             @if ($card->is_active)
-                <span class="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400">
+                <span class="inline-flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400">
                     <span class="w-1.5 h-1.5 rounded-full bg-green-500" aria-hidden="true"></span>
                     Active
                 </span>
             @else
-                <span class="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400">
+                <span class="inline-flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400">
                     <span class="w-1.5 h-1.5 rounded-full bg-red-500" aria-hidden="true"></span>
                     Inactive
                 </span>

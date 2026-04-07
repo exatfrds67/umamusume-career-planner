@@ -106,8 +106,7 @@ class AIChatController extends Controller
 
             return response()->json([
                 'success' => false,
-                'error' => 'Failed to process your message. Please try again.',
-                'details' => config('app.debug') ? $e->getMessage() : null,
+                'error' => $this->normalizeErrorMessage($e),
             ], 500);
         }
     }
@@ -198,7 +197,7 @@ class AIChatController extends Controller
                 ]);
 
                 echo 'data: '.json_encode([
-                    'error' => 'Failed to process your message. Please try again.',
+                    'error' => $this->normalizeErrorMessage($e),
                 ])."\n\n";
                 flush();
             }
@@ -579,8 +578,17 @@ class AIChatController extends Controller
         /** @var array{response: mixed, model: string, provider: string, execution_time: float, cost: float} $execution */
         $execution = $this->routingService->executeWithFallback($requestPayload);
         $responseContent = $execution['response'];
-        $encodedResponse = json_encode($responseContent);
-        $encodedResponse = $encodedResponse === false ? '' : $encodedResponse;
+
+        if (is_array($responseContent) && isset($responseContent['error']) && is_string($responseContent['error'])) {
+            throw new \Exception($responseContent['error']);
+        }
+
+        if (is_string($responseContent)) {
+            $decodedResponse = json_decode($responseContent, true);
+            if (is_array($decodedResponse) && isset($decodedResponse['error']) && is_string($decodedResponse['error'])) {
+                throw new \Exception($decodedResponse['error']);
+            }
+        }
 
         $knowledgeBaseText = null;
         if (isset($context['knowledge_base']) && is_string($context['knowledge_base'])) {
@@ -611,9 +619,9 @@ class AIChatController extends Controller
             is_string($responseContent) => $responseContent,
             is_array($responseContent) => is_string($responseContent['content'] ?? null)
                 ? $responseContent['content']
-                : $encodedResponse,
+                : throw new \Exception('The AI agent could not generate a text response for this request. Please try rephrasing your message.'),
             is_scalar($responseContent) => (string) $responseContent,
-            default => $encodedResponse,
+            default => throw new \Exception('The AI agent returned an invalid data type.'),
         };
 
         return [
@@ -713,6 +721,39 @@ class AIChatController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Map backend or provider exceptions to safe, actionable user messages
+     */
+    private function normalizeErrorMessage(\Exception $e): string
+    {
+        $message = strtolower($e->getMessage());
+
+        if (str_contains($message, 'rate limit') || str_contains($message, 'throttl')) {
+            return 'The AI provider is currently receiving too many requests. Please wait a moment and try again.';
+        }
+        if (str_contains($message, 'connection refused') || str_contains($message, 'timeout') || str_contains($message, 'failed to connect')) {
+            return "We're having trouble connecting to the AI service. Please check your connection or try switching to a different provider in settings.";
+        }
+        if (
+            str_contains($message, 'memory')
+            || str_contains($message, 'context length')
+            || str_contains($message, 'token limit')
+            || str_contains($message, 'requires more system memory')
+            || str_contains($message, 'out of memory')
+        ) {
+            return 'The selected model needs more memory than is currently available. Try a smaller model or switch provider, then retry.';
+        }
+        if (str_contains($message, 'unauthorized') || str_contains($message, 'credentials') || str_contains($message, 'signature')) {
+            return 'There is an authentication issue with the AI provider. Let the system administrator know or verify your API keys if explicitly configured.';
+        }
+        if (str_contains($message, 'structured data without a text response') || str_contains($message, 'invalid data type')) {
+            return 'The AI agent returned structured data without a text response. Please refine your query.';
+        }
+
+        // Fallback for general errors to hide raw backend exception
+        return 'The AI encountered an unexpected issue while processing your message. Trying a different model or provider might help.';
     }
 
     /**

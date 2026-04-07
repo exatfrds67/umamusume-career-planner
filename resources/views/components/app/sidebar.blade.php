@@ -7,6 +7,31 @@
         toolsOpen: false,
         adminOpen: false
     }">
+    @php
+        $activeCharacterId = session('current_character_id');
+        $resolvedCharacterId = null;
+
+        if (auth()->check()) {
+            if (is_numeric($activeCharacterId)) {
+                $resolvedCharacterId = \App\Models\Character::query()
+                    ->where('user_id', (int) auth()->id())
+                    ->whereKey((int) $activeCharacterId)
+                    ->value('id');
+            }
+
+            if (! is_numeric($resolvedCharacterId)) {
+                $resolvedCharacterId = \App\Models\Character::query()
+                    ->where('user_id', (int) auth()->id())
+                    ->latest('updated_at')
+                    ->value('id');
+            }
+        }
+
+        $careerPlanRoute = $resolvedCharacterId !== null
+            ? route('characters.show', $resolvedCharacterId).'#career-plan-visualizer'
+            : route('characters.index');
+    @endphp
+
     <!-- Logo Section with Hover Toggle -->
     <div x-data="{ showToggle: false }" @mouseenter="showToggle = true" @mouseleave="showToggle = false"
         class="relative flex h-16 shrink-0 items-center border-b border-neutral-200 dark:border-neutral-700"
@@ -73,11 +98,15 @@
                             </svg>
                             <span x-show="!$store.sidebar.minimized" class="whitespace-nowrap">Dashboard</span>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Dashboard</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Dashboard<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </a>
                     </li>
 
@@ -96,11 +125,15 @@
                             </svg>
                             <span x-show="!$store.sidebar.minimized" class="whitespace-nowrap">Characters</span>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Characters</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Characters<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </a>
                     </li>
 
@@ -119,11 +152,15 @@
                             </svg>
                             <span x-show="!$store.sidebar.minimized" class="whitespace-nowrap">Training</span>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Training</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Training<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </a>
                     </li>
 
@@ -142,11 +179,15 @@
                             </svg>
                             <span x-show="!$store.sidebar.minimized" class="whitespace-nowrap">Races</span>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Races</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Races<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </a>
                     </li>
 
@@ -165,11 +206,15 @@
                             </svg>
                             <span x-show="!$store.sidebar.minimized" class="whitespace-nowrap">Skills</span>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Skills</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Skills<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </a>
                     </li>
 
@@ -188,11 +233,15 @@
                             </svg>
                             <span x-show="!$store.sidebar.minimized" class="whitespace-nowrap">Support Cards</span>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Support Cards</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Support Cards<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </a>
                     </li>
 
@@ -222,11 +271,15 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                             </svg>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Data Management</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Data Management<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </button>
                         <ul x-show="dataOpen && !$store.sidebar.minimized" x-collapse class="mt-1 space-y-1 pl-11">
                             <li>
@@ -286,11 +339,15 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                             </svg>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Analytics & Reports</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Analytics &amp; Reports<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </button>
                         <ul x-show="analyticsOpen && !$store.sidebar.minimized" x-collapse class="mt-1 space-y-1 pl-11">
                             <li>
@@ -329,11 +386,15 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                             </svg>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">AI & Tools</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">AI &amp; Tools<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </button>
                         <ul x-show="aiOpen && !$store.sidebar.minimized" x-collapse class="mt-1 space-y-1 pl-11">
                             <li>
@@ -346,6 +407,12 @@
                                 <a href="{{ route('ai.chat') }}"
                                     class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('ai.chat') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
                                     AI Chat
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ $careerPlanRoute }}"
+                                    class="block rounded-md py-2 pr-2 pl-2 text-sm leading-6 {{ request()->routeIs('characters.show') ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-700 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400' }}">
+                                    AI Career Plan
                                 </a>
                             </li>
                             <li>
@@ -384,11 +451,15 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                             </svg>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">External Resources</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">External Resources<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </button>
                         <ul x-show="toolsOpen && !$store.sidebar.minimized" x-collapse class="mt-1 space-y-1 pl-11">
                             <li>
@@ -428,11 +499,15 @@
                                             d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                                     </svg>
                                     <div x-show="showTooltip"
-                                        x-transition:enter="transition ease-out duration-150"
-                                        x-transition:enter-start="opacity-0 -translate-x-1"
+                                        x-transition:enter="transition ease-out duration-150 delay-200"
+                                        x-transition:enter-start="opacity-0 translate-x-2"
                                         x-transition:enter-end="opacity-100 translate-x-0"
-                                        class="absolute left-full ml-3 rounded-md bg-amber-900 dark:bg-amber-950 px-2 py-1 text-xs font-semibold text-amber-100 whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                        style="display: none;">Admin Panel</div>
+                                        x-transition:leave="transition ease-in duration-100"
+                                        x-transition:leave-start="opacity-100 translate-x-0"
+                                        x-transition:leave-end="opacity-0 translate-x-2"
+                                        class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-amber-100 bg-amber-900 dark:bg-amber-800 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                        role="tooltip"
+                                        style="display: none;">Admin Panel<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-amber-900 dark:bg-amber-800 rotate-45"></div></div>
                                 </button>
                                 <ul x-show="adminOpen && !$store.sidebar.minimized" x-collapse
                                     class="mt-1 space-y-1 pl-11 bg-amber-50/50 dark:bg-amber-900/10 rounded-md py-2">
@@ -534,11 +609,15 @@
                             </svg>
                             <span x-show="!$store.sidebar.minimized" class="whitespace-nowrap">Profile</span>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Profile</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Profile<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </a>
                     </li>
                     <!-- Settings -->
@@ -558,11 +637,15 @@
                             </svg>
                             <span x-show="!$store.sidebar.minimized" class="whitespace-nowrap">Settings</span>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Settings</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Settings<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </a>
                     </li>
                     <!-- Help -->
@@ -580,11 +663,15 @@
                             </svg>
                             <span x-show="!$store.sidebar.minimized" class="whitespace-nowrap">Help</span>
                             <div x-show="showTooltip"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-x-1"
+                                x-transition:enter="transition ease-out duration-150 delay-200"
+                                x-transition:enter-start="opacity-0 translate-x-2"
                                 x-transition:enter-end="opacity-100 translate-x-0"
-                                class="absolute left-full ml-3 rounded-md bg-neutral-900 dark:bg-neutral-950 px-2 py-1 text-xs font-semibold text-white whitespace-nowrap z-50 pointer-events-none shadow-md"
-                                style="display: none;">Help</div>
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 translate-x-2"
+                                class="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-neutral-900 dark:bg-neutral-700 rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                                role="tooltip"
+                                style="display: none;">Help<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-neutral-900 dark:bg-neutral-700 rotate-45"></div></div>
                         </a>
                     </li>
                 </ul>

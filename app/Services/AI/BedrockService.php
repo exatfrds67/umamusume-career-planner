@@ -122,66 +122,84 @@ class BedrockService
         $model = $model ?? $this->defaultModel;
         $modelId = $this->getModelId($model);
 
-        try {
-            // Build request payload
-            $payload = $this->buildPayload($prompt, $context, $model);
+        $maxRetries = 3;
+        $retryDelay = 1;
 
-            // Invoke Bedrock model
-            $response = $client->invokeModel([
-                'modelId' => $modelId,
-                'contentType' => 'application/json',
-                'accept' => 'application/json',
-                'body' => json_encode($payload),
-            ]);
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                // Build request payload
+                $payload = $this->buildPayload($prompt, $context, $model);
 
-            // Parse response
-            $body = $response['body'] ?? null;
-            if (! \is_object($body) || ! method_exists($body, 'getContents')) {
-                throw new \RuntimeException('Invalid Bedrock response body');
+                // Invoke Bedrock model
+                $response = $client->invokeModel([
+                    'modelId' => $modelId,
+                    'contentType' => 'application/json',
+                    'accept' => 'application/json',
+                    'body' => json_encode($payload),
+                ]);
+
+                // Parse response
+                $body = $response['body'] ?? null;
+                if (! \is_object($body) || ! method_exists($body, 'getContents')) {
+                    throw new \RuntimeException('Invalid Bedrock response body');
+                }
+                $responseBody = json_decode($body->getContents(), true);
+
+                if (! \is_array($responseBody)) {
+                    throw new \RuntimeException('Failed to parse Bedrock response');
+                }
+
+                /** @var array<string, mixed> $responseBody */
+
+                // Extract content based on model type
+                $content = $this->extractContent($responseBody, $model);
+                $tokenCount = $this->extractTokenCount($responseBody, $model);
+
+                // Get request ID safely
+                $requestId = 'unknown';
+                $metadata = $response['ResponseMetadata'] ?? null;
+                if (\is_array($metadata) && isset($metadata['RequestId']) && is_scalar($metadata['RequestId'])) {
+                    $requestId = (string) $metadata['RequestId'];
+                }
+
+                return [
+                    'content' => $content,
+                    'model' => $model,
+                    'token_count' => $tokenCount,
+                    'confidence' => 0.9, // Bedrock models have high confidence
+                    'model_version' => $this->getModelVersion($model),
+                    'request_id' => $requestId,
+                ];
+            } catch (AwsException $e) {
+                if ($attempt < $maxRetries && ($e->getAwsErrorCode() === 'ThrottlingException' || str_contains($e->getMessage(), '429 Too Many Requests'))) {
+                    Log::warning('[Bedrock] Rate limited, retrying in '.$retryDelay.'s', [
+                        'attempt' => $attempt,
+                        'model' => $modelId,
+                    ]);
+                    sleep($retryDelay);
+                    $retryDelay *= 2;
+
+                    continue;
+                }
+
+                Log::error('[Bedrock] AWS API error', [
+                    'error' => $e->getMessage(),
+                    'model' => $model,
+                    'aws_error_code' => $e->getAwsErrorCode(),
+                ]);
+
+                throw new \RuntimeException("Bedrock API error: {$e->getMessage()}", 0, $e);
+            } catch (\Exception $e) {
+                Log::error('[Bedrock] Generation failed', [
+                    'error' => $e->getMessage(),
+                    'model' => $model,
+                ]);
+
+                throw new \RuntimeException("Bedrock generation failed: {$e->getMessage()}", 0, $e);
             }
-            $responseBody = json_decode($body->getContents(), true);
-
-            if (! \is_array($responseBody)) {
-                throw new \RuntimeException('Failed to parse Bedrock response');
-            }
-
-            /** @var array<string, mixed> $responseBody */
-
-            // Extract content based on model type
-            $content = $this->extractContent($responseBody, $model);
-            $tokenCount = $this->extractTokenCount($responseBody, $model);
-
-            // Get request ID safely
-            $requestId = 'unknown';
-            $metadata = $response['ResponseMetadata'] ?? null;
-            if (\is_array($metadata) && isset($metadata['RequestId']) && is_scalar($metadata['RequestId'])) {
-                $requestId = (string) $metadata['RequestId'];
-            }
-
-            return [
-                'content' => $content,
-                'model' => $model,
-                'token_count' => $tokenCount,
-                'confidence' => 0.9, // Bedrock models have high confidence
-                'model_version' => $this->getModelVersion($model),
-                'request_id' => $requestId,
-            ];
-        } catch (AwsException $e) {
-            Log::error('[Bedrock] AWS API error', [
-                'error' => $e->getMessage(),
-                'model' => $model,
-                'aws_error_code' => $e->getAwsErrorCode(),
-            ]);
-
-            throw new \RuntimeException("Bedrock API error: {$e->getMessage()}", 0, $e);
-        } catch (\Exception $e) {
-            Log::error('[Bedrock] Generation failed', [
-                'error' => $e->getMessage(),
-                'model' => $model,
-            ]);
-
-            throw new \RuntimeException("Bedrock generation failed: {$e->getMessage()}", 0, $e);
         }
+
+        throw new \RuntimeException("Bedrock generation failed after {$maxRetries} attempts.");
     }
 
     /**
@@ -270,7 +288,10 @@ class BedrockService
 
         // Add goals context
         if (isset($context['goals']) && is_array($context['goals'])) {
-            $contextStr .= 'Goals: '.implode(', ', $context['goals'])."\n";
+            $goals = array_values(array_filter(array_map(static fn (mixed $goal): ?string => is_string($goal) ? $goal : null, $context['goals'])));
+            if ($goals !== []) {
+                $contextStr .= 'Goals: '.implode(', ', $goals)."\n";
+            }
         }
 
         $contextStr .= "\nQuestion: {$prompt}";

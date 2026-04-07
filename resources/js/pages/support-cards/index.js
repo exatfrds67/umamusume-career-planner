@@ -7,6 +7,15 @@ export function supportCardManager() {
     return {
         showExternalImport: false,
 
+        // View mode: 'grid' or 'list'
+        viewMode: localStorage.getItem("sc:viewMode") ?? "grid",
+
+        // Filter panel visibility (open on desktop, closed on mobile by default)
+        filtersOpen: window.innerWidth >= 768,
+
+        // Count of active filter params (for mobile badge)
+        activeFilterCount: 0,
+
         // External API state
         externalCards: [],
         externalLoading: false,
@@ -24,6 +33,27 @@ export function supportCardManager() {
                     this.loadExternalCards();
                 }
             });
+            this.updateActiveFilterCount();
+        },
+
+        toggleViewMode(mode) {
+            this.viewMode = mode;
+            localStorage.setItem("sc:viewMode", mode);
+        },
+
+        updateActiveFilterCount() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const filterKeys = [
+                "type",
+                "rarity",
+                "tier",
+                "bond_level",
+                "limit_break",
+                "search",
+            ];
+            this.activeFilterCount = filterKeys.filter(
+                (k) => urlParams.has(k) && urlParams.get(k) !== "",
+            ).length;
         },
 
         async loadExternalCards() {

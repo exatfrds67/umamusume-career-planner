@@ -47,7 +47,11 @@
 @endphp
 
 <div id="training-predictions-app" data-character-id="{{ $character->id }}"
-    data-scenario-type="{{ $character->scenario_type }}" data-api-url="{{ route('api.training-predictions.batch') }}"
+    data-scenario-type="{{ $character->scenario_type }}"
+    data-api-url="{{ route('api.training-predictions.batch') }}"
+    data-simulate-url="{{ route('api.training-predictions.simulate') }}"
+    data-train-url="{{ route('training.store', $character) }}"
+    data-rest-url="{{ route('characters.rest', $character) }}"
     class="animate-fade-in-delay-3">
 
     {{-- Loading State --}}
@@ -83,10 +87,45 @@
 
     {{-- Predictions Grid --}}
     <div id="predictions-grid" class="hidden">
+        {{-- Decision-First Hero --}}
+        <section id="recommended-action-hero"
+            class="mb-6 rounded-xl border border-primary-200/70 dark:border-primary-700 bg-linear-to-r from-primary-50 to-blue-50 dark:from-primary-950/30 dark:to-blue-950/20 p-5 sm:p-6"
+            role="region" aria-labelledby="recommended-action-heading" aria-live="polite">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div class="min-w-0">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-primary-700 dark:text-primary-300">Recommended Action</p>
+                    <h3 id="recommended-action-heading" class="mt-1 text-xl font-bold text-neutral-900 dark:text-white">Analyzing best move...</h3>
+                    <p id="recommended-action-summary" class="mt-2 text-sm sm:text-base text-neutral-700 dark:text-neutral-200">
+                        We are evaluating gains, risk, and support-card synergy for this turn.
+                    </p>
+                    <div class="mt-3 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+                        <span id="recommended-action-risk"
+                            class="inline-flex items-center rounded-md px-2 py-1 font-semibold bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200">
+                            Failure Risk: --% (--)
+                        </span>
+                        <span id="recommended-action-primary-gain"
+                            class="inline-flex items-center rounded-md px-2 py-1 font-medium bg-white/80 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700">
+                            Expected Gain: --
+                        </span>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 shrink-0">
+                    <button id="recommended-action-cta" type="button" onclick="window.openTrainingConfirmation(window.__recommendedTraining || 'speed')"
+                        class="btn btn-primary btn-md" aria-label="Confirm recommended training" disabled>
+                        Confirm Recommended Action
+                    </button>
+                    <button type="button" onclick="window.showAIDetails()"
+                        class="btn btn-secondary btn-md" aria-label="View recommendation rationale">
+                        Why this choice?
+                    </button>
+                </div>
+            </div>
+        </section>
+
         {{-- Section Header with Legend --}}
         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h2 id="facilities-heading" class="text-lg font-semibold text-neutral-900 dark:text-white">
-                Training Facilities
+                Ranked Alternatives
                 <span class="text-sm font-normal text-neutral-500 dark:text-neutral-400 ml-2">(Levels 1-5)</span>
             </h2>
             <div class="flex items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400" aria-label="Risk level legend">
@@ -128,6 +167,12 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
+                            <span
+                                class="rank-badge hidden items-center gap-1 px-2 py-1 rounded text-xs font-semibold bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200"
+                                data-testid="rank-badge-{{ $facility }}">
+                                <span class="rank-badge-value">#--</span>
+                                <span class="sr-only">rank</span>
+                            </span>
                             {{-- AI Recommendation Badge --}}
                             <span
                                 class="ai-badge hidden items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
@@ -139,7 +184,7 @@
                             <span
                                 class="risk-badge px-2 py-1 rounded text-xs font-medium bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300"
                                 data-testid="risk-badge-{{ $facility }}">
-                                --
+                                Fail: --%
                             </span>
                         </div>
                     </div>
@@ -194,6 +239,9 @@
                                 <span class="efficiency-score text-xs text-neutral-600 dark:text-neutral-400" aria-label="Efficiency rating">(--)</span>
                             </div>
                         </div>
+                        <p class="efficiency-hint mt-1 text-xs text-neutral-500 dark:text-neutral-400" aria-live="polite">
+                            Score = gains + bonuses - risk penalty
+                        </p>
                     @else
                         {{-- Rest Option --}}
                         <div class="facility-stats space-y-2 text-sm mb-4">
@@ -217,9 +265,8 @@
 
                     {{-- Action Button --}}
                     <button
-                        class="w-full mt-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2
-                        {{ $facility === 'rest' ? 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600' : 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 hover:bg-primary-200 dark:hover:bg-primary-800' }}"
-                        onclick="event.stopPropagation(); selectTraining('{{ $facility }}')"
+                        class="w-full mt-2 btn {{ $facility === 'rest' ? 'btn-secondary' : 'btn-primary' }} btn-sm"
+                        onclick="event.stopPropagation(); openTrainingConfirmation('{{ $facility }}')"
                         aria-label="{{ $facility === 'rest' ? 'Choose rest this turn' : 'Choose ' . $facility . ' training this turn' }}">
                         {{ $facility === 'rest' ? 'Rest' : 'Train' }}
                     </button>
@@ -237,10 +284,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                AI Recommendation
+                Evidence & Calculation
             </h3>
             <p id="ai-recommendation-text" class="text-neutral-700 dark:text-neutral-300 mb-4">
-                Analyzing the best training option for your current situation...
+                Detailed rationale for the recommended action appears here.
             </p>
 
             {{-- Calculation Breakdown (Collapsible) --}}
@@ -268,33 +315,3 @@
     </div>
 </div>
 
-<script>
-    if (typeof window.selectFacility !== 'function') {
-        window.selectFacility = function (facility) {
-            document.querySelectorAll('.training-facility').forEach(function (el) {
-                el.classList.remove('ring-2', 'ring-primary-500');
-            });
-
-            const selected = document.querySelector('[data-facility="' + facility + '"]');
-            if (selected) {
-                selected.classList.add('ring-2', 'ring-primary-500');
-            }
-        };
-    }
-
-    if (typeof window.selectTraining !== 'function') {
-        window.selectTraining = function (facility) {
-            window.dispatchEvent(new CustomEvent('toast', {
-                detail: {
-                    type: 'info',
-                    message: 'Training selection: ' + facility.charAt(0).toUpperCase() + facility.slice(1),
-                },
-            }));
-        };
-    }
-</script>
-
-{{-- Extracted: JS logic moved to resources/js/pages/training/partials/predictions-grid.js --}}
-@pushOnce('scripts')
-    @vite('resources/js/pages/training/partials/predictions-grid.js')
-@endPushOnce

@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\BatchTrainingPredictionRequest;
 use App\Http\Requests\Api\TrainingPredictionRequest;
 use App\Http\Requests\Api\TrainingRecommendationRequest;
+use App\Http\Requests\Api\TrainingSimulationRequest;
 use App\Http\Resources\Api\TrainingPredictionResource;
 use App\Models\Character;
 use App\Services\TrainingCalculationService;
@@ -303,6 +306,92 @@ class TrainingPredictionController extends Controller
                 'success' => false,
                 'message' => 'Batch training predictions failed',
                 'error' => 'An error occurred while calculating batch predictions. Please try again.',
+            ], 500);
+        }
+    }
+
+    /**
+     * Simulate a training action and return authoritative preview values.
+     */
+    public function simulate(TrainingSimulationRequest $request): JsonResponse
+    {
+        try {
+            /** @var Character $character */
+            $character = Character::query()
+                ->with(['aptitudes', 'supportCards.supportCard', 'factors'])
+                ->findOrFail($request->integer('character_id'));
+
+            $trainingType = (string) $request->string('training_type');
+
+            if ($trainingType === 'rest') {
+                $energyRecovery = 50;
+                $currentEnergy = (int) ($character->energy_level ?? 100);
+
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'training_type' => 'rest',
+                        'stat_gains' => [],
+                        'energy_change' => $energyRecovery,
+                        'energy_after' => min(100, $currentEnergy + $energyRecovery),
+                        'failure_risk' => 0.0,
+                        'failure_percent' => 0,
+                        'risk_level' => 'low',
+                        'skill_points' => 0,
+                    ],
+                    'message' => 'Rest simulation generated successfully',
+                ]);
+            }
+
+            $prediction = $this->trainingService->calculateTrainingPrediction($character, $trainingType);
+
+            $energyCost = isset($prediction['energy_cost']) && is_numeric($prediction['energy_cost'])
+                ? (int) $prediction['energy_cost']
+                : 0;
+
+            $currentEnergy = (int) ($character->energy_level ?? 100);
+            $failureRisk = isset($prediction['failure_risk']) && is_numeric($prediction['failure_risk'])
+                ? (float) $prediction['failure_risk']
+                : 0.0;
+            $failurePercent = (int) round($failureRisk * 100);
+
+            $riskLevel = match (true) {
+                $failurePercent < 15 => 'low',
+                $failurePercent <= 40 => 'medium',
+                default => 'high',
+            };
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'training_type' => $trainingType,
+                    'stat_gains' => is_array($prediction['stat_gains'] ?? null) ? $prediction['stat_gains'] : [],
+                    'skill_points' => is_numeric($prediction['skill_points'] ?? null) ? (int) $prediction['skill_points'] : 0,
+                    'energy_change' => -$energyCost,
+                    'energy_after' => max(0, $currentEnergy - $energyCost),
+                    'failure_risk' => $failureRisk,
+                    'failure_percent' => $failurePercent,
+                    'risk_level' => $riskLevel,
+                ],
+                'message' => 'Training simulation generated successfully',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Character not found',
+                'error' => 'The requested character does not exist or does not belong to you.',
+            ], 404);
+        } catch (\Throwable $e) {
+            Log::error('Training simulation failed', [
+                'character_id' => $request->input('character_id'),
+                'training_type' => $request->input('training_type'),
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Training simulation failed',
+                'error' => 'An error occurred while simulating this training option.',
             ], 500);
         }
     }

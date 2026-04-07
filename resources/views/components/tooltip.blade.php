@@ -54,8 +54,7 @@
     @mouseleave="hideTooltip()"
     @focus="showTooltip()"
     @blur="hideTooltip()"
-    class="relative inline-block"
-    {{ $attributes }}
+    {{ $attributes->merge(['class' => 'relative inline-block']) }}
 >
     {{-- Trigger Element (slot content) --}}
     <div>

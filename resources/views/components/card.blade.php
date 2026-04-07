@@ -1,19 +1,21 @@
 @props([
-    'variant' => 'default',
+    'as' => 'div',
+    'padding' => true,
+    'hover' => false,
 ])
 
 @php
-    $baseClasses = 'card';
+    $classes = 'card';
 
-    $variantClasses = match ($variant) {
-        'elevated' => 'shadow-lg',
-        'outlined' => 'shadow-none border-2',
-        default => '',
-    };
+    if ($padding) {
+        $classes .= ' p-4';
+    }
 
-    $classes = trim("$baseClasses $variantClasses " . ($attributes->get('class') ?? ''));
+    if ($hover) {
+        $classes .= ' transition duration-200 hover:-translate-y-0.5 hover:shadow-lg';
+    }
 @endphp
 
-<div {{ $attributes->merge(['class' => $classes]) }}>
+<{{ $as }} {{ $attributes->merge(['class' => $classes]) }}>
     {{ $slot }}
-</div>
+</{{ $as }}>

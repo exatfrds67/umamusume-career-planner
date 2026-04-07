@@ -12,10 +12,10 @@
             </svg>
         </div>
         <div class="flex-1 min-w-0">
-            <h3 id="ai-advisor-heading" class="text-sm font-semibold text-primary-900 dark:text-primary-100">AI Advisor
+            <h3 id="ai-advisor-heading" class="text-sm font-semibold text-primary-900 dark:text-primary-100">AI Advisor Status
             </h3>
             <p id="ai-advisor-message" class="text-sm text-primary-700 dark:text-primary-300 truncate">
-                Analyzing training options for optimal recommendations...
+                Top recommendation appears in the Recommended Action panel below.
             </p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
@@ -23,10 +23,10 @@
                 class="hidden px-2 py-1 rounded text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
                 85% confidence
             </span>
-            <button onclick="showAIDetails()"
+            <button onclick="window.showAIDetails()"
                 class="px-3 py-1.5 text-xs font-medium text-primary-700 dark:text-primary-300 bg-primary-100 dark:bg-primary-900/50 rounded-lg hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                 aria-label="View AI advisor recommendation details">
-                Details
+                Why?
             </button>
         </div>
     </div>

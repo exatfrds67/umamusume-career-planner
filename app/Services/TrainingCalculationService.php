@@ -505,14 +505,24 @@ class TrainingCalculationService
         $currentEnergy = $character->energy_level ?? 100;
         $energyAfter = $currentEnergy - $energyCost;
 
-        // Failure risk increases as energy decreases
-        return match (true) {
+        // Baseline failure risk increases as post-training energy decreases.
+        $baseRisk = match (true) {
             $energyAfter >= 70 => 0.0,
-            $energyAfter >= 50 => 0.05,
-            $energyAfter >= 30 => 0.15,
-            $energyAfter >= 10 => 0.30,
+            $energyAfter >= 50 => 0.10,
+            $energyAfter >= 30 => 0.20,
+            $energyAfter >= 10 => 0.35,
             default => 0.50,
         };
+
+        $moodAdjustment = match ($character->mood_status) {
+            'great' => -0.05,
+            'good' => -0.02,
+            'bad' => 0.05,
+            'awful' => 0.10,
+            default => 0.0,
+        };
+
+        return (float) max(0.0, min(0.95, $baseRisk + $moodAdjustment));
     }
 
     /**

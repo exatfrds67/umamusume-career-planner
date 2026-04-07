@@ -51,7 +51,15 @@
         <div class="space-y-6">
             <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-200">All Characters</h2>
 
-            @forelse($characters as $character)
+            @forelse($characterGroups as $characterGroup)
+                @php
+                    /** @var \App\Models\Character $character */
+                    $character = $characterGroup['default_character'];
+                    /** @var \Illuminate\Support\Collection<int, \App\Models\Career> $careers */
+                    $careers = $characterGroup['careers'];
+                    $careerCount = $characterGroup['career_count'];
+                    $variantCount = $characterGroup['variant_count'];
+                @endphp
                 <div
                     class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 overflow-hidden">
                     {{-- Character Header --}}
@@ -73,8 +81,13 @@
                                     <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">{{ $character->name }}
                                     </h3>
                                     <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                                        {{ $character->careers->count() }} career(s)
+                                        {{ $careerCount }} career(s)
                                     </p>
+                                    @if ($variantCount > 1)
+                                        <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                                            Includes {{ $variantCount }} character variants
+                                        </p>
+                                    @endif
                                 </div>
                             </div>
                             <a href="{{ route('reports.character', $character) }}"
@@ -89,9 +102,9 @@
                     </div>
 
                     {{-- Career List --}}
-                    @if ($character->careers->isNotEmpty())
+                    @if ($careers->isNotEmpty())
                         <div class="divide-y divide-neutral-200 dark:divide-neutral-700">
-                            @foreach ($character->careers as $career)
+                            @foreach ($careers as $career)
                                 <div class="p-4 hover:bg-neutral-50 dark:hover:bg-neutral-700/30 transition-colors duration-200">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-4">
@@ -107,6 +120,7 @@
                                                     {{ ucfirst(str_replace('_', ' ', $career->scenario_type ?? 'Unknown')) }}
                                                 </p>
                                                 <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                                                    {{ $career->character?->name ?? 'Unknown Character' }} •
                                                     Turn {{ $career->current_turn ?? 0 }} • Started
                                                     {{ $career->created_at?->diffForHumans() ?? 'Unknown' }}
                                                 </p>

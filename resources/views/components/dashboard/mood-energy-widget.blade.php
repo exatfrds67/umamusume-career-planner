@@ -29,7 +29,7 @@
             Mood & Energy
         </h3>
 
-        <div class="space-y-3 w-full">
+        <div class="w-full space-y-4">
             {{-- Mood Status using ConditionBadge --}}
             <div class="flex items-center justify-between w-full">
                 <span class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Mood</span>
@@ -39,7 +39,7 @@
             <hr class="border-neutral-200 dark:border-neutral-700/60">
 
             {{-- Energy using EnergyGauge --}}
-            <div class="w-full">
+            <div class="w-full pt-0.5">
                 <x-energy-gauge :value="$energyPercentage" :show-icon="false" :trend="$energyPercentage >= 70 ? 'up' : ($energyPercentage >= 40 ? 'flat' : 'down')" />
             </div>
 

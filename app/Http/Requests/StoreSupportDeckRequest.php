@@ -67,10 +67,21 @@ class StoreSupportDeckRequest extends FormRequest
             }
 
             // Check for duplicate owned cards
-            $ownedCardIds = collect($cards)
-                ->where('is_friend_card', false)
-                ->pluck('support_card_id')
-                ->toArray();
+            $ownedCardIds = [];
+            foreach ($cards as $card) {
+                if (! is_array($card)) {
+                    continue;
+                }
+
+                if (($card['is_friend_card'] ?? false) !== false) {
+                    continue;
+                }
+
+                $supportCardId = $card['support_card_id'] ?? null;
+                if (is_numeric($supportCardId)) {
+                    $ownedCardIds[] = (int) $supportCardId;
+                }
+            }
 
             if (count($ownedCardIds) !== count(array_unique($ownedCardIds))) {
                 $validator->errors()->add('cards', 'Deck cannot contain duplicate cards (except friend cards).');

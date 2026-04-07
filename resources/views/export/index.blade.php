@@ -11,10 +11,7 @@
         <div class="page-hero">
             <div class="page-hero__content">
             <div>
-                <div class="page-hero__eyebrow">
-                    <span>Portable Reports</span>
-                </div>
-            <h1 class="page-hero__title">Data Export</h1>
+            <h1 class="page-hero__title">Export career run data</h1>
             <p class="page-hero__body text-sm sm:text-base">
                 Export your career data in multiple formats including JSON, CSV, and PDF.
             </p>
@@ -35,7 +32,7 @@
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
                     </svg>
-                    Step 1: Select Export Type
+                    Export Type
                 </span>
             </h2>
 
@@ -83,7 +80,7 @@
         </div>
 
         {{-- Format Selection --}}
-        <div class="filter-surface p-6">
+        <div class="filter-surface p-6 mt-4">
             <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                 <span class="inline-flex items-center">
                     <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +88,7 @@
                             d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
                         </path>
                     </svg>
-                    Step 2: Select Format
+                    Export Format
                 </span>
             </h2>
 
@@ -139,20 +136,27 @@
         </div>
 
         {{-- Filters Section --}}
-        <div class="filter-surface p-6">
-            <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
-                <span class="inline-flex items-center">
+        <div x-data="{ showFilters: false }" class="filter-surface mt-4">
+            <button type="button" @click="showFilters = !showFilters" class="w-full flex items-center justify-between p-6 focus:outline-none">
+                <span class="text-lg font-semibold text-neutral-900 dark:text-white inline-flex items-center">
                     <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
                         </path>
                     </svg>
-                    Step 3: Apply Filters (Optional)
+                    Customize Export
                 </span>
-            </h2>
+                <span class="flex items-center text-sm text-neutral-500">
+                    Optional
+                    <svg :class="{'rotate-180': showFilters}" class="w-5 h-5 ml-2 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </span>
+            </button>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {{-- Scenario Type Filter --}}
+            <div x-show="showFilters" x-collapse x-cloak class="px-6 pb-6 pt-2 border-t border-neutral-100 dark:border-neutral-700">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {{-- Scenario Type Filter --}}
                 <div>
                     <label for="filter-scenario" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                         Scenario Type
@@ -198,33 +202,8 @@
             </div>
         </div>
 
-        {{-- Preview & Export Buttons --}}
-        <div class="flex justify-end gap-4 mb-6">
-            <button type="button" id="preview-btn"
-                class="inline-flex items-center px-6 py-3 bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-600 dark:hover:bg-neutral-500 text-neutral-700 dark:text-neutral-200 font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled>
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                    </path>
-                </svg>
-                Preview
-            </button>
-            <button type="button" id="export-btn"
-                class="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled>
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                </svg>
-                Export Data
-            </button>
-        </div>
-
         {{-- Preview Section --}}
-        <div id="preview-section" class="hidden">
+        <div id="preview-section" class="hidden mt-4">
             <div class="filter-surface p-6">
                 <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                     <span class="inline-flex items-center">
@@ -272,55 +251,50 @@
             </div>
         </div>
 
-        {{-- Export History Section --}}
-        <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6 mb-6">
-            <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
-                <span class="inline-flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        {{-- Export History & Scheduled Section --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            {{-- Export History Section (Minimal Card) --}}
+            <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-5">
+                <h2 class="text-md font-semibold text-neutral-900 dark:text-white mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    Export History
-                </span>
-            </h2>
-
-            <div id="export-history" class="space-y-2">
-                <p class="text-neutral-500 dark:text-neutral-400 text-center py-4">No export history yet.</p>
+                    Recent Exports
+                </h2>
+                <div id="export-history" class="text-sm">
+                    <div class="flex flex-col items-center justify-center p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-dashed border-neutral-200 dark:border-neutral-700">
+                        <svg class="w-6 h-6 text-neutral-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <p class="text-neutral-500 dark:text-neutral-400">No export history yet.</p>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        {{-- Scheduled Exports Section --}}
-        <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6 mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">
-                    <span class="inline-flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                            </path>
+            {{-- Scheduled Exports Section (Minimal Card) --}}
+            <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-5">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-md font-semibold text-neutral-900 dark:text-white flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                         Scheduled Exports
-                    </span>
-                </h2>
-                <button type="button" id="schedule-btn"
-                    class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Schedule Export
-                </button>
-            </div>
-
-            <div id="scheduled-exports" class="space-y-2">
-                <p class="text-neutral-500 dark:text-neutral-400 text-center py-4">No scheduled exports.</p>
+                    </h2>
+                    <button type="button" id="schedule-btn-secondary" class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium">
+                        Schedule New
+                    </button>
+                </div>
+                <div id="scheduled-exports" class="text-sm">
+                    <div class="flex flex-col items-center justify-center p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-dashed border-neutral-200 dark:border-neutral-700">
+                        <svg class="w-6 h-6 text-neutral-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="text-neutral-500 dark:text-neutral-400">No automated exports scheduled.</p>
+                    </div>
+                </div>
             </div>
         </div>
 
         {{-- Templates Section --}}
-        <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
-            <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
-                <span class="inline-flex items-center">
+        <div x-data="{ open: false }" class="mt-4 bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700">
+            <button @click="open = !open" type="button" class="w-full flex items-center justify-between p-6 focus:outline-none">
+                <span class="text-lg font-semibold text-neutral-900 dark:text-white flex items-center">
                     <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
@@ -328,25 +302,66 @@
                     </svg>
                     Export Templates
                 </span>
-            </h2>
+                <svg :class="{'rotate-180': open}" class="w-5 h-5 text-neutral-500 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                @foreach ($templates as $key => $template)
-                    <button type="button"
-                        class="p-4 rounded-lg border border-neutral-200 dark:border-neutral-600 hover:border-primary-500 dark:hover:border-primary-400 transition-colors text-left template-card focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                        data-template="{{ $key }}">
-                        <h3 class="font-medium text-neutral-900 dark:text-white mb-1">{{ $template['name'] }}</h3>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ $template['description'] }}</p>
-                        <div class="mt-2 flex flex-wrap gap-1">
-                            @foreach ($template['types'] as $type)
-                                <span
-                                    class="px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded">
-                                    {{ $type }}
-                                </span>
-                            @endforeach
-                        </div>
-                    </button>
-                @endforeach
+            <div x-show="open" x-collapse x-cloak class="px-6 pb-6 border-t border-neutral-100 dark:border-neutral-700 pt-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    @foreach ($templates as $key => $template)
+                        <button type="button"
+                            class="p-4 rounded-lg border border-neutral-200 dark:border-neutral-600 hover:border-primary-500 dark:hover:border-primary-400 transition-colors text-left template-card focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                            data-template="{{ $key }}">
+                            <h3 class="font-medium text-neutral-900 dark:text-white mb-1">{{ $template['name'] }}</h3>
+                            <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ $template['description'] }}</p>
+                            <div class="mt-2 flex flex-wrap gap-1">
+                                @foreach ($template['types'] as $type)
+                                    <span
+                                        class="px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded">
+                                        {{ $type }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Sticky Action Footer --}}
+    <div class="sticky bottom-0 z-40 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <button type="button" id="schedule-btn"
+                class="inline-flex items-center px-6 py-2.5 bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 font-medium rounded-lg transition-colors focus:ring-2 focus:ring-neutral-500 focus:outline-none">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Schedule Export
+            </button>
+            <div class="flex gap-4 ml-auto">
+                <button type="button" id="preview-btn"
+                    class="inline-flex items-center px-6 py-2.5 bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    <svg class="w-5 h-5 mr-2 -ml-1 text-neutral-500 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                        </path>
+                    </svg>
+                    Preview
+                </button>
+                <button type="button" id="export-btn"
+                    class="inline-flex items-center px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Export Data
+                </button>
             </div>
         </div>
     </div>

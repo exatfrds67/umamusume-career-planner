@@ -14,18 +14,18 @@
 <div {{ $attributes->merge(['class' => 'stat-bar-container']) }} style="{{ $getStatStyle() }}">
     {{-- Label and Value --}}
     @if ($showLabel)
-        <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2">
+        <div class="mb-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
+            <div class="flex min-w-0 items-center gap-2">
                 @if ($showIcon)
                     <div class="stat-bar-icon w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold">
                         {{ strtoupper(substr($getStatLabel(), 0, 1)) }}
                     </div>
                 @endif
-                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                <span class="truncate text-sm font-medium text-neutral-700 dark:text-neutral-300">
                     {{ $getStatLabel() }}
                 </span>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex shrink-0 items-center justify-end gap-2 whitespace-nowrap text-right">
                 <span class="text-sm font-bold text-neutral-900 dark:text-neutral-100 tabular-nums">
                     {{ number_format($current) }}
                 </span>
@@ -35,7 +35,7 @@
                     </span>
                 @endif
                 @if ($showPercentage)
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">
+                    <span class="min-w-[3.75rem] text-xs text-neutral-500 dark:text-neutral-400 tabular-nums">
                         {{ number_format($getPercentage(), 1) }}%
                     </span>
                 @endif

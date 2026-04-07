@@ -13,34 +13,17 @@ window.selectFacility = function (facility) {
 };
 
 window.selectTraining = function (facility) {
-    const characterId = document.getElementById("training-predictions-app")?.getAttribute("data-character-id");
-    if (!characterId) {
-        console.error("Character ID not found");
+    if (typeof window.openTrainingConfirmation === "function") {
+        window.openTrainingConfirmation(facility);
         return;
     }
 
-    // Create a form and submit it to the training store endpoint
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = `/characters/${characterId}/training`;
-    
-    // Add CSRF token
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
-    if (csrfToken) {
-        const csrfInput = document.createElement("input");
-        csrfInput.type = "hidden";
-        csrfInput.name = "_token";
-        csrfInput.value = csrfToken;
-        form.appendChild(csrfInput);
-    }
-    
-    // Add training type
-    const trainingInput = document.createElement("input");
-    trainingInput.type = "hidden";
-    trainingInput.name = "training_type";
-    trainingInput.value = facility;
-    form.appendChild(trainingInput);
-    
-    // Submit the form
-    document.body.appendChild(form);
-    form.submit();};
+    window.dispatchEvent(
+        new CustomEvent("toast", {
+            detail: {
+                type: "warning",
+                message: "Training confirmation is not ready yet.",
+            },
+        }),
+    );
+};

@@ -765,9 +765,9 @@ class CareerController extends Controller
             $this->collectAIRecommendations($career, $aiRecommendations);
         }
 
-        $trainingRecommendations = array_values(array_unique($trainingRecommendations));
-        $raceRecommendations = array_values(array_unique($raceRecommendations));
-        $skillRecommendations = array_values(array_unique($skillRecommendations));
+        $trainingRecommendations = array_values(array_unique(array_map(static fn (mixed $value): string => (string) $value, $trainingRecommendations)));
+        $raceRecommendations = array_values(array_unique(array_map(static fn (mixed $value): string => (string) $value, $raceRecommendations)));
+        $skillRecommendations = array_values(array_unique(array_map(static fn (mixed $value): string => (string) $value, $skillRecommendations)));
 
         return response()->json([
             'data' => [

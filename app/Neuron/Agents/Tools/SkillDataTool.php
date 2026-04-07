@@ -255,18 +255,21 @@ class SkillDataTool extends Tool
         $sources = [];
         if (! empty($skill->support_card_sources)) {
             $supportSources = $this->sanitizeArrayForOutput($skill->support_card_sources);
+            /** @var list<string> $supportSources */
             if (! empty($supportSources)) {
                 $sources[] = 'Support Cards: '.implode(', ', array_slice($supportSources, 0, 3));
             }
         }
         if (! empty($skill->event_sources)) {
             $eventSources = $this->sanitizeArrayForOutput($skill->event_sources);
+            /** @var list<string> $eventSources */
             if (! empty($eventSources)) {
                 $sources[] = 'Events: '.implode(', ', array_slice($eventSources, 0, 3));
             }
         }
         if (! empty($skill->inheritance_sources)) {
             $inheritanceSources = $this->sanitizeArrayForOutput($skill->inheritance_sources);
+            /** @var list<string> $inheritanceSources */
             if (! empty($inheritanceSources)) {
                 $sources[] = 'Inheritance: '.implode(', ', array_slice($inheritanceSources, 0, 3));
             }

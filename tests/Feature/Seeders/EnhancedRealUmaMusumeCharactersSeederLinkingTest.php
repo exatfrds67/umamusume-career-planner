@@ -41,7 +41,8 @@ it('links newly seeded external characters to the canonical game character catal
     $gameCharacter = GameCharacter::query()->where('name_en', '=', 'Special Week', 'and')->firstOrFail();
 
     expect($character->game_character_id)->toBe($gameCharacter->id)
-        ->and($character->scenario_type)->toBe('ura_finale');
+        ->and($character->scenario_type)->toBe('ura_finale')
+        ->and($character->is_seeded)->toBeTrue();
 });
 
 it('retroactively links existing external characters when the canonical game character exists', function (): void {
@@ -70,5 +71,6 @@ it('retroactively links existing external characters when the canonical game cha
 
     $character->refresh();
 
-    expect($character->game_character_id)->toBe($gameCharacter->id);
+    expect($character->game_character_id)->toBe($gameCharacter->id)
+        ->and($character->is_seeded)->toBeTrue();
 });

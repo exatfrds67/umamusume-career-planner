@@ -164,18 +164,22 @@ class AgentFeedbackService
         try {
             // Get all feedback for this agent
             $memories = $this->memoryService->getAgentMemories($agentId, AgentMemoryService::MEMORY_LONG_TERM);
-            $feedback = array_filter($memories, function (array $memory): bool {
-                $key = $memory['key'] ?? '';
 
-                return is_string($key) && str_starts_with($key, 'learning:');
-            });
-
-            // Analyze patterns - rekey array for analyzePatterns
             /** @var array<string, mixed> $feedbackForPatterns */
             $feedbackForPatterns = [];
-            foreach ($feedback as $key => $value) {
-                $feedbackForPatterns[(string) $key] = $value;
+            foreach ($memories as $memory) {
+                if (! is_array($memory)) {
+                    continue;
+                }
+
+                $key = $memory['key'] ?? null;
+                if (! is_string($key) || ! str_starts_with($key, 'learning:')) {
+                    continue;
+                }
+
+                $feedbackForPatterns[$key] = $memory;
             }
+
             $patterns = $this->analyzePatterns($feedbackForPatterns);
 
             // Store learned patterns

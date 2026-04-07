@@ -232,6 +232,11 @@ class OllamaService
             if (is_array($decoded) && isset($decoded['error']) && is_string($decoded['error'])) {
                 throw new \RuntimeException('Ollama error: '.$decoded['error']);
             }
+
+            // Guard against malformed JSON payloads that still look like error objects.
+            if ($decoded === null && json_last_error() !== JSON_ERROR_NONE && stripos($content, '"error"') !== false) {
+                throw new \RuntimeException('Ollama returned malformed error payload');
+            }
         }
 
         return $content;

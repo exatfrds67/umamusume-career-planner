@@ -142,6 +142,7 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
                         'current_stats' => json_encode($this->getBaseStats($normalizedName)),
                         'growth_rates' => json_encode($this->getGrowthRates($normalizedName)),
                         'game_character_id' => $character->game_character_id ?? $gameCharacter?->id,
+                        'is_seeded' => true,
                     ]);
 
                     $skipped++;
@@ -161,6 +162,7 @@ class EnhancedRealUmaMusumeCharactersSeeder extends Seeder
                     'user_id' => $user->id,
                     'name' => $characterName,
                     'avatar_url' => $avatarUrl,
+                    'is_seeded' => true,
                     'game_character_id' => $gameCharacter?->id,
                     'scenario_type' => 'ura_finale',
                     'career_stage' => 'junior',

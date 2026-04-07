@@ -1,29 +1,32 @@
 @props(['tier', 'size' => 'sm'])
 
 @php
-    $sizeClasses = [
-        'xs' => 'px-1.5 py-0.5 text-xs',
-        'sm' => 'px-2 py-0.5 text-xs',
-        'md' => 'px-2.5 py-1 text-sm',
-    ];
-
-    $tierColors = [
-        'S+' =>
-            'bg-linear-to-r from-red-100 to-pink-100 text-red-800 dark:from-red-900 dark:to-pink-900 dark:text-red-200 border border-red-300 dark:border-red-700',
-        'S' =>
-            'bg-linear-to-r from-orange-100 to-yellow-100 text-orange-800 dark:from-orange-900 dark:to-yellow-900 dark:text-orange-200 border border-orange-300 dark:border-orange-700',
-        'A' =>
-            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border border-green-300 dark:border-green-700',
-        'B' =>
-            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border border-blue-300 dark:border-blue-700',
-        'C' =>
-            'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-600',
-    ];
-
-    $colorClass = $tierColors[$tier] ?? 'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200';
-    $sizeClass = $sizeClasses[$size] ?? $sizeClasses['sm'];
+    $variant = match ($tier) {
+        'S+' => 'tier-s-plus',
+        'S'  => 'tier-s',
+        'A'  => 'tier-a',
+        'B'  => 'tier-b',
+        'C'  => 'tier-c',
+        default => 'neutral',
+    };
+    // Use !important overrides so .badge base CSS (unlayered, higher cascade priority) is correctly superseded.
+    $sizeOverride = match ($size) {
+        'xs'    => '!text-xs !px-1.5 !py-0.5',
+        'md'    => '!text-sm !px-2.5 !py-1',
+        default => '!text-xs !px-2 !py-0.5',
+    };
+    $tierIcon = match ($tier) {
+        'S+' => '👑',
+        'S'  => '★',
+        'A'  => '◆',
+        'B'  => '▲',
+        default => null,
+    };
 @endphp
 
-<span class="inline-flex items-center {{ $sizeClass }} rounded font-bold {{ $colorClass }}">
+<x-badge :variant="$variant" class="{{ $sizeOverride }} !rounded !font-bold">
+    @if ($tierIcon)
+        <span aria-hidden="true">{{ $tierIcon }}</span>
+    @endif
     {{ $tier }}
-</span>
+</x-badge>

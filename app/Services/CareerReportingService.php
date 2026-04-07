@@ -248,10 +248,20 @@ class CareerReportingService
      * Get highlight stats from training sessions
      *
      * @param  Collection<int, \App\Models\TrainingSession>  $sessions
-     * @return array{best_stat: string, best_value: int, total_gains: int, avg_per_turn: float}
+     * @return array{best_stat: string, best_value: int, total_gains: int, avg_per_turn: float, has_data: bool}
      */
     protected function getHighlightStats(Collection $sessions): array
     {
+        if ($sessions->isEmpty()) {
+            return [
+                'best_stat' => 'n/a',
+                'best_value' => 0,
+                'total_gains' => 0,
+                'avg_per_turn' => 0.0,
+                'has_data' => false,
+            ];
+        }
+
         $statTotals = array_fill_keys(self::STAT_TYPES, 0);
 
         /** @var TrainingSession $session */
@@ -271,6 +281,7 @@ class CareerReportingService
             'best_value' => $statTotals[$bestStat] ?? 0,
             'total_gains' => $totalGains,
             'avg_per_turn' => $turnCount > 0 ? round($totalGains / $turnCount, 2) : 0.0,
+            'has_data' => true,
         ];
     }
 
@@ -815,7 +826,8 @@ class CareerReportingService
      *     stat_statistics: array<string, array<string, mixed>>,
      *     training_statistics: array<string, mixed>,
      *     race_statistics: array<string, mixed>,
-     *     correlation_analysis: array<string, mixed>
+     *     correlation_analysis: array<string, mixed>,
+     *     has_training_data: bool
      * }
      */
     protected function buildStatisticalSummary(Collection $sessions, Collection $races): array
@@ -825,6 +837,7 @@ class CareerReportingService
             'training_statistics' => $this->calculateTrainingStatistics($sessions),
             'race_statistics' => $this->calculateRaceStatistics($races),
             'correlation_analysis' => $this->performCorrelationAnalysis($sessions, $races),
+            'has_training_data' => $sessions->isNotEmpty(),
         ];
     }
 
@@ -1174,6 +1187,20 @@ class CareerReportingService
      */
     protected function generateKeyInsights(array $performanceOverview, array $trainingAnalysis, array $raceAnalysis): array
     {
+        $totalSessions = isset($trainingAnalysis['total_sessions']) && is_int($trainingAnalysis['total_sessions'])
+            ? $trainingAnalysis['total_sessions']
+            : 0;
+        $totalRaces = isset($raceAnalysis['total_races']) && is_int($raceAnalysis['total_races'])
+            ? $raceAnalysis['total_races']
+            : 0;
+
+        if ($totalSessions === 0 && $totalRaces === 0) {
+            return [
+                'No training sessions or races are recorded yet. Continue your run to unlock detailed insights.',
+                'Track a few turns of training to start seeing meaningful efficiency and stat trend analysis.',
+            ];
+        }
+
         $insights = [];
 
         // Efficiency insights
@@ -1277,9 +1304,6 @@ class CareerReportingService
         $winRate = isset($raceAnalysis['win_rate']) && is_numeric($raceAnalysis['win_rate'])
             ? (float) $raceAnalysis['win_rate']
             : 0.0;
-        $totalRaces = isset($raceAnalysis['total_races']) && is_int($raceAnalysis['total_races'])
-            ? $raceAnalysis['total_races']
-            : 0;
         if ($totalRaces > 0) {
             if ($winRate >= 70) {
                 $insights[] = "Outstanding race performance ({$winRate}% win rate) - dominant competitive showing.";
@@ -1322,6 +1346,16 @@ class CareerReportingService
      */
     protected function generateImprovementRecommendations(Career $career, array $performanceOverview, array $trainingAnalysis): array
     {
+        $totalSessions = isset($trainingAnalysis['total_sessions']) && is_int($trainingAnalysis['total_sessions'])
+            ? $trainingAnalysis['total_sessions']
+            : 0;
+        if ($totalSessions === 0) {
+            return [
+                'Start by recording your first few training turns so recommendations can adapt to your run pattern.',
+                'Prioritize early friendship bond setup to improve future training consistency and gains.',
+            ];
+        }
+
         $recommendations = [];
 
         // Efficiency-based recommendations

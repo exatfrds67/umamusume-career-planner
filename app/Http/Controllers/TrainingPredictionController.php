@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Character;
@@ -53,6 +55,8 @@ class TrainingPredictionController extends Controller
      */
     public function show(Character $character): View
     {
+        $this->authorize('view', $character);
+
         $character->load([
             'aptitudes',
             'supportCards.supportCard',

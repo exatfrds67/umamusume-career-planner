@@ -11,28 +11,52 @@
 
     <div class="container mx-auto px-4 py-8">
         {{-- Page Header --}}
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Historical Tracking & Benchmarking</h1>
-            <p class="mt-2 text-neutral-600 dark:text-neutral-400">
-                Analyze your long-term performance trends and compare against community benchmarks.
-            </p>
+        <div class="mb-8 flex items-start justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Historical Tracking & Benchmarking</h1>
+                <p class="mt-2 text-neutral-600 dark:text-neutral-400">
+                    Analyze your long-term performance trends and compare against community benchmarks.
+                </p>
+            </div>
+
+            <button onclick="clearHistoricalCache()"
+                class="inline-flex items-center px-4 py-2 bg-neutral-600 hover:bg-neutral-700 text-white text-sm font-medium rounded-lg transition-colors shrink-0">
+                <svg aria-hidden="true" class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh Data
+            </button>
         </div>
 
         {{-- Error/Insufficient Data Alert --}}
         @if (isset($longTermTrends['error']))
+            @php
+                $currentSampleSize = (int) ($longTermTrends['current_sample_size'] ?? 0);
+                $requiredSampleSize = (int) ($longTermTrends['required_sample_size'] ?? 5);
+                $progressPercent = $requiredSampleSize > 0 ? min(100, (int) round(($currentSampleSize / $requiredSampleSize) * 100)) : 0;
+            @endphp
             <div role="alert"
                 class="mb-6 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 p-4 border border-yellow-200 dark:border-yellow-800">
-                <div class="flex items-center">
+                <div class="flex items-start">
                     <svg aria-hidden="true" class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                             d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
                             clip-rule="evenodd" />
                     </svg>
-                    <div class="ml-3">
+                    <div class="ml-3 w-full">
                         <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Insufficient Data</h3>
                         <p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
                             {{ $longTermTrends['message'] ?? 'Complete more careers to unlock historical tracking features.' }}
                         </p>
+                        <p class="mt-2 text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                            Progress: {{ $currentSampleSize }} / {{ $requiredSampleSize }} completed careers
+                        </p>
+                        <div class="mt-2 h-2 w-full rounded-full bg-yellow-100 dark:bg-yellow-900/40" role="progressbar"
+                            aria-valuenow="{{ $progressPercent }}" aria-valuemin="0" aria-valuemax="100"
+                            aria-label="Historical tracking readiness progress">
+                            <div class="h-2 rounded-full bg-yellow-500" style="width: {{ $progressPercent }}%"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -346,17 +370,6 @@
             </div>
         @endif
 
-        {{-- Refresh Cache Button --}}
-        <div class="mt-8 flex justify-end">
-            <button onclick="clearHistoricalCache()"
-                class="inline-flex items-center px-4 py-2 bg-neutral-600 hover:bg-neutral-700 text-white text-sm font-medium rounded-lg transition-colors">
-                <svg aria-hidden="true" class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Refresh Data
-            </button>
-        </div>
     </div>
 
     @vite(['resources/js/pages/historical/index.js'])

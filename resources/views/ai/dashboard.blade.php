@@ -9,13 +9,41 @@
     <div class="py-12" x-data="aiDashboard()">
         <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
             {{-- Page Header --}}
-            <div class="mb-6">
-                <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">AI Management Dashboard</h1>
-                <p class="mt-2 text-neutral-600 dark:text-neutral-400">Monitor AI provider performance, costs, and server health</p>
+            <div class="mb-6 flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">AI Management Dashboard</h1>
+                    <p class="mt-2 text-neutral-600 dark:text-neutral-400">Monitor AI provider performance, costs, and server health</p>
+                </div>
+                <div>
+                    <button @click="loadDashboard(false)" 
+                        type="button"
+                        class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-neutral-900 shadow-sm ring-1 ring-inset ring-neutral-300 hover:bg-neutral-50 dark:bg-neutral-800 dark:text-white dark:ring-neutral-700 dark:hover:bg-neutral-700">
+                        <svg class="mr-2 h-4 w-4" :class="{'animate-spin text-blue-600': loading}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                        Refresh
+                    </button>
+                </div>
             </div>
 
-            <!-- Summary Cards -->
-            <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4" aria-label="Summary Statistics">
+            <!-- Initial Loading Skeleton -->
+            <div x-show="initialLoad" class="space-y-6 animate-pulse">
+                <!-- Skeletons for summary cards -->
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <template x-for="i in 4" :key="i">
+                        <div class="h-32 rounded-lg bg-white dark:bg-neutral-800 shadow-xs"></div>
+                    </template>
+                </div>
+                <!-- Skeletons for wide cards -->
+                <div class="h-64 rounded-lg bg-white dark:bg-neutral-800 shadow-xs"></div>
+                <div class="h-64 rounded-lg bg-white dark:bg-neutral-800 shadow-xs"></div>
+            </div>
+
+            <!-- Content Container -->
+            <div x-show="!initialLoad" x-cloak class="space-y-6">
+
+                <!-- Summary Cards -->
+                <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4" aria-label="Summary Statistics">
                 <!-- Total Requests Card -->
                 <article class="overflow-hidden bg-white shadow-xs dark:bg-neutral-800 sm:rounded-lg">
                     <div class="p-6">
@@ -111,6 +139,16 @@
                 <div class="p-6">
                     <h2 id="mcp-server-status-title" class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">MCP Server Status</h2>
                     <div class="space-y-4">
+                        <template x-if="Object.keys(servers).length === 0">
+                            <div class="rounded-lg border border-neutral-200 border-dashed p-8 text-center dark:border-neutral-700">
+                                <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+                                </svg>
+                                <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-white">No servers</h3>
+                                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">No MCP servers are currently registered or active.</p>
+                            </div>
+                        </template>
+
                         <template x-for="(server, name) in servers" :key="name">
                             <div
                                 class="flex items-center justify-between rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
@@ -167,7 +205,18 @@
                 <div class="p-6">
                     <h2 id="performance-comparison-title" class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">AI Provider Performance
                         Comparison</h2>
-                    <div class="overflow-x-auto">
+                    
+                    <template x-if="Object.keys(performance.providers).length === 0">
+                        <div class="mt-4 mb-4 rounded-lg border border-neutral-200 border-dashed p-8 text-center dark:border-neutral-700">
+                            <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-white">No performance data</h3>
+                            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">No requests have been made to AI providers yet.</p>
+                        </div>
+                    </template>
+
+                    <div class="overflow-x-auto" x-show="Object.keys(performance.providers).length > 0">
                         <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
                             <thead class="bg-neutral-50 dark:bg-neutral-900">
                                 <tr>
@@ -255,6 +304,8 @@
                     </div>
                 </div>
             </section>
+
+            </div> <!-- End Content Container -->
         </div>
     </div>
 

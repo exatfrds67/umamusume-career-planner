@@ -10,7 +10,6 @@ use App\Services\MCP\Tools\Context7Service;
 use App\Services\MCP\Tools\FetchService;
 use App\Services\MCP\Tools\ToolChainingService;
 use Illuminate\Support\Facades\Cache;
-use Mockery;
 use Tests\TestCase;
 
 /**
@@ -30,8 +29,8 @@ class ToolChainingWorkflowTest extends TestCase
     {
         parent::setUp();
 
-        /** @var MCPClientService&Mockery\MockInterface $mcpClient */
-        $mcpClient = Mockery::mock(MCPClientService::class);
+        /** @var MCPClientService&\Mockery\MockInterface $mcpClient */
+        $mcpClient = \Mockery::mock(MCPClientService::class);
         $mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
         $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
         $this->mcpClient = $mcpClient;
@@ -56,7 +55,7 @@ class ToolChainingWorkflowTest extends TestCase
 
     protected function tearDown(): void
     {
-        Mockery::close();
+        \Mockery::close();
         parent::tearDown();
     }
 

@@ -50,6 +50,8 @@ use Illuminate\Support\Str;
  * @property bool $is_pinned
  * @property bool $is_seeded
  * @property array<string, mixed>|null $completion_data
+ * @property array<string, mixed>|null $synergy_snapshot
+ * @property \Illuminate\Support\Carbon|null $synergy_computed_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -98,6 +100,8 @@ class Character extends Model
         'is_pinned',
         'is_seeded',
         'completion_data',
+        'synergy_snapshot',
+        'synergy_computed_at',
         'available_sp',
         'game_character_id',
     ];
@@ -133,6 +137,8 @@ class Character extends Model
             'is_pinned' => 'boolean',
             'is_seeded' => 'boolean',
             'completion_data' => 'array',
+            'synergy_snapshot' => 'array',
+            'synergy_computed_at' => 'datetime',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
@@ -298,12 +304,18 @@ class Character extends Model
         $stats = is_string($value) ? json_decode($value, true) : $value;
         $stats = is_array($stats) ? $stats : [];
 
+        $speed = $stats['speed'] ?? 0;
+        $stamina = $stats['stamina'] ?? 0;
+        $power = $stats['power'] ?? 0;
+        $guts = $stats['guts'] ?? 0;
+        $wit = $stats['wit'] ?? 0;
+
         return [
-            'speed' => is_numeric($stats['speed'] ?? 0) ? (int) $stats['speed'] : 0,
-            'stamina' => is_numeric($stats['stamina'] ?? 0) ? (int) $stats['stamina'] : 0,
-            'power' => is_numeric($stats['power'] ?? 0) ? (int) $stats['power'] : 0,
-            'guts' => is_numeric($stats['guts'] ?? 0) ? (int) $stats['guts'] : 0,
-            'wit' => is_numeric($stats['wit'] ?? 0) ? (int) $stats['wit'] : 0,
+            'speed' => is_numeric($speed) ? (int) $speed : 0,
+            'stamina' => is_numeric($stamina) ? (int) $stamina : 0,
+            'power' => is_numeric($power) ? (int) $power : 0,
+            'guts' => is_numeric($guts) ? (int) $guts : 0,
+            'wit' => is_numeric($wit) ? (int) $wit : 0,
         ];
     }
 

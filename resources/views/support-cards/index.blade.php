@@ -20,14 +20,23 @@
                 </p>
             </div>
             <div class="page-hero__actions">
-                <button @click="showExternalImport = !showExternalImport" class="btn btn-success"
-                    :class="{ 'ring-2 ring-green-500': showExternalImport }" :aria-expanded="showExternalImport.toString()" aria-controls="external-import-panel">
+                @auth
+                    <a href="{{ route('characters.index') }}" class="btn btn-primary flex items-center gap-2"
+                        title="Select a character to build a deck">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Build Deck
+                    </a>
+                @endauth
+                <button @click="showExternalImport = !showExternalImport" class="btn btn-outline"
+                    :class="{ 'ring-2 ring-primary-400': showExternalImport }" :aria-expanded="showExternalImport.toString()" aria-controls="external-import-panel">
                     <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                     </svg>
                     <span x-show="!showExternalImport">Import from API</span>
-                    <span x-show="showExternalImport">Close Import</span>
+                    <span x-show="showExternalImport" x-cloak>Close Import</span>
                 </button>
             </div>
             </div>
@@ -40,9 +49,22 @@
         </div>
 
         <!-- Filters -->
-        <aside class="filter-surface p-4"
-            aria-label="Filters">
-            <h2 class="sr-only">Collection Filters</h2>
+        <aside class="filter-surface p-4" aria-label="Filters">
+            <div class="flex items-center justify-between md:hidden mb-3">
+                <h2 class="text-sm font-semibold text-neutral-700 dark:text-neutral-200">
+                    Filters
+                    <template x-if="activeFilterCount > 0">
+                        <span class="ml-1.5 inline-flex items-center justify-center rounded-full bg-primary-600 px-1.5 py-0.5 text-xs font-bold text-white" x-text="activeFilterCount"></span>
+                    </template>
+                </h2>
+                <button type="button" @click="filtersOpen = !filtersOpen"
+                    class="btn btn-outline text-xs" :aria-expanded="filtersOpen.toString()">
+                    <span x-show="filtersOpen" x-cloak>Hide Filters</span>
+                    <span x-show="!filtersOpen">Show Filters</span>
+                </button>
+            </div>
+            <h2 class="sr-only hidden md:block">Collection Filters</h2>
+            <div x-show="filtersOpen" x-cloak>
             <form method="GET" action="{{ route('support-cards.index') }}" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <!-- Search -->
@@ -129,8 +151,8 @@
 
                     <!-- Limit Break (WF-010 requirement) -->
                     <div class="md:col-span-1">
-                        <label for="limit_break" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
-                            LB
+                        <label for="limit_break" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1" title="Limit Break">
+                            LB <span class="sr-only">(Limit Break)</span>
                         </label>
                         <select id="limit_break" name="limit_break"
                             class="form-select block w-full rounded-md border-neutral-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
@@ -148,7 +170,7 @@
                         <label for="sort" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                             Sort
                         </label>
-                        <select id="sort" name="sort"
+                        <select id="sort" name="sort" onchange="this.form.submit()"
                             class="form-select block w-full rounded-md border-neutral-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-neutral-700 dark:border-neutral-600 dark:text-white">
                             <option value="tier" {{ request('sort', 'tier') === 'tier' ? 'selected' : '' }}>Tier</option>
                             <option value="usage_rate" {{ request('sort') === 'usage_rate' ? 'selected' : '' }}>Most Used</option>
@@ -180,20 +202,63 @@
                     </div>
                 </div>
             </form>
+            </div>
         </aside>
 
-        <!-- Collection Stats Widget (WF-010 requirement) -->
+        {{-- F-04: Active filter chips --}}
+        @php
+            $activeFilterParams = [
+                'search'      => request('search'),
+                'type'        => request('type'),
+                'rarity'      => request('rarity'),
+                'tier'        => request('tier'),
+                'bond_level'  => request('bond_level'),
+                'limit_break' => request('limit_break'),
+            ];
+            $filterChipLabels = [
+                'search'      => 'Search',
+                'type'        => 'Type',
+                'rarity'      => 'Rarity',
+                'tier'        => 'Tier',
+                'bond_level'  => 'Bond',
+                'limit_break' => 'LB',
+            ];
+        @endphp
+        @if (collect($activeFilterParams)->filter()->isNotEmpty())
+            <div class="flex flex-wrap items-center gap-2" aria-label="Active filters">
+                <span class="text-xs font-semibold text-neutral-500 dark:text-neutral-400">Active:</span>
+                @foreach ($activeFilterParams as $key => $value)
+                    @if ($value)
+                        @php
+                            $clearUrl = route('support-cards.index', request()->except($key));
+                        @endphp
+                        <a href="{{ $clearUrl }}"
+                            class="inline-flex items-center gap-1 rounded-full bg-primary-100 px-3 py-1 text-xs font-medium text-primary-800 hover:bg-primary-200 dark:bg-primary-900/40 dark:text-primary-300 dark:hover:bg-primary-900/60 transition-colors"
+                            title="Remove {{ $filterChipLabels[$key] }} filter">
+                            <span>{{ $filterChipLabels[$key] }}: {{ $value }}</span>
+                            <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                            </svg>
+                        </a>
+                    @endif
+                @endforeach
+                <a href="{{ route('support-cards.index') }}"
+                    class="text-xs text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 underline ml-1">
+                    Clear all
+                </a>
+            </div>
+        @endif
+
         <!-- Collection Stats Widget -->
-        <aside class="filter-surface p-4"
-            aria-labelledby="stats-heading">
+        <aside class="filter-surface p-4" aria-labelledby="stats-heading">
             <h2 id="stats-heading" class="sr-only">Collection Statistics</h2>
-            <div class="flex flex-wrap items-center justify-between gap-4">
-                <div class="flex items-center gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="flex flex-wrap items-center gap-6">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ $cards->total() }}</div>
                         <div class="text-xs text-neutral-500 dark:text-neutral-400">Total Cards</div>
                     </div>
-                    <div class="h-8 border-l border-neutral-200 dark:border-neutral-600"></div>
+                    <div class="hidden sm:block h-8 border-l border-neutral-200 dark:border-neutral-600"></div>
                     <div class="flex gap-4">
                         @foreach (['SSR' => 'text-yellow-500', 'SR' => 'text-purple-500', 'R' => 'text-blue-500'] as $r => $color)
                             <div class="text-center">
@@ -202,37 +267,62 @@
                             </div>
                         @endforeach
                     </div>
-                    <div class="h-8 border-l border-neutral-200 dark:border-neutral-600"></div>
-                    <div class="flex gap-3 text-xs">
-                        @php
-                            $typeCounts = $cards->getCollection()->groupBy(fn($c) => $c->card_type)->map->count();
-                        @endphp
+                    <div class="hidden sm:block h-8 border-l border-neutral-200 dark:border-neutral-600"></div>
+                    <div class="flex flex-wrap gap-2">
                         @foreach ($typeCounts as $type => $count)
-                            <span class="px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300">
+                            <a href="{{ route('support-cards.index', array_merge(request()->except('page'), ['type' => $type])) }}"
+                                class="inline-flex items-center rounded px-2 py-1 text-xs font-medium bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600 transition-colors"
+                                title="Filter by {{ ucfirst($type) }} cards">
                                 {{ ucfirst($type) }}: {{ $count }}
-                            </span>
+                            </a>
                         @endforeach
                     </div>
                 </div>
-                @if (auth()->check())
-                    <a href="{{ route('characters.index') }}" class="btn btn-primary flex items-center gap-2"
-                        title="Select a character to build a deck">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                            aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Build Deck
-                    </a>
-                @endif
             </div>
         </aside>
 
-        <!-- Cards Grid -->
+        <!-- Cards Grid / List -->
         <section aria-label="Support Card List">
             @if ($cards->count() > 0)
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {{-- F-10: View mode toggle row --}}
+                <div class="mb-4 flex items-center justify-between">
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                        Showing {{ $cards->firstItem() }}–{{ $cards->lastItem() }} of {{ $cards->total() }} cards
+                    </p>
+                    <div class="flex items-center gap-1" role="group" aria-label="View mode">
+                        <button type="button" @click="toggleViewMode('grid')"
+                            :class="viewMode === 'grid' ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300' : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200'"
+                            class="rounded p-2 transition-colors" :aria-pressed="(viewMode === 'grid').toString()" title="Grid view">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                            <span class="sr-only">Grid view</span>
+                        </button>
+                        <button type="button" @click="toggleViewMode('list')"
+                            :class="viewMode === 'list' ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300' : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200'"
+                            class="rounded p-2 transition-colors" :aria-pressed="(viewMode === 'list').toString()" title="List view">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            </svg>
+                            <span class="sr-only">List view</span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Grid View --}}
+                <div x-show="viewMode === 'grid'" x-cloak
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @foreach ($cards as $card)
                         <x-support-card-tile :card="$card" />
+                    @endforeach
+                </div>
+
+                {{-- List View --}}
+                <div x-show="viewMode === 'list'" x-cloak class="space-y-2">
+                    @foreach ($cards as $card)
+                        <x-support-card-list-item :card="$card" />
                     @endforeach
                 </div>
 
@@ -240,6 +330,7 @@
                     {{ $cards->links() }}
                 </div>
             @else
+                {{-- F-19: Empty state with "Clear all filters" --}}
                 <div
                     class="text-center py-12 bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700">
                     <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24"
@@ -251,6 +342,11 @@
                     <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                         Try adjusting your filters or search criteria.
                     </p>
+                    @if (request()->anyFilled(['search', 'type', 'rarity', 'tier', 'bond_level', 'limit_break']))
+                        <a href="{{ route('support-cards.index') }}" class="btn btn-primary mt-4">
+                            Clear all filters
+                        </a>
+                    @endif
                 </div>
             @endif
         </section>

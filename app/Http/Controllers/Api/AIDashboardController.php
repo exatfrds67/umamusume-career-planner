@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -9,6 +11,7 @@ use App\Services\AI\CostTrackingService;
 use App\Services\MCP\MCPMonitoringService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * AI Dashboard Controller
@@ -53,10 +56,11 @@ class AIDashboardController extends Controller
                 'data' => $overview,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch AI dashboard overview', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch dashboard overview',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -74,10 +78,11 @@ class AIDashboardController extends Controller
                 'data' => $servers,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch AI server status', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch server status',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -95,10 +100,11 @@ class AIDashboardController extends Controller
                 'data' => $performance,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch AI performance comparison', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch performance comparison',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -119,10 +125,11 @@ class AIDashboardController extends Controller
                 'data' => $costs,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch AI cost data', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch cost data',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -140,10 +147,11 @@ class AIDashboardController extends Controller
                 'data' => $agents,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch AI agents data', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch agents data',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -207,10 +215,11 @@ class AIDashboardController extends Controller
                 'data' => $conversations,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch AI conversations', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch conversations',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -236,10 +245,11 @@ class AIDashboardController extends Controller
                 'data' => $analytics,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch conversation analytics', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch conversation analytics',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -250,7 +260,7 @@ class AIDashboardController extends Controller
     public function serverHealth(Request $request, string $serverName): JsonResponse
     {
         try {
-            $hours = (int) $request->query('hours', 24);
+            $hours = (int) $request->query('hours', '24');
 
             $history = $this->mcpMonitoring->getServerHealthHistory($serverName, $hours);
             $stats = $this->mcpMonitoring->getServerUptimeStats($serverName, $hours);
@@ -263,10 +273,11 @@ class AIDashboardController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch server health history', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch server health history',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -286,10 +297,11 @@ class AIDashboardController extends Controller
                 'data' => $recommendations,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch cost optimization recommendations', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch cost optimization recommendations',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -300,7 +312,7 @@ class AIDashboardController extends Controller
     public function costTrend(Request $request): JsonResponse
     {
         try {
-            $days = (int) $request->query('days', 30);
+            $days = (int) $request->query('days', '30');
             $userId = $request->user()?->id;
 
             $trend = $this->costTracking->getDailyCostTrend($days, $userId);
@@ -310,10 +322,11 @@ class AIDashboardController extends Controller
                 'data' => $trend,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch cost trend', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch cost trend',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }

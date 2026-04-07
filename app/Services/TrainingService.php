@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Career;
 use App\Models\Character;
 use App\Models\TrainingSession;
 use App\Services\Training\BondProgressionService;
@@ -237,14 +238,14 @@ class TrainingService
         array $bondUpdates,
         array $skillHints
     ): TrainingSession {
-        $career = $character->currentCareer;
+        $career = $this->resolveCareerForTraining($character);
         $energyCost = $this->calculateEnergyCost($trainingType);
         $energyBefore = $character->energy_level ?? 100;
         $energyAfter = max(0, $energyBefore - $energyCost);
         $totalStatPoints = array_sum($gains);
 
         return TrainingSession::create([
-            'career_id' => $career?->id,
+            'career_id' => $career->id,
             'character_id' => $character->id,
             'turn_number' => $character->current_turn,
             'career_phase' => $character->career_stage,
@@ -268,6 +269,28 @@ class TrainingService
             ],
             'friendship_training' => $bonuses['is_friendship'],
             'friendship_level_bonus' => $bonuses['is_friendship'] ? 20 : 0,
+        ]);
+    }
+
+    protected function resolveCareerForTraining(Character $character): Career
+    {
+        $career = $character->currentCareer;
+        if ($career instanceof Career) {
+            return $career;
+        }
+
+        return Career::query()->create([
+            'user_id' => $character->user_id,
+            'character_id' => $character->id,
+            'star_level' => 3,
+            'career_name' => $character->name.' Career',
+            'scenario_type' => $character->scenario_type,
+            'status' => 'active',
+            'current_turn' => max(1, (int) $character->current_turn),
+            'current_phase' => in_array($character->career_stage, ['junior', 'classic', 'senior'], true)
+                    ? $character->career_stage
+                    : 'junior',
+            'started_at' => now()->toDateString(),
         ]);
     }
 

@@ -149,6 +149,7 @@ document.addEventListener("alpine:init", () => {
         selectTrainee(trainee) {
             const avatarUrl = this.resolveCharacterImageUrl(trainee);
 
+            this.clearAvatarUploadInput();
             this.formData.trainee = trainee;
             this.formData.name = trainee.name || "";
             this.formData.title = trainee.title || "";
@@ -455,7 +456,16 @@ document.addEventListener("alpine:init", () => {
             reader.readAsDataURL(file);
         },
 
+        clearAvatarUploadInput() {
+            const avatarUploadInput = document.querySelector('input[name="avatar_upload"]');
+
+            if (avatarUploadInput) {
+                avatarUploadInput.value = '';
+            }
+        },
+
         selectGalleryImage(imagePath) {
+            this.clearAvatarUploadInput();
             this.formData.avatar_url = imagePath;
             this.formData.avatar_preview = imagePath;
             this.showGallery = false;
@@ -463,6 +473,7 @@ document.addEventListener("alpine:init", () => {
         },
 
         useDefaultAvatar() {
+            this.clearAvatarUploadInput();
             this.formData.avatar_url = '';
             this.formData.avatar_preview = '';
             this.showGallery = false;

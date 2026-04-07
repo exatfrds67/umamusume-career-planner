@@ -36,7 +36,7 @@ final readonly class SupportCardDeck
     /**
      * Minimum number of cards at bond ≥80 required for Friendship Training activation
      */
-    public const MIN_FRIENDSHIP_CARDS = 3;
+    public const MIN_FRIENDSHIP_CARDS = 1;
 
     /**
      * Create a new Support Card Deck

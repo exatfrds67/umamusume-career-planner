@@ -8,8 +8,12 @@ export default () => ({
     async loadPreference() {
         try {
             const response = await fetch("/api/ai/chat/preferences");
-            const data = await response.json();
-            if (data.selected_agent) {
+            const responseData = await response.json();
+            
+            // Normalize payload to handle `{success: true, data: {...}}` envelope
+            const data = responseData.success !== undefined ? responseData.data : responseData;
+            
+            if (data && data.selected_agent) {
                 this.selectedAgent = data.selected_agent;
             }
         } catch (error) {

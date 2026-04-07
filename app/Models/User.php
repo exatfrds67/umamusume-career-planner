@@ -302,7 +302,13 @@ class User extends Authenticatable
         $settings = $this->ai_settings->getArrayCopy();
         $model = $settings['preferred_model'] ?? null;
 
-        return is_string($model) ? $model : 'ollama';
+        if (is_string($model) && $model !== '') {
+            return $model;
+        }
+
+        $defaultProvider = config('ai.default_provider', 'ollama');
+
+        return is_string($defaultProvider) && $defaultProvider !== '' ? $defaultProvider : 'ollama';
     }
 
     /**

@@ -5,10 +5,18 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\AsyncCareerPlanRequest;
 use App\Http\Requests\Api\CareerPlanningRequest;
+use App\Http\Requests\Api\LockCareerPlanRequest;
+use App\Jobs\GenerateCareerPlan;
+use App\Jobs\SendTurnNotification;
+use App\Models\CareerPlan;
+use App\Models\Character;
 use App\Services\Neuron\CareerPlanningService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -225,5 +233,242 @@ class CareerPlanningController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
+    }
+
+    /**
+     * Queue an asynchronous timeline-based career plan.
+     */
+    public function requestTimelinePlan(AsyncCareerPlanRequest $request): JsonResponse
+    {
+        $user = $request->user();
+        if ($user === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Authentication required.',
+            ], 401);
+        }
+
+        $validated = $request->validated();
+        $character = Character::query()->findOrFail($request->integer('character_id'));
+        $this->authorize('view', $character);
+
+        $jobId = (string) Str::uuid();
+        $planId = (string) Str::uuid();
+
+        CareerPlan::query()->create([
+            'id' => $planId,
+            'user_id' => (int) $user->id,
+            'character_id' => $character->id,
+            'goal' => isset($validated['goal']) && is_string($validated['goal']) ? $validated['goal'] : null,
+            'plan' => [
+                'plan_id' => $planId,
+                'character_id' => $character->id,
+                'created_at' => now()->toIso8601String(),
+                'goal' => $validated['goal'] ?? 'Complete the career',
+                'status' => 'queued',
+                'job_id' => $jobId,
+                'total_turns' => 0,
+                'timeline' => [],
+                'summary' => [],
+                'metadata' => [
+                    'options' => $validated['options'] ?? [],
+                ],
+            ],
+            'is_locked' => false,
+            'current_turn' => 1,
+        ]);
+
+        Cache::put("career-plan-job:{$jobId}", [
+            'status' => 'queued',
+            'plan_id' => $planId,
+        ], now()->addDay());
+
+        GenerateCareerPlan::dispatch(
+            $jobId,
+            $planId,
+            $character->id,
+            [
+                'goal' => $validated['goal'] ?? null,
+                'options' => is_array($validated['options'] ?? null) ? $validated['options'] : [],
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'job_id' => $jobId,
+            'plan_id' => $planId,
+            'status_url' => url("/api/career-planning/plan/jobs/{$jobId}"),
+        ], 202);
+    }
+
+    /**
+     * Return the status of an asynchronous plan generation job.
+     */
+    public function getTimelinePlanStatus(string $jobId): JsonResponse
+    {
+        $status = Cache::get("career-plan-job:{$jobId}");
+        if (! is_array($status)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Job not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'job_id' => $jobId,
+                'status' => $status['status'] ?? 'unknown',
+                'plan_id' => $status['plan_id'] ?? null,
+                'error' => $status['error'] ?? null,
+            ],
+        ]);
+    }
+
+    /**
+     * Retrieve a stored timeline-based career plan.
+     */
+    public function showTimelinePlan(string $planId): JsonResponse
+    {
+        $user = auth()->user();
+        if ($user === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Authentication required.',
+            ], 401);
+        }
+
+        $plan = CareerPlan::query()
+            ->where('id', $planId)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        if (! $plan->isCompleted()) {
+            return response()
+                ->json([
+                    'success' => true,
+                    'status' => $plan->status(),
+                    'plan_id' => $plan->id,
+                ], 202)
+                ->header('Retry-After', '10');
+        }
+
+        return response()->json([
+            'success' => true,
+            'plan' => $plan->plan,
+        ]);
+    }
+
+    /**
+     * Lock a generated plan and optionally store notification preferences.
+     */
+    public function lockTimelinePlan(LockCareerPlanRequest $request, string $planId): JsonResponse
+    {
+        $user = $request->user();
+        if ($user === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Authentication required.',
+            ], 401);
+        }
+
+        $plan = CareerPlan::query()
+            ->where('id', $planId)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        if ($plan->is_locked) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Plan already locked.',
+            ], 400);
+        }
+
+        if (! $plan->isCompleted()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Plan is not ready to be locked yet.',
+            ], 409);
+        }
+
+        $preferences = $request->validated('notification_preferences', []);
+        $plan->storeNotificationPreferences(is_array($preferences) ? $preferences : []);
+        $plan->is_locked = true;
+        $plan->locked_at = now();
+        $plan->current_turn = $request->integer('start_turn', 1);
+        $plan->save();
+
+        SendTurnNotification::dispatch($plan->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Plan locked.',
+        ]);
+    }
+
+    /**
+     * Get the next planned action from a locked plan.
+     */
+    public function nextTimelineAction(string $planId): JsonResponse
+    {
+        $user = auth()->user();
+        if ($user === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Authentication required.',
+            ], 401);
+        }
+
+        $plan = CareerPlan::query()
+            ->where('id', $planId)
+            ->where('user_id', $user->id)
+            ->where('is_locked', true)
+            ->firstOrFail();
+
+        $next = $plan->getNextAction();
+        if ($next === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No further actions. Plan complete?',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'turn' => $plan->current_turn,
+            'action' => $next['action'] ?? [],
+            'remaining_turns' => max(
+                0,
+                ((is_numeric($plan->plan['total_turns'] ?? null) ? (int) $plan->plan['total_turns'] : 0) - $plan->current_turn)
+            ),
+        ]);
+    }
+
+    /**
+     * Advance the tracked turn for a locked plan.
+     */
+    public function advanceTimelineTurn(string $planId): JsonResponse
+    {
+        $user = auth()->user();
+        if ($user === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Authentication required.',
+            ], 401);
+        }
+
+        $plan = CareerPlan::query()
+            ->where('id', $planId)
+            ->where('user_id', $user->id)
+            ->where('is_locked', true)
+            ->firstOrFail();
+
+        $plan->advanceTurn();
+        SendTurnNotification::dispatch($plan->id);
+
+        return response()->json([
+            'success' => true,
+            'new_turn' => $plan->current_turn,
+        ]);
     }
 }

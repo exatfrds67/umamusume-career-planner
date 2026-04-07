@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\MCP;
 
 use App\Services\AI\BedrockService;
-use Cloudstudio\Ollama\Facades\Ollama;
+use App\Services\AI\OllamaService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -71,7 +71,8 @@ class AgentRoutingService
     public function __construct(
         private readonly MCPClientService $mcpClient,
         private readonly CostManagementService $costManager,
-        private readonly BedrockService $bedrockService
+        private readonly BedrockService $bedrockService,
+        private readonly OllamaService $ollamaService
     ) {}
 
     /**
@@ -318,10 +319,10 @@ class AgentRoutingService
      *
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectFallbackProvider(string $complexity, string $reason): array
+    protected function selectFallbackProvider(string $complexity, string $reason, string $failedProvider = ''): array
     {
-        // Always try Ollama first if available — covers both budget and provider failures
-        if ($this->isOllamaAvailable()) {
+        // Don't fallback to Ollama if Ollama was the one that just failed (e.g., OOM)
+        if ($failedProvider !== self::PROVIDER_OLLAMA && $this->isOllamaAvailable()) {
             $defaultModel = config('ai.ollama.default_model', 'llama3');
 
             return [
@@ -332,7 +333,7 @@ class AgentRoutingService
             ];
         }
 
-        // Ollama unavailable — fall back to cheapest Bedrock option only when primary was not Bedrock
+        // Ollama unavailable or failed — fall back to cheapest Bedrock option
         return [
             'provider' => self::PROVIDER_BEDROCK,
             'model' => 'amazon.nova-lite-v1:0',
@@ -358,28 +359,26 @@ class AgentRoutingService
             $executionTime = microtime(true) - $startTime;
 
             // Check if performance is acceptable
-            if ($this->isPerformanceAcceptable($route['provider'], $executionTime)) {
-                // Record successful execution
-                $this->recordExecution($route, $executionTime, true);
-
-                return [
-                    'success' => true,
-                    'response' => $response,
+            if (! $this->isPerformanceAcceptable($route['provider'], $executionTime)) {
+                // Log warning but still return the valid response rather than throwing it away
+                Log::warning('[AgentRouting] Performance threshold exceeded, but returning valid response', [
                     'provider' => $route['provider'],
-                    'model' => $route['model'],
                     'execution_time' => $executionTime,
-                    'cost' => $this->calculateActualCost($route, $request, $response),
-                    'fallback_used' => false,
-                ];
+                ]);
             }
 
-            // Performance unacceptable, try fallback
-            Log::warning('[AgentRouting] Performance threshold exceeded, attempting fallback', [
-                'provider' => $route['provider'],
-                'execution_time' => $executionTime,
-            ]);
+            // Record successful execution
+            $this->recordExecution($route, $executionTime, true);
 
-            return $this->executeFallback($request, $route, 'performance_threshold');
+            return [
+                'success' => true,
+                'response' => $response,
+                'provider' => $route['provider'],
+                'model' => $route['model'],
+                'execution_time' => $executionTime,
+                'cost' => $this->calculateActualCost($route, $request, $response),
+                'fallback_used' => false,
+            ];
         } catch (\Exception $e) {
             Log::error('[AgentRouting] Primary provider failed, attempting fallback', [
                 'provider' => $route['provider'],
@@ -403,7 +402,8 @@ class AgentRoutingService
     protected function executeFallback(array $request, array $primaryRoute, string $reason): array
     {
         $complexity = $this->detectComplexity($request);
-        $fallbackRoute = $this->selectFallbackProvider($complexity, $reason);
+        $failedProvider = is_string($primaryRoute['provider'] ?? null) ? $primaryRoute['provider'] : 'unknown';
+        $fallbackRoute = $this->selectFallbackProvider($complexity, $reason, $failedProvider);
 
         $startTime = microtime(true);
 
@@ -471,21 +471,17 @@ class AgentRoutingService
             $prompt = $systemContext."\n\nUser Query: ".$prompt;
         }
 
-        $response = Ollama::agent('Umamusume Career Advisor')
-            ->model($model)
-            ->prompt($prompt)
-            ->options([
-                'temperature' => is_numeric($request['temperature'] ?? null) ? (float) $request['temperature'] : 0.3,
-                'top_p' => is_numeric($request['top_p'] ?? null) ? (float) $request['top_p'] : 0.9,
-                'max_tokens' => is_numeric($request['max_tokens'] ?? null) ? (int) $request['max_tokens'] : 2048,
-            ])
-            ->ask();
+        try {
+            $response = $this->ollamaService->generate($prompt, [], $model);
 
-        if (is_array($response)) {
-            return is_string($response['response'] ?? null) ? $response['response'] : (is_string($response['content'] ?? null) ? $response['content'] : (json_encode($response) ?: ''));
+            return is_string($response['content'] ?? null) ? $response['content'] : '';
+        } catch (\Exception $e) {
+            Log::error('[AgentRouting] Ollama execution failed', [
+                'model' => $model,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
         }
-
-        return is_string($response) ? (string) $response : '';
     }
 
     /**

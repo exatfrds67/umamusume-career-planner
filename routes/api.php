@@ -69,6 +69,10 @@ Route::middleware('auth:sanctum')->prefix('training-predictions')->name('api.tra
     Route::post('/recommend', [TrainingPredictionController::class, 'recommend'])
         ->name('recommend');
 
+    // Simulate a training action for confirmation preview
+    Route::post('/simulate', [TrainingPredictionController::class, 'simulate'])
+        ->name('simulate');
+
     // Cache management
     Route::delete('/cache/{characterId}', [TrainingPredictionController::class, 'clearCache'])
         ->name('cache.clear');
@@ -740,7 +744,42 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('neuron')->name('ap
             ->name('plan.stream');
         Route::get('/history/{characterId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getHistory'])
             ->name('history');
+        Route::post('/plan/jobs', [\App\Http\Controllers\Api\CareerPlanningController::class, 'requestTimelinePlan'])
+            ->name('plan.jobs');
+        Route::get('/plan/jobs/{jobId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getTimelinePlanStatus'])
+            ->name('plan.jobs.status');
+        Route::get('/plan/{planId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'showTimelinePlan'])
+            ->where('planId', '[a-f0-9-]+')
+            ->name('plan.show');
+        Route::post('/plan/{planId}/lock', [\App\Http\Controllers\Api\CareerPlanningController::class, 'lockTimelinePlan'])
+            ->where('planId', '[a-f0-9-]+')
+            ->name('plan.lock');
+        Route::get('/plan/{planId}/next', [\App\Http\Controllers\Api\CareerPlanningController::class, 'nextTimelineAction'])
+            ->where('planId', '[a-f0-9-]+')
+            ->name('plan.next');
+        Route::post('/plan/{planId}/advance', [\App\Http\Controllers\Api\CareerPlanningController::class, 'advanceTimelineTurn'])
+            ->where('planId', '[a-f0-9-]+')
+            ->name('plan.advance');
     });
+});
+
+Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('ai')->name('api.ai.')->group(function () {
+    Route::post('/career/plan', [\App\Http\Controllers\Api\CareerPlanningController::class, 'requestTimelinePlan'])
+        ->name('career.plan');
+    Route::get('/career/plan/jobs/{jobId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getTimelinePlanStatus'])
+        ->name('career.plan.jobs.status');
+    Route::get('/plan/{planId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'showTimelinePlan'])
+        ->where('planId', '[a-f0-9-]+')
+        ->name('plan.show');
+    Route::post('/plan/{planId}/lock', [\App\Http\Controllers\Api\CareerPlanningController::class, 'lockTimelinePlan'])
+        ->where('planId', '[a-f0-9-]+')
+        ->name('plan.lock');
+    Route::get('/plan/{planId}/next', [\App\Http\Controllers\Api\CareerPlanningController::class, 'nextTimelineAction'])
+        ->where('planId', '[a-f0-9-]+')
+        ->name('plan.next');
+    Route::post('/plan/{planId}/advance', [\App\Http\Controllers\Api\CareerPlanningController::class, 'advanceTimelineTurn'])
+        ->where('planId', '[a-f0-9-]+')
+        ->name('plan.advance');
 });
 
 // Legacy compatibility routes (kept for test and client backward compatibility)
@@ -761,6 +800,22 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
             ->name('plan.stream');
         Route::get('/history/{characterId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getHistory'])
             ->name('history');
+        Route::post('/plan/jobs', [\App\Http\Controllers\Api\CareerPlanningController::class, 'requestTimelinePlan'])
+            ->name('plan.jobs');
+        Route::get('/plan/jobs/{jobId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getTimelinePlanStatus'])
+            ->name('plan.jobs.status');
+        Route::get('/plan/{planId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'showTimelinePlan'])
+            ->where('planId', '[a-f0-9-]+')
+            ->name('plan.show');
+        Route::post('/plan/{planId}/lock', [\App\Http\Controllers\Api\CareerPlanningController::class, 'lockTimelinePlan'])
+            ->where('planId', '[a-f0-9-]+')
+            ->name('plan.lock');
+        Route::get('/plan/{planId}/next', [\App\Http\Controllers\Api\CareerPlanningController::class, 'nextTimelineAction'])
+            ->where('planId', '[a-f0-9-]+')
+            ->name('plan.next');
+        Route::post('/plan/{planId}/advance', [\App\Http\Controllers\Api\CareerPlanningController::class, 'advanceTimelineTurn'])
+            ->where('planId', '[a-f0-9-]+')
+            ->name('plan.advance');
     });
 });
 

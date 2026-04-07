@@ -499,29 +499,64 @@ const aiChatInterface = function (config) {
          * Show error message with contextual details
          */
         showError(message) {
+            let safeMessage = message;
+
+            if (typeof safeMessage === "string" && safeMessage.trim().startsWith("{")) {
+                try {
+                    const parsed = JSON.parse(safeMessage);
+                    if (parsed && typeof parsed.error === "string") {
+                        safeMessage = parsed.error;
+                    }
+                } catch (error) {
+                    console.debug("Error message is not valid JSON", error);
+                }
+            }
+
             let errorTitle = "Error";
             let errorIcon = "⚠️";
+            let actions = [];
 
-            if (message.toLowerCase().includes("network") || message.toLowerCase().includes("connection")) {
+            const normalized = String(safeMessage || "").toLowerCase();
+
+            if (normalized.includes("network") || normalized.includes("connection")) {
                 errorTitle = "Connection Error";
                 errorIcon = "🔌";
-            } else if (message.toLowerCase().includes("rate limit") || message.toLowerCase().includes("too many")) {
+                safeMessage = "We couldn't reach the AI service. Please check your network or try a different provider.";
+                actions = [{ label: "Retry Message", method: "regenerateResponse", primary: true }];
+            } else if (normalized.includes("rate limit") || normalized.includes("too many")) {
                 errorTitle = "Rate Limited";
                 errorIcon = "⏱️";
-            } else if (message.toLowerCase().includes("model") || message.toLowerCase().includes("unavailable")) {
+                safeMessage = "The provider is currently rate limited. Please wait a moment, then retry.";
+                actions = [{ label: "Retry Now", method: "regenerateResponse", primary: true }];
+            } else if (
+                normalized.includes("requires more system memory")
+                || normalized.includes("out of memory")
+                || normalized.includes("memory")
+                || normalized.includes("model")
+                || normalized.includes("unavailable")
+            ) {
                 errorTitle = "Model Unavailable";
                 errorIcon = "🤖";
-            } else if (message.toLowerCase().includes("unauthorized") || message.toLowerCase().includes("401")) {
+                safeMessage = "This model needs more memory than is available. Switch to a smaller model and try again.";
+                actions = [
+                    { label: "Switch to Nova-Lite", method: "switchToNovaLite", primary: true },
+                    { label: "Retry", method: "regenerateResponse", primary: false }
+                ];
+            } else if (normalized.includes("unauthorized") || normalized.includes("401")) {
                 errorTitle = "Authentication Error";
                 errorIcon = "🔒";
+                safeMessage = "The AI provider credentials are invalid or expired. Please review provider settings.";
+            } else {
+                actions = [{ label: "Retry", method: "regenerateResponse", primary: true }];
             }
 
             this.addMessage({
                 id: Date.now(),
                 sender: "system",
-                content: `${errorIcon} **${errorTitle}**: ${message}`,
+                content: `${errorIcon} **${errorTitle}**: ${safeMessage}`,
                 timestamp: new Date().toISOString(),
                 isError: true,
+                actions: actions,
             });
         },
 
@@ -673,30 +708,31 @@ const aiChatInterface = function (config) {
          * Regenerate the last AI response
          */
         async regenerateResponse() {
-            // Find the last user message
-            const lastUserMsg = [...this.messages].reverse().find(m => m.sender === "user");
-            if (!lastUserMsg || this.isProcessing) {
+            // Find the last user message index
+            const lastUserIndex = this.messages.map(m => m.sender).lastIndexOf("user");
+            if (lastUserIndex === -1 || this.isProcessing) {
                 return;
             }
 
-            // Remove the last AI message
-            const lastAiIndex = this.messages.map(m => m.sender).lastIndexOf("ai");
-            if (lastAiIndex !== -1) {
-                this.messages.splice(lastAiIndex, 1);
-                this.messages = [...this.messages];
-                this.saveToLocalStorage();
-            }
-
-            // Re-send the last user message
+            // Save the user message content before removing it
+            const lastUserMsg = this.messages[lastUserIndex];
             this.currentMessage = lastUserMsg.content;
-            // Remove the last user message too (sendMessage will re-add it)
-            const lastUserIndex = this.messages.map(m => m.sender).lastIndexOf("user");
-            if (lastUserIndex !== -1) {
-                this.messages.splice(lastUserIndex, 1);
-                this.messages = [...this.messages];
-            }
 
+            // Remove the last user message and any messages that came after it (including AI responses and System errors)
+            this.messages = this.messages.slice(0, lastUserIndex);
+            this.saveToLocalStorage();
+
+            // Re-send
             await this.sendMessage();
+        },
+
+        switchToNovaLite() {
+            this.provider = 'bedrock';
+            this.model = 'nova-lite';
+            
+            // Re-sync UI selects if needed (handled by x-model usually)
+            
+            this.regenerateResponse();
         },
 
         /**

@@ -83,16 +83,60 @@
             @include('training.partials.character-overview', ['character' => $selectedCharacter])
             @include('training.partials.ai-advisor-banner')
             @include('training.partials.predictions-grid', ['character' => $selectedCharacter])
+
+            <x-modal name="training-confirmation" title="Confirm Training Action" size="lg">
+                <div class="space-y-4" id="training-confirmation-content" aria-live="polite">
+                    <div class="rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 p-4">
+                        <div class="flex items-center justify-between gap-3">
+                            <h4 id="training-confirmation-facility" class="text-base font-semibold text-neutral-900 dark:text-white">Training</h4>
+                            <span id="training-confirmation-risk" class="px-2 py-1 rounded text-xs font-semibold bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300">Fail: --%</span>
+                        </div>
+                        <p id="training-confirmation-status" class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Preparing preview...</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="rounded-lg border border-neutral-200 dark:border-neutral-700 p-3">
+                            <div class="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Energy Change</div>
+                            <div id="training-confirmation-energy" class="mt-1 text-sm font-semibold text-neutral-900 dark:text-white">--</div>
+                        </div>
+                        <div class="rounded-lg border border-neutral-200 dark:border-neutral-700 p-3">
+                            <div class="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Energy After</div>
+                            <div id="training-confirmation-energy-after" class="mt-1 text-sm font-semibold text-neutral-900 dark:text-white">--</div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-lg border border-neutral-200 dark:border-neutral-700 p-3">
+                        <div class="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400 mb-2">Expected Stat Gains</div>
+                        <div id="training-confirmation-gains" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-neutral-700 dark:text-neutral-200">
+                            <span>Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <x-slot:footer>
+                    <x-button variant="secondary" @click="$dispatch('close-modal', 'training-confirmation')">Cancel</x-button>
+                    <button type="button" id="training-confirmation-submit" class="btn btn-primary btn-md" disabled>
+                        Confirm
+                    </button>
+                </x-slot:footer>
+            </x-modal>
         @else
             <div class="card rounded-xl p-12 text-center animate-fade-in-delay-2">
-                <div class="text-neutral-500 dark:text-neutral-400 mb-4" aria-hidden="true">
-                    <svg class="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                <div class="mb-4">
+                    <img src="/images/app_logo/uma_musume_race_planner_logo_128.png"
+                         alt="{{ config('app.name') }}"
+                         class="mx-auto h-20 w-20 opacity-40 dark:opacity-30">
                 </div>
                 <h3 class="text-lg font-medium text-neutral-900 dark:text-white mb-2">No Character Selected</h3>
-                <p class="text-neutral-700 dark:text-neutral-300">Please select a character to view training predictions</p>
+                <p class="text-neutral-700 dark:text-neutral-300 mb-5">Choose a character to unlock AI predictions, risk analysis, and turn-by-turn recommendations.</p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('character_id')?.focus()">
+                        Quick Switch
+                    </button>
+                    <a href="{{ route('characters.create') }}" class="btn btn-primary">
+                        Create Character
+                    </a>
+                </div>
             </div>
         @endif
     </div>

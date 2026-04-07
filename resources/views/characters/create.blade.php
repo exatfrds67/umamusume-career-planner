@@ -162,7 +162,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('characters.store') }}" id="character-form">
+        <form method="POST" action="{{ route('characters.store') }}" enctype="multipart/form-data" id="character-form">
             @csrf
 
             <!-- Step 1: Basic Information -->

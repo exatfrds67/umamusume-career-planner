@@ -167,7 +167,41 @@ test('training predictions index without character shows empty state', function 
 
     $response->assertSuccessful();
     $response->assertSee('No Character Selected');
-    $response->assertSee('Please select a character to view training predictions');
+    $response->assertSee('Choose a character to unlock AI predictions, risk analysis, and turn-by-turn recommendations.');
+});
+
+test('training predictions index with selected character includes confirmation modal and action urls', function () use (&$character, &$user) {
+    $response = $this->actingAs($user)->get(route('training.predictions', ['character_id' => $character->id]));
+
+    $response->assertSuccessful();
+    $response->assertSee('training-confirmation-content', false);
+    $response->assertSee('training-confirmation-submit', false);
+    $response->assertSee('data-simulate-url', false);
+    $response->assertSee('data-train-url', false);
+    $response->assertSee('data-rest-url', false);
+    $response->assertSee('recommended-action-hero', false);
+    $response->assertSee('Recommended Action');
+    $response->assertSee('recommended-action-cta', false);
+    $response->assertSee('Why this choice?');
+});
+
+test('training predictions index includes ranked alternative badge hooks', function () use (&$character, &$user) {
+    $response = $this->actingAs($user)->get(route('training.predictions', ['character_id' => $character->id]));
+
+    $response->assertSuccessful();
+    $response->assertSee('Ranked Alternatives');
+    $response->assertSee('rank-badge', false);
+    $response->assertSee('data-testid="rank-badge-speed"', false);
+    $response->assertSee('data-testid="rank-badge-rest"', false);
+});
+
+test('training predictions keeps a single sticky owner for scrolling UI', function () use (&$character, &$user) {
+    $response = $this->actingAs($user)->get(route('training.predictions', ['character_id' => $character->id]));
+
+    $response->assertSuccessful();
+    $response->assertSee('filter-surface p-6 animate-fade-in-delay-1"', false);
+    $response->assertDontSee('filter-surface p-6 animate-fade-in-delay-1 sticky top-14 z-20', false);
+    $response->assertSee('status-strip p-4 mb-6 animate-fade-in-delay-2 lg:sticky lg:top-20 lg:z-30 backdrop-blur-sm', false);
 });
 
 test('training predictions index displays all training types', function () use (&$character, &$user) {

@@ -41,6 +41,14 @@ it('displays dashboard with character data when characters exist', function () {
     $response->assertViewHas('hasCharacters', true);
     $response->assertViewHas('selectedCharacter');
     $response->assertSee('Test Uma');
+    $response->assertSee('Primary Decision Zone');
+    $response->assertSee('Secondary Context Zone');
+    $response->assertSee('Tertiary Insights Zone');
+    $response->assertSeeInOrder([
+        'Primary Decision Zone',
+        'Secondary Context Zone',
+        'Tertiary Insights Zone',
+    ]);
 });
 
 it('allows selecting a specific character via query parameter', function () {

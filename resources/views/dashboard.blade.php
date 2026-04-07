@@ -10,6 +10,33 @@
             'spAvailable' => $selectedCharacter?->available_sp,
             'storageMode' => null,
         ];
+
+        $topSuggestion = $trainingSuggestions[0] ?? null;
+        $riskLabels = [
+            'none' => 'No Risk',
+            'low' => 'Low Risk',
+            'medium' => 'Medium Risk',
+            'high' => 'High Risk',
+        ];
+
+        $nextRaceReadiness = null;
+        if (!empty($nextRaceRequirements ?? [])) {
+            $readinessScores = [];
+            foreach ($nextRaceRequirements as $statKey => $requiredValue) {
+                if (!is_numeric($requiredValue) || (int) $requiredValue <= 0) {
+                    continue;
+                }
+
+                $normalizedStat = $statKey === 'wisdom' ? 'wit' : $statKey;
+                $currentValue = (int) ($stats[$normalizedStat] ?? 0);
+                $requiredInt = (int) $requiredValue;
+                $readinessScores[] = (int) min(100, round(($currentValue / $requiredInt) * 100));
+            }
+
+            if (!empty($readinessScores)) {
+                $nextRaceReadiness = (int) round(array_sum($readinessScores) / count($readinessScores));
+            }
+        }
     @endphp
 
     {{-- Breadcrumb Navigation --}}
@@ -81,8 +108,62 @@
             <!-- Empty State -->
             <x-dashboard.empty-state />
         @else
+            <section class="space-y-4 animate-fade-in-delay-1" aria-labelledby="primary-decision-heading">
+                <div class="section-kicker">
+                    <span>Primary Decision</span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                    <h3 id="primary-decision-heading" class="text-lg font-semibold text-neutral-900 dark:text-white">Primary Decision Zone</h3>
+                    <a href="{{ route('training.predictions') }}" class="btn btn-secondary btn-sm">
+                        Review Full Predictions
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <article class="panel-surface rounded-xl p-5" aria-labelledby="next-best-action-title">
+                        <p class="text-xs font-semibold uppercase tracking-[0.12em] text-primary-700 dark:text-primary-300">What To Do Now</p>
+                        <h4 id="next-best-action-title" class="mt-2 text-base font-semibold text-neutral-900 dark:text-white">Next Best Action</h4>
+                        @if ($topSuggestion)
+                            <p class="mt-2 text-sm font-medium text-neutral-900 dark:text-neutral-100">{{ $topSuggestion['action'] }}</p>
+                            <p class="mt-1 text-sm text-neutral-700 dark:text-neutral-300">{{ $topSuggestion['gains'] ?? 'Focus on the highest projected gain this turn.' }}</p>
+                            <p class="mt-2 text-xs text-neutral-600 dark:text-neutral-300">
+                                Risk: {{ $riskLabels[$topSuggestion['risk'] ?? 'none'] ?? 'No Risk' }}. This recommendation is based on current stats, mood, and energy.
+                            </p>
+                        @else
+                            <p class="mt-2 text-sm text-neutral-700 dark:text-neutral-300">No recommendation available yet. Generate a prediction to get your next best action.</p>
+                        @endif
+                        <div class="mt-4">
+                            <a href="{{ route('training.predictions') }}" class="btn btn-primary btn-sm">Start Recommended Training</a>
+                        </div>
+                    </article>
+
+                    <article class="status-strip p-5" aria-labelledby="turn-status-title">
+                        <p class="status-strip__item-label">Why It Matters</p>
+                        <h4 id="turn-status-title" class="mt-2 text-base font-semibold text-neutral-900 dark:text-white">Turn Progress</h4>
+                        <p class="mt-2 text-3xl font-extrabold leading-none text-neutral-950 dark:text-white">{{ $metrics['currentTurn'] }} / {{ $metrics['maxTurns'] }}</p>
+                        <p class="mt-2 text-sm text-neutral-700 dark:text-neutral-300">Status: <span class="font-semibold">{{ $metrics['trackStatus'] }}</span></p>
+                        <p class="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Staying on track protects your race readiness and skill pacing for upcoming turns.</p>
+                    </article>
+
+                    <article class="status-strip p-5" aria-labelledby="race-readiness-title">
+                        <p class="status-strip__item-label">Upcoming Constraint</p>
+                        <h4 id="race-readiness-title" class="mt-2 text-base font-semibold text-neutral-900 dark:text-white">Next Race Readiness</h4>
+                        @if ($nextRaceReadiness !== null)
+                            <p class="mt-2 text-3xl font-extrabold leading-none text-neutral-950 dark:text-white">{{ $nextRaceReadiness }}%</p>
+                            <p class="mt-2 text-sm text-neutral-700 dark:text-neutral-300">{{ $nextRaceName ?? 'Next race' }}</p>
+                        @elseif($metrics['nextRace'])
+                            <p class="mt-2 text-base font-semibold text-neutral-900 dark:text-white">{{ $metrics['nextRace'] }}</p>
+                            <p class="mt-2 text-sm text-neutral-700 dark:text-neutral-300">{{ $metrics['turnsUntilRace'] }} turns remaining</p>
+                        @else
+                            <p class="mt-2 text-sm text-neutral-700 dark:text-neutral-300">No race scheduled yet.</p>
+                        @endif
+                        <p class="mt-2 text-xs text-neutral-600 dark:text-neutral-300">Use stat and mood context below to increase confidence before race day.</p>
+                    </article>
+                </div>
+            </section>
+
             <!-- Key Metrics Overview -->
-            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 animate-fade-in-delay-1">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in-delay-1" aria-label="Top dashboard metrics">
                 <!-- Current Turn -->
                 <div class="metric-card metric-card--primary">
                     <div class="metric-card__body">
@@ -140,34 +221,6 @@
                     </div>
                 </div>
 
-                <!-- Skills Acquired -->
-                <div class="metric-card metric-card--success">
-                    <div class="metric-card__body">
-                        <div class="metric-card__row">
-                            <div class="metric-card__icon shrink-0">
-                                <svg class="h-6 w-6 text-success-600 dark:text-success-400" fill="none"
-                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
-                                </svg>
-                            </div>
-                            <div class="w-0 flex-1">
-                                <dl>
-                                    <dt class="metric-card__eyebrow truncate">Skills Acquired</dt>
-                                    <dd class="flex items-baseline flex-wrap gap-x-2">
-                                        <div class="metric-card__value whitespace-nowrap">
-                                            {{ $metrics['skillsAcquired'] }} / {{ $metrics['targetSkills'] }}
-                                        </div>
-                                        <div class="metric-badge metric-badge--success">
-                                            SP&nbsp;Left:&nbsp;{{ $metrics['skillPoints'] }}
-                                        </div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Next Race -->
                 <div class="metric-card metric-card--warning">
                     <div class="metric-card__body">
@@ -201,72 +254,83 @@
                 </div>
             </div>
 
-            <!-- Main 2-Column Grid (per WF-001 wireframe) -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in-delay-2">
+            <section class="space-y-4 animate-fade-in-delay-2" aria-labelledby="secondary-context-heading">
+                <div class="section-kicker">
+                    <span>Context</span>
+                </div>
+                <h3 id="secondary-context-heading" class="text-lg font-semibold text-neutral-900 dark:text-white">Secondary Context Zone</h3>
 
-                <!-- Left Column: Progress & Schedule (2/3 width) -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Turn Counter Widget -->
-                    <div class="glass-card rounded-xl p-6">
-                        <x-turn-counter :current="$metrics['currentTurn']" :total="$metrics['maxTurns']" />
+                <!-- Main 2-Column Grid (per WF-001 wireframe) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    <!-- Left Column: Progress & Schedule (2/3 width) -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Goals Widget -->
+                        <x-dashboard.goals-widget :shortTermGoal="$goals['shortTerm']['goal']" :shortTermProgress="$goals['shortTerm']['progress']" :longTermGoal="$goals['longTerm']['goal']" :longTermProgress="$goals['longTerm']['progress']"
+                            :characterId="$selectedCharacter?->id" />
+
+                        <!-- Training Suggestions -->
+                        <livewire:dashboard.training-suggestion-panel :suggestions="$trainingSuggestions" />
+
+                        <!-- Upcoming Races -->
+                        <x-dashboard.upcoming-races :races="$races" />
+
+                        <!-- Recent Results Timeline -->
+                        <x-dashboard.recent-results :results="$recentResults" />
                     </div>
 
-                    <!-- Goals Widget -->
-                    <x-dashboard.goals-widget :shortTermGoal="$goals['shortTerm']['goal']" :shortTermProgress="$goals['shortTerm']['progress']" :longTermGoal="$goals['longTerm']['goal']" :longTermProgress="$goals['longTerm']['progress']"
-                        :characterId="$selectedCharacter?->id" />
+                    <!-- Right Column: Stats & Advisories (1/3 width) -->
+                    <div class="flex flex-col gap-6 h-full">
+                        <!-- Character Stats Card -->
+                        <x-dashboard.stats-snapshot :stats="$stats" :character="$selectedCharacter" :raceRequirements="$nextRaceRequirements ?? []" :nextRaceName="$nextRaceName ?? null" />
 
-                    <!-- Training Suggestions -->
-                    <x-dashboard.training-suggestions :suggestions="$trainingSuggestions" />
+                        <!-- Mood/Energy Widget -->
+                        <x-dashboard.mood-energy-widget :mood="$moodEnergy['mood']" :energy="$moodEnergy['energy']" :maxEnergy="$moodEnergy['maxEnergy']" />
 
-                    <!-- Upcoming Races -->
-                    <x-dashboard.upcoming-races :races="$races" />
-
-                    <!-- Recent Results Timeline -->
-                    <x-dashboard.recent-results :results="$recentResults" />
+                        <!-- AI Advisor Card -->
+                        <x-dashboard.ai-advisor-card class="flex-1" />
+                    </div>
                 </div>
-
-                <!-- Right Column: Stats & Advisories (1/3 width) -->
-                <div class="flex flex-col gap-6 h-full">
-                    <!-- Character Stats Card -->
-                    <x-dashboard.stats-snapshot :stats="$stats" :character="$selectedCharacter" />
-
-                    <!-- Mood/Energy Widget -->
-                    <x-dashboard.mood-energy-widget :mood="$moodEnergy['mood']" :energy="$moodEnergy['energy']" :maxEnergy="$moodEnergy['maxEnergy']" />
-
-                    <!-- AI Advisor Card -->
-                    <x-dashboard.ai-advisor-card class="flex-1" />
-                </div>
-            </div>
+            </section>
 
             <!-- Analytics & Quick Actions -->
             <div class="space-y-8">
-            <!-- Quick Actions -->
-            <div class="animate-fade-in-delay-3">
+            <!-- Insights -->
+            <section class="animate-fade-in-delay-3" x-data="{ insightsOpen: (typeof window !== 'undefined' ? window.innerWidth >= 1024 : false) }" aria-labelledby="tertiary-insights-heading">
                 <div class="section-kicker">
                     <span>Insights</span>
                 </div>
-                <h3 class="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Analytics & Race Planning</h3>
-
-                {{-- Phase 5: Analytics Section --}}
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 items-start">
-                    {{-- Stat Progression Chart --}}
-                        <x-line-chart title="Stat Progression" :data="$statProgression" :labels="$progressionLabels" :colors="['#3B82F6', '#10B981', '#F59E0B']"
-                        :dataset-labels="['Total Stats']"
-                        height="h-72" />
-
-                    {{-- Fan Count Hierarchy --}}
-                        <x-class-pyramid title="Race Grade Distribution" :grades="$raceGrades" variant="pyramid" />
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <h3 id="tertiary-insights-heading" class="text-lg font-semibold text-neutral-900 dark:text-white">Tertiary Insights Zone</h3>
+                    <button type="button" class="btn btn-secondary btn-sm lg:hidden" @click="insightsOpen = !insightsOpen"
+                        :aria-expanded="insightsOpen.toString()" aria-controls="dashboard-insights-content">
+                        <span x-text="insightsOpen ? 'Hide Insights' : 'Show Insights'"></span>
+                    </button>
                 </div>
 
-                {{-- Activity Timeline --}}
-                <x-activity-timeline title="Recent Activity" :events="$recentActivity ?? []" variant="timeline" class="mb-6" />
-            </div>
+                <div id="dashboard-insights-content" x-show="insightsOpen" x-collapse>
+                    {{-- Phase 5: Analytics Section --}}
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 items-start">
+                        {{-- Stat Progression Chart --}}
+                            <x-line-chart title="Stat Progression" :data="$statProgression" :labels="$progressionLabels" :colors="['#3B82F6', '#10B981', '#F59E0B']"
+                            :dataset-labels="['Total Stats']"
+                            height="h-72" />
+
+                        {{-- Fan Count Hierarchy --}}
+                            <x-class-pyramid title="Race Grade Distribution" :grades="$raceGrades" variant="pyramid" />
+                    </div>
+
+                    {{-- Activity Timeline --}}
+                    <x-activity-timeline title="Recent Activity" :events="$recentActivity ?? []" variant="timeline" class="mb-6" />
+                </div>
+            </section>
 
             <div class="animate-fade-in-delay-3">
                 <div class="section-kicker">
                     <span>Actions</span>
                 </div>
-                <h3 class="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Quick Actions</h3>
+                <h3 class="text-lg font-semibold mb-2 text-neutral-900 dark:text-white">Quick Actions</h3>
+                <p class="mb-4 text-sm text-neutral-600 dark:text-neutral-300">Secondary shortcuts. Use the primary decision zone above for your recommended next move.</p>
                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                     <a href="{{ $selectedCharacter ? route('training.predictions.show', $selectedCharacter) : route('training.predictions') }}"
                         class="action-card action-card--training relative group block w-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900">

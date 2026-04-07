@@ -81,6 +81,9 @@ Route::middleware('auth')->group(function () {
     // Factor management routes
     Route::get('/characters/{character}/factors', [CharacterController::class, 'manageFactors'])->name('characters.factors.manage');
     Route::post('/characters/{character}/factors', [CharacterController::class, 'storeFactors'])->name('characters.factors.store');
+
+    // Synergy build analysis
+    Route::get('/characters/{character}/synergy', [CharacterController::class, 'synergy'])->name('characters.synergy');
     Route::put('/characters/{character}/factors/{factor}', [CharacterController::class, 'updateFactor'])->name('characters.factors.update');
     Route::delete('/characters/{character}/factors/{factor}', [CharacterController::class, 'destroyFactor'])->name('characters.factors.destroy');
     Route::patch('/characters/{character}/factors/{factor}/toggle', [CharacterController::class, 'toggleFactor'])->name('characters.factors.toggle');

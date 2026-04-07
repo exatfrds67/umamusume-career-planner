@@ -28,17 +28,20 @@ document.addEventListener("alpine:init", () => {
             budget_status: null,
         },
         loading: false,
+        initialLoad: true,
 
         init() {
             this.loadDashboard();
-            setInterval(() => this.loadDashboard(), 5000);
+            setInterval(() => this.loadDashboard(true), 5000);
         },
 
-        async loadDashboard() {
-            if (this.loading) {
+        async loadDashboard(isAutoRefresh = false) {
+            if (this.loading && !isAutoRefresh) {
                 return;
             }
-            this.loading = true;
+            if (!isAutoRefresh) {
+                this.loading = true;
+            }
 
             try {
                 const response = await fetch(
@@ -47,15 +50,16 @@ document.addEventListener("alpine:init", () => {
                 const data = await response.json();
 
                 if (data.success) {
-                    this.summary = data.data.summary;
-                    this.servers = data.data.servers;
-                    this.performance = data.data.performance;
-                    this.costs = data.data.costs;
+                    this.summary = { ...this.summary, ...(data.data.summary || {}) };
+                    this.servers = data.data.servers || {};
+                    this.performance = { ...this.performance, ...(data.data.performance || {}) };
+                    this.costs = { ...this.costs, ...(data.data.costs || {}) };
                 }
             } catch (error) {
                 console.error("Failed to load dashboard:", error);
             } finally {
                 this.loading = false;
+                this.initialLoad = false;
             }
         },
     }));

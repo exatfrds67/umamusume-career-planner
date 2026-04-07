@@ -4,18 +4,44 @@ declare(strict_types=1);
 
 namespace App\Services\Simulation;
 
-use App\Models\Career;
-
 /**
  * Simulates a single training scenario for career planning.
  *
  * Takes a career configuration and runs statistical simulation
  * to predict outcomes based on training parameters.
  *
- * @see Requirements: FR-12.1
+ * Requirement coverage: FR-12.1
  */
 class SimulationEngine
 {
+    /**
+     * Apply a single timeline action to the provided state snapshot.
+     *
+     * @param  array<string, mixed>  $state
+     * @param  array<string, mixed>  $action
+     * @return array<string, mixed>
+     */
+    public function applyAction(array $state, array $action): array
+    {
+        $nextState = $state;
+        $nextState['stats'] = $this->normalizeStats(is_array($state['stats'] ?? null) ? $state['stats'] : []);
+        $nextState['energy'] = $this->intValue($state['energy'] ?? 100);
+        $nextState['mood'] = $this->stringValue($state['mood'] ?? 'normal');
+        $nextState['sp'] = $this->intValue($state['sp'] ?? 0);
+        $nextState['skills'] = is_array($state['skills'] ?? null) ? array_values($state['skills']) : [];
+        $nextState['total_sp_earned'] = $this->intValue($state['total_sp_earned'] ?? $nextState['sp']);
+        $nextState['races_won'] = $this->intValue($state['races_won'] ?? 0);
+
+        $type = $this->stringValue($action['type'] ?? 'training');
+
+        return match ($type) {
+            'rest' => $this->applyRestAction($nextState, $action),
+            'race' => $this->applyRaceAction($nextState, $action),
+            'skill' => $this->applySkillAction($nextState, $action),
+            default => $this->applyTrainingAction($nextState, $action),
+        };
+    }
+
     /**
      * Run a single simulation scenario.
      *
@@ -134,5 +160,109 @@ class SimulationEngine
         $totalGain = array_sum($stats) - 500;
 
         return round($totalGain / max(1, $turns), 2);
+    }
+
+    /**
+     * @param  array<string, mixed>  $state
+     * @param  array<string, mixed>  $action
+     * @return array<string, mixed>
+     */
+    protected function applyTrainingAction(array $state, array $action): array
+    {
+        $gains = $this->normalizeStats(is_array($action['expected_gains'] ?? null) ? $action['expected_gains'] : []);
+        $stats = $this->normalizeStats(is_array($state['stats'] ?? null) ? $state['stats'] : []);
+
+        foreach ($gains as $stat => $gain) {
+            $stats[$stat] = min(1200, $this->intValue($stats[$stat] ?? 0) + $gain);
+        }
+
+        $state['stats'] = $stats;
+
+        $currentEnergy = $this->intValue($state['energy'] ?? 100);
+        $state['energy'] = $this->intValue($action['energy_after'] ?? max(0, $currentEnergy - 18));
+        $spGain = $this->intValue($action['expected_sp_gain'] ?? (3 + (int) floor(array_sum($gains) / 25)));
+        $state['sp'] = $this->intValue($state['sp'] ?? 0) + $spGain;
+        $state['total_sp_earned'] = $this->intValue($state['total_sp_earned'] ?? 0) + $spGain;
+
+        return $state;
+    }
+
+    /**
+     * @param  array<string, mixed>  $state
+     * @param  array<string, mixed>  $action
+     * @return array<string, mixed>
+     */
+    protected function applyRestAction(array $state, array $action): array
+    {
+        $currentEnergy = $this->intValue($state['energy'] ?? 100);
+        $state['energy'] = $this->intValue($action['energy_after'] ?? min(100, $currentEnergy + 30));
+
+        return $state;
+    }
+
+    /**
+     * @param  array<string, mixed>  $state
+     * @param  array<string, mixed>  $action
+     * @return array<string, mixed>
+     */
+    protected function applyRaceAction(array $state, array $action): array
+    {
+        $state['energy'] = max(0, $this->intValue($state['energy'] ?? 100) - 12);
+        $spGain = $this->intValue($action['sp_reward'] ?? 45);
+        $state['sp'] = $this->intValue($state['sp'] ?? 0) + $spGain;
+        $state['total_sp_earned'] = $this->intValue($state['total_sp_earned'] ?? 0) + $spGain;
+
+        $expectedResult = $this->stringValue($action['expected_result'] ?? '');
+        if (str_contains($expectedResult, 'win')) {
+            $state['races_won'] = $this->intValue($state['races_won'] ?? 0) + 1;
+        }
+
+        return $state;
+    }
+
+    /**
+     * @param  array<string, mixed>  $state
+     * @param  array<string, mixed>  $action
+     * @return array<string, mixed>
+     */
+    protected function applySkillAction(array $state, array $action): array
+    {
+        $spentSp = $this->intValue($action['spent_sp'] ?? 0);
+        $state['sp'] = max(0, $this->intValue($state['sp'] ?? 0) - $spentSp);
+
+        $skillId = $action['skill_id'] ?? null;
+        if ($skillId !== null) {
+            if (! is_array($state['skills'] ?? null)) {
+                $state['skills'] = [];
+            }
+            $state['skills'][] = $this->stringValue($skillId);
+        }
+
+        return $state;
+    }
+
+    /**
+     * @param  array<string, mixed>  $stats
+     * @return array{speed: int, stamina: int, power: int, guts: int, wit: int}
+     */
+    protected function normalizeStats(array $stats): array
+    {
+        return [
+            'speed' => $this->intValue($stats['speed'] ?? 0),
+            'stamina' => $this->intValue($stats['stamina'] ?? 0),
+            'power' => $this->intValue($stats['power'] ?? 0),
+            'guts' => $this->intValue($stats['guts'] ?? 0),
+            'wit' => $this->intValue($stats['wit'] ?? 0),
+        ];
+    }
+
+    private function intValue(mixed $value): int
+    {
+        return is_numeric($value) ? (int) $value : 0;
+    }
+
+    private function stringValue(mixed $value): string
+    {
+        return is_scalar($value) ? (string) $value : '';
     }
 }

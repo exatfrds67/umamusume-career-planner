@@ -42,7 +42,7 @@ class SupportCardDeckService
         }
 
         // Check for duplicates
-        $cardIds = array_column($cards, 'card_id');
+        $cardIds = array_values(array_map(static fn (mixed $id): int => (int) $id, array_column($cards, 'card_id')));
         $uniqueIds = array_unique($cardIds);
 
         if (count($cardIds) !== count($uniqueIds)) {
@@ -58,10 +58,14 @@ class SupportCardDeckService
         }
 
         // Verify all cards exist
-        $existingCards = SupportCardDefinition::whereIn('id', $cardIds)->pluck('id')->toArray();
+        $existingCards = SupportCardDefinition::whereIn('id', $cardIds)
+            ->pluck('id')
+            ->map(static fn (mixed $id): int => is_numeric($id) ? (int) $id : 0)
+            ->toArray();
+        /** @var array<int, int> $existingCards */
         $missingCards = array_diff($cardIds, $existingCards);
         if (! empty($missingCards)) {
-            $errors[] = 'Some cards do not exist: '.implode(', ', array_map('strval', $missingCards));
+            $errors[] = 'Some cards do not exist: '.implode(', ', array_map(static fn (mixed $id): string => (string) $id, $missingCards));
         }
 
         // Warning for suboptimal compositions

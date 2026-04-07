@@ -11,10 +11,7 @@
         <div class="page-hero">
             <div class="page-hero__content">
             <div>
-                <div class="page-hero__eyebrow">
-                    <span>Ingestion Pipeline</span>
-                </div>
-            <h1 class="page-hero__title">Data Import</h1>
+            <h1 class="page-hero__title">Import career run data</h1>
             <p class="page-hero__body text-sm sm:text-base">
                 Import your career data from various formats including CSV, JSON, or copy-paste text.
             </p>
@@ -35,7 +32,7 @@
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
                     </svg>
-                    Step 1: Select Import Type
+                    Import Type
                 </span>
             </h2>
 
@@ -75,14 +72,14 @@
         </div>
 
         {{-- Input Method Selection --}}
-        <div class="filter-surface p-6">
+        <div class="filter-surface p-6 mt-4">
             <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                 <span class="inline-flex items-center">
                     <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                     </svg>
-                    Step 2: Provide Data
+                    Provide Data
                 </span>
             </h2>
 
@@ -173,24 +170,8 @@ Key-Value: Name: Character
             </div>
         </div>
 
-        {{-- Preview Button --}}
-        <div class="flex justify-end mb-6">
-            <button type="button" id="preview-btn"
-                class="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled>
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                    </path>
-                </svg>
-                Preview Import
-            </button>
-        </div>
-
         {{-- Preview Results Section --}}
-        <div id="preview-section" class="hidden">
+        <div id="preview-section" class="hidden mt-4">
             <div class="filter-surface p-6">
                 <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
                     <span class="inline-flex items-center">
@@ -200,7 +181,7 @@ Key-Value: Name: Character
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
                             </path>
                         </svg>
-                        Step 3: Review & Import
+                        Review & Import
                     </span>
                 </h2>
 
@@ -259,28 +240,11 @@ Key-Value: Name: Character
                         </tbody>
                     </table>
                 </div>
-
-                {{-- Import Button --}}
-                <div class="mt-6 flex justify-end gap-4">
-                    <button type="button" id="cancel-btn"
-                        class="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-600 dark:hover:bg-neutral-500 text-neutral-700 dark:text-neutral-200 font-medium rounded-lg transition-colors">
-                        Cancel
-                    </button>
-                    <button type="button" id="import-btn"
-                        class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled>
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                        </svg>
-                        Import <span id="import-count">0</span> Records
-                    </button>
-                </div>
             </div>
         </div>
 
         {{-- Import Results Section --}}
-        <div id="results-section" class="hidden">
+        <div id="results-section" class="hidden mt-4">
             <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
                 <div id="results-success" class="hidden">
                     <div class="text-center py-8">
@@ -329,9 +293,9 @@ Key-Value: Name: Character
         </div>
 
         {{-- Templates Section --}}
-        <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
-            <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
-                <span class="inline-flex items-center">
+        <div x-data="{ open: false }" class="mt-4 bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700">
+            <button @click="open = !open" type="button" class="w-full flex items-center justify-between p-6 focus:outline-none">
+                <span class="text-lg font-semibold text-neutral-900 dark:text-white flex items-center">
                     <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
@@ -339,46 +303,84 @@ Key-Value: Name: Character
                     </svg>
                     Import Templates & Help
                 </span>
-            </h2>
+                <svg :class="{'rotate-180': open}" class="w-5 h-5 text-neutral-500 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
 
-            <div class="prose dark:prose-invert max-w-none">
-                <p class="text-neutral-600 dark:text-neutral-400 mb-4">
-                    Use these templates as a starting point for your import data. Select an import type above to see
-                    specific templates.
-                </p>
+            <div x-show="open" x-collapse x-cloak class="px-6 pb-6">
+                <div class="prose dark:prose-invert max-w-none border-t border-neutral-100 dark:border-neutral-700 pt-4">
+                    <p class="text-neutral-600 dark:text-neutral-400 mb-4">
+                        Use these templates as a starting point for your import data. Select an import type above to see
+                        specific templates.
+                    </p>
 
-                <div id="template-content" class="hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <h4 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">CSV Format</h4>
-                            <pre id="csv-template" class="bg-neutral-50 dark:bg-neutral-700 p-4 rounded-lg text-sm overflow-x-auto"></pre>
-                            <button type="button"
-                                class="copy-template mt-2 text-sm text-primary-600 dark:text-primary-400 hover:underline"
-                                data-format="csv">
-                                Copy CSV Template
-                            </button>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">JSON Format</h4>
-                            <pre id="json-template" class="bg-neutral-50 dark:bg-neutral-700 p-4 rounded-lg text-sm overflow-x-auto"></pre>
-                            <button type="button"
-                                class="copy-template mt-2 text-sm text-primary-600 dark:text-primary-400 hover:underline"
-                                data-format="json">
-                                Copy JSON Template
-                            </button>
+                    <div id="template-content" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">CSV Format</h4>
+                                <pre id="csv-template" class="bg-neutral-50 dark:bg-neutral-700 p-4 rounded-lg text-sm overflow-x-auto"></pre>
+                                <button type="button"
+                                    class="copy-template mt-2 text-sm text-primary-600 dark:text-primary-400 hover:underline"
+                                    data-format="csv">
+                                    Copy CSV Template
+                                </button>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">JSON Format</h4>
+                                <pre id="json-template" class="bg-neutral-50 dark:bg-neutral-700 p-4 rounded-lg text-sm overflow-x-auto"></pre>
+                                <button type="button"
+                                    class="copy-template mt-2 text-sm text-primary-600 dark:text-primary-400 hover:underline"
+                                    data-format="json">
+                                    Copy JSON Template
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="template-placeholder" class="text-center py-8 text-neutral-500 dark:text-neutral-400">
-                    <svg class="mx-auto h-12 w-12 text-neutral-400 mb-4" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
+                    <div id="template-placeholder" class="text-center py-8 text-neutral-500 dark:text-neutral-400">
+                        <svg class="mx-auto h-12 w-12 text-neutral-400 mb-4" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        Select an import type above to see templates
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{-- Sticky Action Footer --}}
+    <div class="sticky bottom-0 z-40 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <button type="button" id="cancel-btn"
+                class="hidden px-6 py-2.5 bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 font-medium rounded-lg transition-colors focus:ring-2 focus:ring-neutral-500 focus:outline-none">
+                Reset
+            </button>
+            <div class="flex gap-4 ml-auto">
+                <button type="button" id="preview-btn"
+                    class="inline-flex items-center px-6 py-2.5 bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    <svg class="w-5 h-5 mr-2 -ml-1 text-neutral-500 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
                         </path>
                     </svg>
-                    Select an import type above to see templates
-                </div>
+                    Preview
+                </button>
+                
+                <button type="button" id="import-btn"
+                    class="hidden inline-flex items-center px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Import Data
+                </button>
             </div>
         </div>
     </div>

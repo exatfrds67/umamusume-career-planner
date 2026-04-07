@@ -31,7 +31,13 @@ it('passes goal races data to character index view when character is linked', fu
     $response = $this->actingAs($user)->get(route('characters.index'));
 
     $response->assertOk();
-    $response->assertSee('Sprinters Stakes');
+
+    $characters = $response->viewData('characters');
+    expect($characters)->not->toBeNull();
+
+    $firstCharacter = $characters->items()[0] ?? null;
+    expect($firstCharacter)->toBeArray();
+    expect(data_get($firstCharacter, 'next_goal.name'))->toBe('Sprinters Stakes');
 });
 
 it('shows goal races section on character show page', function () {
@@ -96,20 +102,31 @@ it('does not show goal races section when character has no game character linked
     $response->assertDontSee('Goal Races');
 });
 
-it('includes goal_races in character index JSON data', function () {
+it('deduplicates goal races on character index rendering', function () {
     $user = User::factory()->create();
 
     $gameCharacter = GameCharacter::factory()->create(['name_en' => 'Speed Star']);
-    $goalRace = GameRace::factory()->create([
+    $goalRaceA = GameRace::factory()->create([
+        'name_en' => 'Japanese Derby',
+        'grade' => 'G1',
+        'distance_meters' => 2400,
+        'distance_category' => 'long',
+    ]);
+    $goalRaceB = GameRace::factory()->create([
         'name_en' => 'Japanese Derby',
         'grade' => 'G1',
         'distance_meters' => 2400,
         'distance_category' => 'long',
     ]);
 
-    $gameCharacter->targetRaces()->attach($goalRace->id, [
+    $gameCharacter->targetRaces()->attach($goalRaceA->id, [
         'race_type' => 'goal',
         'priority' => 1,
+        'notes' => null,
+    ]);
+    $gameCharacter->targetRaces()->attach($goalRaceB->id, [
+        'race_type' => 'goal',
+        'priority' => 2,
         'notes' => null,
     ]);
 
@@ -122,9 +139,95 @@ it('includes goal_races in character index JSON data', function () {
     $response = $this->actingAs($user)->get(route('characters.index'));
 
     $response->assertOk();
-    $responseContent = $response->getContent();
-    expect($responseContent)->toContain('"goal_races"');
-    expect($responseContent)->toContain('Japanese Derby');
+
+    $characters = $response->viewData('characters');
+    expect($characters)->not->toBeNull();
+
+    $firstCharacter = $characters->items()[0] ?? null;
+    expect($firstCharacter)->toBeArray();
+    expect(data_get($firstCharacter, 'goal_races'))->toHaveCount(1)
+        ->and(data_get($firstCharacter, 'goal_races.0.name'))->toBe('Japanese Derby');
+});
+
+it('paginates character index with default 50 per page', function () {
+    $user = User::factory()->create();
+
+    Character::factory()->count(55)->create([
+        'user_id' => $user->id,
+        'is_seeded' => false,
+    ]);
+
+    $response = $this->actingAs($user)->get(route('characters.index'));
+
+    $response->assertOk();
+    $response->assertSee('Showing 50 of 55 characters');
+    $response->assertSee('page=2', false);
+});
+
+it('groups duplicate variants under a single parent card', function () {
+    $user = User::factory()->create();
+
+    Character::factory()->create([
+        'user_id' => $user->id,
+        'name' => 'Haru Urara',
+        'scenario_type' => 'ura_finale',
+    ]);
+
+    Character::factory()->create([
+        'user_id' => $user->id,
+        'name' => 'Haru Urara',
+        'scenario_type' => 'unity_cup',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('characters.index'));
+
+    $response->assertOk();
+    $response->assertSee('Showing 1 of 1 characters');
+    $response->assertSee('Versions');
+});
+
+it('renders compare and gallery controls with compare scan cues on index', function () {
+    $user = User::factory()->create();
+
+    Character::factory()->create([
+        'user_id' => $user->id,
+        'name' => 'Compare Mode Runner',
+        'scenario_type' => 'ura_finale',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('characters.index'));
+
+    $response->assertOk();
+    $response->assertSee('data-testid="compare-view-toggle"', false);
+    $response->assertSee('data-testid="gallery-view-toggle"', false);
+    $response->assertSee('data-testid="compare-view-list"', false);
+    $response->assertSee('Core Stats');
+    $response->assertSee('Compare View is optimized for fast stat scan.');
+});
+
+it('includes a grouped parent when searching for a variant name', function () {
+    $user = User::factory()->create();
+    $gameCharacter = GameCharacter::factory()->create(['name_en' => 'Variant Parent']);
+
+    Character::factory()->create([
+        'user_id' => $user->id,
+        'name' => 'Tokai Teio A',
+        'game_character_id' => $gameCharacter->id,
+        'status' => 'active',
+    ]);
+
+    Character::factory()->create([
+        'user_id' => $user->id,
+        'name' => 'Tokai Teio B',
+        'game_character_id' => $gameCharacter->id,
+        'status' => 'completed',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('characters.index', ['search' => 'Tokai Teio A']));
+
+    $response->assertOk();
+    $response->assertSee('Showing 1 of 1 characters');
+    $response->assertSee('Versions');
 });
 
 it('stores game_character_id when creating character with trainee_id', function () {
@@ -219,8 +322,14 @@ it('shows both sprint G1 goals on index for a character with multiple goal races
     $response = $this->actingAs($user)->get(route('characters.index'));
 
     $response->assertOk();
-    $response->assertSee('Sprinters Stakes');
-    $response->assertSee('Takamatsunomiya Kinen');
+
+    $characters = $response->viewData('characters');
+    expect($characters)->not->toBeNull();
+
+    $firstCharacter = $characters->items()[0] ?? null;
+    expect($firstCharacter)->toBeArray();
+    expect(data_get($firstCharacter, 'next_goal.name'))->toBe('Sprinters Stakes')
+        ->and(data_get($firstCharacter, 'remaining_goal_count'))->toBe(1);
 });
 
 it('seeded Curren Chan game character has two sprint G1 goals', function () {

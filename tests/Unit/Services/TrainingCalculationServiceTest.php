@@ -12,7 +12,6 @@ use App\Models\Character;
 use App\Services\MCP\MCPClientService;
 use App\Services\MCP\TrainingOptimizationAgent;
 use App\Services\TrainingCalculationService;
-use Mockery;
 
 beforeEach(function () {
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */

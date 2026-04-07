@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Character;
@@ -57,13 +59,23 @@ class DashboardController extends Controller
             return $this->getEmptyDashboardData();
         }
 
+        $races = $this->getUpcomingRaces($character);
         $statProgression = $this->getStatProgression($character);
+        $nextRace = $races[0] ?? null;
+        $nextRaceRequirements = is_array($nextRace) && isset($nextRace['requirements']) && is_array($nextRace['requirements'])
+            ? $nextRace['requirements']
+            : [];
+        $nextRaceName = is_array($nextRace)
+            ? ($nextRace['name'] ?? null)
+            : null;
 
         return [
             'metrics' => $this->getMetrics($character),
             'stats' => $this->getStats($character),
             'goals' => $this->getGoals($character),
-            'races' => $this->getUpcomingRaces($character),
+            'races' => $races,
+            'nextRaceRequirements' => $nextRaceRequirements,
+            'nextRaceName' => is_string($nextRaceName) ? $nextRaceName : null,
             'trainingSuggestions' => $this->getTrainingSuggestions($character),
             'recentResults' => $this->getRecentResults($character),
             'moodEnergy' => $this->getMoodEnergy($character),
@@ -314,6 +326,7 @@ class DashboardController extends Controller
                         'turn' => $currentTurn + 14,
                         'turnsAway' => 14,
                         'readiness' => $this->calculateRaceReadiness($stats, []),
+                        'requirements' => [],
                         'isGoalRace' => true,
                     ];
                 }
@@ -339,6 +352,7 @@ class DashboardController extends Controller
                         'turn' => $currentTurn + ($turnsAway ?? 14),
                         'turnsAway' => $turnsAway,
                         'readiness' => $this->calculateRaceReadiness($stats, []),
+                        'requirements' => [],
                     ]];
                 }
             }
@@ -375,6 +389,7 @@ class DashboardController extends Controller
                     'turn' => $raceTurn,
                     'turnsAway' => $raceTurn - $currentTurn,
                     'readiness' => $readiness,
+                    'requirements' => isset($race['requirements']) && is_array($race['requirements']) ? $race['requirements'] : [],
                     'isGoalRace' => $isGoalRace,
                 ];
             }

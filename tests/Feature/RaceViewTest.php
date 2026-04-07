@@ -43,6 +43,26 @@ class RaceViewTest extends TestCase
         $response->assertSee('G1');
     }
 
+    public function test_race_calendar_displays_surface_text_label(): void
+    {
+        $user = User::factory()->create();
+
+        GameRace::query()->create([
+            'slug' => 'test-surface-race',
+            'name_en' => 'Test Surface Race',
+            'grade' => 'G3',
+            'phase' => 'junior',
+            'surface' => 'turf',
+            'distance_meters' => 1600,
+            'distance_category' => 'mile',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('races.index'));
+
+        $response->assertOk();
+        $response->assertSee('Surface: Turf');
+    }
+
     public function test_race_calendar_has_semantic_structure(): void
     {
         $user = User::factory()->create();
@@ -52,6 +72,7 @@ class RaceViewTest extends TestCase
         $response->assertOk();
         $response->assertSee('<aside', false);
         $response->assertSee('<h1', false);
+        $response->assertSee('data-testid="race-summary-bar"', false);
     }
 
     public function test_race_catalog_filters_by_grade(): void

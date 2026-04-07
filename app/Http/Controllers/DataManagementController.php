@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Services\DataExportService;
-use App\Services\DataImportService;
-use App\Services\DataMigrationService;
 use App\Services\DataOperationHistoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -33,19 +30,7 @@ class DataManagementController extends Controller
      */
     public function index(): View
     {
-        $importTypes = DataImportService::IMPORT_TYPES;
-        $exportTypes = DataExportService::EXPORT_TYPES;
-        $exportFormats = DataExportService::SUPPORTED_FORMATS;
-        $exportTemplates = DataExportService::EXPORT_TEMPLATES;
-        $legacyFormats = DataMigrationService::LEGACY_FORMATS;
-
-        return view('data-management.index', compact(
-            'importTypes',
-            'exportTypes',
-            'exportFormats',
-            'exportTemplates',
-            'legacyFormats'
-        ));
+        return view('data-management.index');
     }
 
     /**

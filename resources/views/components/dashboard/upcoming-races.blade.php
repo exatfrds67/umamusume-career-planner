@@ -17,6 +17,11 @@
 
         <div class="space-y-3">
             @forelse($races as $race)
+                @php
+                    $turnsAway = (int) ($race['turnsAway'] ?? 0);
+                    $turnValue = $race['turn'] ?? null;
+                    $turnsProgress = $turnsAway > 0 ? max(8, min(100, (int) round((14 - min($turnsAway, 14)) / 14 * 100))) : 0;
+                @endphp
                 <div
                     class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors {{ isset($race['isGoalRace']) && $race['isGoalRace'] ? 'border-l-4 border-primary-500' : '' }}">
                     <div class="flex-1 min-w-0">
@@ -25,9 +30,11 @@
                                 class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold {{ ($race['grade'] ?? 'G3') === 'G1' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300' }}">
                                 {{ $race['grade'] ?? 'G3' }}
                             </span>
-                            <span class="text-sm font-medium text-neutral-900 dark:text-white truncate">
-                                {{ $race['name'] ?? 'Unknown Race' }}
-                            </span>
+                            <x-tooltip :content="$race['name'] ?? 'Unknown Race'" position="top">
+                                <span class="text-sm font-medium text-neutral-900 dark:text-white truncate max-w-45">
+                                    {{ $race['name'] ?? 'Unknown Race' }}
+                                </span>
+                            </x-tooltip>
                             @if (isset($race['isGoalRace']) && $race['isGoalRace'])
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-primary-100 text-primary-800 dark:bg-primary-900/50 dark:text-primary-300">
                                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -37,17 +44,26 @@
                                 </span>
                             @endif
                         </div>
-                        <span class="text-xs text-neutral-500 dark:text-neutral-400">
+                        <div class="text-xs text-neutral-500 dark:text-neutral-400">
+                            @if ($turnValue !== null)
+                                <span class="mr-2 font-medium">Turn {{ $turnValue }}</span>
+                            @endif
                             @if (isset($race['turnsAway']))
-                                @if ($race['turnsAway'] === 0)
+                                @if ($turnsAway === 0)
                                     <span class="font-semibold text-primary-600 dark:text-primary-400">Race Day!</span>
                                 @else
-                                    In {{ $race['turnsAway'] }} turn{{ $race['turnsAway'] !== 1 ? 's' : '' }}
+                                    <span class="font-medium">T-{{ $turnsAway }}</span>
+                                    <span class="ml-1">({{ $turnsAway }} turn{{ $turnsAway !== 1 ? 's' : '' }} away)</span>
                                 @endif
                             @elseif (isset($race['date']))
                                 {{ \Carbon\Carbon::parse($race['date'])->format('M d, Y') }}
                             @endif
-                        </span>
+                        </div>
+                        @if ($turnsAway > 0)
+                            <div class="mt-1.5 h-1.5 w-full max-w-32 rounded-full bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
+                                <div class="h-full bg-primary-500 rounded-full" style="width: {{ $turnsProgress }}%"></div>
+                            </div>
+                        @endif
                     </div>
                     <div class="flex items-center gap-3 ml-4">
                         <x-ui.readiness-badge :percentage="$race['readiness'] ?? 0" />

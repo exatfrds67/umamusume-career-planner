@@ -19,9 +19,9 @@
                 <span class="text-sm text-neutral-600 dark:text-neutral-400">
                     Last updated: <span x-text="lastUpdated">--</span>
                 </span>
-                <button @click="refreshAll()"
+                <button @click="loadDashboard(false)"
                     class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                    <svg class="inline-block h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg class="inline-block h-4 w-4 mr-1" :class="{'animate-spin': loading}" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                         </path>
@@ -29,6 +29,22 @@
                     Refresh All
                 </button>
             </div>
+
+            <!-- Initial Loading Skeleton -->
+            <div x-show="initialLoad" class="space-y-6 animate-pulse">
+                <!-- Skeletons for summary cards -->
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <template x-for="i in 4" :key="i">
+                        <div class="h-32 rounded-lg bg-white dark:bg-neutral-800 shadow-xs"></div>
+                    </template>
+                </div>
+                <!-- Skeletons for wide cards -->
+                <div class="h-64 rounded-lg bg-white dark:bg-neutral-800 shadow-xs"></div>
+                <div class="h-64 rounded-lg bg-white dark:bg-neutral-800 shadow-xs"></div>
+            </div>
+
+            <!-- Content Area -->
+            <div x-show="!initialLoad" x-cloak class="space-y-6">
 
             <!-- Tab Navigation -->
             <div class="border-b border-neutral-200 dark:border-neutral-700">
@@ -108,7 +124,7 @@
                                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">MCP Servers</p>
                                     <p class="mt-2 text-3xl font-semibold text-neutral-900 dark:text-white">
                                         <span x-text="overview.healthy_servers">0</span>/<span
-                                            x-text="overview.total_servers">0</span>
+                                            x-text="overview.enabled_servers">0</span>
                                     </p>
                                 </div>
                                 <div class="rounded-full bg-blue-100 p-3 dark:bg-blue-900">
@@ -120,17 +136,19 @@
                                     </svg>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <span class="text-sm text-neutral-600 dark:text-neutral-400">Status: </span>
-                                <span class="font-semibold"
-                                    :class="{
-                                        'text-green-600 dark:text-green-400': overview.healthy_servers === overview
-                                            .total_servers,
-                                        'text-yellow-600 dark:text-yellow-400': overview.healthy_servers > 0 && overview
-                                            .healthy_servers < overview.total_servers,
-                                        'text-red-600 dark:text-red-400': overview.healthy_servers === 0
-                                    }"
-                                    x-text="overview.healthy_servers === overview.total_servers ? 'All Healthy' : (overview.healthy_servers > 0 ? 'Degraded' : 'Critical')"></span>
+                            <div class="mt-4 flex items-center justify-between">
+                                <div>
+                                    <span class="text-sm text-neutral-600 dark:text-neutral-400">Status: </span>
+                                    <span class="font-semibold"
+                                        :class="{
+                                            'text-green-600 dark:text-green-400': overview.healthy_servers === overview.enabled_servers && overview.enabled_servers > 0,
+                                            'text-yellow-600 dark:text-yellow-400': overview.healthy_servers > 0 && overview.healthy_servers < overview.enabled_servers,
+                                            'text-red-600 dark:text-red-400': overview.healthy_servers === 0 && overview.enabled_servers > 0,
+                                            'text-neutral-500 dark:text-neutral-400': overview.enabled_servers === 0
+                                        }"
+                                        x-text="overview.enabled_servers === 0 ? 'All Disabled' : (overview.healthy_servers === overview.enabled_servers ? 'All Healthy' : (overview.healthy_servers > 0 ? (overview.healthy_servers + '/' + overview.enabled_servers + ' Degraded') : 'Critical'))"></span>
+                                </div>
+                                <div x-show="overview.disabled_servers > 0" class="text-xs text-neutral-500 dark:text-neutral-400" x-text="overview.disabled_servers + ' Disabled'"></div>
                             </div>
                         </div>
                     </div>
@@ -234,7 +252,7 @@
                                                 }">
                                             </div>
                                             <span class="text-sm text-neutral-700 dark:text-neutral-300"
-                                                x-text="server.name"></span>
+                                                x-text="server.server_name || name"></span>
                                         </div>
                                         <span class="text-xs text-neutral-500 dark:text-neutral-400"
                                             x-text="server.uptime_percentage + '% uptime'"></span>
@@ -253,7 +271,7 @@
                         <div class="p-6">
                             <h3 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Recent Agent Activity
                             </h3>
-                            <div class="space-y-3">
+                            <div class="space-y-3" x-show="Object.keys(agents || {}).length > 0">
                                 <template x-for="(agent, index) in Object.values(agents).slice(0, 5)"
                                     :key="index">
                                     <div class="flex items-center justify-between">
@@ -273,6 +291,9 @@
                                             x-text="agent.status"></span>
                                     </div>
                                 </template>
+                            </div>
+                            <div x-show="Object.keys(agents || {}).length === 0" class="py-4">
+                                <x-error-state title="No Active Agents" message="Agent activity will appear here when tasks are processing." />
                             </div>
                             <button @click="activeTab = 'agents'"
                                 class="mt-4 w-full rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600">
@@ -402,21 +423,50 @@
                 <div class="overflow-hidden bg-white shadow-xs dark:bg-neutral-800 sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">Performance Metrics</h3>
-                        <div class="space-y-4">
+                        
+                        <div x-show="Object.keys(performance.providers || {}).length === 0" class="py-12">
+                            <x-error-state title="No Performance Data" message="Performance telemetry will appear here once tools are utilized." />
+                        </div>
+                        
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2" x-show="Object.keys(performance.providers || {}).length > 0" style="display: none;">
                             <template x-for="(provider, name) in performance.providers" :key="name">
-                                <div class="rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
-                                    <h4 class="font-medium text-neutral-900 dark:text-white"
+                                <div class="rounded-lg border border-neutral-200 p-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                                    <h4 class="mb-4 font-semibold text-neutral-900 dark:text-white"
                                         x-text="provider.name || name"></h4>
-                                    <div class="mt-2 grid grid-cols-2 gap-4 text-sm">
+                                    
+                                    <div class="space-y-4">
+                                        <!-- Response Time Gauge -->
                                         <div>
-                                            <span class="text-neutral-600 dark:text-neutral-400">Avg Response:</span>
-                                            <span class="ml-2 font-medium"
-                                                x-text="(provider.avg_response_time || 0).toFixed(2) + 's'"></span>
+                                            <div class="mb-1 flex justify-between text-sm">
+                                                <span class="text-neutral-600 dark:text-neutral-400">Avg Response Time</span>
+                                                <span class="font-medium text-neutral-900 dark:text-white" x-text="(provider.avg_response_time || 0).toFixed(2) + 's'"></span>
+                                            </div>
+                                            <div class="h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
+                                                <div class="h-full rounded-full transition-all duration-500"
+                                                     :class="{
+                                                         'bg-green-500': provider.avg_response_time < 1.0,
+                                                         'bg-yellow-500': provider.avg_response_time >= 1.0 && provider.avg_response_time < 3.0,
+                                                         'bg-red-500': provider.avg_response_time >= 3.0
+                                                     }"
+                                                     :style="`width: ${Math.min(100, Math.max(5, (5.0 - (provider.avg_response_time || 0)) / 5.0 * 100))}%`"></div>
+                                            </div>
                                         </div>
+
+                                        <!-- Success Rate Gauge -->
                                         <div>
-                                            <span class="text-neutral-600 dark:text-neutral-400">Success Rate:</span>
-                                            <span class="ml-2 font-medium"
-                                                x-text="(provider.success_rate || 0).toFixed(1) + '%'"></span>
+                                            <div class="mb-1 flex justify-between text-sm">
+                                                <span class="text-neutral-600 dark:text-neutral-400">Success Rate</span>
+                                                <span class="font-medium text-neutral-900 dark:text-white" x-text="(provider.success_rate || 0).toFixed(1) + '%'"></span>
+                                            </div>
+                                            <div class="h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
+                                                <div class="h-full rounded-full transition-all duration-500"
+                                                     :class="{
+                                                         'bg-green-500': provider.success_rate >= 95.0,
+                                                         'bg-yellow-500': provider.success_rate >= 80.0 && provider.success_rate < 95.0,
+                                                         'bg-red-500': provider.success_rate < 80.0
+                                                     }"
+                                                     :style="`width: ${provider.success_rate || 0}%`"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -452,6 +502,8 @@
                     </div>
                 </div>
             </div>
+
+            </div> <!-- End Content Area -->
         </div>
     </div>
 

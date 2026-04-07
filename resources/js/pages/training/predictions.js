@@ -4,6 +4,10 @@
  * with support card indicators, risk badges, efficiency ratings, and calculation breakdowns
  */
 
+let latestPredictions = null;
+let selectedTrainingFacility = null;
+window.__recommendedTraining = null;
+
 /**
  * Fetch predictions with retry logic
  * @param {string} apiUrl - API endpoint URL
@@ -67,6 +71,8 @@ export function updatePredictionsUI(predictions) {
 
     if (!predictions) return;
 
+    latestPredictions = predictions;
+
     const facilities = predictions.facilities || predictions;
     const recommendation = predictions.recommendation || {};
     const summary = predictions.summary || "";
@@ -75,10 +81,29 @@ export function updatePredictionsUI(predictions) {
     const recommendedTraining =
         recommendation.recommended_training || findBestTraining(facilities);
 
+    const ranking = rankFacilities(facilities);
+
     // Update each facility card
     Object.entries(facilities).forEach(([facility, data]) => {
-        updateFacilityCard(facility, data, facility === recommendedTraining);
+        const facilityRank = ranking[facility]?.rank || null;
+        const isTopRanked = Boolean(ranking[facility]?.isTop);
+
+        updateFacilityCard(
+            facility,
+            data,
+            facility === recommendedTraining,
+            facilityRank,
+            isTopRanked,
+        );
     });
+
+    updateRecommendedActionHero(
+        recommendedTraining,
+        facilities?.[recommendedTraining],
+        recommendation,
+        summary,
+        ranking,
+    );
 
     // Update AI advisor banner
     updateAIAdvisor(recommendation, summary);
@@ -95,11 +120,24 @@ export function updatePredictionsUI(predictions) {
  * @param {Object} data - Prediction data for this facility
  * @param {boolean} isRecommended - Whether this is the AI recommended option
  */
-function updateFacilityCard(facility, data, isRecommended) {
+function updateFacilityCard(
+    facility,
+    data,
+    isRecommended,
+    rankData = null,
+    isTopRanked = false,
+) {
     const card = document.querySelector(
         `.training-facility[data-facility="${facility}"]`,
     );
     if (!card) return;
+
+    card.classList.toggle("ring-2", isTopRanked);
+    card.classList.toggle("ring-primary-500", isTopRanked);
+    card.classList.toggle("border-primary-300", isTopRanked);
+    card.classList.toggle("dark:border-primary-700", isTopRanked);
+    card.classList.toggle("opacity-90", !isTopRanked);
+    card.classList.toggle("hover:opacity-100", !isTopRanked);
 
     // Update AI recommendation badge
     const aiBadge = card.querySelector(".ai-badge");
@@ -111,11 +149,28 @@ function updateFacilityCard(facility, data, isRecommended) {
         }
     }
 
+    // Update rank badge
+    const rankBadge = card.querySelector(".rank-badge");
+    const rankBadgeValue = card.querySelector(".rank-badge-value");
+    if (rankBadge && rankData !== null) {
+        rankBadge.classList.remove("hidden");
+        rankBadge.classList.toggle("bg-primary-100", isTopRanked);
+        rankBadge.classList.toggle("dark:bg-primary-900/30", isTopRanked);
+        rankBadge.classList.toggle("text-primary-700", isTopRanked);
+        rankBadge.classList.toggle("dark:text-primary-300", isTopRanked);
+        if (rankBadgeValue) {
+            rankBadgeValue.textContent = isTopRanked
+                ? `#${rankData} Top`
+                : `#${rankData}`;
+        }
+    }
+
     // Update risk badge
     const riskBadge = card.querySelector(".risk-badge");
     if (riskBadge && data.failure_risk !== undefined) {
         const riskPercent = Math.round(data.failure_risk * 100);
-        riskBadge.textContent = `${riskPercent}%`;
+        const riskLevel = getRiskLevelText(riskPercent);
+        riskBadge.textContent = `Fail: ${riskPercent}% ${riskLevel}`;
         riskBadge.className = `risk-badge px-2 py-1 rounded text-xs font-medium ${getRiskBadgeClass(riskPercent)}`;
     }
 
@@ -264,6 +319,7 @@ function updateSkillHintsSection(card, data) {
 function updateEfficiencyRating(card, data) {
     const starsEl = card.querySelector(".efficiency-stars");
     const scoreEl = card.querySelector(".efficiency-score");
+    const hintEl = card.querySelector(".efficiency-hint");
 
     if (!starsEl || !scoreEl) return;
 
@@ -280,7 +336,21 @@ function updateEfficiencyRating(card, data) {
 
     starsEl.innerHTML =
         filledStarSvg.repeat(stars) + emptyStarSvg.repeat(5 - stars);
-    scoreEl.textContent = `(${Math.round(score)})`;
+    scoreEl.textContent = `${Math.round(score)}/100`;
+    scoreEl.setAttribute(
+        "title",
+        "Efficiency score based on gains, risk, and bonus multipliers.",
+    );
+
+    if (hintEl) {
+        if (score >= 70) {
+            hintEl.textContent = "Higher is better";
+        } else if (score >= 45) {
+            hintEl.textContent = "Balanced option";
+        } else {
+            hintEl.textContent = "Risk outweighs gain";
+        }
+    }
 }
 
 /**
@@ -318,7 +388,7 @@ function updateAIAdvisor(recommendation, summary) {
         const training = recommendation.recommended_training;
         const reason = recommendation.reason || "";
         messageEl.textContent = training
-            ? `Focus on ${capitalize(training)} training! ${reason}`
+            ? `Recommendation ready: ${capitalize(training)}. Open Why for rationale.`
             : "Analyzing training options...";
     }
 
@@ -333,6 +403,118 @@ function updateAIAdvisor(recommendation, summary) {
             recommendation.reason ||
             "Best option for current character state.";
     }
+}
+
+/**
+ * Update decision-first recommendation hero.
+ * @param {string} recommendedTraining
+ * @param {Object|null} recommendationData
+ * @param {Object} recommendation
+ * @param {string} summary
+ * @param {Object<string, {rank:number,isTop:boolean}>} ranking
+ */
+function updateRecommendedActionHero(
+    recommendedTraining,
+    recommendationData,
+    recommendation,
+    summary,
+    ranking,
+) {
+    const headingEl = document.getElementById("recommended-action-heading");
+    const summaryEl = document.getElementById("recommended-action-summary");
+    const riskEl = document.getElementById("recommended-action-risk");
+    const gainEl = document.getElementById("recommended-action-primary-gain");
+    const ctaEl = document.getElementById("recommended-action-cta");
+
+    const trainingLabel = capitalize(recommendedTraining || "speed");
+    const rank = ranking?.[recommendedTraining]?.rank || 1;
+    const failureRisk = Math.round(
+        Number(recommendationData?.failure_risk || recommendation?.prediction?.failure_risk || 0) *
+            100,
+    );
+    const riskText = getRiskLevelText(failureRisk);
+    const primaryGainText = getPrimaryGainText(recommendationData);
+
+    window.__recommendedTraining = recommendedTraining || "speed";
+
+    if (headingEl) {
+        headingEl.textContent = `#${rank} ${trainingLabel} Training`;
+    }
+
+    if (summaryEl) {
+        summaryEl.textContent =
+            summary ||
+            recommendation?.reason ||
+            `Highest confidence option for this turn is ${trainingLabel}.`;
+    }
+
+    if (riskEl) {
+        riskEl.textContent = `Failure Risk: ${failureRisk}% ${riskText}`;
+        riskEl.className = `inline-flex items-center rounded-md px-2 py-1 font-semibold ${getRiskBadgeClass(failureRisk)}`;
+    }
+
+    if (gainEl) {
+        gainEl.textContent = `Expected Gain: ${primaryGainText}`;
+    }
+
+    if (ctaEl) {
+        ctaEl.removeAttribute("disabled");
+        ctaEl.setAttribute(
+            "aria-label",
+            `Confirm recommended ${trainingLabel.toLowerCase()} training`,
+        );
+        ctaEl.textContent = `Confirm ${trainingLabel}`;
+        ctaEl.onclick = () => window.openTrainingConfirmation(window.__recommendedTraining || "speed");
+    }
+}
+
+/**
+ * Rank facilities by recommendation score/efficiency score.
+ * @param {Object<string, Object>} facilities
+ * @returns {Object<string, {rank:number,isTop:boolean}>}
+ */
+function rankFacilities(facilities) {
+    const sortable = Object.entries(facilities || {}).map(([facility, data]) => {
+        const rawScore = Number(
+            data?.recommendation_score ?? data?.efficiency_score ?? calculateEfficiencyScore(data),
+        );
+
+        return {
+            facility,
+            score: Number.isFinite(rawScore) ? rawScore : 0,
+        };
+    });
+
+    sortable.sort((a, b) => b.score - a.score);
+
+    return sortable.reduce((acc, item, index) => {
+        acc[item.facility] = {
+            rank: index + 1,
+            isTop: index === 0,
+        };
+
+        return acc;
+    }, {});
+}
+
+/**
+ * Build compact primary gain text for recommendation hero.
+ * @param {Object|null|undefined} data
+ * @returns {string}
+ */
+function getPrimaryGainText(data) {
+    if (!data || !data.stat_gains) {
+        return "No stat gains";
+    }
+
+    const gains = Object.entries(data.stat_gains).sort((a, b) => Number(b[1]) - Number(a[1]));
+    const bestGain = gains.find(([, value]) => Number(value) > 0);
+
+    if (!bestGain) {
+        return "No stat gains";
+    }
+
+    return `+${bestGain[1]} ${capitalize(bestGain[0])}`;
 }
 
 /**
@@ -388,6 +570,22 @@ function getRiskBadgeClass(riskPercent) {
     } else {
         return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
     }
+}
+
+/**
+ * Get human-readable risk level suffix.
+ * @param {number} riskPercent
+ * @returns {string}
+ */
+function getRiskLevelText(riskPercent) {
+    if (riskPercent < 15) {
+        return "(Low)";
+    }
+    if (riskPercent <= 40) {
+        return "(Medium)";
+    }
+
+    return "(High)";
 }
 
 /**
@@ -573,21 +771,258 @@ window.clearCache = async function () {
     }
 };
 
+function getFacilityPreview(facility) {
+    if (!latestPredictions) {
+        return null;
+    }
+
+    const facilities = latestPredictions.facilities || latestPredictions;
+    return facilities?.[facility] || null;
+}
+
+function renderSimulationPreview(data, statusText = "Preview ready") {
+    const facilityLabel = document.getElementById("training-confirmation-facility");
+    const riskEl = document.getElementById("training-confirmation-risk");
+    const energyChangeEl = document.getElementById("training-confirmation-energy");
+    const energyAfterEl = document.getElementById("training-confirmation-energy-after");
+    const gainsEl = document.getElementById("training-confirmation-gains");
+    const statusEl = document.getElementById("training-confirmation-status");
+
+    if (facilityLabel) {
+        facilityLabel.textContent = capitalize(
+            data.training_type || selectedTrainingFacility || "training",
+        );
+    }
+
+    const failurePercent =
+        data.failure_percent !== undefined
+            ? data.failure_percent
+            : Math.round((data.failure_risk || 0) * 100);
+    if (riskEl) {
+        riskEl.textContent = `Fail: ${failurePercent}% ${getRiskLevelText(failurePercent)}`;
+        riskEl.className = `px-2 py-1 rounded text-xs font-semibold ${getRiskBadgeClass(failurePercent)}`;
+    }
+
+    if (energyChangeEl) {
+        const energyChange = Number(data.energy_change || 0);
+        const sign = energyChange > 0 ? "+" : "";
+        energyChangeEl.textContent = `${sign}${energyChange}`;
+    }
+
+    if (energyAfterEl) {
+        energyAfterEl.textContent = `${data.energy_after ?? "--"}/100`;
+    }
+
+    if (gainsEl) {
+        const gains = data.stat_gains || {};
+        const entries = Object.entries(gains).filter(([, value]) => Number(value) > 0);
+
+        if (entries.length === 0) {
+            gainsEl.innerHTML = '<span class="text-neutral-500 dark:text-neutral-400">No stat gains</span>';
+        } else {
+            gainsEl.innerHTML = entries
+                .map(
+                    ([stat, value]) =>
+                        `<span class="rounded bg-neutral-100 dark:bg-neutral-700 px-2 py-1"><strong class="capitalize">${stat}</strong>: +${value}</span>`,
+                )
+                .join("");
+        }
+    }
+
+    if (statusEl) {
+        statusEl.textContent = statusText;
+    }
+}
+
+async function fetchAuthoritativeSimulation(facility) {
+    const appEl = document.getElementById("training-predictions-app");
+    if (!appEl) {
+        return;
+    }
+
+    const simulateUrl = appEl.dataset.simulateUrl;
+    const characterId = appEl.dataset.characterId;
+    if (!simulateUrl || !characterId) {
+        return;
+    }
+
+    const response = await fetch(simulateUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRF-TOKEN":
+                document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "",
+        },
+        body: JSON.stringify({
+            character_id: Number(characterId),
+            training_type: facility,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Simulation failed (${response.status})`);
+    }
+
+    const payload = await response.json();
+    if (!payload.success || !payload.data) {
+        throw new Error(payload.message || "Simulation failed");
+    }
+
+    return payload.data;
+}
+
+function submitConfirmedTraining(facility) {
+    const appEl = document.getElementById("training-predictions-app");
+    if (!appEl) {
+        return;
+    }
+
+    const trainingUrl = appEl.dataset.trainUrl;
+    const restUrl = appEl.dataset.restUrl;
+    const action = facility === "rest" ? restUrl : trainingUrl;
+    if (!action) {
+        return;
+    }
+
+    const submitButton = document.getElementById("training-confirmation-submit");
+    if (submitButton) {
+        submitButton.setAttribute("disabled", "disabled");
+        submitButton.textContent = "Processing...";
+    }
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = action;
+
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute("content");
+
+    if (csrfToken) {
+        const csrfInput = document.createElement("input");
+        csrfInput.type = "hidden";
+        csrfInput.name = "_token";
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+    }
+
+    if (facility !== "rest") {
+        const trainingInput = document.createElement("input");
+        trainingInput.type = "hidden";
+        trainingInput.name = "training_type";
+        trainingInput.value = facility;
+        form.appendChild(trainingInput);
+    }
+
+    const previewSeenInput = document.createElement("input");
+    previewSeenInput.type = "hidden";
+    previewSeenInput.name = "preview_confirmed";
+    previewSeenInput.value = "1";
+    form.appendChild(previewSeenInput);
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+window.openTrainingConfirmation = async function (facility) {
+    selectedTrainingFacility = facility;
+    const submitButton = document.getElementById("training-confirmation-submit");
+    if (submitButton) {
+        submitButton.setAttribute("disabled", "disabled");
+        submitButton.textContent = "Loading preview...";
+        submitButton.onclick = () => submitConfirmedTraining(facility);
+    }
+
+    const quickPreview = getFacilityPreview(facility);
+    if (quickPreview) {
+        const mappedPreview = {
+            training_type: facility,
+            stat_gains: quickPreview.stat_gains || {},
+            energy_change:
+                facility === "rest"
+                    ? Number(quickPreview.energy_recovery || 50)
+                    : -Number(quickPreview.energy_cost || 0),
+            energy_after: "--",
+            failure_risk: Number(quickPreview.failure_risk || 0),
+            failure_percent: Math.round(Number(quickPreview.failure_risk || 0) * 100),
+        };
+        renderSimulationPreview(mappedPreview, "Showing fast preview, validating...");
+    } else {
+        renderSimulationPreview(
+            {
+                training_type: facility,
+                stat_gains: {},
+                energy_change: 0,
+                energy_after: "--",
+                failure_percent: 0,
+            },
+            "Preparing preview...",
+        );
+    }
+
+    const openEvent = new CustomEvent("open-modal", {
+        detail: "training-confirmation",
+    });
+    window.dispatchEvent(openEvent);
+    document.dispatchEvent(openEvent);
+
+    // Allow confirmation using the fast preview while authoritative simulation loads.
+    if (submitButton) {
+        submitButton.removeAttribute("disabled");
+        submitButton.textContent =
+            facility === "rest" ? "Confirm Rest" : "Confirm Training";
+    }
+
+    try {
+        const authoritativePreview = await fetchAuthoritativeSimulation(facility);
+        renderSimulationPreview(authoritativePreview, "Authoritative preview ready");
+
+        if (submitButton) {
+            submitButton.removeAttribute("disabled");
+            submitButton.textContent =
+                facility === "rest" ? "Confirm Rest" : "Confirm Training";
+            submitButton.onclick = () => submitConfirmedTraining(facility);
+        }
+    } catch (error) {
+        renderSimulationPreview(
+            {
+                training_type: facility,
+                stat_gains: {},
+                energy_change: 0,
+                energy_after: "--",
+                failure_percent: 0,
+            },
+            `Preview unavailable: ${error.message}`,
+        );
+        window.dispatchEvent(
+            new CustomEvent("toast", {
+                detail: {
+                    type: "error",
+                    message:
+                        "Unable to load authoritative preview. You can still confirm using the fast preview.",
+                },
+            }),
+        );
+
+        if (submitButton) {
+            submitButton.removeAttribute("disabled");
+            submitButton.textContent =
+                facility === "rest" ? "Confirm Rest" : "Confirm Training";
+        }
+    }
+};
+
 /**
  * Toggle/show the AI analysis drilldown panel.
  * Previously inline in training/predictions.blade.php
  */
 window.showAIDetails = function () {
-    const panel = document.getElementById("ai-analysis-panel");
-    if (panel) {
-        panel.classList.toggle("hidden");
-        return;
-    }
-
-    const banner = document.getElementById("ai-advisor-banner");
-    if (!banner) {
-        return;
-    }
+    try {
+        const banner = document.getElementById("ai-advisor-banner");
+        if (!banner) {
+            return;
+        }
 
     const advisorMessage =
         document.getElementById("ai-advisor-message")?.textContent?.trim() ||
@@ -612,13 +1047,19 @@ window.showAIDetails = function () {
         breakdownEl?.querySelector(".breakdown-mood")?.textContent?.trim() ||
         "--";
 
-    const drilldown = document.createElement("div");
-    drilldown.id = "ai-analysis-panel";
-    drilldown.className =
-        "card rounded-xl p-6 mb-6 border border-primary-200 dark:border-primary-800 animate-fade-in";
-    drilldown.setAttribute("role", "region");
-    drilldown.setAttribute("aria-label", "AI Analysis Details");
-    drilldown.innerHTML = `
+        let drilldown = document.getElementById("ai-analysis-panel");
+
+        if (!drilldown) {
+            drilldown = document.createElement("div");
+            drilldown.id = "ai-analysis-panel";
+            drilldown.className =
+                "card rounded-xl p-6 mb-6 border border-primary-200 dark:border-primary-800 animate-fade-in";
+            drilldown.setAttribute("role", "region");
+            drilldown.setAttribute("aria-label", "AI Analysis Details");
+            banner.insertAdjacentElement("afterend", drilldown);
+        }
+
+        drilldown.innerHTML = `
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
                 <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -675,5 +1116,31 @@ window.showAIDetails = function () {
         </div>
     `;
 
-    banner.insertAdjacentElement("afterend", drilldown);
+        drilldown.classList.remove("hidden");
+        drilldown.classList.add("ring-2", "ring-primary-500", "ring-offset-2", "ring-offset-neutral-900");
+        setTimeout(() => {
+            drilldown?.classList.remove(
+                "ring-2",
+                "ring-primary-500",
+                "ring-offset-2",
+                "ring-offset-neutral-900",
+            );
+        }, 700);
+
+        const evidenceDetails = document.querySelector("#predictions-summary details");
+        if (evidenceDetails && !evidenceDetails.open) {
+            evidenceDetails.open = true;
+        }
+
+        drilldown.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (error) {
+        window.dispatchEvent(
+            new CustomEvent("toast", {
+                detail: {
+                    type: "error",
+                    message: "Unable to open rationale panel.",
+                },
+            }),
+        );
+    }
 };

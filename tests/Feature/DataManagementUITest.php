@@ -23,7 +23,7 @@ describe('Data Management Hub View', function () {
 
         $response->assertSuccessful();
         $response->assertViewIs('data-management.index');
-        $response->assertSee('Data Management Hub');
+        $response->assertSee('Data Management');
     });
 
     it('redirects unauthenticated users', function () {
@@ -33,44 +33,15 @@ describe('Data Management Hub View', function () {
         $response->assertRedirect();
     });
 
-    it('displays all tab navigation options', function () {
+    it('displays task action cards instead of tabs', function () {
         $response = $this->actingAs($this->user)
             ->get(route('data-management.index'));
 
-        $response->assertSee('Overview');
-        $response->assertSee('Import');
-        $response->assertSee('Export');
-        $response->assertSee('Migration');
-        $response->assertSee('Backup');
-        $response->assertSee('History');
-    });
-
-    it('passes import types to the view', function () {
-        $response = $this->actingAs($this->user)
-            ->get(route('data-management.index'));
-
-        $response->assertViewHas('importTypes');
-    });
-
-    it('passes export types to the view', function () {
-        $response = $this->actingAs($this->user)
-            ->get(route('data-management.index'));
-
-        $response->assertViewHas('exportTypes');
-    });
-
-    it('passes export formats to the view', function () {
-        $response = $this->actingAs($this->user)
-            ->get(route('data-management.index'));
-
-        $response->assertViewHas('exportFormats');
-    });
-
-    it('passes legacy formats to the view', function () {
-        $response = $this->actingAs($this->user)
-            ->get(route('data-management.index'));
-
-        $response->assertViewHas('legacyFormats');
+        $response->assertSee('Import Data');
+        $response->assertSee('Export Data');
+        $response->assertSee('Migrate Legacy Data');
+        $response->assertSee('Create Backup');
+        $response->assertSee('Recent Activity History');
     });
 });
 

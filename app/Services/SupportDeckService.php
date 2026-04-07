@@ -39,10 +39,17 @@ class SupportDeckService
         }
 
         // Check for duplicates (excluding friend cards)
-        $ownedCardIds = collect($cards)
-            ->where('is_friend_card', false)
-            ->pluck('support_card_id')
-            ->toArray();
+        $ownedCardIds = [];
+        foreach ($cards as $card) {
+            if (($card['is_friend_card'] ?? false) !== false) {
+                continue;
+            }
+
+            $supportCardId = $card['support_card_id'] ?? null;
+            if (is_numeric($supportCardId)) {
+                $ownedCardIds[] = (int) $supportCardId;
+            }
+        }
 
         if (count($ownedCardIds) !== count(array_unique($ownedCardIds))) {
             $errors[] = 'Deck cannot contain duplicate cards (except friend cards)';

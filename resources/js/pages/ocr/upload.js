@@ -61,7 +61,7 @@ class OCRUploadManager {
                     maxFileSizeEl.textContent = `${(this.maxFileSize / 1048576).toFixed(0)} MB`;
                 }
             } else {
-                this.showError("OCR system is not available");
+                this.showError(data.message || "OCR system is not available");
             }
         } catch (error) {
             console.error("Failed to check OCR status:", error);

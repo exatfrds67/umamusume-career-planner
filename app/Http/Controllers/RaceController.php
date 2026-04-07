@@ -21,9 +21,13 @@ class RaceController extends Controller
      */
     public function index(Request $request): \Illuminate\View\View
     {
-        $catalogQuery = GameRace::query()
-            ->orderByRaw("CASE grade WHEN 'G1' THEN 1 WHEN 'G2' THEN 2 WHEN 'G3' THEN 3 WHEN 'OP' THEN 4 WHEN 'Pre-OP' THEN 5 WHEN 'Debut' THEN 6 ELSE 7 END")
-            ->orderBy('year_in_scenario');
+        $validSorts = ['date', 'grade', 'distance', 'fans'];
+        $sort = in_array($request->input('sort'), $validSorts, true) ? $request->input('sort') : 'date';
+
+        $gradeOrderSql = "CASE grade WHEN 'G1' THEN 1 WHEN 'G2' THEN 2 WHEN 'G3' THEN 3 WHEN 'OP' THEN 4 WHEN 'Pre-OP' THEN 5 WHEN 'Debut' THEN 6 ELSE 7 END";
+        $seasonOrderSql = "CASE COALESCE(season, '') WHEN 'spring' THEN 1 WHEN 'summer' THEN 2 WHEN 'autumn' THEN 3 WHEN 'winter' THEN 4 ELSE 5 END";
+
+        $catalogQuery = GameRace::query();
 
         if ($request->filled('grade')) {
             $catalogQuery->where('grade', '=', $request->input('grade'));
@@ -43,7 +47,52 @@ class RaceController extends Controller
             $catalogQuery->where('distance_category', '=', $request->input('distance'));
         }
 
-        $catalog = $catalogQuery->get();
+        if ($request->filled('season')) {
+            $catalogQuery->where('season', '=', $request->input('season'));
+        }
+
+        if ($request->filled('venue')) {
+            $catalogQuery->where('venue', '=', $request->input('venue'));
+        }
+
+        $minFans = $request->integer('min_fans', 0);
+        if ($minFans > 0) {
+            $catalogQuery->where('fan_requirement', '>=', $minFans);
+        }
+
+        if ($sort === 'grade') {
+            $catalogQuery
+                ->orderByRaw($gradeOrderSql)
+                ->orderByRaw('COALESCE(year_in_scenario, 9999)')
+                ->orderByRaw($seasonOrderSql);
+        } elseif ($sort === 'distance') {
+            $catalogQuery
+                ->orderBy('distance_meters')
+                ->orderByRaw($gradeOrderSql);
+        } elseif ($sort === 'fans') {
+            $catalogQuery
+                ->orderByRaw('(fan_requirement IS NULL OR fan_requirement = 0)')
+                ->orderBy('fan_requirement', 'desc')
+                ->orderByRaw($gradeOrderSql);
+        } else {
+            $catalogQuery
+                ->orderByRaw('COALESCE(year_in_scenario, 9999)')
+                ->orderByRaw($seasonOrderSql)
+                ->orderByRaw($gradeOrderSql);
+        }
+
+        $catalog = $catalogQuery->paginate(50)->withQueryString();
+
+        $activeFilters = [
+            'grade' => $request->input('grade', ''),
+            'phase' => $request->input('phase', ''),
+            'surface' => $request->input('surface', ''),
+            'distance' => $request->input('distance', ''),
+            'season' => $request->input('season', ''),
+            'venue' => $request->input('venue', ''),
+            'min_fans' => $request->input('min_fans', ''),
+            'sort' => $sort,
+        ];
 
         $recentResults = Race::query()
             ->with('character')
@@ -52,13 +101,29 @@ class RaceController extends Controller
             ->limit(10)
             ->get();
 
+        $availableVenues = GameRace::query()
+            ->whereNotNull('venue')
+            ->distinct()
+            ->orderBy('venue')
+            ->pluck('venue');
+
         return view('races.index', [
             'catalog' => $catalog,
             'recentResults' => $recentResults,
+            'activeFilters' => $activeFilters,
             'grades' => ['G1', 'G2', 'G3', 'OP', 'Pre-OP', 'Debut'],
             'phases' => ['junior', 'classic', 'senior'],
             'surfaces' => ['turf', 'dirt'],
             'distances' => ['sprint', 'mile', 'medium', 'long', 'super_long'],
+            'availableSeasons' => ['spring', 'summer', 'autumn', 'winter'],
+            'availableVenues' => $availableVenues,
+            'fanThresholds' => [100, 200, 500, 1000],
+            'sortOptions' => [
+                'date' => 'Date (Default)',
+                'grade' => 'Grade',
+                'distance' => 'Distance',
+                'fans' => 'Fan Requirement',
+            ],
         ]);
     }
 

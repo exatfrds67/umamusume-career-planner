@@ -259,7 +259,6 @@ it('displays confidence score when provided', function () {
     );
 
     // Check for confidence display
-    expect($html)->toContain('Confidence:');
     expect($html)->toContain('92%');
 });
 

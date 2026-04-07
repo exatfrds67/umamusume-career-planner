@@ -44,7 +44,7 @@
             </div>
 
             {{-- Stepper Component --}}
-            <x-stepper :steps="['Character', 'Goals', 'Skills', 'Races', 'Review']" x-bind:current="currentStep" x-bind:completed="completedSteps" class="mb-8" />
+            <x-stepper :steps="['Character', 'Goals', 'Skills', 'Races', 'Synergy', 'Review']" x-bind:current="currentStep" x-bind:completed="completedSteps" class="mb-8" />
 
             {{-- Error Display --}}
             <div x-show="currentStepErrors.length > 0" x-transition class="mb-6">
@@ -373,8 +373,28 @@
                     </div>
                 </div>
 
-                {{-- Step 5: Review & Submit --}}
+                {{-- Step 5: Synergy Analysis --}}
                 <div x-show="currentStep === 4" x-transition class="space-y-6">
+                    <h2 class="text-2xl font-semibold text-neutral-900 dark:text-white mb-4">
+                        Synergy Analysis
+                    </h2>
+                    <p class="text-neutral-600 dark:text-neutral-400 mb-4">
+                        Review how well your build's stats, skills, and strategy work together.
+                    </p>
+                    <template x-if="plan.character_id">
+                        <div>
+                            <livewire:synergy-build-planner :characterId="(int) old('character_id', request()->integer('character_id'))" wire:key="wizard-synergy-create-{{ (int) old('character_id', request()->integer('character_id')) }}" />
+                        </div>
+                    </template>
+                    <template x-if="!plan.character_id">
+                        <div class="text-center py-8 text-neutral-500 dark:text-neutral-400">
+                            <p>Select a character first to see synergy analysis.</p>
+                        </div>
+                    </template>
+                </div>
+
+                {{-- Step 6: Review & Submit --}}
+                <div x-show="currentStep === 5" x-transition class="space-y-6">
                     <h2 class="text-2xl font-semibold text-neutral-900 dark:text-white mb-4">
                         Review Your Plan
                     </h2>

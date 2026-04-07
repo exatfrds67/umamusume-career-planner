@@ -347,15 +347,12 @@ class HybridAIService
 
             $processingTime = microtime(true) - $startTime;
 
-            // Check if processing was too slow
+            // Log if processing was slow, but do not throw an exception (since we already have the answer)
             if ($processingTime > $this->ollamaTimeout) {
-                Log::warning('[HybridAI] Ollama processing exceeded timeout', [
+                Log::warning('[HybridAI] Ollama processing exceeded timeout but returned response', [
                     'processing_time' => $processingTime,
                     'timeout' => $this->ollamaTimeout,
                 ]);
-
-                // Trigger fallback to Bedrock
-                throw new \RuntimeException('Ollama processing timeout');
             }
 
             $tokenCount = isset($response['token_count']) && is_int($response['token_count'])
@@ -464,7 +461,7 @@ class HybridAIService
                 ? $response['token_count']
                 : (isset($complexity['token_estimate']) && is_int($complexity['token_estimate']) ? $complexity['token_estimate'] : 0);
 
-            $model = isset($response['model']) && is_string($response['model']) ? $response['model'] : 'claude-3-5-sonnet';
+            $model = isset($response['model']) && is_string($response['model']) ? $response['model'] : $this->getDefaultBedrockModel();
             $cost = $this->calculateCost($tokenCount, $model);
 
             return [
@@ -517,7 +514,7 @@ class HybridAIService
                 ? $response['token_count']
                 : (isset($complexity['token_estimate']) && is_int($complexity['token_estimate']) ? $complexity['token_estimate'] : 0);
 
-            $model = isset($response['model']) && is_string($response['model']) ? $response['model'] : 'claude-3-5-sonnet';
+            $model = isset($response['model']) && is_string($response['model']) ? $response['model'] : $this->getDefaultBedrockModel();
             $cost = $this->calculateCost($tokenCount, $model);
 
             return [
@@ -622,6 +619,13 @@ class HybridAIService
         return new AgentCoreWrapper($this->mcpClient, $context);
     }
 
+    protected function getDefaultBedrockModel(): string
+    {
+        $model = config('ai.bedrock.default_model', 'claude-3-5-sonnet');
+
+        return is_string($model) ? $model : 'claude-3-5-sonnet';
+    }
+
     /**
      * Select appropriate Bedrock model based on complexity
      *
@@ -630,7 +634,7 @@ class HybridAIService
     protected function selectBedrockModel(array $complexity): string
     {
         if ($complexity['requires_multi_step'] || $complexity['level'] === 'complex') {
-            return 'claude-3-5-sonnet'; // Best balance of intelligence and cost
+            return $this->getDefaultBedrockModel(); // Best balance of intelligence and cost
         }
 
         if ($complexity['level'] === 'medium') {
@@ -913,11 +917,14 @@ class StrandsAgentWrapper
      */
     public function process(string $prompt, array $requestContext = []): array
     {
+        $defaultModelConfig = config('ai.bedrock.default_model', 'claude-3-5-sonnet');
+        $defaultModel = is_string($defaultModelConfig) ? $defaultModelConfig : 'claude-3-5-sonnet';
+
         // Use MCP client to invoke strands-agents tools
         $result = $this->mcpClient->callTool('strands-agents', 'create_agent', [
             'prompt' => $prompt,
             'context' => [...$this->context, ...$requestContext],
-            'model' => 'claude-3-5-sonnet',
+            'model' => $defaultModel,
         ]);
 
         $workflowStepsRaw = $result['workflow_steps'] ?? null;
@@ -926,7 +933,7 @@ class StrandsAgentWrapper
 
         return [
             'content' => isset($result['response']) && is_string($result['response']) ? $result['response'] : '',
-            'model' => isset($result['model']) && is_string($result['model']) ? $result['model'] : 'claude-3-5-sonnet',
+            'model' => isset($result['model']) && is_string($result['model']) ? $result['model'] : $defaultModel,
             'token_count' => isset($result['token_count']) && is_int($result['token_count']) ? $result['token_count'] : 0,
             'confidence' => isset($result['confidence']) && (is_float($result['confidence']) || is_int($result['confidence'])) ? (float) $result['confidence'] : 0.95,
             'agent_id' => $result['agent_id'] ?? null,
@@ -962,11 +969,14 @@ class AgentCoreWrapper
      */
     public function process(string $prompt, array $requestContext = []): array
     {
+        $defaultModelConfig = config('ai.bedrock.default_model', 'claude-3-5-sonnet');
+        $defaultModel = is_string($defaultModelConfig) ? $defaultModelConfig : 'claude-3-5-sonnet';
+
         // Use MCP client to invoke agentcore-mcp-server tools
         $result = $this->mcpClient->callTool('agentcore-mcp-server', 'invoke_agent', [
             'prompt' => $prompt,
             'context' => [...$this->context, ...$requestContext],
-            'model' => 'claude-3-5-sonnet',
+            'model' => $defaultModel,
         ]);
 
         $workflowStepsRaw = $result['workflow_steps'] ?? null;
@@ -975,7 +985,7 @@ class AgentCoreWrapper
 
         return [
             'content' => isset($result['response']) && is_string($result['response']) ? $result['response'] : '',
-            'model' => isset($result['model']) && is_string($result['model']) ? $result['model'] : 'claude-3-5-sonnet',
+            'model' => isset($result['model']) && is_string($result['model']) ? $result['model'] : $defaultModel,
             'token_count' => isset($result['token_count']) && is_int($result['token_count']) ? $result['token_count'] : 0,
             'confidence' => isset($result['confidence']) && (is_float($result['confidence']) || is_int($result['confidence'])) ? (float) $result['confidence'] : 0.95,
             'agent_id' => $result['agent_id'] ?? null,

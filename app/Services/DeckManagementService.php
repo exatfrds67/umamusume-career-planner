@@ -457,11 +457,18 @@ class DeckManagementService
         }
 
         // Check position slots
-        $positions = $deck->pluck('position_slot')->sort()->values()->toArray();
+        $positions = $deck
+            ->pluck('position_slot')
+            ->map(static fn (mixed $position): int => is_numeric($position) ? (int) $position : 0)
+            ->sort()
+            ->values()
+            ->toArray();
         $expectedPositions = range(1, self::MAX_DECK_SIZE);
         if ($positions !== $expectedPositions) {
             $validation['is_valid'] = false;
-            $validation['errors'][] = 'Invalid position slots. Expected: '.implode(', ', $expectedPositions).'. Found: '.implode(', ', $positions);
+            $expectedPositionsStr = array_map(static fn (mixed $position): string => (string) $position, $expectedPositions);
+            $positionsStr = array_map(static fn (mixed $position): string => (string) $position, $positions);
+            $validation['errors'][] = 'Invalid position slots. Expected: '.implode(', ', $expectedPositionsStr).'. Found: '.implode(', ', $positionsStr);
         }
 
         return $validation;

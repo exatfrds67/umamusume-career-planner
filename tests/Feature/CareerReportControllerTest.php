@@ -25,7 +25,7 @@ describe('Reports Index', function () {
 
         $response->assertStatus(200);
         $response->assertViewIs('reports.index');
-        $response->assertViewHas('characters');
+        $response->assertViewHas('characterGroups');
         $response->assertViewHas('recentCareers');
     });
 
@@ -45,6 +45,41 @@ describe('Reports Index', function () {
         $response->assertStatus(200);
         $response->assertSee('Own Character');
         $response->assertDontSee('Other Character');
+    });
+
+    it('groups character variants into one report card and aggregates careers', function () {
+        $baseCharacter = Character::factory()->for($this->user)->create([
+            'name' => 'Vodka',
+            'game_character_id' => 777,
+            'updated_at' => now(),
+        ]);
+
+        $starVariant = Character::factory()->for($this->user)->create([
+            'name' => 'Vodka (Star)',
+            'game_character_id' => 777,
+            'updated_at' => now()->subMinute(),
+        ]);
+
+        $platinumVariant = Character::factory()->for($this->user)->create([
+            'name' => 'Vodka (Platinum)',
+            'game_character_id' => 777,
+            'updated_at' => now()->subMinutes(2),
+        ]);
+
+        Career::factory()->for($starVariant)->for($this->user)->count(2)->create();
+        Career::factory()->for($platinumVariant)->for($this->user)->count(1)->create();
+
+        $response = $this->actingAs($this->user)->get(route('reports.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Vodka');
+        $response->assertSee('3 career(s)');
+        $response->assertSee('Includes 3 character variants');
+        $response->assertSee('Vodka (Star)');
+        $response->assertSee('Vodka (Platinum)');
+        $response->assertDontSee('No careers found for this character.');
+
+        expect($baseCharacter->careers()->count())->toBe(0);
     });
 });
 

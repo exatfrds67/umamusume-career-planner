@@ -199,9 +199,9 @@ describe('BedrockService', function () {
             $mockClient = \Mockery::mock(BedrockRuntimeClient::class);
 
             $awsException = new AwsException(
-                'ThrottlingException',
+                'AccessDeniedException',
                 \Mockery::mock(Command::class),
-                ['code' => 'ThrottlingException']
+                ['code' => 'AccessDeniedException']
             );
 
             $mockClient->shouldReceive('invokeModel')

@@ -308,7 +308,9 @@ describe('Server Status API', function () {
             ])
             ->assertJsonStructure([
                 'success',
-                'data',
+                'data' => [
+                    'servers',
+                ],
             ]);
     });
 
@@ -334,7 +336,11 @@ describe('Workflow Status API', function () {
             ])
             ->assertJsonStructure([
                 'success',
-                'data',
+                'data' => [
+                    'workflow_id',
+                    'status',
+                    'progress_percentage',
+                ],
             ]);
     });
 
@@ -347,7 +353,11 @@ describe('Workflow Status API', function () {
             ])
             ->assertJsonStructure([
                 'success',
-                'data',
+                'data' => [
+                    'workflow_id',
+                    'status',
+                    'progress_percentage',
+                ],
             ]);
     });
 });
@@ -362,7 +372,9 @@ describe('Tool Usage API', function () {
             ])
             ->assertJsonStructure([
                 'success',
-                'data',
+                'data' => [
+                    'active_tools',
+                ],
             ]);
     });
 
@@ -375,7 +387,9 @@ describe('Tool Usage API', function () {
             ])
             ->assertJsonStructure([
                 'success',
-                'data',
+                'data' => [
+                    'active_tools',
+                ],
             ]);
     });
 });

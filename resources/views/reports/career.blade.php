@@ -62,6 +62,13 @@
             </div>
         </div>
 
+        @php
+            $hasTrainingData = ($report['training_analysis']['total_sessions'] ?? 0) > 0;
+            $hasRaceData = ($report['race_analysis']['total_races'] ?? 0) > 0;
+            $hasStatSummaryData = (bool) ($report['statistical_summary']['has_training_data'] ?? false);
+            $hasHighlightData = (bool) ($report['executive_summary']['highlight_stats']['has_data'] ?? false);
+        @endphp
+
         {{-- Executive Summary --}}
         <div class="mb-8 bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
             <h2 class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">Executive Summary</h2>
@@ -70,7 +77,7 @@
                     <p class="text-sm text-neutral-500 dark:text-neutral-400">Status</p>
                     <p
                         class="text-2xl font-bold {{ $report['executive_summary']['career_status'] === 'completed' ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400' }}">
-                        {{ ucfirst($report['executive_summary']['career_status']) }}
+                        {{ ucfirst(str_replace('_', ' ', $report['executive_summary']['career_status'])) }}
                     </p>
                 </div>
                 <div class="text-center p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
@@ -90,12 +97,17 @@
                 </div>
                 <div class="text-center p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
                     <p class="text-sm text-neutral-500 dark:text-neutral-400">Best Stat</p>
-                    <p class="text-2xl font-bold text-neutral-900 dark:text-white">
-                        {{ ucfirst($report['executive_summary']['highlight_stats']['best_stat']) }}
-                    </p>
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                        +{{ $report['executive_summary']['highlight_stats']['best_value'] }} total
-                    </p>
+                    @if ($hasHighlightData)
+                        <p class="text-2xl font-bold text-neutral-900 dark:text-white">
+                            {{ ucfirst($report['executive_summary']['highlight_stats']['best_stat']) }}
+                        </p>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                            +{{ $report['executive_summary']['highlight_stats']['best_value'] }} total
+                        </p>
+                    @else
+                        <p class="text-2xl font-bold text-neutral-500 dark:text-neutral-300">Not Available</p>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Needs training data</p>
+                    @endif
                 </div>
             </div>
 
@@ -215,67 +227,79 @@
             {{-- Training Analysis --}}
             <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
                 <h2 class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">Training Analysis</h2>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
-                        <p class="text-2xl font-bold text-neutral-900 dark:text-white">
-                            {{ $report['training_analysis']['total_sessions'] }}</p>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Total Sessions</p>
+                @if ($hasTrainingData)
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                            <p class="text-2xl font-bold text-neutral-900 dark:text-white">
+                                {{ $report['training_analysis']['total_sessions'] }}</p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Total Sessions</p>
+                        </div>
+                        <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                            <p class="text-2xl font-bold text-green-600 dark:text-green-400">
+                                {{ ucfirst($report['training_analysis']['best_training_type']) }}</p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Best Training</p>
+                        </div>
+                        <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                            <p class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                                {{ $report['training_analysis']['friendship_training_stats']['count'] }}</p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Friendship Training</p>
+                        </div>
+                        <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                            <p
+                                class="text-2xl font-bold {{ $report['training_analysis']['failure_analysis']['total_failures'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }}">
+                                {{ $report['training_analysis']['failure_analysis']['total_failures'] }}
+                            </p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Failures</p>
+                        </div>
                     </div>
-                    <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
-                        <p class="text-2xl font-bold text-green-600 dark:text-green-400">
-                            {{ ucfirst($report['training_analysis']['best_training_type']) }}</p>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Best Training</p>
+                @else
+                    <div class="rounded-lg border border-dashed border-neutral-300 dark:border-neutral-600 p-4 text-sm text-neutral-600 dark:text-neutral-300">
+                        No training sessions are recorded yet. Continue your run and log training turns to unlock analysis.
                     </div>
-                    <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
-                        <p class="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                            {{ $report['training_analysis']['friendship_training_stats']['count'] }}</p>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Friendship Training</p>
-                    </div>
-                    <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
-                        <p
-                            class="text-2xl font-bold {{ $report['training_analysis']['failure_analysis']['total_failures'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }}">
-                            {{ $report['training_analysis']['failure_analysis']['total_failures'] }}
-                        </p>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Failures</p>
-                    </div>
-                </div>
+                @endif
             </div>
 
             {{-- Race Analysis --}}
             <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
                 <h2 class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">Race Analysis</h2>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
-                        <p class="text-2xl font-bold text-neutral-900 dark:text-white">
-                            {{ $report['race_analysis']['total_races'] }}</p>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Total Races</p>
+                @if ($hasRaceData)
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                            <p class="text-2xl font-bold text-neutral-900 dark:text-white">
+                                {{ $report['race_analysis']['total_races'] }}</p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Total Races</p>
+                        </div>
+                        <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                            <p class="text-2xl font-bold text-green-600 dark:text-green-400">
+                                {{ $report['race_analysis']['wins'] }}</p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Wins</p>
+                        </div>
+                        <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                            <p class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                                {{ $report['race_analysis']['win_rate'] }}%</p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Win Rate</p>
+                        </div>
+                        <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
+                            <p class="text-2xl font-bold text-neutral-900 dark:text-white">
+                                {{ $report['race_analysis']['avg_position'] }}</p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Avg Position</p>
+                        </div>
                     </div>
-                    <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
-                        <p class="text-2xl font-bold text-green-600 dark:text-green-400">
-                            {{ $report['race_analysis']['wins'] }}</p>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Wins</p>
-                    </div>
-                    <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
-                        <p class="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                            {{ $report['race_analysis']['win_rate'] }}%</p>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Win Rate</p>
-                    </div>
-                    <div class="text-center p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
-                        <p class="text-2xl font-bold text-neutral-900 dark:text-white">
-                            {{ $report['race_analysis']['avg_position'] }}</p>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Avg Position</p>
-                    </div>
-                </div>
 
-                @if ($report['race_analysis']['best_race'])
-                    <div
-                        class="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                        <p class="text-sm font-medium text-green-800 dark:text-green-200">Best Race</p>
-                        <p class="text-sm text-green-700 dark:text-green-300">
-                            {{ $report['race_analysis']['best_race']['race_name'] }}
-                            ({{ $report['race_analysis']['best_race']['grade'] }})
-                            - Position: {{ $report['race_analysis']['best_race']['position'] }}
-                        </p>
+                    @if ($report['race_analysis']['best_race'])
+                        <div
+                            class="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                            <p class="text-sm font-medium text-green-800 dark:text-green-200">Best Race</p>
+                            <p class="text-sm text-green-700 dark:text-green-300">
+                                {{ $report['race_analysis']['best_race']['race_name'] }}
+                                ({{ $report['race_analysis']['best_race']['grade'] }})
+                                - Position: {{ $report['race_analysis']['best_race']['position'] }}
+                            </p>
+                        </div>
+                    @endif
+                @else
+                    <div class="rounded-lg border border-dashed border-neutral-300 dark:border-neutral-600 p-4 text-sm text-neutral-600 dark:text-neutral-300">
+                        No races are recorded yet. Enter race results to unlock race analysis and benchmark insights.
                     </div>
                 @endif
             </div>
@@ -339,55 +363,61 @@
         {{-- Statistical Summary --}}
         <div class="bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-neutral-200 dark:border-neutral-700 p-6">
             <h2 class="text-xl font-semibold text-neutral-900 dark:text-white mb-4">Statistical Summary</h2>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
-                    <thead>
-                        <tr>
-                            <th scope="col"
-                                class="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-                                Stat</th>
-                            <th scope="col"
-                                class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-                                Mean</th>
-                            <th scope="col"
-                                class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-                                Median</th>
-                            <th scope="col"
-                                class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-                                Std Dev</th>
-                            <th scope="col"
-                                class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-                                Min</th>
-                            <th scope="col"
-                                class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-                                Max</th>
-                            <th scope="col"
-                                class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-                                Total</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
-                        @foreach ($report['statistical_summary']['stat_statistics'] as $stat => $stats)
-                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/50">
-                                <th scope="row" class="px-4 py-3 text-sm font-medium text-neutral-900 dark:text-white">
-                                    {{ ucfirst($stat) }}</th>
-                                <td class="px-4 py-3 text-sm text-right text-neutral-600 dark:text-neutral-400">
-                                    {{ $stats['mean'] }}</td>
-                                <td class="px-4 py-3 text-sm text-right text-neutral-600 dark:text-neutral-400">
-                                    {{ $stats['median'] }}</td>
-                                <td class="px-4 py-3 text-sm text-right text-neutral-600 dark:text-neutral-400">
-                                    {{ $stats['std_dev'] }}</td>
-                                <td class="px-4 py-3 text-sm text-right text-neutral-600 dark:text-neutral-400">
-                                    {{ $stats['min'] }}</td>
-                                <td class="px-4 py-3 text-sm text-right text-neutral-600 dark:text-neutral-400">
-                                    {{ $stats['max'] }}</td>
-                                <td class="px-4 py-3 text-sm text-right font-medium text-neutral-900 dark:text-white">
-                                    {{ $stats['total'] }}</td>
+            @if ($hasStatSummaryData)
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
+                        <thead>
+                            <tr>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                                    Stat</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                                    Mean</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                                    Median</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                                    Std Dev</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                                    Min</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                                    Max</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                                    Total</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
+                            @foreach ($report['statistical_summary']['stat_statistics'] as $stat => $stats)
+                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/50">
+                                    <th scope="row" class="px-4 py-3 text-sm font-medium text-neutral-900 dark:text-white">
+                                        {{ ucfirst($stat) }}</th>
+                                    <td class="px-4 py-3 text-sm text-right text-neutral-600 dark:text-neutral-400">
+                                        {{ $stats['mean'] }}</td>
+                                    <td class="px-4 py-3 text-sm text-right text-neutral-600 dark:text-neutral-400">
+                                        {{ $stats['median'] }}</td>
+                                    <td class="px-4 py-3 text-sm text-right text-neutral-600 dark:text-neutral-400">
+                                        {{ $stats['std_dev'] }}</td>
+                                    <td class="px-4 py-3 text-sm text-right text-neutral-600 dark:text-neutral-400">
+                                        {{ $stats['min'] }}</td>
+                                    <td class="px-4 py-3 text-sm text-right text-neutral-600 dark:text-neutral-400">
+                                        {{ $stats['max'] }}</td>
+                                    <td class="px-4 py-3 text-sm text-right font-medium text-neutral-900 dark:text-white">
+                                        {{ $stats['total'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="rounded-lg border border-dashed border-neutral-300 dark:border-neutral-600 p-4 text-sm text-neutral-600 dark:text-neutral-300">
+                    Statistical summary appears after training data is collected. Keep recording sessions to unlock this section.
+                </div>
+            @endif
         </div>
     </div>
 @endsection

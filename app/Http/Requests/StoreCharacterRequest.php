@@ -50,6 +50,7 @@ class StoreCharacterRequest extends FormRequest
             'external_source_id' => ['nullable', 'string', 'max:50'],
             'external_source' => ['nullable', 'string', 'max:100'],
             'avatar_url' => ['nullable', 'string', 'max:500'],
+            'avatar_upload' => ['nullable', 'required_if:avatar_url,custom_upload', 'image', 'mimes:jpeg,jpg,png,gif', 'max:2048'],
             'trainee_id' => ['nullable', 'integer', 'exists:ucp_game_characters,id'],
             'title' => ['nullable', 'string', 'max:100'],
 
@@ -101,6 +102,11 @@ class StoreCharacterRequest extends FormRequest
 
             'scenario_type.required' => 'Please select a scenario type.',
             'scenario_type.in' => 'Invalid scenario type selected.',
+
+            'avatar_upload.required_if' => 'Please upload an image file when using a custom avatar.',
+            'avatar_upload.image' => 'Custom avatar must be a valid image.',
+            'avatar_upload.mimes' => 'Custom avatar must be a JPG, PNG, or GIF image.',
+            'avatar_upload.max' => 'Custom avatar must not be larger than 2MB.',
 
             'stats.*.required' => 'All stat values are required.',
             'stats.*.integer' => 'The :attribute field must be an integer.',

@@ -60,6 +60,38 @@ class AvatarProcessingService
             return $manager->read($path);
         }
 
+        if (str_starts_with($avatarUrl, '/storage/')) {
+            $relativeStoragePath = ltrim(substr($avatarUrl, strlen('/storage/')), '/');
+            if ($relativeStoragePath === '') {
+                return null;
+            }
+
+            $path = Storage::disk('public')->path($relativeStoragePath);
+            if (! file_exists($path)) {
+                return null;
+            }
+
+            return $manager->read($path);
+        }
+
+        if (str_starts_with($avatarUrl, 'http://') || str_starts_with($avatarUrl, 'https://')) {
+            $parsedUrlPath = parse_url($avatarUrl, PHP_URL_PATH);
+
+            if (is_string($parsedUrlPath) && str_starts_with($parsedUrlPath, '/storage/')) {
+                $relativeStoragePath = ltrim(substr($parsedUrlPath, strlen('/storage/')), '/');
+                if ($relativeStoragePath === '') {
+                    return null;
+                }
+
+                $path = Storage::disk('public')->path($relativeStoragePath);
+                if (! file_exists($path)) {
+                    return null;
+                }
+
+                return $manager->read($path);
+            }
+        }
+
         if (str_starts_with($avatarUrl, 'data:image/')) {
             $parts = explode(',', $avatarUrl, 2);
             if (count($parts) !== 2) {
@@ -111,7 +143,7 @@ class AvatarProcessingService
 
         $image->toJpeg(85)->save($fullPath);
 
-        return Storage::disk('public')->url($relativePath);
+        return '/storage/'.ltrim($relativePath, '/');
     }
 
     private function saveCircular(ImageInterface $image, int $characterId): ?string
@@ -159,6 +191,6 @@ class AvatarProcessingService
         imagedestroy($gdSource);
         imagedestroy($gdCircular);
 
-        return Storage::disk('public')->url($relativePath);
+        return '/storage/'.ltrim($relativePath, '/');
     }
 }

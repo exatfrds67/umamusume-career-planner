@@ -95,12 +95,19 @@ class SupportCardController extends Controller
             ->groupBy('rarity')
             ->pluck('cnt', 'rarity');
 
+        // Total type counts across all active cards (used by stats widget type chips)
+        $typeCounts = SupportCardDefinition::query()
+            ->where('is_active', true)
+            ->selectRaw('card_type, COUNT(*) as cnt')
+            ->groupBy('card_type')
+            ->pluck('cnt', 'card_type');
+
         // Get filter options
         $cardTypes = ['speed', 'stamina', 'power', 'guts', 'wit', 'friend'];
         $rarities = ['SSR', 'SR', 'R'];
         $tiers = ['S+', 'S', 'A', 'B', 'C'];
 
-        return view('support-cards.index', compact('cards', 'cardTypes', 'rarities', 'tiers', 'totalRarityCounts'));
+        return view('support-cards.index', compact('cards', 'cardTypes', 'rarities', 'tiers', 'totalRarityCounts', 'typeCounts'));
     }
 
     /**

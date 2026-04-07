@@ -8,11 +8,11 @@
 // Uses window.Alpine set by app.js (Livewire-bundled Alpine instance)
 const ROUTES = {
     overview: "/api/mcp/dashboard/overview",
-    servers: "/api/mcp/servers",
-    agents: "/api/mcp/agents",
-    costs: "/api/mcp/costs",
-    performance: "/api/mcp/performance",
-    settings: "/api/mcp/settings",
+    servers: "/api/mcp/dashboard/servers",
+    agents: "/api/mcp/dashboard/agents",
+    costs: "/api/mcp/dashboard/costs",
+    performance: "/api/mcp/dashboard/performance",
+    settings: "/api/mcp/dashboard/settings",
 };
 
 // Register Alpine component — handles both pre-initialized and late-loaded Alpine
@@ -22,6 +22,7 @@ function registerMcpDashboard() {
         lastUpdated: "--",
         performanceTimeRange: "24h",
         loading: false,
+        initialLoad: true,
 
         overview: {
             total_servers: 0,
@@ -77,15 +78,20 @@ function registerMcpDashboard() {
         init() {
             this.loadDashboard();
             // Refresh every 10 seconds
-            setInterval(() => this.loadDashboard(), 10000);
+            setInterval(() => this.loadDashboard(true), 10000);
 
             // Listen for custom events
             this.$watch("activeTab", () => this.loadTabData());
         },
 
-        async loadDashboard() {
-            if (this.loading) return;
-            this.loading = true;
+        async loadDashboard(isAutoRefresh = false) {
+            if (this.loading && !isAutoRefresh) {
+                return;
+            }
+
+            if (!isAutoRefresh) {
+                this.loading = true;
+            }
 
             try {
                 const response = await fetch(ROUTES.overview, {
@@ -100,12 +106,21 @@ function registerMcpDashboard() {
                 const data = await response.json();
 
                 if (data.success) {
-                    this.overview = data.data.overview;
-                    this.servers = data.data.servers;
-                    this.agents = data.data.agents;
-                    this.costs = data.data.costs;
-                    this.performance = data.data.performance;
-                    this.settings = data.data.settings;
+                    this.overview = {
+                        ...this.overview,
+                        ...(data.data?.overview || {}),
+                    };
+                    this.servers = this.toObject(data.data?.servers);
+                    this.agents = this.toObject(data.data?.agents);
+                    this.costs = { ...this.costs, ...(data.data?.costs || {}) };
+                    this.performance = {
+                        ...this.performance,
+                        ...(data.data?.performance || {}),
+                    };
+                    this.settings = {
+                        ...this.settings,
+                        ...(data.data?.settings || {}),
+                    };
                     this.lastUpdated = new Date().toLocaleTimeString();
                 }
             } catch (error) {
@@ -121,7 +136,14 @@ function registerMcpDashboard() {
                 );
             } finally {
                 this.loading = false;
+                this.initialLoad = false;
             }
+        },
+
+        toObject(value) {
+            return value && typeof value === "object" && !Array.isArray(value)
+                ? value
+                : {};
         },
 
         async loadTabData() {
@@ -158,7 +180,7 @@ function registerMcpDashboard() {
 
                 const data = await response.json();
                 if (data.success) {
-                    this.servers = data.data;
+                    this.servers = this.toObject(data.data);
                 }
             } catch (error) {
                 console.error("Failed to load servers:", error);
@@ -178,7 +200,7 @@ function registerMcpDashboard() {
 
                 const data = await response.json();
                 if (data.success) {
-                    this.agents = data.data;
+                    this.agents = this.toObject(data.data);
                 }
             } catch (error) {
                 console.error("Failed to load agents:", error);

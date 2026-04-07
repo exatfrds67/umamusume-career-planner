@@ -628,12 +628,16 @@ class DataExportService
                 $output .= implode(',', $headers)."\n";
 
                 foreach ($flattenedData as $row) {
-                    $escapedValues = array_map(function ($value) {
+                    $escapedValues = array_map(function ($value): string {
                         if (\is_string($value) && (str_contains($value, ',') || str_contains($value, '"') || str_contains($value, "\n"))) {
                             return '"'.str_replace('"', '""', $value).'"';
                         }
 
-                        return $value;
+                        if ($value === null) {
+                            return '';
+                        }
+
+                        return is_scalar($value) ? (string) $value : (json_encode($value) ?: '');
                     }, array_values($row));
                     $output .= implode(',', $escapedValues)."\n";
                 }

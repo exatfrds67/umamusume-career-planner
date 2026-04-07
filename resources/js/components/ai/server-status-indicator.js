@@ -14,9 +14,12 @@ export default () => ({
 
         try {
             const response = await fetch("/api/ai/chat/server-status");
-            const data = await response.json();
+            const responseData = await response.json();
+            
+            // Normalize payload: handle `{success: true, data: {...}}` envelope
+            const data = responseData.success !== undefined ? responseData.data : responseData;
 
-            if (data.servers) {
+            if (data && data.servers) {
                 this.servers = Object.entries(data.servers).map(
                     ([name, server]) => ({
                         name: name,

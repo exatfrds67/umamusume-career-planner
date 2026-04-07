@@ -153,7 +153,9 @@ class SupportCardEnrichmentService
             $uniqueText = \is_array($gametoraData['unique_effects_text'] ?? null) ? $gametoraData['unique_effects_text'] : [];
             if (! empty($uniqueText)) {
                 $existingEffects = \is_array($updates['unique_effects'] ?? null) ? $updates['unique_effects'] : (\is_array($card->unique_effects) ? $card->unique_effects : []);
-                $updates['unique_effects'] = array_unique(array_merge($existingEffects, $uniqueText));
+                $existingEffectStrings = array_values(array_filter(array_map(static fn (mixed $value): ?string => is_string($value) ? $value : null, $existingEffects)));
+                $uniqueTextStrings = array_values(array_filter(array_map(static fn (mixed $value): ?string => is_string($value) ? $value : null, $uniqueText)));
+                $updates['unique_effects'] = array_values(array_unique(array_merge($existingEffectStrings, $uniqueTextStrings)));
             }
 
             // Apply events to card_metadata

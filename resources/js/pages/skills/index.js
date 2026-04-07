@@ -45,7 +45,14 @@ document.addEventListener("alpine:init", () => {
             searchQuery: "",
             hintLevel: "all", // New filter for hint levels
             statAffinity: "all", // New filter for stat affinity (SPD/STA/POW/GUT/WIT)
+            statusFilter: "all", // 'all' | 'acquired' | 'planned' — interactive chip filter
         },
+
+        // Sort
+        sortBy: "status", // 'status' | 'name_asc' | 'name_desc' | 'sp_cost_desc' | 'sp_cost_asc' | 'sp_savings_desc' | 'grade_desc'
+
+        // Mobile filter panel
+        filtersOpen: false,
 
         // Pagination
         currentPage: 1,
@@ -282,6 +289,38 @@ document.addEventListener("alpine:init", () => {
             }
         },
 
+        // Computed: active filter count (excludes statusFilter — shown separately in chips)
+        get activeFilterCount() {
+            let count = 0;
+            if (this.filters.searchQuery) count++;
+            if (this.filters.skillType !== "all") count++;
+            if (this.filters.rarity !== "all") count++;
+            if (this.filters.metaTier !== "all") count++;
+            if (this.filters.hintLevel !== "all") count++;
+            if (this.filters.statAffinity !== "all") count++;
+            if (this.sortBy !== "status") count++;
+            return count;
+        },
+
+        // Clear all filters back to defaults
+        clearAllFilters() {
+            this.filters.searchQuery = "";
+            this.filters.skillType = "all";
+            this.filters.rarity = "all";
+            this.filters.metaTier = "all";
+            this.filters.hintLevel = "all";
+            this.filters.statAffinity = "all";
+            this.filters.statusFilter = "all";
+            this.sortBy = "status";
+            this.resetPagination();
+        },
+
+        // Toggle status quick-filter chip
+        toggleStatusFilter(status) {
+            this.filters.statusFilter = this.filters.statusFilter === status ? "all" : status;
+            this.resetPagination();
+        },
+
         // Computed: Filtered skills
         get filteredSkills() {
             let filtered = this.skills;
@@ -333,13 +372,43 @@ document.addEventListener("alpine:init", () => {
                 );
             }
 
-            // Sort: acquired first → planned second → untracked last
-            const priority = (s) => {
-                if (s.is_acquired) return 0;
-                if (s.is_planned) return 1;
-                return 2;
-            };
-            filtered = [...filtered].sort((a, b) => priority(a) - priority(b));
+            // Filter by status chip (acquired / planned)
+            if (this.filters.statusFilter === "acquired") {
+                filtered = filtered.filter((s) => s.is_acquired);
+            } else if (this.filters.statusFilter === "planned") {
+                filtered = filtered.filter((s) => !s.is_acquired && s.is_planned);
+            }
+
+            // Sort according to user selection
+            const gradeOrder = { "S+": 0, S: 1, A: 2, B: 3, C: 4 };
+            filtered = [...filtered].sort((a, b) => {
+                switch (this.sortBy) {
+                    case "name_asc":
+                        return a.name.localeCompare(b.name);
+                    case "name_desc":
+                        return b.name.localeCompare(a.name);
+                    case "sp_cost_desc":
+                        return (b.base_sp_cost || 0) - (a.base_sp_cost || 0);
+                    case "sp_cost_asc":
+                        return (a.base_sp_cost || 0) - (b.base_sp_cost || 0);
+                    case "sp_savings_desc":
+                        return (b.sp_savings || 0) - (a.sp_savings || 0);
+                    case "grade_desc": {
+                        const ga = gradeOrder[this.getSkillGrade(a)] ?? 5;
+                        const gb = gradeOrder[this.getSkillGrade(b)] ?? 5;
+                        return ga - gb;
+                    }
+                    case "status":
+                    default: {
+                        const priority = (s) => {
+                            if (s.is_acquired) return 0;
+                            if (s.is_planned) return 1;
+                            return 2;
+                        };
+                        return priority(a) - priority(b);
+                    }
+                }
+            });
 
             return filtered;
         },
@@ -624,6 +693,12 @@ document.addEventListener("alpine:init", () => {
         getSkillGrade(skill) {
             // Database uses S+, S, A, B, C
             return skill.meta_tier || "C";
+        },
+
+        // Shape character for grade badge — colour-blind visual cue (aria-hidden in template)
+        getGradeShapeChar(grade) {
+            const shapes = { "S+": "★", S: "★", A: "◆", B: "▲" };
+            return shapes[grade] ?? "";
         },
 
         // Get skill type display name

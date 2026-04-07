@@ -1,5 +1,5 @@
 {{-- WF-004: Status Bar - Energy, Mood, Turn, Fail% --}}
-<section class="status-strip p-4 mb-6 animate-fade-in-delay-2" aria-labelledby="status-bar-heading">
+<section class="status-strip p-4 mb-6 animate-fade-in-delay-2 lg:sticky lg:top-20 lg:z-30 backdrop-blur-sm" aria-labelledby="status-bar-heading">
     <h2 id="status-bar-heading" class="sr-only">Current Status</h2>
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-6 flex-wrap">
@@ -73,19 +73,20 @@
                 @php
                     $baseFailRate = match (true) {
                         $character->energy_level >= 70 => 0,
-                        $character->energy_level >= 50 => 5,
-                        $character->energy_level >= 30 => 15,
-                        $character->energy_level >= 10 => 30,
+                        $character->energy_level >= 50 => 10,
+                        $character->energy_level >= 30 => 20,
+                        $character->energy_level >= 10 => 35,
                         default => 50,
                     };
-                    $failColor = match (true) {
-                        $baseFailRate <= 5 => 'text-green-600 dark:text-green-400',
-                        $baseFailRate <= 15 => 'text-yellow-600 dark:text-yellow-400',
-                        $baseFailRate <= 30 => 'text-orange-600 dark:text-orange-400',
-                        default => 'text-red-600 dark:text-red-400',
+                    $failStatus = match (true) {
+                        $baseFailRate < 15 => 'success',
+                        $baseFailRate <= 40 => 'warning',
+                        default => 'error',
                     };
                 @endphp
-                <span class="text-sm font-semibold {{ $failColor }}">{{ $baseFailRate }}%</span>
+                <x-badge.status :status="$failStatus" aria-label="Base failure rate">
+                    Fail: {{ $baseFailRate }}%
+                </x-badge.status>
             </div>
         </div>
 

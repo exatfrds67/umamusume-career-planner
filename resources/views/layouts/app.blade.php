@@ -147,8 +147,8 @@
         @endisset
 
         <!-- Main Content -->
-        <main class="py-10 pb-24 lg:pb-10" id="main-content">
-            <div class="px-4 sm:px-6 lg:px-8">
+        <main class="flex flex-col flex-1 min-h-0 py-10 pb-24 lg:pb-10" id="main-content">
+            <div class="px-4 sm:px-6 lg:px-8 flex-1 flex flex-col min-h-0">
                 @yield('content')
                 {{ $slot ?? '' }}
             </div>

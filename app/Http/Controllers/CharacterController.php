@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCharacterRequest;
 use App\Http\Requests\UpdateCharacterRequest;
+use App\Http\Resources\CharacterRosterResource;
 use App\Models\Aptitude;
+use App\Models\CareerPlan;
 use App\Models\Character;
 use App\Models\Factor;
 use App\Models\GameCharacter;
@@ -14,9 +16,12 @@ use App\Services\CharacterStateService;
 use App\Services\FactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class CharacterController extends Controller
@@ -33,38 +38,145 @@ class CharacterController extends Controller
      */
     public function index(Request $request): View
     {
-        // Load all characters with game character goal races for client-side filtering
-        $characters = Character::query()
-            ->with(['aptitudes', 'gameCharacter.goalRaces', 'currentCareer'])
-            ->orderBy('is_pinned', 'desc')
-            ->orderBy('updated_at', 'desc')
+        $search = trim((string) $request->query('search', ''));
+        $scenario = (string) $request->query('scenario', '');
+        $status = (string) $request->query('status', '');
+        $sort = (string) $request->query('sort', 'updated_at');
+        $perPage = max(1, min((int) $request->query('per_page', 50), 100));
+        $requestedPage = max(1, (int) $request->query('page', 1));
+
+        $characterQuery = Character::query()
+            ->with(['gameCharacter.goalRaces', 'currentCareer'])
+            ->where(function ($query): void {
+                $query->where('user_id', Auth::id())
+                    ->orWhere('is_seeded', true);
+            })
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($searchQuery) use ($search): void {
+                    $searchQuery->where('name', 'like', "%{$search}%")
+                        ->orWhere('title', 'like', "%{$search}%");
+                });
+            })
+            ->when($scenario !== '', fn ($query) => $query->where('scenario_type', $scenario))
+            ->when($status !== '', fn ($query) => $query->where('status', $status));
+
+        $characters = $characterQuery
+            ->orderByDesc('is_pinned')
+            ->orderByDesc('updated_at')
             ->get();
 
-        // Add progress percentage and goal races to each character
-        $characters->transform(function (Character $character): Character {
-            $progress = $character->getProgressPercentage();
-            $character->setAttribute('progress', $progress);
+        $groupedCharacters = $characters
+            ->groupBy(fn (Character $character): string => $this->canonicalGroupKey($character));
 
-            // Attach goal races from the linked game character
-            $goalRaces = [];
-            if ($character->gameCharacter) {
-                $goalRaces = $character->gameCharacter->goalRaces->map(fn ($race) => [
-                    'name' => $race->name_en,
-                    'grade' => $race->grade,
-                    'distance' => $race->distance_meters,
-                    'distance_category' => $race->distance_category,
-                    'phase' => $race->phase,
-                    'venue' => $race->venue,
-                    'priority' => $race->pivot->priority,
-                    'notes' => $race->pivot->notes,
-                ])->sortBy('priority')->values()->toArray();
+        $normalizedCharacters = $groupedCharacters
+            ->map(function ($variantGroup) {
+                /** @var \Illuminate\Support\Collection<int, Character> $variantGroup */
+                $sortedVariants = $variantGroup
+                    ->sortByDesc(fn (Character $character) => $character->updated_at?->getTimestamp() ?? 0)
+                    ->values();
+
+                /** @var Character $defaultVariant */
+                $defaultVariant = $sortedVariants->first();
+
+                return CharacterRosterResource::make([
+                    'canonical_name' => $defaultVariant->name,
+                    'default_character' => $defaultVariant,
+                    'variants' => $sortedVariants,
+                ])->resolve();
+            })
+            ->values();
+
+        /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $normalizedCharacters */
+        $sortedCharacters = $this->sortGroupedCharacters($normalizedCharacters, $sort);
+        $totalGroups = $sortedCharacters->count();
+        $lastPage = max(1, (int) ceil($totalGroups / $perPage));
+        $currentPage = min($requestedPage, $lastPage);
+        $offset = ($currentPage - 1) * $perPage;
+
+        $currentItems = $sortedCharacters->slice($offset, $perPage)->values();
+
+        $characters = new LengthAwarePaginator(
+            $currentItems,
+            $totalGroups,
+            $perPage,
+            $currentPage,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ],
+        );
+
+        $groupedCharacters = $currentItems
+            ->groupBy('group_letter')
+            ->sortKeys();
+
+        $activeFilters = [
+            'search' => $search,
+            'scenario' => $scenario,
+            'status' => $status,
+            'sort' => $sort,
+            'per_page' => $perPage,
+        ];
+
+        // Aggregate counts for the stats widget (all visible characters, ignoring active filters)
+        $scenarioCounts = Character::query()
+            ->where(function ($q): void {
+                $q->where('user_id', Auth::id())->orWhere('is_seeded', true);
+            })
+            ->whereNotNull('scenario_type')
+            ->where('scenario_type', '!=', '')
+            ->selectRaw('scenario_type, COUNT(*) as cnt')
+            ->groupBy('scenario_type')
+            ->pluck('cnt', 'scenario_type');
+
+        $statusCounts = Character::query()
+            ->where(function ($q): void {
+                $q->where('user_id', Auth::id())->orWhere('is_seeded', true);
+            })
+            ->whereNotNull('status')
+            ->selectRaw('status, COUNT(*) as cnt')
+            ->groupBy('status')
+            ->pluck('cnt', 'status');
+
+        return view('characters.index', [
+            'characters' => $characters,
+            'groupedCharacters' => $groupedCharacters,
+            'activeFilters' => $activeFilters,
+            'scenarioCounts' => $scenarioCounts,
+            'statusCounts' => $statusCounts,
+        ]);
+    }
+
+    private function canonicalGroupKey(Character $character): string
+    {
+        if ($character->game_character_id !== null) {
+            return 'game:'.$character->game_character_id;
+        }
+
+        $normalizedName = preg_replace('/[^a-z0-9]/i', '', mb_strtolower($character->name)) ?? '';
+
+        return 'name:'.$normalizedName;
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, array<string, mixed>>  $groupedCharacters
+     * @return \Illuminate\Support\Collection<int, array<string, mixed>>
+     */
+    private function sortGroupedCharacters(Collection $groupedCharacters, string $sort): Collection
+    {
+        $sorted = $groupedCharacters->sort(function (array $left, array $right) use ($sort): int {
+            if (($left['is_pinned'] ?? false) !== ($right['is_pinned'] ?? false)) {
+                return ($left['is_pinned'] ?? false) ? -1 : 1;
             }
-            $character->setAttribute('goal_races', $goalRaces);
 
-            return $character;
+            return match ($sort) {
+                'name' => strcmp($this->safeString($left['name'] ?? null), $this->safeString($right['name'] ?? null)),
+                'created_at' => strcmp($this->safeString($right['created_at'] ?? null), $this->safeString($left['created_at'] ?? null)),
+                default => strcmp($this->safeString($right['updated_at'] ?? null), $this->safeString($left['updated_at'] ?? null)),
+            };
         });
 
-        return view('characters.index', compact('characters'));
+        return $sorted->values();
     }
 
     /**
@@ -96,6 +208,11 @@ class CharacterController extends Controller
         }
 
         return redirect()->back()->with('success', 'Selected character updated.');
+    }
+
+    private function safeString(mixed $value): string
+    {
+        return is_scalar($value) ? (string) $value : '';
     }
 
     /**
@@ -156,13 +273,17 @@ class CharacterController extends Controller
         try {
             DB::beginTransaction();
 
+            $selectedAvatarUrl = $request->input('avatar_url');
+            $hasCustomAvatarUpload = $selectedAvatarUrl === 'custom_upload' && $request->hasFile('avatar_upload');
+            $persistedAvatarUrl = $selectedAvatarUrl === 'custom_upload' ? null : $selectedAvatarUrl;
+
             // Create the character with all required JSON fields
             $traineeId = $request->input('trainee_id');
             $character = Character::create([
                 'user_id' => Auth::id(),
                 'name' => $request->input('name'),
                 'title' => $request->input('title'),
-                'avatar_url' => $request->input('avatar_url'),
+                'avatar_url' => $persistedAvatarUrl,
                 'image_x' => $request->float('image_x', 0.0),
                 'image_y' => $request->float('image_y', 0.0),
                 'image_zoom' => $request->float('image_zoom', 1.0),
@@ -193,6 +314,17 @@ class CharacterController extends Controller
                 'completion_data' => [],
             ]);
 
+            $character->careers()->create([
+                'user_id' => Auth::id(),
+                'star_level' => 3,
+                'career_name' => $character->name.' Career',
+                'scenario_type' => $character->scenario_type,
+                'status' => 'active',
+                'current_turn' => 1,
+                'current_phase' => 'junior',
+                'started_at' => now()->toDateString(),
+            ]);
+
             // Create aptitude records
             $aptitudes = $request->input('aptitudes');
             if (\is_array($aptitudes) && $this->isValidAptitudesArray($aptitudes)) {
@@ -203,10 +335,26 @@ class CharacterController extends Controller
 
             DB::commit();
 
+            if ($hasCustomAvatarUpload) {
+                $uploadedAvatarPath = $request->file('avatar_upload')->store(
+                    "avatars/uploads/{$character->id}",
+                    'public',
+                );
+
+                if (! is_string($uploadedAvatarPath) || $uploadedAvatarPath === '') {
+                    throw new \RuntimeException('Failed to store uploaded avatar.');
+                }
+
+                $character->update([
+                    'avatar_url' => '/storage/'.ltrim($uploadedAvatarPath, '/'),
+                ]);
+            }
+
             // Process avatar (outside transaction — non-critical)
-            if ($character->avatar_url && $character->avatar_url !== 'custom_upload') {
+            $avatarUrl = $character->avatar_url;
+            if ($avatarUrl) {
                 $processed = $this->avatarProcessingService->processAvatar(
-                    $character->avatar_url,
+                    $avatarUrl,
                     [
                         'image_x' => $character->image_x,
                         'image_y' => $character->image_y,
@@ -252,6 +400,8 @@ class CharacterController extends Controller
         // Use policy authorization (allows admins and owners)
         $this->authorize('view', $character);
 
+        session(['current_character_id' => $character->id]);
+
         $character->load([
             'aptitudes',
             'factors',
@@ -260,8 +410,17 @@ class CharacterController extends Controller
         ]);
 
         $aiTip = $this->getAiTip($character);
+        $latestCareerPlan = null;
 
-        return view('characters.show', compact('character', 'aiTip'));
+        if (Schema::hasTable((new CareerPlan)->getTable())) {
+            $latestCareerPlan = CareerPlan::query()
+                ->where('user_id', (int) Auth::id())
+                ->where('character_id', $character->id)
+                ->latest('updated_at')
+                ->first();
+        }
+
+        return view('characters.show', compact('character', 'aiTip', 'latestCareerPlan'));
     }
 
     /**
@@ -753,5 +912,17 @@ class CharacterController extends Controller
                 ->back()
                 ->with('error', 'Failed to delete factor. Please try again.');
         }
+    }
+
+    /**
+     * Display synergy build analysis for a character.
+     */
+    public function synergy(Character $character): View
+    {
+        $this->authorize('view', $character);
+
+        $character->load(['aptitudes', 'skillAcquisitions.skill', 'careers.parentCharacters.inheritanceEvents', 'supportCards.supportCard']);
+
+        return view('characters.synergy', compact('character'));
     }
 }

@@ -2,12 +2,13 @@
  * planWizard Alpine.js Component
  * 
  * Multi-step wizard for creating/editing career plans.
- * Handles state management, validation, and navigation across 5 steps:
+ * Handles state management, validation, and navigation across 6 steps:
  * 1. Character Selection
  * 2. Goal Setting
  * 3. Skill Selection
  * 4. Race Planning
- * 5. Review & Submit
+ * 5. Synergy Analysis
+ * 6. Review & Submit
  * 
  * @usage
  * <div x-data="planWizard({ plan: {}, mode: 'create' })" x-init="init()">
@@ -28,6 +29,7 @@ export default function planWizard(config = {}) {
             { key: 'goals', label: 'Goals', required: true },
             { key: 'skills', label: 'Skills', required: false },
             { key: 'races', label: 'Races', required: false },
+            { key: 'synergy', label: 'Synergy', required: false },
             { key: 'review', label: 'Review', required: false },
         ],
         completedSteps: [],
@@ -59,7 +61,7 @@ export default function planWizard(config = {}) {
             // Load initial plan data if editing
             if (this.mode === 'edit' && this.initialPlan) {
                 this.plan = { ...this.plan, ...this.initialPlan };
-                this.completedSteps = [0, 1, 2, 3, 4]; // Mark all as completed for edit mode
+                this.completedSteps = [0, 1, 2, 3, 4, 5]; // Mark all as completed for edit mode
             }
             
             // Listen for character selection
@@ -143,6 +145,10 @@ export default function planWizard(config = {}) {
                     
                 case 'races':
                     // Optional step - no validation errors
+                    break;
+                    
+                case 'synergy':
+                    // Optional step - informational only
                     break;
                     
                 case 'review':

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -9,6 +11,7 @@ use App\Services\MCP\CostManagementService;
 use App\Services\MCP\MCPMonitoringService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MCP Dashboard Controller
@@ -47,10 +50,11 @@ class MCPDashboardController extends Controller
                 'data' => $overview,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch MCP dashboard overview', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch MCP dashboard overview',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -68,10 +72,11 @@ class MCPDashboardController extends Controller
                 'data' => $servers,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch MCP server status', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch server status',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -89,10 +94,11 @@ class MCPDashboardController extends Controller
                 'data' => $agents,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch MCP agents', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch agents',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -110,10 +116,11 @@ class MCPDashboardController extends Controller
                 'data' => $costs,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch MCP cost data', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch cost data',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -132,10 +139,11 @@ class MCPDashboardController extends Controller
                 'data' => $performance,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch MCP performance metrics', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch performance metrics',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -153,10 +161,11 @@ class MCPDashboardController extends Controller
                 'data' => $settings,
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch MCP settings', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch settings',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -204,10 +213,11 @@ class MCPDashboardController extends Controller
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
+            Log::error('Failed to update MCP settings', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update settings',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -221,6 +231,8 @@ class MCPDashboardController extends Controller
     {
         $healthCheck = $this->mcpMonitoring->performHealthCheck();
         $healthyServers = collect($healthCheck)->where('status', 'healthy')->count();
+        $disabledServers = collect($healthCheck)->where('status', 'disabled')->count();
+        $enabledServers = \count($healthCheck) - $disabledServers;
 
         $agents = $this->agentLifecycle->getActiveAgents();
         $activeAgents = \count($agents);
@@ -229,6 +241,8 @@ class MCPDashboardController extends Controller
 
         return [
             'total_servers' => \count($healthCheck),
+            'enabled_servers' => $enabledServers,
+            'disabled_servers' => $disabledServers,
             'healthy_servers' => $healthyServers,
             'active_agents' => $activeAgents,
             'active_workflows' => collect($agents)->sum('workflow_steps'),

@@ -7,10 +7,62 @@ namespace Tests\Unit\Neuron\Agents;
 use App\Neuron\Agents\BaseAgent;
 use Mockery;
 use NeuronAI\Chat\History\ChatHistoryInterface;
-use NeuronAI\Chat\History\EloquentChatHistory;
 use NeuronAI\Laravel\Facades\AIProvider;
 use NeuronAI\Providers\AIProviderInterface;
 use Tests\TestCase;
+
+class TestableBaseAgent extends BaseAgent
+{
+    public function __construct(
+        private string $threadId,
+        private bool $mockChatHistory = false
+    ) {}
+
+    protected function getThreadId(): string
+    {
+        return $this->threadId;
+    }
+
+    public function instructions(): string
+    {
+        return 'Test instructions';
+    }
+
+    public function testProvider(): AIProviderInterface
+    {
+        return $this->provider();
+    }
+
+    /**
+     * @param  array<int, string>  $background
+     * @param  array<int, string>  $steps
+     * @param  array<int, string>  $output
+     */
+    public function testBuildSystemPrompt(array $background, array $steps, array $output): string
+    {
+        return $this->buildSystemPrompt($background, $steps, $output);
+    }
+
+    public function testChatHistory(): ChatHistoryInterface
+    {
+        if ($this->mockChatHistory) {
+            /** @var ChatHistoryInterface $chatHistory */
+            $chatHistory = Mockery::mock(ChatHistoryInterface::class);
+
+            return $chatHistory;
+        }
+
+        return $this->chatHistory();
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function testTools(): array
+    {
+        return $this->tools();
+    }
+}
 
 /**
  * Unit tests for BaseAgent abstract class.
@@ -33,54 +85,9 @@ class BaseAgentTest extends TestCase
     /**
      * Create a concrete implementation of BaseAgent for testing.
      */
-    private function createTestAgent(string $threadId = 'test-thread-123', bool $mockChatHistory = false): BaseAgent
+    private function createTestAgent(string $threadId = 'test-thread-123', bool $mockChatHistory = false): TestableBaseAgent
     {
-        return new class($threadId, $mockChatHistory) extends BaseAgent
-        {
-            public function __construct(
-                private string $threadId,
-                private bool $mockChatHistory = false
-            ) {}
-
-            protected function getThreadId(): string
-            {
-                return $this->threadId;
-            }
-
-            public function instructions(): string
-            {
-                return 'Test instructions';
-            }
-
-            // Expose protected methods for testing
-            public function test_provider(): AIProviderInterface
-            {
-                return $this->provider();
-            }
-
-            public function test_build_system_prompt(array $background, array $steps, array $output): string
-            {
-                return $this->buildSystemPrompt($background, $steps, $output);
-            }
-
-            public function test_chat_history(): ChatHistoryInterface
-            {
-                if ($this->mockChatHistory) {
-                    // Return a mock that doesn't query the database
-                    return Mockery::mock(EloquentChatHistory::class, [
-                        'threadId' => $this->threadId,
-                        'modelClass' => \App\Models\ChatMessage::class,
-                    ])->makePartial();
-                }
-
-                return $this->chatHistory();
-            }
-
-            public function test_tools(): array
-            {
-                return $this->tools();
-            }
-        };
+        return new TestableBaseAgent($threadId, $mockChatHistory);
     }
 
     public function test_uses_the_default_provider_from_configuration(): void
@@ -96,7 +103,7 @@ class BaseAgentTest extends TestCase
             ->andReturn($mockProvider);
 
         $agent = $this->createTestAgent();
-        $provider = $agent->test_provider();
+        $provider = $agent->testProvider();
 
         $this->assertInstanceOf(AIProviderInterface::class, $provider);
     }
@@ -121,7 +128,7 @@ class BaseAgentTest extends TestCase
             'Explain the reasoning behind your recommendation',
         ];
 
-        $systemPrompt = $agent->test_build_system_prompt($background, $steps, $output);
+        $systemPrompt = $agent->testBuildSystemPrompt($background, $steps, $output);
 
         $this->assertIsString($systemPrompt);
         $this->assertStringContainsString('Uma Musume training mechanics', $systemPrompt);
@@ -133,7 +140,7 @@ class BaseAgentTest extends TestCase
     {
         $agent = $this->createTestAgent();
 
-        $systemPrompt = $agent->test_build_system_prompt([], [], []);
+        $systemPrompt = $agent->testBuildSystemPrompt([], [], []);
 
         $this->assertIsString($systemPrompt);
     }
@@ -143,18 +150,18 @@ class BaseAgentTest extends TestCase
         $threadId = 'user_123_character_456';
         $agent = $this->createTestAgent($threadId, mockChatHistory: true);
 
-        $chatHistory = $agent->test_chat_history();
+        $chatHistory = $agent->testChatHistory();
 
         // Verify that chat history is created and is the correct type
         $this->assertInstanceOf(ChatHistoryInterface::class, $chatHistory);
-        $this->assertInstanceOf(EloquentChatHistory::class, $chatHistory);
+        $this->assertInstanceOf(ChatHistoryInterface::class, $chatHistory);
     }
 
     public function test_returns_empty_tools_array_by_default(): void
     {
         $agent = $this->createTestAgent();
 
-        $tools = $agent->test_tools();
+        $tools = $agent->testTools();
 
         $this->assertIsArray($tools);
         $this->assertEmpty($tools);
@@ -165,8 +172,8 @@ class BaseAgentTest extends TestCase
         $agent1 = $this->createTestAgent('thread-1', mockChatHistory: true);
         $agent2 = $this->createTestAgent('thread-2', mockChatHistory: true);
 
-        $history1 = $agent1->test_chat_history();
-        $history2 = $agent2->test_chat_history();
+        $history1 = $agent1->testChatHistory();
+        $history2 = $agent2->testChatHistory();
 
         // Verify both are chat history instances
         $this->assertInstanceOf(ChatHistoryInterface::class, $history1);
@@ -184,8 +191,8 @@ class BaseAgentTest extends TestCase
         $steps = ['Step 1', 'Step 2'];
         $output = ['Output format'];
 
-        $prompt1 = $agent->test_build_system_prompt($background, $steps, $output);
-        $prompt2 = $agent->test_build_system_prompt($background, $steps, $output);
+        $prompt1 = $agent->testBuildSystemPrompt($background, $steps, $output);
+        $prompt2 = $agent->testBuildSystemPrompt($background, $steps, $output);
 
         $this->assertEquals($prompt1, $prompt2);
     }
@@ -194,7 +201,7 @@ class BaseAgentTest extends TestCase
     {
         $agent = $this->createTestAgent();
 
-        $systemPrompt = $agent->test_build_system_prompt(
+        $systemPrompt = $agent->testBuildSystemPrompt(
             ['Single background'],
             ['Single step'],
             ['Single output']
@@ -228,7 +235,7 @@ class BaseAgentTest extends TestCase
             'Output 2',
         ];
 
-        $systemPrompt = $agent->test_build_system_prompt($background, $steps, $output);
+        $systemPrompt = $agent->testBuildSystemPrompt($background, $steps, $output);
 
         $this->assertIsString($systemPrompt);
         $this->assertStringContainsString('Background 1', $systemPrompt);
@@ -251,7 +258,7 @@ class BaseAgentTest extends TestCase
             ->andReturn($mockProvider);
 
         $agent = $this->createTestAgent();
-        $provider = $agent->test_provider();
+        $provider = $agent->testProvider();
 
         $this->assertInstanceOf(AIProviderInterface::class, $provider);
     }

@@ -97,8 +97,8 @@ class CharacterMappingService
                 $id = $char['id'] ?? $char['game_id'] ?? null;
                 $name = $char['name_en'] ?? $char['name'] ?? null;
 
-                if ($id !== null && $name !== null && \is_numeric($id)) {
-                    $mapping[(int) $id] = (string) $name;
+                if ($id !== null && is_numeric($id) && is_string($name) && $name !== '') {
+                    $mapping[(int) $id] = $name;
                 }
             }
 

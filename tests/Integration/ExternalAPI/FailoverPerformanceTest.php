@@ -9,7 +9,6 @@ use App\Services\ExternalAPI\CacheManagerService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-use Mockery;
 use Tests\Support\ExternalAPI\FailoverTestAPIService;
 
 beforeEach(function () {
@@ -28,7 +27,7 @@ beforeEach(function () {
     $this->mcpClient = new MCPClientService;
     $this->mcpClient->healthCheck();
 
-    $this->metricsService = Mockery::mock(APIPerformanceMetricsService::class);
+    $this->metricsService = \Mockery::mock(APIPerformanceMetricsService::class);
     $this->metricsService->shouldReceive('recordResponseTime')->byDefault();
     $this->metricsService->shouldReceive('recordError')->byDefault();
 
@@ -38,7 +37,7 @@ beforeEach(function () {
 
 afterEach(function () {
     Cache::flush();
-    Mockery::close();
+    \Mockery::close();
 });
 
 describe('Failover Performance', function () {

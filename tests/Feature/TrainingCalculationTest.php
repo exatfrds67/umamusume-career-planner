@@ -6,14 +6,13 @@ use App\Models\Character;
 use App\Services\MCP\MCPClientService;
 use App\Services\MCP\TrainingOptimizationAgent;
 use App\Services\TrainingCalculationService;
-use Mockery;
 
 test('calculates speed training gains correctly', function () {
     // Mock dependencies
-    /** @var MCPClientService&Mockery\MockInterface $mcpClient */
-    $mcpClient = Mockery::mock(MCPClientService::class);
-    /** @var TrainingOptimizationAgent&Mockery\MockInterface $trainingAgent */
-    $trainingAgent = Mockery::mock(TrainingOptimizationAgent::class);
+    /** @var MCPClientService&\Mockery\MockInterface $mcpClient */
+    $mcpClient = \Mockery::mock(MCPClientService::class);
+    /** @var TrainingOptimizationAgent&\Mockery\MockInterface $trainingAgent */
+    $trainingAgent = \Mockery::mock(TrainingOptimizationAgent::class);
 
     $service = new TrainingCalculationService($mcpClient, $trainingAgent);
 
@@ -52,10 +51,10 @@ test('calculates speed training gains correctly', function () {
 });
 
 test('verified formula produces consistent results', function () {
-    /** @var MCPClientService&Mockery\MockInterface $mcpClient */
-    $mcpClient = Mockery::mock(MCPClientService::class);
-    /** @var TrainingOptimizationAgent&Mockery\MockInterface $trainingAgent */
-    $trainingAgent = Mockery::mock(TrainingOptimizationAgent::class);
+    /** @var MCPClientService&\Mockery\MockInterface $mcpClient */
+    $mcpClient = \Mockery::mock(MCPClientService::class);
+    /** @var TrainingOptimizationAgent&\Mockery\MockInterface $trainingAgent */
+    $trainingAgent = \Mockery::mock(TrainingOptimizationAgent::class);
 
     $service = new TrainingCalculationService($mcpClient, $trainingAgent);
 
@@ -93,10 +92,10 @@ test('verified formula produces consistent results', function () {
 });
 
 test('per-training cap applies correctly', function () {
-    /** @var MCPClientService&Mockery\MockInterface $mcpClient */
-    $mcpClient = Mockery::mock(MCPClientService::class);
-    /** @var TrainingOptimizationAgent&Mockery\MockInterface $trainingAgent */
-    $trainingAgent = Mockery::mock(TrainingOptimizationAgent::class);
+    /** @var MCPClientService&\Mockery\MockInterface $mcpClient */
+    $mcpClient = \Mockery::mock(MCPClientService::class);
+    /** @var TrainingOptimizationAgent&\Mockery\MockInterface $trainingAgent */
+    $trainingAgent = \Mockery::mock(TrainingOptimizationAgent::class);
 
     $service = new TrainingCalculationService($mcpClient, $trainingAgent);
 
@@ -138,10 +137,10 @@ test('per-training cap applies correctly', function () {
 });
 
 test('scenario-specific mechanics are calculated', function () {
-    /** @var MCPClientService&Mockery\MockInterface $mcpClient */
-    $mcpClient = Mockery::mock(MCPClientService::class);
-    /** @var TrainingOptimizationAgent&Mockery\MockInterface $trainingAgent */
-    $trainingAgent = Mockery::mock(TrainingOptimizationAgent::class);
+    /** @var MCPClientService&\Mockery\MockInterface $mcpClient */
+    $mcpClient = \Mockery::mock(MCPClientService::class);
+    /** @var TrainingOptimizationAgent&\Mockery\MockInterface $trainingAgent */
+    $trainingAgent = \Mockery::mock(TrainingOptimizationAgent::class);
 
     $service = new TrainingCalculationService($mcpClient, $trainingAgent);
 

@@ -10,6 +10,7 @@ use App\Services\CareerReportingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -44,6 +45,41 @@ class CareerReportController extends Controller
             ->orderBy('name')
             ->get();
 
+        /** @var Collection<int, array<string, mixed>> $characterGroups */
+        $characterGroups = $characters
+            ->groupBy(fn (Character $character): string => $this->canonicalGroupKey($character))
+            ->map(function (Collection $variantGroup): array {
+                /** @var Collection<int, Character> $variantGroup */
+                $variants = $variantGroup
+                    ->sortByDesc(fn (Character $character): int => $character->updated_at?->getTimestamp() ?? 0)
+                    ->values();
+
+                /** @var Character $defaultCharacter */
+                $defaultCharacter = $variants->first();
+
+                /** @var Collection<int, Career> $careers */
+                $careers = $variants
+                    ->flatMap(function (Character $character): Collection {
+                        return $character->careers->map(function (Career $career) use ($character): Career {
+                            $career->setRelation('character', $character);
+
+                            return $career;
+                        });
+                    })
+                    ->sortByDesc(fn (Career $career): int => $career->created_at?->getTimestamp() ?? 0)
+                    ->values();
+
+                return [
+                    'default_character' => $defaultCharacter,
+                    'variants' => $variants,
+                    'variant_count' => $variants->count(),
+                    'careers' => $careers,
+                    'career_count' => $careers->count(),
+                ];
+            })
+            ->sortBy(fn (array $group): string => mb_strtolower((string) $group['default_character']->name))
+            ->values();
+
         // Get recent careers for quick access
         $recentCareers = Career::whereHas('character', function ($query) use ($user) {
             $query->where('user_id', $user->id ?? throw new \Exception('User required'));
@@ -53,7 +89,18 @@ class CareerReportController extends Controller
             ->limit(5)
             ->get();
 
-        return view('reports.index', compact('characters', 'recentCareers'));
+        return view('reports.index', compact('characterGroups', 'recentCareers'));
+    }
+
+    private function canonicalGroupKey(Character $character): string
+    {
+        if ($character->game_character_id !== null) {
+            return 'game:'.$character->game_character_id;
+        }
+
+        $normalizedName = preg_replace('/[^a-z0-9]/i', '', mb_strtolower($character->name)) ?? '';
+
+        return 'name:'.$normalizedName;
     }
 
     /**

@@ -6,14 +6,15 @@ declare(strict_types=1);
  * @property App\Services\MCP\MCPClientService&Mockery\MockInterface $mcpClient
  * @property App\Services\MCP\CostManagementService&Mockery\MockInterface $costManager
  * @property App\Services\AI\BedrockService&Mockery\MockInterface $bedrockService
+ * @property App\Services\AI\OllamaService&Mockery\MockInterface $ollamaService
  * @property App\Services\MCP\AgentRoutingService $service
  */
 
 use App\Services\AI\BedrockService;
+use App\Services\AI\OllamaService;
 use App\Services\MCP\AgentRoutingService;
 use App\Services\MCP\CostManagementService;
 use App\Services\MCP\MCPClientService;
-use Cloudstudio\Ollama\Facades\Ollama;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -41,6 +42,8 @@ beforeEach(function () {
     $costManager = Mockery::mock(CostManagementService::class);
     /** @var BedrockService&Mockery\MockInterface $bedrockService */
     $bedrockService = Mockery::mock(BedrockService::class);
+    /** @var OllamaService&Mockery\MockInterface $ollamaService */
+    $ollamaService = Mockery::mock(OllamaService::class);
 
     // Set up default mock expectations for methods called during route validation
     $mcpClient->shouldReceive('isServerHealthy')
@@ -56,10 +59,18 @@ beforeEach(function () {
         ->andReturn(true)
         ->byDefault();
 
+    $ollamaService->shouldReceive('generate')
+        ->andReturn([
+            'content' => 'Test response',
+            'model' => 'llama3',
+        ])
+        ->byDefault();
+
     $this->mcpClient = $mcpClient;
     $this->costManager = $costManager;
     $this->bedrockService = $bedrockService;
-    $this->service = new AgentRoutingService($this->mcpClient, $this->costManager, $this->bedrockService);
+    $this->ollamaService = $ollamaService;
+    $this->service = new AgentRoutingService($this->mcpClient, $this->costManager, $this->bedrockService, $this->ollamaService);
 
     // Clear cache before each test
     Cache::flush();
@@ -254,13 +265,12 @@ describe('Execution with Fallback', function () {
             'localhost:11434/api/tags' => Http::response(['models' => []], 200),
         ]);
 
-        $agentMock = Mockery::mock();
-        $agentMock->shouldReceive('model')->andReturnSelf();
-        $agentMock->shouldReceive('prompt')->andReturnSelf();
-        $agentMock->shouldReceive('options')->andReturnSelf();
-        $agentMock->shouldReceive('ask')->andReturn('Test response');
-
-        Ollama::shouldReceive('agent')->once()->andReturn($agentMock);
+        $this->ollamaService->shouldReceive('generate')
+            ->once()
+            ->andReturn([
+                'content' => 'Test response',
+                'model' => 'llama3',
+            ]);
 
         $result = $this->service->executeWithFallback($request);
 

@@ -85,13 +85,30 @@ class AIDashboardService
             ];
         }
 
+        $defaultSummary = [
+            'total_requests_24h' => 0,
+            'success_rate' => 0.0,
+            'avg_response_time' => 0.0,
+            'total_cost_24h' => 0.0,
+            'active_agents' => 0,
+            'healthy_servers' => 0,
+            'total_servers' => 0,
+        ];
+
         return [
-            'summary' => is_array($result['summary'] ?? null) ? $result['summary'] : [],
+            'summary' => is_array($result['summary'] ?? null) && ! empty($result['summary']) ? $result['summary'] : $defaultSummary,
             'servers' => is_array($result['servers'] ?? null) ? $result['servers'] : [],
-            'performance' => is_array($result['performance'] ?? null) ? $result['performance'] : [],
-            'costs' => is_array($result['costs'] ?? null) ? $result['costs'] : [],
-            'agents' => is_array($result['agents'] ?? null) ? $result['agents'] : [],
-            'conversations' => is_array($result['conversations'] ?? null) ? $result['conversations'] : [],
+            'performance' => is_array($result['performance'] ?? null) && ! empty($result['performance']) ? $result['performance'] : ['providers' => [], 'comparison' => []],
+            'costs' => is_array($result['costs'] ?? null) && ! empty($result['costs']) ? $result['costs'] : [
+                'daily_cost' => 0.0, 'weekly_cost' => 0.0, 'monthly_cost' => 0.0, 'projected_monthly' => 0.0,
+                'by_provider' => [], 'by_model' => [], 'budget_status' => [], 'optimization_recommendations' => [],
+            ],
+            'agents' => is_array($result['agents'] ?? null) && ! empty($result['agents']) ? $result['agents'] : [
+                'total_agents' => 0, 'active_agents' => 0, 'idle_agents' => 0, 'agents' => [],
+            ],
+            'conversations' => is_array($result['conversations'] ?? null) && ! empty($result['conversations']) ? $result['conversations'] : [
+                'total_conversations' => 0, 'total_messages' => 0, 'avg_conversation_length' => 0.0, 'most_used_tools' => [], 'recent_conversations' => [],
+            ],
         ];
     }
 
@@ -722,8 +739,13 @@ class AIDashboardService
      */
     protected function getActiveAgentCount(): int
     {
-        // Get count from agent orchestration service
-        return 0;
+        try {
+            $agentStatuses = $this->agentOrchestration->getAgentStatuses();
+
+            return collect($agentStatuses)->filter(fn ($s) => isset($s['status']) && $s['status'] === 'processing')->count();
+        } catch (\Exception) {
+            return 0;
+        }
     }
 
     /**
@@ -744,7 +766,11 @@ class AIDashboardService
                     return \is_array($decoded) && isset($decoded['confidence']) ? $decoded['confidence'] : null;
                 }
 
-                return \is_array($metadata) && isset($metadata['confidence']) ? $metadata['confidence'] : null;
+                if (! \is_array($metadata)) {
+                    return null;
+                }
+
+                return $metadata['confidence'] ?? null;
             })
             ->filter()
             ->values();

@@ -3,7 +3,7 @@
     'careerId' => null,
 ])
 
-<div class="ai-chat-interface flex flex-col h-full bg-white dark:bg-neutral-900 rounded-lg shadow-lg" x-data="aiChatInterface({
+<div {{ $attributes->merge(['class' => 'ai-chat-interface flex flex-col h-full bg-white dark:bg-neutral-900 rounded-lg shadow-lg']) }} x-data="aiChatInterface({
     characterId: {{ $characterId ?? 'null' }},
     careerId: {{ $careerId ?? 'null' }}
 })"
@@ -149,7 +149,7 @@
                         :aria-label="`Message from ${msg.sender === 'user' ? 'you' : 'AI assistant'}`">
 
                         {{-- Avatar --}}
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-xs border border-white dark:border-neutral-800"
                             :class="{
                                 'bg-neutral-300 dark:bg-neutral-600': msg.sender === 'user',
                                 'bg-red-400': msg.sender === 'system' && msg.isError,
@@ -180,13 +180,13 @@
                         </div>
 
                         {{-- Message Content --}}
-                        <div class="flex-1 max-w-3xl">
-                            <div class="rounded-lg p-4 shadow-xs"
+                        <div class="flex-1 max-w-4xl">
+                            <div class="rounded-2xl px-4 py-3 shadow-xs"
                                 :class="{
-                                    'bg-primary-600 text-white': msg.sender === 'user',
+                                    'bg-primary-600 text-white rounded-tr-sm': msg.sender === 'user',
                                     'bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-200 border border-red-200 dark:border-red-800': msg.sender === 'system' && msg.isError,
                                     'bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700': msg.sender === 'system' && !msg.isError,
-                                    'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-600': msg.sender === 'ai'
+                                    'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 rounded-tl-sm': msg.sender === 'ai'
                                 }">
 
                                 {{-- Message Header --}}
@@ -289,6 +289,19 @@
                                     </div>
                                 </template>
 
+                                {{-- Message Error/Recovery Actions --}}
+                                <template x-if="msg.actions && msg.actions.length > 0">
+                                    <div class="mt-3 pt-3 border-t border-red-200 dark:border-red-900/50 flex flex-wrap gap-2">
+                                        <template x-for="action in msg.actions" :key="action.method">
+                                            <button @click="$event.preventDefault(); typeof $data[action.method] === 'function' ? $data[action.method]() : null"
+                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+                                                    :class="action.primary ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : 'bg-neutral-600 hover:bg-neutral-700 focus:ring-neutral-500'"
+                                                    x-text="action.label">
+                                            </button>
+                                        </template>
+                                    </div>
+                                </template>
+
                                 {{-- Message Actions --}}
                                 <div class="mt-3 flex items-center gap-3 text-xs">
                                     <button @click="copyMessage(msg.id, msg.content)"
@@ -347,13 +360,13 @@
 
                 {{-- Typing Indicator --}}
                 <div x-show="isTyping" class="flex items-start gap-3 animate-fade-in-up">
-                    <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center shrink-0">
+                    <div class="w-8 h-8 bg-primary-500 rounded-full shadow-xs border border-white dark:border-neutral-800 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <div class="flex-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-3">
+                    <div class="flex-1 max-w-4xl bg-neutral-100 dark:bg-neutral-800 rounded-2xl rounded-tl-sm px-4 py-3 shadow-xs">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-xs font-medium text-neutral-600 dark:text-neutral-400"
                                 x-text="`AI is thinking... (${model})`"></span>
@@ -363,7 +376,7 @@
                                 Cancel
                             </button>
                         </div>
-                        <div class="flex gap-1">
+                        <div class="flex gap-1 py-1">
                             <span class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"
                                 style="animation-delay: 0ms"></span>
                             <span class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"
@@ -386,33 +399,33 @@
             </div>
 
             {{-- Input Area --}}
-            <div class="p-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800">
-                <form @submit.prevent="sendMessage()" class="flex items-end gap-3">
-                    <div class="flex-1">
+            <div class="p-3 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800">
+                <form @submit.prevent="sendMessage()" class="flex items-end gap-3 max-w-5xl mx-auto">
+                    <div class="flex-1 relative">
                         <label for="message-input" class="sr-only">Type your message</label>
                         <textarea id="message-input" x-model="currentMessage" @keydown.enter.prevent="handleEnterKey($event)"
                             placeholder="Ask about training strategies, character optimization, or any career planning questions..."
-                            class="w-full resize-none border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                            rows="3" maxlength="2000" :disabled="isProcessing"
+                            class="w-full resize-none border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm py-3 px-4 pb-8"
+                            rows="2" maxlength="2000" :disabled="isProcessing"
                             :aria-disabled="isProcessing"
                             aria-describedby="input-help"
                             aria-label="Type your message to AI assistant"></textarea>
                         <div id="input-help"
-                            class="mt-1 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
-                            <span>Enter to send, Shift+Enter for new line — <button type="button" @click="openKeyboardShortcuts()" class="underline hover:text-primary-500 transition-colors" aria-label="Show keyboard shortcuts">Shortcuts (Ctrl+/)</button></span>
+                            class="absolute bottom-2 inset-x-4 flex items-center justify-between text-xs text-neutral-400 dark:text-neutral-500">
+                            <span>Enter to send, Shift+Enter for new line — <button type="button" @click="openKeyboardShortcuts()" class="hover:text-primary-500 transition-colors" aria-label="Show keyboard shortcuts">Shortcuts (Ctrl+/)</button></span>
                             <span x-text="`${currentMessage.length}/2000`"></span>
                         </div>
                     </div>
 
                     <button type="submit" :disabled="!currentMessage.trim() || isProcessing"
-                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        class="p-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm self-stretch flex items-center justify-center min-w-14"
                         aria-label="Send message">
-                        <svg x-show="!isProcessing" class="w-5 h-5" fill="none" stroke="currentColor"
+                        <svg x-show="!isProcessing" class="w-6 h-6" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
-                        <svg x-show="isProcessing" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <svg x-show="isProcessing" class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                 stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor"

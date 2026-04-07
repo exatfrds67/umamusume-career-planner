@@ -76,31 +76,80 @@
             {{-- SP Overview Card --}}
             <section class="card bg-linear-to-br from-primary-500 to-primary-600 text-white"
                 aria-labelledby="sp-stats-heading">
-                <h2 id="sp-stats-heading" class="sr-only">SP Statistics</h2>
+                <h2 id="sp-stats-heading" class="sr-only">SP Statistics Overview</h2>
                 <div class="card-body">
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                        <div>
-                            <p class="text-primary-100 text-sm font-medium">Available SP</p>
-                            <p class="text-3xl font-bold mt-1" x-text="formatNumber(character?.available_sp || 0)"></p>
+                    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                        {{-- 1. Available SP (primary KPI — largest) --}}
+                        <div class="flex flex-col gap-1">
+                            <p class="text-primary-100 text-xs font-semibold uppercase tracking-wide">Available SP</p>
+                            <p class="text-3xl font-extrabold tabular-nums leading-none"
+                                x-text="formatNumber(character?.available_sp || 0)"
+                                aria-label="Available SP"></p>
+                            <p class="text-xs text-primary-200">Ready to spend</p>
                         </div>
-                        <div>
-                            <p class="text-primary-100 text-sm font-medium">Total Earned</p>
-                            <p class="text-2xl font-bold mt-1" x-text="formatNumber(spStats?.total_earned || 0)"></p>
+
+                        {{-- 2. SP Spent --}}
+                        <div class="flex flex-col gap-1">
+                            <p class="text-primary-100 text-xs font-semibold uppercase tracking-wide">SP Spent</p>
+                            <p class="text-2xl font-bold tabular-nums leading-none"
+                                x-text="formatNumber(spStats?.total_spent || 0)"
+                                aria-label="Total SP spent"></p>
+                            <p class="text-xs text-primary-200">Total invested</p>
                         </div>
-                        <div>
-                            <p class="text-primary-100 text-sm font-medium">SP Spent</p>
-                            <p class="text-2xl font-bold mt-1" x-text="formatNumber(spStats?.total_spent || 0)"></p>
+
+                        {{-- 3. SP Saved via Hints --}}
+                        <div class="flex flex-col gap-1">
+                            <p class="text-primary-100 text-xs font-semibold uppercase tracking-wide">SP Saved</p>
+                            <p class="text-2xl font-bold tabular-nums leading-none text-green-300"
+                                x-text="formatNumber(spStats?.total_saved || 0)"
+                                aria-label="SP saved through hint discounts"></p>
+                            <p class="text-xs text-primary-200">Via hint discounts</p>
                         </div>
-                        <div>
-                            <p class="text-primary-100 text-sm font-medium">SP Saved (Hints)</p>
-                            <p class="text-2xl font-bold mt-1 text-green-300"
-                                x-text="formatNumber(spStats?.total_saved || 0)"></p>
-                        </div>
-                        <div>
-                            <p class="text-primary-100 text-sm font-medium">Skills with Hints</p>
-                            <p class="text-2xl font-bold mt-1" x-text="skillsWithHints"></p>
-                            <p class="text-xs text-primary-100 mt-1"
-                                x-text="`${formatNumber(potentialSavings)} SP potential`"></p>
+
+                        {{-- 4. SP Potential (with info tooltip) --}}
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-1.5">
+                                <p class="text-primary-100 text-xs font-semibold uppercase tracking-wide">SP Potential</p>
+                                {{-- Info button with inline tooltip --}}
+                                <div
+                                    x-data="{ showSpTooltip: false }"
+                                    class="relative inline-flex"
+                                    @mouseenter="showSpTooltip = true"
+                                    @mouseleave="showSpTooltip = false"
+                                    @focus="showSpTooltip = true"
+                                    @blur="showSpTooltip = false">
+                                    <button
+                                        type="button"
+                                        class="w-4 h-4 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+                                        aria-label="What is SP Potential?"
+                                        tabindex="0">
+                                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                    <div
+                                        x-show="showSpTooltip"
+                                        x-transition:enter="transition ease-out duration-150"
+                                        x-transition:enter-start="opacity-0 scale-95"
+                                        x-transition:enter-end="opacity-100 scale-100"
+                                        x-transition:leave="transition ease-in duration-100"
+                                        x-transition:leave-start="opacity-100 scale-100"
+                                        x-transition:leave-end="opacity-0 scale-95"
+                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 w-56 rounded-lg bg-neutral-900 text-white text-xs p-3 shadow-xl pointer-events-none"
+                                        role="tooltip"
+                                        aria-live="polite">
+                                        <p class="font-semibold mb-1">SP Potential</p>
+                                        <p class="text-neutral-300">Maximum additional SP you could save by applying your current hints. Calculated as the sum of each hinted skill&apos;s base cost &times; its hint discount level.</p>
+                                        <div class="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-neutral-900 rotate-45 -mt-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-2xl font-bold tabular-nums leading-none text-yellow-300"
+                                x-text="formatNumber(Math.round(potentialSavings))"
+                                aria-label="SP savings potential from unused hints"></p>
+                            <p class="text-xs text-primary-200">
+                                <span x-text="skillsWithHints"></span> skill<span x-show="skillsWithHints !== 1">s</span> with hints
+                            </p>
                         </div>
                     </div>
                 </div>
