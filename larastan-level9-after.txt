@@ -1,0 +1,56 @@
+C:\XAMPP\htdocs\umamusume-career-planner\app\Http\Controllers\Api\V1\CareerController.php:768:Cannot cast mixed to string.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:177:Cannot access offset 'career_run' on mixed.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:177:Cannot access offset 'stat_speed' on mixed.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:177:Cannot access offset 'trainee_name' on mixed.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:182:Cannot access offset 'name' on mixed.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:182:Cannot access offset 'scenario_type' on mixed.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:182:Cannot access offset 'speed' on mixed.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:194:Parameter #1 $array of function array_keys expects array, mixed given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:205:Parameter #1 $array of function array_keys expects array, mixed given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:1444:Cannot cast mixed to string.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:1445:Cannot cast mixed to int.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:1454:Binary operation "+" between mixed and 1 results in an error.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DataMigrationService.php:1457:Cannot access an offset on mixed.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\DeckManagementService.php:470:Cannot cast mixed to string.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\ExternalAPI\ConflictDetectionService.php:996:Method App\Services\ExternalAPI\ConflictDetectionService::indexById() should return array<int|string, array<string, mixed>> but returns array<int|string, array<mixed, mixed>>.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\ExternalAPI\DataQualityScoringService.php:704:Parameter #1 $array of function array_count_values expects an array of values castable to string, list<mixed> given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\ExternalAPI\DataValidationAgent.php:290:Parameter #2 $array of function implode expects array<string>, array<mixed> given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\ExternalAPI\DataValidationAgent.php:494:Parameter #2 $array of function implode expects array<string>, array<mixed> given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\ExternalAPI\DataValidationAgent.php:818:Parameter #1 $array of function array_unique expects an array of values castable to string, list<mixed> given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\ExternalAPI\DataValidationService.php:392:Parameter #2 $array of function implode expects array<string>, array<mixed, mixed> given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\MCP\AgentCommunicationService.php:268:Cannot access an offset on mixed.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\MCP\AgentOrchestrationService.php:322:Cannot cast mixed to float.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\MCP\MCPClientService.php:239:Method App\Services\MCP\MCPClientService::healthCheck() should return array<string, array{status: string, message: string, capabilities?: array<string, mixed>, health?: array<string, mixed>}> but returns array<string, array{status: 'disabled', message: 'Server is disabled…'}|array{status: string, message: string, capabilities: mixed, health: array<string, mixed>}>.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\Neuron\CareerPlanningService.php:351:Parameter #2 $array of function implode expects array<string>, array<mixed, mixed> given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\Neuron\NeuronAIService.php:459:Parameter $expectedPerformance of class App\Neuron\Responses\RaceStrategyResponse constructor expects string|null, mixed given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\Neuron\SkillRecommendationService.php:271:Parameter #2 $array of function implode expects array<string>, array<mixed, mixed> given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SkillStrategyAnalyzer.php:49:Cannot cast mixed to string.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SkillStrategyAnalyzer.php:65:Cannot cast mixed to string.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SkillStrategyAnalyzer.php:77:Cannot cast mixed to string.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SkillStrategyAnalyzer.php:89:Cannot cast mixed to string.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SkillStrategyAnalyzer.php:94:Parameter #1 $callback of function array_map expects (callable(mixed): mixed)|null, 'strval' given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SkillStrategyAnalyzer.php:210:Parameter #1 $callback of function array_map expects (callable(mixed): mixed)|null, 'strval' given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SkillStrategyAnalyzer.php:211:Cannot access property $name on mixed.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SkillStrategyAnalyzer.php:326:Using nullsafe property access "?->running_style" on left side of ?? is unnecessary. Use -> instead.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SkillStrategyAnalyzer.php:336:Using nullsafe property access "?->distance_type" on left side of ?? is unnecessary. Use -> instead.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SynergyBuildAnalyzerService.php:140:Parameter #1 $data of static method App\ValueObjects\SynergyReport::fromArray() expects array{overall_score: float, tier: string, layers: array<int, array<string, mixed>>, critical_issues?: array<int, string>, computed_at: string}, array<string, mixed>|null given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SynergyBuildAnalyzerService.php:366:Possibly invalid array key type mixed.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SynergyBuildAnalyzerService.php:367:Offset 'final_corner'|'final_straight'|'mid_race'|'opening' on array{opening: int<0, max>, mid_race: int<0, max>, final_corner: int<0, max>, final_straight: int<0, max>} in isset() always exists and is not nullable.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SynergyBuildAnalyzerService.php:386:Offset 'synergy_strength' on array{skill: App\Models\Skill, synergies: Illuminate\Support\Collection<int, App\Models\Skill>, synergy_count: int, synergy_strength: float} on left side of ?? always exists and is not nullable.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SynergyBuildAnalyzerService.php:485:Binary operation "." between non-falsy-string and mixed results in an error.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SynergyBuildAnalyzerService.php:550:Match arm comparison between App\Enums\SparkType::White and App\Enums\SparkType::White is always true.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SynergyBuildAnalyzerService.php:602:Parameter #1 $array of function array_unique expects an array of values castable to string, list<mixed> given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SynergyBuildAnalyzerService.php:607:Parameter #1 $array of function array_intersect expects an array of values castable to string, array<int<0, max>, mixed> given.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SynergyBuildAnalyzerService.php:732:Using nullsafe property access "?->running_style" on left side of ?? is unnecessary. Use -> instead.
+C:\XAMPP\htdocs\umamusume-career-planner\app\Services\SynergyBuildAnalyzerService.php:745:Using nullsafe property access "?->distance_type" on left side of ?? is unnecessary. Use -> instead.
+C:\XAMPP\htdocs\umamusume-career-planner\app\ValueObjects\SynergyReport.php:91:Parameter #1 $data of static method App\ValueObjects\SynergyLayerScore::fromArray() expects array{layer: string, score: float, weight: float, issues?: array<int, string>, recommendations?: array<int, string>, breakdown?: array<string, mixed>}, array<string, mixed> given.
+C:\XAMPP\htdocs\umamusume-career-planner\tests\Browser\CharacterRosterEnhancementsTest.php:31:Cannot cast mixed to string.
+C:\XAMPP\htdocs\umamusume-career-planner\tests\Browser\CharacterRosterEnhancementsTest.php:31:Cannot cast mixed to string.
+C:\XAMPP\htdocs\umamusume-career-planner\tests\Browser\CharacterRosterEnhancementsTest.php:55:Cannot cast mixed to int.
+C:\XAMPP\htdocs\umamusume-career-planner\tests\Browser\CharacterRosterEnhancementsTest.php:55:Cannot cast mixed to int.
+C:\XAMPP\htdocs\umamusume-career-planner\tests\Feature\CharacterCreationTest.php:11:Function validCharacterPayload() has parameter $overrides with no value type specified in iterable type array.
+C:\XAMPP\htdocs\umamusume-career-planner\tests\Feature\CharacterCreationTest.php:11:Function validCharacterPayload() return type has no value type specified in iterable type array.
+C:\XAMPP\htdocs\umamusume-career-planner\tests\Feature\Livewire\SynergyBuildPlannerTest.php:16:Call to an undefined method Illuminate\Testing\TestResponse::assertSet().
+C:\XAMPP\htdocs\umamusume-career-planner\tests\Feature\Livewire\SynergyBuildPlannerTest.php:30:Call to an undefined method Illuminate\Testing\TestResponse::assertSet().
+C:\XAMPP\htdocs\umamusume-career-planner\tests\Feature\Livewire\SynergyBuildPlannerTest.php:57:Call to an undefined method Illuminate\Testing\TestResponse::assertSet().
+C:\XAMPP\htdocs\umamusume-career-planner\tests\Unit\Services\SynergyBuildAnalyzerServiceTest.php:52:Cannot cast mixed to float.

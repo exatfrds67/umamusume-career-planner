@@ -1,0 +1,243 @@
+Reading ./composer.json (/mnt/c/XAMPP/htdocs/umamusume-career-planner/c
+  ⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯
+  ⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯⨯The following exception is caused by a process timeout
+Check https://getcomposer.org/doc/06-config.md#process-timeout for details
+
+In Process.php line 1205:
+                                                                               
+  The process "'/usr/bin/php8.4' -d allow_url_fopen='1' -d disable_functions=  
+  '' -d memory_limit='-1' artisan test --compact" exceeded the timeout of 300  
+   seconds.                                                                    
+                                                                               
+
+test [--dev] [--no-dev] [--] [<args>...]
+
+9.2 (2025-11-19 21:57:25) with PHP 8.4.16 on Linux / 6.6.87.2-microsoft-standard-WSL2
+> test: @php artisan config:clear --ansi
+Executing command (CWD): '/usr/bin/php8.4' -d allow_url_fopen='1' -d disable_functions='' -d memory_limit='-1' artisan config:clear --ansi
+
+  [37;44m INFO [39;49m Configuration cache cleared successfully.  
+
+> test: @php artisan test --compact
+Executing command (CWD): '/usr/bin/php8.4' -d allow_url_fopen='1' -d disable_functions='' -d memory_limit='-1' artisan test --compact
+
+   FAIL  Tests\Unit\Services\GameMechanicsEnginePropertyTest
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 7: Stamina Requirement Calculation → it applies style multipliers correctly
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 7: Stamina Requirement Calculation → it falls within expected ranges for each distance with Escape style
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 11: Facility Level Progression → it progresses by 1 level every 4 uses
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 11: Facility Level Progression → it never exceeds level 5
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 11: Facility Level Progression → it is always at least level 1
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 11: Facility Level Progression → it is monotonically increasing
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 11: Facility Level Progression → it has correct boundaries at level transitions
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 11: Facility Level Progression → it maintains correct level for all values within a range
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 10: Multi-Training Bonus Calculation → it scales linearly at 5% per card up to 6 cards
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 10: Multi-Training Bonus Calculation → it never exceeds 30% regardless of card count
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 10: Multi-Training Bonus Calculation → it is always non-negative
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 10: Multi-Training Bonus Calculation → it is monotonically increasing up to the cap
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 7: Stamina Requirement Calculation → it decreases with less aggressive running styles
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 7: Stamina Requirement Calculation → it is always non-negative
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 7: Stamina Requirement Calculation → it decreases with more recovery skills
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 7: Stamina Requirement Calculation → it increases with longer distances
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 7: Stamina Requirement Calculation → it reduces by approximately 150-200 per recovery skill
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 7: Stamina Requirement Calculation → it is deterministic for the same inputs
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 7: Stamina Requirement Calculation → it handles all valid distance-style combinations
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it applies correct hint level discounts
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it applies Fast Learner bonus correctly
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it applies Fast Learner bonus on top of hint discounts
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it always returns non-negative integers
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it decreases monotonically with higher hint levels
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it is deterministic for the same inputs
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it handles edge case hint levels correctly
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it handles various base costs correctly
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it handles Fast Learner with various base costs
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it calculates correct discount percentages
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it handles hint level boundaries correctly
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it applies discounts correctly for common skill costs
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it never increases cost with higher hint levels
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 5: Skill Hint Level Discount Accuracy → it Fast Learner never increases cost
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 8: Stamina Recovery Skill Adjustment → it reduces stamina requirements for each recovery skill
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 8: Stamina Recovery Skill Adjustment → it scales linearly with number of recovery skills
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 8: Stamina Recovery Skill Adjustment → it applies recovery reduction after style modifier
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 8: Stamina Recovery Skill Adjustment → it never results in negative stamina requirement
+  ⨯ GameMechanicsEngine Property-Based Tests → Property 8: Stamina Recovery Skill Adjustment → it works with empty recovery skills array
+  ⨯ GameMechanicsEngine Property-Based Tests → Training Gain Properties → it always returns a positive integer for valid inputs
+  ⨯ GameMechanicsEngine Property-Based Tests → Training Gain Properties → it increases with higher facility levels
+  ⨯ GameMechanicsEngine Property-Based Tests → Training Gain Properties → it increases with more support cards present
+  ⨯ GameMechanicsEngine Property-Based Tests → Training Gain Properties → it increases with better mood
+  ⨯ GameMechanicsEngine Property-Based Tests → Training Gain Properties → it is higher with friendship training than without
+  ⨯ GameMechanicsEngine Property-Based Tests → Training Gain Properties → it adds support card bonuses to the final result
+
+   FAIL  Tests\Unit\Components\RecommendationCardComponentTest
+  ⨯ it displays confidence score when provided
+  ⨯ it renders recommendation card with required attributes
+  ⨯ it initializes Alpine.js with correct default state
+  ⨯ it respects expanded prop when set to true
+  ⨯ it includes x-show directive for dismissal
+  ⨯ it includes x-collapse directive for expand/collapse animation
+  ⨯ it includes click handler for expand/collapse
+  ⨯ it includes click handler for dismiss button
+  ⨯ it binds aria-expanded to Alpine.js state
+  ⨯ it includes transition directives for smooth animations
+  ⨯ it applies correct priority color classes
+  ⨯ it displays priority icon based on priority level
+  ⨯ it hides confidence score when not provided
+  ⨯ it displays reasoning section when provided
+  ⨯ it displays expected outcomes section when provided
+  ⨯ it displays risks section when provided
+  ⨯ it includes focus ring classes for accessibility
+  ⨯ it includes action buttons when showActions is true
+  ⨯ it hides action buttons when showActions is false
+  ⨯ it includes Livewire wire:click for apply action
+  ⨯ it includes Livewire wire:click for feedback action
+  ⨯ it has proper keyboard navigation attributes
+  ⨯ it includes dark mode classes
+  ⨯ it generates unique card ID for each instance
+  ⨯ it renders without errors
+  ⨯ it renders complete HTML structure
+  ⨯ it handles empty expected outcomes array gracefully
+  ⨯ it handles empty risks array gracefully
+  ⨯ it rotates chevron icon based on expanded state
+
+   FAIL  Tests\Unit\Enums\PriorityTest
+  ⨯ Priority Enum → cases → it has all expected priority levels
+  ⨯ Priority Enum → cases → it has correct string values
+  ⨯ Priority Enum → label → it returns correct labels
+  ⨯ Priority Enum → description → it returns correct descriptions
+  ⨯ Priority Enum → color → it returns correct color classes
+  ⨯ Priority Enum → weight → it returns correct weights
+  ⨯ Priority Enum → weight → it has weights in descending order
+  ⨯ Priority Enum → comparison methods → isHigherThan → it correctly compares priorities
+  ⨯ Priority Enum → comparison methods → isHigherThan → it returns false when comparing equal priorities
+  ⨯ Priority Enum → comparison methods → isHigherThan → it returns false when comparing lower priorities
+  ⨯ Priority Enum → comparison methods → isLowerThan → it correctly compares priorities
+  ⨯ Priority Enum → comparison methods → isLowerThan → it returns false when comparing equal priorities
+  ⨯ Priority Enum → comparison methods → isLowerThan → it returns false when comparing higher priorities
+  ⨯ Priority Enum → comparison methods → isEqualTo → it returns true for same priorities
+  ⨯ Priority Enum → comparison methods → isEqualTo → it returns false for different priorities
+  ⨯ Priority Enum → comparison methods → isAtLeast → it returns true for higher or equal priorities
+  ⨯ Priority Enum → comparison methods → isAtLeast → it returns false for lower priorities
+  ⨯ Priority Enum → comparison methods → isAtMost → it returns true for lower or equal priorities
+  ⨯ Priority Enum → comparison methods → isAtMost → it returns false for higher priorities
+  ⨯ Priority Enum → convenience methods → isCritical → it returns true only for CRITICAL priority
+  ⨯ Priority Enum → convenience methods → isHighOrCritical → it returns true for HIGH and CRITICAL priorities
+  ⨯ Priority Enum → convenience methods → isLow → it returns true only for LOW priority
+  ⨯ Priority Enum → static comparison methods → max → it returns the higher priority
+  ⨯ Priority Enum → static comparison methods → max → it returns the same priority when both are equal
+  ⨯ Priority Enum → static comparison methods → min → it returns the lower priority
+  ⨯ Priority Enum → static comparison methods → min → it returns the same priority when both are equal
+  ⨯ Priority Enum → static helper methods → ordered → it returns priorities in descending order
+  ⨯ Priority Enum → static helper methods → all → it returns all priority cases
+  ⨯ Priority Enum → static helper methods → values → it returns all priority string values
+  ⨯ Priority Enum → BackedEnum methods → it can be created from string value
+  ⨯ Priority Enum → BackedEnum methods → it throws exception for invalid value
+  ⨯ Priority Enum → BackedEnum methods → it can try to create from string value
+  ⨯ Priority Enum → sorting behavior → it can sort priorities by weight
+
+   FAIL  Tests\Unit\Models\CareerModelTest
+  ⨯ Career Model → relationships → it has many training sessions
+  ⨯ Career Model → relationships → it has many races
+  ⨯ Career Model → relationships → it has many skill acquisitions
+  ⨯ Career Model → attributes → it has valid scenario type
+  ⨯ Career Model → attributes → it has valid status
+  ⨯ Career Model → attributes → it tracks current turn
+  ⨯ Career Model → scopes → it filters active careers
+  ⨯ Career Model → scopes → it filters completed careers
+  ⨯ Career Model → timestamps → it tracks started_at timestamp
+  ⨯ Career Model → star level → it stores star level between 1 and 5 with (1)
+  ⨯ Career Model → star level → it stores star level between 1 and 5 with (2)
+  ⨯ Career Model → star level → it stores star level between 1 and 5 with (3)
+  ⨯ Career Model → star level → it stores star level between 1 and 5 with (4)
+  ⨯ Career Model → star level → it stores star level between 1 and 5 with (5)
+  ⨯ Career Model → timestamps → it tracks completed_at timestamp
+  ⨯ Career Model → performance analysis → it stores performance analysis as JSON
+  ⨯ Career Model → factory → it creates valid career with factory
+  ⨯ Career Model → star level → it defaults to 3 stars when not specified
+  ⨯ Career Model → star level → it casts star level to integer
+  ⨯ Career Model → star level → it is included in fillable attributes
+  ⨯ Career Model → star level → it uses factory withStarLevel state
+  ⨯ Career Model → star level → it clamps star level in factory withStarLevel state
+  ⨯ Career Model → relationships → it belongs to a character
+
+   FAIL  Tests\Unit\Models\CharacterModelTest
+  ⨯ Character Model → relationships → it belongs to a user
+  ⨯ Character Model → attributes → it has valid scenario type
+  ⨯ Character Model → accessors → it calculates total stats
+  ⨯ Character Model → factory → it creates valid character with factory
+  ⨯ Character Model → attributes → it has valid stat values
+  ⨯ Character Model → attributes → it has valid energy level
+  ⨯ Character Model → relationships → it has many aptitudes
+  ⨯ Character Model → scopes → it filters by user
+  ⨯ Character Model → relationships → it has many careers
+  ⨯ Character Model → relationships → it has many factors
+  ⨯ Character Model → relationships → it has many skill acquisitions
+  ⨯ Character Model → relationships → it has many support cards through pivot
+  ⨯ Character Model → attributes → it has valid mood status
+  ⨯ Character Model → factory → it creates character with specific scenario
+  ⨯ Character Model → scopes → it filters by scenario type
+
+   FAIL  Tests\Unit\Models\PredictionAccuracyTest
+  ⨯ PredictionAccuracy Factory States → it can create inaccurate predictions
+  ⨯ PredictionAccuracy Model → it casts accuracy_score to float
+  ⨯ PredictionAccuracy Model → it casts created_at to datetime
+  ⨯ PredictionAccuracy Helper Methods → it can calculate differences between predicted and actual values
+  ⨯ PredictionAccuracy Helper Methods → it handles missing keys in actual value
+  ⨯ PredictionAccuracy Factory States → it can create accurate predictions
+  ⨯ PredictionAccuracy Factory States → it can create training gain predictions
+  ⨯ PredictionAccuracy Model → it belongs to a career
+  ⨯ PredictionAccuracy Model → it casts predicted_value to array
+  ⨯ PredictionAccuracy Helper Methods → it can get summary
+  ⨯ PredictionAccuracy Helper Methods → it handles non-numeric values in differences calculation
+  ⨯ PredictionAccuracy Factory States → it can create highly accurate predictions
+  ⨯ PredictionAccuracy Factory States → it can create race placement predictions
+  ⨯ PredictionAccuracy Helper Methods → it can get accuracy as percentage
+  ⨯ PredictionAccuracy Helper Methods → it can calculate average percentage error
+  ⨯ PredictionAccuracy Factory States → it can create skill hint predictions
+  ⨯ PredictionAccuracy Model → it casts actual_value to array
+  ⨯ PredictionAccuracy Factory States → it can create bond increase predictions
+  ⨯ PredictionAccuracy Helper Methods → it can check if prediction is accurate
+  ⨯ PredictionAccuracy Helper Methods → it can check if prediction is inaccurate
+  ⨯ PredictionAccuracy Helper Methods → it can check if prediction is highly accurate
+  ⨯ PredictionAccuracy Scopes → it can scope by career
+  ⨯ PredictionAccuracy Scopes → it can order by accuracy score
+  ⨯ PredictionAccuracy Scopes → it can order by creation date
+  ⨯ PredictionAccuracy Scopes → it can scope by accuracy below threshold
+  ⨯ PredictionAccuracy Scopes → it can order by turn number
+  ⨯ PredictionAccuracy Scopes → it can scope by accuracy above threshold
+  ⨯ PredictionAccuracy Scopes → it can scope by turn
+  ⨯ PredictionAccuracy Scopes → it can scope by prediction type
+  ⨯ PredictionAccuracy Scopes → it can scope by model version
+  ⨯ PredictionAccuracy Helper Methods → it can get accuracy level
+  ⨯ PredictionAccuracy Model → it can be created with valid attributes
+The following exception is caused by a process timeout
+Check https://getcomposer.org/doc/06-config.md#process-timeout for details
+
+In Process.php line 1205:
+                                                                               
+  [Symfony\Component\Process\Exception\ProcessTimedOutException]               
+  The process "'/usr/bin/php8.4' -d allow_url_fopen='1' -d disable_functions=  
+  '' -d memory_limit='-1' artisan test --compact" exceeded the timeout of 300  
+   seconds.                                                                    
+                                                                               
+
+Exception trace:
+  at phar:///usr/local/bin/composer/vendor/symfony/process/Process.php:1205
+ Symfony\Component\Process\Process->checkTimeout() at phar:///usr/local/bin/composer/vendor/symfony/process/Process.php:431
+ Symfony\Component\Process\Process->wait() at phar:///usr/local/bin/composer/vendor/symfony/process/Process.php:255
+ Symfony\Component\Process\Process->run() at phar:///usr/local/bin/composer/src/Composer/Util/ProcessExecutor.php:168
+ Composer\Util\ProcessExecutor->runProcess() at phar:///usr/local/bin/composer/src/Composer/Util/ProcessExecutor.php:213
+ Composer\Util\ProcessExecutor->doExecute() at phar:///usr/local/bin/composer/src/Composer/Util/ProcessExecutor.php:99
+ Composer\Util\ProcessExecutor->execute() at phar:///usr/local/bin/composer/src/Composer/EventDispatcher/EventDispatcher.php:483
+ Composer\EventDispatcher\EventDispatcher->executeTty() at phar:///usr/local/bin/composer/src/Composer/EventDispatcher/EventDispatcher.php:437
+ Composer\EventDispatcher\EventDispatcher->doDispatch() at phar:///usr/local/bin/composer/src/Composer/EventDispatcher/EventDispatcher.php:142
+ Composer\EventDispatcher\EventDispatcher->dispatchScript() at phar:///usr/local/bin/composer/src/Composer/Command/ScriptAliasCommand.php:87
+ Composer\Command\ScriptAliasCommand->execute() at phar:///usr/local/bin/composer/vendor/symfony/console/Command/Command.php:298
+ Symfony\Component\Console\Command\Command->run() at phar:///usr/local/bin/composer/vendor/symfony/console/Application.php:1040
+ Symfony\Component\Console\Application->doRunCommand() at phar:///usr/local/bin/composer/vendor/symfony/console/Application.php:301
+ Symfony\Component\Console\Application->doRun() at phar:///usr/local/bin/composer/src/Composer/Console/Application.php:418
+ Composer\Console\Application->doRun() at phar:///usr/local/bin/composer/vendor/symfony/console/Application.php:171
+ Symfony\Component\Console\Application->run() at phar:///usr/local/bin/composer/src/Composer/Console/Application.php:138
+ Composer\Console\Application->run() at phar:///usr/local/bin/composer/bin/composer:112
+ require() at /usr/local/bin/composer:29
+
+test [--dev] [--no-dev] [--] [<args>...]
+

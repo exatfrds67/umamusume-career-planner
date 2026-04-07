@@ -1,3 +1,664 @@
+Note: Using configuration file /mnt/c/XAMPP/htdocs/umamusume-career-planner/phpstan.neon.
+   0/490 [░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0%[1G[2K  20/490 [▓░░░░░░░░░░░░░░░░░░░░░░░░░░░]   4%[1G[2K  40/490 [▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░]   8%[1G[2K  60/490 [▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░]  12%[1G[2K  80/490 [▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░]  16%[1G[2K 120/490 [▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░]  24%[1G[2K 140/490 [▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░]  28%[1G[2K 160/490 [▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░]  32%[1G[2K 200/490 [▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░]  40%[1G[2K 220/490 [▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░]  44%[1G[2K 240/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░]  48%[1G[2K 260/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░]  53%[1G[2K 280/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░]  57%[1G[2K 300/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░]  61%[1G[2K 320/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░]  65%[1G[2K 340/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░]  69%[1G[2K 360/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░]  73%[1G[2K 400/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░]  81%[1G[2K 440/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░]  89%[1G[2K 460/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░]  93%[1G[2K 470/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░]  95%[1G[2K 490/490 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
 
- [OK] No errors                                                                                                         
+ ------ -------------------------------------------- 
+  Line   app/Console/Commands/SendPlanReminders.php  
+ ------ -------------------------------------------- 
+  47     Cannot cast mixed to int.                   
+         🪪  cast.int                                
+ ------ -------------------------------------------- 
+
+ ------ ------------------------------------------------------- 
+  Line   app/Http/Controllers/Api/CareerPlanningController.php  
+ ------ ------------------------------------------------------- 
+  252    Cannot cast mixed to int.                              
+         🪪  cast.int                                           
+  398    Cannot cast mixed to int.                              
+         🪪  cast.int                                           
+  440    Cannot cast mixed to int.                              
+         🪪  cast.int                                           
+ ------ ------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Http/Controllers/Api/TrackblazerController.php                     
+ ------ ----------------------------------------------------------------------- 
+  22     Method App\Http\Controllers\Api\TrackblazerController::logRival() has  
+         no return type specified.                                              
+         🪪  missingType.return                                                 
+  44     Method                                                                 
+         App\Http\Controllers\Api\TrackblazerController::reserveAgenda() has    
+         no return type specified.                                              
+         🪪  missingType.return                                                 
+  62     Method App\Http\Controllers\Api\TrackblazerController::exportAgenda()  
+         has no return type specified.                                          
+         🪪  missingType.return                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------ 
+  Line   app/Http/Controllers/Api/V1/CareerController.php                  
+ ------ ------------------------------------------------------------------ 
+  768    Parameter #1 $array of function array_unique expects an array of  
+         values castable to string, array<mixed> given.                    
+         🪪  argument.type                                                 
+ ------ ------------------------------------------------------------------ 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Http/Controllers/CharacterController.php                           
+ ------ ----------------------------------------------------------------------- 
+  88     Parameter #1 $groupedCharacters of method                              
+         App\Http\Controllers\CharacterController::sortGroupedCharacters()      
+         expects Illuminate\Support\Collection<int, array<string, mixed>>, Ill  
+         uminate\Support\Collection<int, array> given.                          
+         🪪  argument.type                                                      
+  171    Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  171    Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  172    Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  172    Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  173    Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  173    Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  338    Parameter #1 $string of function ltrim expects string, string|false    
+         given.                                                                 
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------- 
+  Line   app/Http/Controllers/RaceController.php  
+ ------ ----------------------------------------- 
+  58     Cannot cast mixed to int.                
+         🪪  cast.int                             
+ ------ ----------------------------------------- 
+
+ ------ ------------------------------------------------------------------ 
+  Line   app/Http/Requests/StoreSupportDeckRequest.php                     
+ ------ ------------------------------------------------------------------ 
+  75     Parameter #1 $array of function array_unique expects an array of  
+         values castable to string, array<mixed> given.                    
+         🪪  argument.type                                                 
+ ------ ------------------------------------------------------------------ 
+
+ ------ --------------------------------------------------------------------- 
+  Line   app/Http/Resources/CharacterRosterResource.php                       
+ ------ --------------------------------------------------------------------- 
+  74     Using nullsafe property access "?->goalRaces" on left side of ?? is  
+         unnecessary. Use -> instead.                                         
+         🪪  nullsafe.neverNull                                               
+ ------ --------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Jobs/GenerateCareerPlan.php                                        
+ ------ ----------------------------------------------------------------------- 
+  52     Parameter #3 $options of method                                        
+         App\Services\CareerPlanTimelineService::build() expects array<string,  
+          mixed>, mixed given.                                                  
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------ 
+  Line   app/Jobs/SendTurnNotification.php                     
+ ------ ------------------------------------------------------ 
+  34     Cannot call method notify() on App\Models\User|null.  
+         🪪  method.nonObject                                  
+ ------ ------------------------------------------------------ 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Models/AgendaExport.php                                            
+ ------ ----------------------------------------------------------------------- 
+  11     Class App\Models\AgendaExport uses generic trait                       
+         Illuminate\Database\Eloquent\Factories\HasFactory but does not         
+         specify its types: TFactory                                            
+         🪪  missingType.generics                                               
+  25     PHPDoc type array<int, string> of property App\Models\AgendaExport::$  
+         fillable is not covariant with PHPDoc type list<string> of overridden  
+          property Illuminate\Database\Eloquent\Model::$fillable.               
+         🪪  property.phpDocType                                                
+         💡  You can fix 3rd party PHPDoc types with stub files:                
+         💡  https://phpstan.org/user-guide/stub-files                          
+  34     Method App\Models\AgendaExport::career() has no return type            
+         specified.                                                             
+         🪪  missingType.return                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Models/AgendaReservation.php                                       
+ ------ ----------------------------------------------------------------------- 
+  11     Class App\Models\AgendaReservation uses generic trait                  
+         Illuminate\Database\Eloquent\Factories\HasFactory but does not         
+         specify its types: TFactory                                            
+         🪪  missingType.generics                                               
+  25     PHPDoc type array<int, string> of property App\Models\AgendaReservati  
+         on::$fillable is not covariant with PHPDoc type list<string> of overr  
+         idden property Illuminate\Database\Eloquent\Model::$fillable.          
+         🪪  property.phpDocType                                                
+         💡  You can fix 3rd party PHPDoc types with stub files:                
+         💡  https://phpstan.org/user-guide/stub-files                          
+  35     Method App\Models\AgendaReservation::career() has no return type       
+         specified.                                                             
+         🪪  missingType.return                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ --------------------------- 
+  Line   app/Models/CareerPlan.php  
+ ------ --------------------------- 
+  146    Cannot cast mixed to int.  
+         🪪  cast.int               
+ ------ --------------------------- 
+
+ ------ --------------------------- 
+  Line   app/Models/Character.php   
+ ------ --------------------------- 
+  308    Cannot cast mixed to int.  
+         🪪  cast.int               
+  309    Cannot cast mixed to int.  
+         🪪  cast.int               
+  310    Cannot cast mixed to int.  
+         🪪  cast.int               
+  311    Cannot cast mixed to int.  
+         🪪  cast.int               
+  312    Cannot cast mixed to int.  
+         🪪  cast.int               
+ ------ --------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Models/RivalLog.php                                                
+ ------ ----------------------------------------------------------------------- 
+  11     Class App\Models\RivalLog uses generic trait                           
+         Illuminate\Database\Eloquent\Factories\HasFactory but does not         
+         specify its types: TFactory                                            
+         🪪  missingType.generics                                               
+  25     PHPDoc type array<int, string> of property App\Models\RivalLog::$fill  
+         able is not covariant with PHPDoc type list<string> of overridden pro  
+         perty Illuminate\Database\Eloquent\Model::$fillable.                   
+         🪪  property.phpDocType                                                
+         💡  You can fix 3rd party PHPDoc types with stub files:                
+         💡  https://phpstan.org/user-guide/stub-files                          
+  49     Method App\Models\RivalLog::career() has no return type specified.     
+         🪪  missingType.return                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------- 
+  Line   app/Models/User.php                                                 
+ ------ -------------------------------------------------------------------- 
+  305    Method App\Models\User::getPreferredAIModel() should return string  
+         but returns mixed.                                                  
+         🪪  return.type                                                     
+ ------ -------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Neuron/Agents/Tools/SkillDataTool.php                              
+ ------ ----------------------------------------------------------------------- 
+  259    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed> given.                                                          
+         🪪  argument.type                                                      
+  265    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed> given.                                                          
+         🪪  argument.type                                                      
+  271    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed> given.                                                          
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  Line   app/Notifications/TurnReminder.php                                    
+ ------ ---------------------------------------------------------------------- 
+  56     Part $reasoning (mixed) of encapsed string cannot be cast to string.  
+         🪪  encapsedStringPart.nonString                                      
+ ------ ---------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------- 
+  Line   app/Services/AI/AIDashboardService.php                              
+ ------ -------------------------------------------------------------------- 
+  745    Call to function is_array() with array{status?: string,             
+         tasks_completed?: int, success_rate?: float, avg_duration?: float,  
+         last_active_at?: string|null} will always evaluate to true.         
+         🪪  function.alreadyNarrowedType                                    
+ ------ -------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/AI/AgentFeedbackService.php                               
+ ------ ----------------------------------------------------------------------- 
+  179    Parameter #1 $feedback of method                                       
+         App\Services\AI\AgentFeedbackService::analyzePatterns() expects array  
+         <string, mixed>, array<int|string, mixed> given.                       
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/AI/BedrockService.php                                     
+ ------ ----------------------------------------------------------------------- 
+  291    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed, mixed> given.                                                   
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------- 
+  Line   app/Services/AgendaService.php                                 
+ ------ --------------------------------------------------------------- 
+  43     Binary operation "+" between mixed and 1 results in an error.  
+         🪪  binaryOp.invalid                                           
+ ------ --------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/CareerPlanTimelineService.php                             
+ ------ ----------------------------------------------------------------------- 
+  86     Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  113    Parameter #1 $currentEnergy of method                                  
+         App\Services\CareerPlanTimelineService::buildRestAction() expects      
+         int, mixed given.                                                      
+         🪪  argument.type                                                      
+  156    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  157    Cannot cast mixed to float.                                            
+         🪪  cast.double                                                        
+  159    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  177    Binary operation "-" between mixed and 18 results in an error.         
+         🪪  binaryOp.invalid                                                   
+  178    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  187    PHPDoc tag @param references unknown parameter: $state                 
+         🪪  parameter.notFound                                                 
+  205    Parameter #1 $stats of method                                          
+         App\Services\RaceConditionService::applyConditionPenalties() expects   
+         array<string, int>, mixed given.                                       
+         🪪  argument.type                                                      
+  227    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  229    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  230    Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  242    Parameter #2 $array of function array_map expects array, mixed given.  
+         🪪  argument.type                                                      
+  245    Offset 'skill' on array{skill: App\Models\Skill, priority: string,     
+         reason: string, cost: int} on left side of ?? always exists and is     
+         not nullable.                                                          
+         🪪  nullCoalesce.offset                                                
+  247    Instanceof between App\Models\Skill and App\Models\Skill will always   
+         evaluate to true.                                                      
+         🪪  instanceof.alwaysTrue                                              
+  262    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  304    Parameter #1 $array of function asort expects array, mixed given.      
+         🪪  argument.type                                                      
+  323    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  445    Cannot access offset string on mixed.                                  
+         🪪  offsetAccess.nonOffsetAccessible                                   
+  458    Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ------------------------------------------ 
+  Line   app/Services/CharacterMappingService.php  
+ ------ ------------------------------------------ 
+  101    Cannot cast mixed to string.              
+         🪪  cast.string                           
+ ------ ------------------------------------------ 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/DataExportService.php                                     
+ ------ ----------------------------------------------------------------------- 
+  638    Parameter #2 $array of function implode expects array<string>, list<m  
+         ixed> given.                                                           
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------- 
+  Line   app/Services/DataMigrationService.php                            
+ ------ ----------------------------------------------------------------- 
+  177    Cannot access offset 'career_run' on mixed.                      
+         🪪  offsetAccess.nonOffsetAccessible                             
+  177    Cannot access offset 'stat_speed' on mixed.                      
+         🪪  offsetAccess.nonOffsetAccessible                             
+  177    Cannot access offset 'trainee_name' on mixed.                    
+         🪪  offsetAccess.nonOffsetAccessible                             
+  182    Cannot access offset 'name' on mixed.                            
+         🪪  offsetAccess.nonOffsetAccessible                             
+  182    Cannot access offset 'scenario_type' on mixed.                   
+         🪪  offsetAccess.nonOffsetAccessible                             
+  182    Cannot access offset 'speed' on mixed.                           
+         🪪  offsetAccess.nonOffsetAccessible                             
+  194    Parameter #1 $array of function array_keys expects array, mixed  
+         given.                                                           
+         🪪  argument.type                                                
+  205    Parameter #1 $array of function array_keys expects array, mixed  
+         given.                                                           
+         🪪  argument.type                                                
+  1444   Cannot cast mixed to string.                                     
+         🪪  cast.string                                                  
+  1445   Cannot cast mixed to int.                                        
+         🪪  cast.int                                                     
+  1454   Binary operation "+" between mixed and 1 results in an error.    
+         🪪  binaryOp.invalid                                             
+  1457   Cannot access an offset on mixed.                                
+         🪪  offsetAccess.nonOffsetAccessible                             
+ ------ ----------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/DeckManagementService.php                                 
+ ------ ----------------------------------------------------------------------- 
+  464    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed> given.                                                          
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/ExternalAPI/ConflictDetectionService.php                  
+ ------ ----------------------------------------------------------------------- 
+  996    Method App\Services\ExternalAPI\ConflictDetectionService::indexById()  
+         should return array<int|string, array<string, mixed>> but returns arr  
+         ay<int|string, array<mixed, mixed>>.                                   
+         🪪  return.type                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------- 
+  Line   app/Services/ExternalAPI/DataQualityScoringService.php               
+ ------ --------------------------------------------------------------------- 
+  704    Parameter #1 $array of function array_count_values expects an array  
+         of values castable to string, list<mixed> given.                     
+         🪪  argument.type                                                    
+ ------ --------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/ExternalAPI/DataValidationAgent.php                       
+ ------ ----------------------------------------------------------------------- 
+  290    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed> given.                                                          
+         🪪  argument.type                                                      
+  494    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed> given.                                                          
+         🪪  argument.type                                                      
+  818    Parameter #1 $array of function array_unique expects an array of       
+         values castable to string, list<mixed> given.                          
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/ExternalAPI/DataValidationService.php                     
+ ------ ----------------------------------------------------------------------- 
+  392    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed, mixed> given.                                                   
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------ 
+  Line   app/Services/MCP/AgentCommunicationService.php  
+ ------ ------------------------------------------------ 
+  268    Cannot access an offset on mixed.               
+         🪪  offsetAccess.nonOffsetAccessible            
+ ------ ------------------------------------------------ 
+
+ ------ ------------------------------------------------ 
+  Line   app/Services/MCP/AgentOrchestrationService.php  
+ ------ ------------------------------------------------ 
+  322    Cannot cast mixed to float.                     
+         🪪  cast.double                                 
+ ------ ------------------------------------------------ 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/MCP/MCPClientService.php                                  
+ ------ ----------------------------------------------------------------------- 
+  239    Method App\Services\MCP\MCPClientService::healthCheck() should return  
+         array<string, array{status: string, message: string, capabilities?:    
+         array<string, mixed>, health?: array<string, mixed>}> but returns arr  
+         ay<string, array{status: 'disabled', message: 'Server is               
+         disabled…'}|array{status: string, message: string, capabilities:       
+         mixed, health: array<string, mixed>}>.                                 
+         🪪  return.type                                                        
+         💡  Offset 'capabilities' (array<string, mixed>) does not accept type   
+         mixed.                                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/Neuron/CareerPlanningService.php                          
+ ------ ----------------------------------------------------------------------- 
+  351    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed, mixed> given.                                                   
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------- 
+  Line   app/Services/Neuron/NeuronAIService.php                        
+ ------ --------------------------------------------------------------- 
+  459    Parameter $expectedPerformance of class                        
+         App\Neuron\Responses\RaceStrategyResponse constructor expects  
+         string|null, mixed given.                                      
+         🪪  argument.type                                              
+ ------ --------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/Neuron/SkillRecommendationService.php                     
+ ------ ----------------------------------------------------------------------- 
+  271    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed, mixed> given.                                                   
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/Simulation/SimulationEngine.php                           
+ ------ ----------------------------------------------------------------------- 
+  27     Parameter #1 $stats of method                                          
+         App\Services\Simulation\SimulationEngine::normalizeStats() expects     
+         array<string, mixed>, mixed given.                                     
+         🪪  argument.type                                                      
+  28     Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  29     Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  30     Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  32     Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  33     Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  35     Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  172    Parameter #1 $stats of method                                          
+         App\Services\Simulation\SimulationEngine::normalizeStats() expects     
+         array<string, mixed>, mixed given.                                     
+         🪪  argument.type                                                      
+  175    Cannot access offset 'guts'|'power'|'speed'|'stamina'|'wit' on mixed.  
+         🪪  offsetAccess.nonOffsetAccessible                                   
+  175    Cannot access offset 'guts'|'power'|'speed'|'stamina'|'wit' on mixed.  
+         🪪  offsetAccess.nonOffsetAccessible                                   
+  175    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  178    Binary operation "-" between mixed and 18 results in an error.         
+         🪪  binaryOp.invalid                                                   
+  178    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  179    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  180    Binary operation "+=" between mixed and int results in an error.       
+         🪪  assignOp.invalid                                                   
+  181    Binary operation "+=" between mixed and int results in an error.       
+         🪪  assignOp.invalid                                                   
+  193    Binary operation "+" between mixed and 30 results in an error.         
+         🪪  binaryOp.invalid                                                   
+  193    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  205    Binary operation "-" between mixed and 12 results in an error.         
+         🪪  binaryOp.invalid                                                   
+  206    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  207    Binary operation "+=" between mixed and int results in an error.       
+         🪪  assignOp.invalid                                                   
+  208    Binary operation "+=" between mixed and int results in an error.       
+         🪪  assignOp.invalid                                                   
+  210    Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  212    Cannot use ++ on mixed.                                                
+         🪪  postInc.type                                                       
+  225    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  226    Binary operation "-" between mixed and int results in an error.        
+         🪪  binaryOp.invalid                                                   
+  230    Cannot access an offset on mixed.                                      
+         🪪  offsetAccess.nonOffsetAccessible                                   
+  230    Cannot cast mixed to string.                                           
+         🪪  cast.string                                                        
+  243    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  244    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  245    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  246    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+  247    Cannot cast mixed to int.                                              
+         🪪  cast.int                                                           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  Line   app/Services/SkillStrategyAnalyzer.php                                
+ ------ ---------------------------------------------------------------------- 
+  49     Cannot cast mixed to string.                                          
+         🪪  cast.string                                                       
+  65     Cannot cast mixed to string.                                          
+         🪪  cast.string                                                       
+  77     Cannot cast mixed to string.                                          
+         🪪  cast.string                                                       
+  89     Cannot cast mixed to string.                                          
+         🪪  cast.string                                                       
+  94     Parameter #1 $callback of function array_map expects                  
+         (callable(mixed): mixed)|null, 'strval' given.                        
+         🪪  argument.type                                                     
+         💡  Type #1 from the union: Type                                      
+         bool|float|GMP|int|resource|string|null of parameter #1 $value of     
+         passed callable needs to be same or wider than parameter type mixed   
+         of accepting callable.                                                
+  210    Parameter #1 $callback of function array_map expects                  
+         (callable(mixed): mixed)|null, 'strval' given.                        
+         🪪  argument.type                                                     
+         💡  Type #1 from the union: Type                                      
+         bool|float|GMP|int|resource|string|null of parameter #1 $value of     
+         passed callable needs to be same or wider than parameter type mixed   
+         of accepting callable.                                                
+  211    Cannot access property $name on mixed.                                
+         🪪  property.nonObject                                                
+  326    Using nullsafe property access "?->running_style" on left side of ??  
+         is unnecessary. Use -> instead.                                       
+         🪪  nullsafe.neverNull                                                
+  336    Using nullsafe property access "?->distance_type" on left side of ??  
+         is unnecessary. Use -> instead.                                       
+         🪪  nullsafe.neverNull                                                
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------- 
+  Line   app/Services/SupportCardDeckService.php                          
+ ------ ----------------------------------------------------------------- 
+  62     Parameter #2 $arrays of function array_diff expects an array of  
+         values castable to string, array<mixed> given.                   
+         🪪  argument.type                                                
+ ------ ----------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------ 
+  Line   app/Services/SupportCardEnrichmentService.php                     
+ ------ ------------------------------------------------------------------ 
+  156    Parameter #1 $array of function array_unique expects an array of  
+         values castable to string, array<mixed> given.                    
+         🪪  argument.type                                                 
+ ------ ------------------------------------------------------------------ 
+
+ ------ ------------------------------------------------------------------ 
+  Line   app/Services/SupportDeckService.php                               
+ ------ ------------------------------------------------------------------ 
+  47     Parameter #1 $array of function array_unique expects an array of  
+         values castable to string, array<mixed> given.                    
+         🪪  argument.type                                                 
+ ------ ------------------------------------------------------------------ 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/SynergyBuildAnalyzerService.php                           
+ ------ ----------------------------------------------------------------------- 
+  140    Parameter #1 $data of static method                                    
+         App\ValueObjects\SynergyReport::fromArray() expects                    
+         array{overall_score: float, tier: string, layers: array<int, array<st  
+         ring, mixed>>, critical_issues?: array<int, string>, computed_at: str  
+         ing}, array<string, mixed>|null given.                                 
+         🪪  argument.type                                                      
+  366    Possibly invalid array key type mixed.                                 
+         🪪  offsetAccess.invalidOffset                                         
+  367    Offset 'final_corner'|'final_straight'|'mid_race'|'opening' on         
+         array{opening: int<0, max>, mid_race: int<0, max>, final_corner:       
+         int<0, max>, final_straight: int<0, max>} in isset() always exists     
+         and is not nullable.                                                   
+         🪪  isset.offset                                                       
+  386    Offset 'synergy_strength' on array{skill: App\Models\Skill,            
+         synergies: Illuminate\Support\Collection<int, App\Models\Skill>, syne  
+         rgy_count: int, synergy_strength: float} on left side of ?? always     
+         exists and is not nullable.                                            
+         🪪  nullCoalesce.offset                                                
+  485    Binary operation "." between non-falsy-string and mixed results in an  
+         error.                                                                 
+         🪪  binaryOp.invalid                                                   
+  550    Match arm comparison between App\Enums\SparkType::White and            
+         App\Enums\SparkType::White is always true.                             
+         🪪  match.alwaysTrue                                                   
+         💡  Remove remaining cases below this one and this error will          
+         disappear too.                                                         
+  602    Parameter #1 $array of function array_unique expects an array of       
+         values castable to string, list<mixed> given.                          
+         🪪  argument.type                                                      
+  607    Parameter #1 $array of function array_intersect expects an array of    
+         values castable to string, array<int<0, max>, mixed> given.            
+         🪪  argument.type                                                      
+  732    Using nullsafe property access "?->running_style" on left side of ??   
+         is unnecessary. Use -> instead.                                        
+         🪪  nullsafe.neverNull                                                 
+  745    Using nullsafe property access "?->distance_type" on left side of ??   
+         is unnecessary. Use -> instead.                                        
+         🪪  nullsafe.neverNull                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Services/TrackblazerService.php                                    
+ ------ ----------------------------------------------------------------------- 
+  17     Method App\Services\TrackblazerService::logRivalEncounter() has        
+         parameter $skillHints with no value type specified in iterable type    
+         array.                                                                 
+         🪪  missingType.iterableValue                                          
+         💡  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  38     Method App\Services\TrackblazerService::getRivalLogs() has no return   
+         type specified.                                                        
+         🪪  missingType.return                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------- 
+  Line   app/Services/TrainingService.php                     
+ ------ ----------------------------------------------------- 
+  248    Using nullsafe property access on non-nullable type  
+         App\Models\Career. Use -> instead.                   
+         🪪  nullsafe.neverNull                               
+ ------ ----------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/ValueObjects/Recommendation.php                                    
+ ------ ----------------------------------------------------------------------- 
+  161    Parameter #2 $array of function implode expects array<string>, array<  
+         mixed, mixed> given.                                                   
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/ValueObjects/SynergyReport.php                                     
+ ------ ----------------------------------------------------------------------- 
+  91     Parameter #1 $data of static method                                    
+         App\ValueObjects\SynergyLayerScore::fromArray() expects array{layer:   
+         string, score: float, weight: float, issues?: array<int, string>, rec  
+         ommendations?: array<int, string>, breakdown?: array<string, mixed>},  
+          array<string, mixed> given.                                           
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ [ERROR] Found 152 errors                                                       
 
