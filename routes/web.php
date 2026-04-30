@@ -20,6 +20,11 @@ Route::prefix('demo')->group(function () {
 // Developer demos page
 Route::get('/dev/demos', fn () => view('dev.demos'))->name('dev.demos');
 
+// Design preview — serves the React prototype SPA
+Route::get('/design', function () {
+    return redirect('/design/index.html');
+})->name('design.preview');
+
 // PWA routes - Service Worker and Offline Page
 Route::get('/sw.js', function () {
     $content = file_get_contents(public_path('sw.js'));
@@ -118,6 +123,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/api/search', [App\Http\Controllers\Api\SearchController::class, 'search'])->name('api.search');
 
+    // Achievements route
+    Route::get('/achievements', fn () => view('achievements.index'))->name('achievements.index');
+
     // AI Dashboard routes
     Route::get('/ai/dashboard', fn () => view('ai.dashboard'))->name('ai.dashboard');
 
@@ -164,6 +172,9 @@ Route::middleware('auth')->group(function () {
 
     // Data Management Hub routes (Task 5.3.5)
     Route::get('/data-management', [App\Http\Controllers\DataManagementController::class, 'index'])->name('data-management.index');
+
+    // Data page — MigrationWizard + overview (Phase 8)
+    Route::get('/data', fn () => view('data.index'))->name('data.index');
 
     // External Data Browser routes
     Route::get('/external-data/browse', fn () => view('external-data.browse'))->name('external-data.browse');
@@ -277,8 +288,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 // Help routes (public)
-Route::get('/help', fn () => response(view('help.index'))
-    ->header('Cache-Control', 'public, max-age=3600, s-maxage=86400')
+Route::get(
+    '/help',
+    fn () => response(view('help.index'))
+        ->header('Cache-Control', 'public, max-age=3600, s-maxage=86400')
 )->name('help.index');
 
 // Feedback routes (placeholders)
