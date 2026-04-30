@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\StorageMode;
 use App\Models\Character;
 use App\Models\ConversationMessage;
+use App\Services\AI\ConversationHistoryService;
 use App\Services\MCP\AgentRoutingService;
 use App\Services\MCP\RealTimeMonitoringService;
 use Illuminate\Http\JsonResponse;
@@ -22,7 +24,8 @@ class AIChatController extends Controller
 {
     public function __construct(
         private readonly AgentRoutingService $routingService,
-        private readonly RealTimeMonitoringService $realTimeMonitoringService
+        private readonly RealTimeMonitoringService $realTimeMonitoringService,
+        private readonly ConversationHistoryService $conversationHistoryService,
     ) {}
 
     /**
@@ -31,16 +34,66 @@ class AIChatController extends Controller
     public function index(Request $request): View
     {
         $character = null;
+        $userId = Auth::id();
 
         // Load character context if provided
         if ($request->has('character_id')) {
             $character = Character::with(['currentCareer', 'aptitudes', 'skills'])
-                ->where('user_id', Auth::id())
+                ->where('user_id', $userId)
                 ->findOrFail($request->integer('character_id'));
+        } elseif ($userId) {
+            // Auto-load the most recently active character
+            $character = Character::with(['currentCareer', 'aptitudes'])
+                ->where('user_id', $userId)
+                ->orderByDesc('updated_at')
+                ->first();
         }
+
+        // Determine storage mode
+        $storageMode = StorageMode::fromRequest($request);
+
+        // Load recent conversation history (last 10 unique conversations)
+        $recentConversations = [];
+        if ($userId) {
+            try {
+                $historyData = $this->conversationHistoryService->getConversations([
+                    'limit' => 10,
+                    'offset' => 0,
+                ]);
+                // Group by conversation_id and get the latest message per conversation
+                $grouped = collect($historyData['conversations'] ?? [])
+                    ->groupBy('conversation_id')
+                    ->map(fn ($msgs) => $msgs->first())
+                    ->values()
+                    ->take(10)
+                    ->toArray();
+                $recentConversations = $grouped;
+            } catch (\Exception $e) {
+                Log::warning('Failed to load conversation history for AI chat', ['error' => $e->getMessage()]);
+            }
+        }
+
+        // Get AI provider status
+        $aiStatus = Cache::remember('ai:provider:status', 30, function () {
+            $ollamaEnabled = (bool) config('ai.providers.ollama.enabled', true);
+            $bedrockEnabled = (bool) config('ai.providers.bedrock.enabled', false);
+            $defaultProvider = (string) config('ai.default_provider', 'ollama');
+
+            return [
+                'primary' => $defaultProvider,
+                'available' => true,
+                'ollama_available' => $ollamaEnabled,
+                'bedrock_available' => $bedrockEnabled,
+                'ollama_model' => (string) config('ai.providers.ollama.model', 'llama3.2'),
+                'bedrock_model' => (string) config('ai.providers.bedrock.model', 'claude-3-5-sonnet'),
+            ];
+        });
 
         return view('ai.chat', [
             'character' => $character,
+            'storageMode' => $storageMode,
+            'recentConversations' => $recentConversations,
+            'aiStatus' => $aiStatus,
         ]);
     }
 

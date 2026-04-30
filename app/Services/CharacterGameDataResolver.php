@@ -221,7 +221,7 @@ class CharacterGameDataResolver
     /**
      * @return array<string, string>
      */
-    private function localImagesByName(): array
+    public function localImagesByName(): array
     {
         if ($this->localImagesByName !== null) {
             return $this->localImagesByName;
@@ -340,10 +340,25 @@ class CharacterGameDataResolver
     private function manualLocalImageOverrides(): array
     {
         $overrides = [];
-        $silenceSuzukaPath = '/images/trainee_images/bb962aabeafaee5cbf7831e4d178ca64.jpg';
 
+        // Silence Suzuka — hash-named file
+        $silenceSuzukaPath = '/images/trainee_images/bb962aabeafaee5cbf7831e4d178ca64.jpg';
         if (File::exists(public_path(ltrim($silenceSuzukaPath, '/')))) {
             $overrides['Silence Suzuka'] = $silenceSuzukaPath;
+        }
+
+        // Characters that only appear in multi-character images — map to the best available file
+        $multiCharOverrides = [
+            'Biwa Hayahide' => '/images/trainee_images/__narita_brian_and_biwa_hayahide_umamusume_drawn_by_hitoto__sample-e1edfe57e7e12f49d5a724698f738783.jpg',
+            'Grass Wonder' => '/images/trainee_images/__special_week_and_grass_wonder_umamusume_drawn_by_murasaki_himuro__c5cd811241a372d775e9ba2e2d09c65f.jpg',
+            'Nakayama Festa' => '/images/trainee_images/__nakayama_festa_and_alex_umamusume_and_2_more_drawn_by_hakuki__c80d09aab832bf5d94c91dfbe030df9f.jpg',
+            'Winning Ticket' => '/images/trainee_images/__maruzensky_and_sakura_chiyono_o_umamusume_drawn_by_rin_yukameiko__0042184bd89f44eb954daa70b0b0b732.jpg',
+        ];
+
+        foreach ($multiCharOverrides as $characterName => $path) {
+            if (File::exists(public_path(ltrim($path, '/')))) {
+                $overrides[$characterName] = $path;
+            }
         }
 
         return $overrides;

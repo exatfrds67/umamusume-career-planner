@@ -17,114 +17,85 @@ class RaceController extends Controller
     ) {}
 
     /**
-     * Display the race catalog and recent race history.
+     * Display the race calendar with filtering and the Livewire race strategy panel.
      */
     public function index(Request $request): \Illuminate\View\View
     {
-        $validSorts = ['date', 'grade', 'distance', 'fans'];
-        $sort = in_array($request->input('sort'), $validSorts, true) ? $request->input('sort') : 'date';
-
-        $gradeOrderSql = "CASE grade WHEN 'G1' THEN 1 WHEN 'G2' THEN 2 WHEN 'G3' THEN 3 WHEN 'OP' THEN 4 WHEN 'Pre-OP' THEN 5 WHEN 'Debut' THEN 6 ELSE 7 END";
-        $seasonOrderSql = "CASE COALESCE(season, '') WHEN 'spring' THEN 1 WHEN 'summer' THEN 2 WHEN 'autumn' THEN 3 WHEN 'winter' THEN 4 ELSE 5 END";
-
-        $catalogQuery = GameRace::query();
-
-        if ($request->filled('grade')) {
-            $catalogQuery->where('grade', '=', $request->input('grade'));
-        }
-
-        if ($request->filled('phase')) {
-            $catalogQuery->where(static function ($q) use ($request): void {
-                $q->where('phase', '=', $request->input('phase'))->orWhere('phase', '=', 'all');
-            });
-        }
-
-        if ($request->filled('surface')) {
-            $catalogQuery->where('surface', '=', $request->input('surface'));
-        }
-
-        if ($request->filled('distance')) {
-            $catalogQuery->where('distance_category', '=', $request->input('distance'));
-        }
-
-        if ($request->filled('season')) {
-            $catalogQuery->where('season', '=', $request->input('season'));
-        }
-
-        if ($request->filled('venue')) {
-            $catalogQuery->where('venue', '=', $request->input('venue'));
-        }
-
-        $minFans = $request->integer('min_fans', 0);
-        if ($minFans > 0) {
-            $catalogQuery->where('fan_requirement', '>=', $minFans);
-        }
-
-        if ($sort === 'grade') {
-            $catalogQuery
-                ->orderByRaw($gradeOrderSql)
-                ->orderByRaw('COALESCE(year_in_scenario, 9999)')
-                ->orderByRaw($seasonOrderSql);
-        } elseif ($sort === 'distance') {
-            $catalogQuery
-                ->orderBy('distance_meters')
-                ->orderByRaw($gradeOrderSql);
-        } elseif ($sort === 'fans') {
-            $catalogQuery
-                ->orderByRaw('(fan_requirement IS NULL OR fan_requirement = 0)')
-                ->orderBy('fan_requirement', 'desc')
-                ->orderByRaw($gradeOrderSql);
-        } else {
-            $catalogQuery
-                ->orderByRaw('COALESCE(year_in_scenario, 9999)')
-                ->orderByRaw($seasonOrderSql)
-                ->orderByRaw($gradeOrderSql);
-        }
-
-        $catalog = $catalogQuery->paginate(50)->withQueryString();
+        $allowedSorts = ['date', 'grade', 'distance', 'fans'];
+        $sort = in_array($request->query('sort', 'date'), $allowedSorts, true)
+            ? $request->query('sort', 'date')
+            : 'date';
 
         $activeFilters = [
-            'grade' => $request->input('grade', ''),
-            'phase' => $request->input('phase', ''),
-            'surface' => $request->input('surface', ''),
-            'distance' => $request->input('distance', ''),
-            'season' => $request->input('season', ''),
-            'venue' => $request->input('venue', ''),
-            'min_fans' => $request->input('min_fans', ''),
+            'grade' => $request->query('grade', ''),
+            'season' => $request->query('season', ''),
+            'surface' => $request->query('surface', ''),
+            'distance' => $request->query('distance', ''),
+            'venue' => $request->query('venue', ''),
+            'min_fans' => $request->query('min_fans', ''),
             'sort' => $sort,
         ];
 
-        $recentResults = Race::query()
-            ->with('character')
-            ->when(auth()->check(), static fn ($q) => $q->whereHas('character', static fn ($cq) => $cq->whereHas('careers', static fn ($cr) => $cr->where('user_id', auth()->id()))))
-            ->latest()
-            ->limit(10)
-            ->get();
+        $query = GameRace::query();
 
-        $availableVenues = GameRace::query()
-            ->whereNotNull('venue')
-            ->distinct()
-            ->orderBy('venue')
-            ->pluck('venue');
+        if ($activeFilters['grade'] !== '') {
+            $query->where('grade', $activeFilters['grade']);
+        }
+        if ($activeFilters['season'] !== '') {
+            $query->where('season', $activeFilters['season']);
+        }
+        if ($activeFilters['surface'] !== '') {
+            $query->where('surface', $activeFilters['surface']);
+        }
+        if ($activeFilters['distance'] !== '') {
+            $query->where('distance_category', $activeFilters['distance']);
+        }
+        if ($activeFilters['venue'] !== '') {
+            $query->where('venue', $activeFilters['venue']);
+        }
+        if ($activeFilters['min_fans'] !== '' && is_numeric($activeFilters['min_fans'])) {
+            $query->where('fan_requirement', '>=', (int) $activeFilters['min_fans']);
+        }
 
-        return view('races.index', [
-            'catalog' => $catalog,
-            'recentResults' => $recentResults,
-            'activeFilters' => $activeFilters,
-            'grades' => ['G1', 'G2', 'G3', 'OP', 'Pre-OP', 'Debut'],
-            'phases' => ['junior', 'classic', 'senior'],
-            'surfaces' => ['turf', 'dirt'],
-            'distances' => ['sprint', 'mile', 'medium', 'long', 'super_long'],
-            'availableSeasons' => ['spring', 'summer', 'autumn', 'winter'],
-            'availableVenues' => $availableVenues,
-            'fanThresholds' => [100, 200, 500, 1000],
-            'sortOptions' => [
-                'date' => 'Date (Default)',
-                'grade' => 'Grade',
-                'distance' => 'Distance',
-                'fans' => 'Fan Requirement',
-            ],
-        ]);
+        $query = match ($sort) {
+            'grade' => $query->orderByRaw("CASE grade WHEN 'G1' THEN 1 WHEN 'G2' THEN 2 WHEN 'G3' THEN 3 WHEN 'OP' THEN 4 WHEN 'Pre-OP' THEN 5 WHEN 'Debut' THEN 6 ELSE 7 END"),
+            'distance' => $query->orderBy('distance_meters'),
+            'fans' => $query->orderByDesc('fans_reward'),
+            default => $query->orderBy('year_in_scenario')->orderBy('month_label'),
+        };
+
+        $catalog = $query->paginate(100)->withQueryString();
+
+        $grades = GameRace::query()->distinct()->orderBy('grade')->pluck('grade');
+        $availableSeasons = GameRace::query()->distinct()->whereNotNull('season')->orderBy('season')->pluck('season');
+        $availableVenues = GameRace::query()->distinct()->whereNotNull('venue')->orderBy('venue')->pluck('venue');
+        $fanThresholds = [500, 1000, 2000, 5000, 10000];
+        $sortOptions = [
+            'date' => 'Date (Default)',
+            'grade' => 'Grade',
+            'distance' => 'Distance',
+            'fans' => 'Fan Reward',
+        ];
+
+        $recentResults = collect();
+        if (auth()->check()) {
+            $recentResults = Race::query()
+                ->whereHas('character', fn ($q) => $q->where('user_id', auth()->id()))
+                ->orderByDesc('created_at')
+                ->limit(10)
+                ->get();
+        }
+
+        return view('races.index', compact(
+            'catalog',
+            'activeFilters',
+            'grades',
+            'availableSeasons',
+            'availableVenues',
+            'fanThresholds',
+            'sortOptions',
+            'recentResults'
+        ));
     }
 
     /**

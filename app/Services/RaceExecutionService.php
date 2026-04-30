@@ -211,4 +211,146 @@ class RaceExecutionService
         $character->available_sp = (int) $character->available_sp + $spReward;
         $character->save();
     }
+
+    /**
+     * Get all upcoming races for a character.
+     *
+     * @return array<array<string, mixed>>
+     */
+    public function getUpcomingRaces(Character $character): array
+    {
+        // Get upcoming races based on current phase
+        $races = GameRace::query()
+            ->where(function ($q) use ($character) {
+                $q->where('phase', $character->career_stage ?? 'junior')
+                    ->orWhere('phase', 'all');
+            })
+            ->where('is_ura_finale', false)
+            ->orderBy('year_in_scenario')
+            ->orderBy('month_label')
+            ->limit(20)
+            ->get();
+
+        $upcomingRaces = [];
+        foreach ($races as $race) {
+            // Calculate readiness based on character stats vs race requirements
+            $readiness = 50;
+            $stats = $character->current_stats;
+            $requirements = is_array($race->stat_requirements) ? $race->stat_requirements : [];
+            if (! empty($requirements)) {
+                $metCount = 0;
+                $totalCount = 0;
+                foreach ($requirements as $stat => $required) {
+                    if (is_numeric($required) && $required > 0) {
+                        $totalCount++;
+                        $current = $stats[$stat] ?? 0;
+                        if ($current >= $required) {
+                            $metCount++;
+                        }
+                    }
+                }
+                $readiness = $totalCount > 0 ? (int) round(($metCount / $totalCount) * 100) : 75;
+            } else {
+                $readiness = 75;
+            }
+
+            $upcomingRaces[] = [
+                'id' => $race->id,
+                'name' => $race->name_en,
+                'grade' => $race->grade,
+                'distance' => $race->distance_meters,
+                'distance_category' => $race->distance_category,
+                'surface' => $race->surface,
+                'venue' => $race->venue,
+                'turn' => $race->year_in_scenario,
+                'requirements' => $race->stat_requirements ?? [],
+                'fans_reward' => $race->fans_reward,
+                'sp_reward' => $race->sp_reward,
+                'readiness' => $readiness,
+            ];
+        }
+
+        return $upcomingRaces;
+    }
+
+    /**
+     * Record a race result with a specific placement.
+     *
+     * @return array<string, mixed>|false
+     */
+    public function recordResult(int $characterId, int $raceId, int $placement): array|false
+    {
+        $character = Character::find($characterId);
+        if (! $character) {
+            return false;
+        }
+
+        $gameRace = GameRace::find($raceId);
+        if (! $gameRace) {
+            return false;
+        }
+
+        if ($character->current_turn >= 78) {
+            return false;
+        }
+
+        try {
+            return DB::transaction(function () use ($character, $gameRace, $placement) {
+                $career = $character->currentCareer;
+                if (! $career) {
+                    return false;
+                }
+
+                // Create a simulated result based on placement
+                $result = [
+                    'finish_position' => $placement,
+                    'won_race' => $placement === 1,
+                    'performance_rating' => match (true) {
+                        $placement <= 1 => 'excellent',
+                        $placement <= 3 => 'good',
+                        $placement <= 5 => 'average',
+                        $placement <= 10 => 'below_average',
+                        default => 'poor',
+                    },
+                ];
+
+                // Record the race
+                $race = $this->recordRace($character, $career, $gameRace, $result);
+
+                // Apply rewards based on placement
+                $this->applyRaceRewards($character, $gameRace, $result);
+
+                // Progress turn
+                $turnResult = $this->stateService->progressTurn($character);
+
+                // Update career
+                $career->current_turn = $turnResult['turn'];
+                $newPhase = $turnResult['stage'];
+                if (\in_array($newPhase, ['junior', 'classic', 'senior'], true)) {
+                    /** @var 'junior'|'classic'|'senior' $newPhase */
+                    $career->current_phase = $newPhase;
+                }
+                $career->save();
+
+                // Check career completion
+                $careerCompleted = $turnResult['turn'] >= 78;
+                if ($careerCompleted) {
+                    $career->status = 'completed';
+                    $career->save();
+                    $character->status = 'completed';
+                    $character->save();
+                }
+
+                return [
+                    'success' => true,
+                    'race' => $race,
+                    'result' => $result,
+                    'turn_result' => $turnResult,
+                    'career_completed' => $careerCompleted,
+                ];
+            });
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }

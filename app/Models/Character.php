@@ -232,6 +232,14 @@ class Character extends Model
     }
 
     /**
+     * @return HasMany<Race, $this>
+     */
+    public function races(): HasMany
+    {
+        return $this->hasMany(Race::class);
+    }
+
+    /**
      * @return HasMany<CharacterSupportCard, $this>
      */
     public function supportCards(): HasMany

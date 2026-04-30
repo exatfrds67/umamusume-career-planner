@@ -33,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Web middleware - prevent aggressive HTML caching
         $middleware->web(append: [
             \App\Http\Middleware\SetCacheHeaders::class,
+            \App\Http\Middleware\SetImageCacheHeaders::class,
             \App\Http\Middleware\PreserveLivewireFlash::class,
         ]);
 

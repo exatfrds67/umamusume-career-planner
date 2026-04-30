@@ -44,9 +44,15 @@ class TrainingController extends Controller
             ];
         }
 
+        $recommended = $this->predictionService->getRecommendedTraining($character);
+        $recommendedFacility = $recommended['recommended_facility'] ?? null;
+        $recommendedReason = $recommended['reason'] ?? null;
+
         return view('training.index', [
             'character' => $character,
             'trainingData' => $trainingData,
+            'recommendedFacility' => $recommendedFacility,
+            'recommendedReason' => $recommendedReason,
         ]);
     }
 
