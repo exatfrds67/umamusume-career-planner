@@ -37,13 +37,14 @@
     $navItems = is_array($items) ? $items : $defaultItems;
 @endphp
 
-<nav {{ $attributes->merge(['class' => 'lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-neutral-200 dark:border-neutral-700 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-md']) }} aria-label="Mobile navigation">
+<nav {{ $attributes->merge(['class' => 'lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-700 bg-gradient-to-t from-slate-950 to-slate-900 backdrop-blur-sm']) }} aria-label="Mobile navigation" data-testid="mobile-bottom-nav">
     <ul class="grid grid-cols-5">
         @foreach ($navItems as $item)
             <li>
                 <a href="{{ route($item['route']) }}"
-                    class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-[11px] font-medium transition-colors {{ $item['active'] ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200' }}"
-                    {!! $item['active'] ? 'aria-current="page"' : '' !!}>
+                    class="flex flex-col items-center justify-center gap-1 px-2 py-3 text-[11px] font-semibold transition-colors {{ $item['active'] ? 'text-pink-400 bg-pink-500/10' : 'text-slate-400 hover:text-slate-200' }}"
+                    :aria-current="{{ $item['active'] ? 'page' : null }}"
+                    data-testid="mobile-nav-{{ strtolower(str_replace(' ', '-', $item['label'])) }}">
                     @switch($item['icon'])
                         @case('trainer')
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -76,7 +77,7 @@
                                     d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
                             </svg>
                     @endswitch
-                    <span>{{ $item['label'] }}</span>
+                    <span class="whitespace-nowrap">{{ $item['label'] }}</span>
                 </a>
             </li>
         @endforeach
