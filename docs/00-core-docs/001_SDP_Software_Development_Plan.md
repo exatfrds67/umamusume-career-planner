@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.0
-**Date**: February 22, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.2 and game-accurate mechanics
 
 ---
 
@@ -42,7 +42,7 @@ optimize skill builds through AI-powered recommendations.
 
 ### 1.2 Current Codebase Metrics
 
-- **Metric**: Registered Routes; **Value**: 571
+- **Metric**: Registered Routes; **Value**: 585
 - **Metric**: Test Cases; **Value**: 3,316+
 - **Metric**: Assertions; **Value**: 11,563+
 - **Metric**: Eloquent Models; **Value**: 40
@@ -550,7 +550,7 @@ Each task is complete when:
 ### 13.1 Revision History
 
 - **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Added
-codebase metrics (571 routes, 3,316+ tests, 40 models, 70+ services); added MCP Integration and
+codebase metrics (585 routes, 3,316+ tests, 40 models, 191 services); added MCP Integration and
 Admin Panel modules; updated Neuron AI service details (5 services)
 - **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated tech
 stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI,

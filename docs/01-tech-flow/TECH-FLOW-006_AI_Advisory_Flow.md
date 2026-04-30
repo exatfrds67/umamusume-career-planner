@@ -1,7 +1,7 @@
 # TECH-FLOW-006: AI Advisory and Chat Orchestration
 
-**Document Version**: 2.3.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Status**: Current provider and config boundaries reviewed; provider examples are illustrative and
 not authoritative runtime values
 
@@ -140,6 +140,15 @@ configuration for operational truth.
 - AI conversations, OCR-derived context, and advisory payloads should document retention,
 authorization, and redaction requirements when expanded further.
 
+### Fallback and Rate-Limit Expectations
+
+- Provider selection and fallback order should remain service-driven through routing and hybrid
+service layers, not hardcoded in controllers.
+- If a provider is unavailable, throttled, or times out, fallback behavior should degrade
+predictably and still return a structured advisory error payload.
+- Chat and advisory endpoints should document and enforce rate-limiting policy at the route or
+middleware layer, especially for streaming and high-frequency advisory calls.
+
 ---
 
 ## 7. Performance and Eager Loading
@@ -158,5 +167,4 @@ authorization, and redaction requirements when expanded further.
 - [FLOW-006](../01-flows/FLOW-006_AI_Advisory_System.md)
 - [SEQ-006](../01-sequences/SEQ-006_AI_Advice_Generation.md)
 - [SEQ-017](../01-sequences/SEQ-017_Storage_Mode_Transition.md)
-- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)

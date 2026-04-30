@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Updated with verified game mechanics from Global English Server
@@ -332,6 +332,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved verified flow mechanics and references. |
 | 2.3.0 | 2026-03-10 | Development Team | Added aptitude column-to-stat footnote (Surface → Power, Distance → Speed, Style → Wit); added factor colour legend (Blue/Red/Green/White). |
 | 2.2.2 | 2026-03-08 | Development Team | Clarified that Local mode initialization generates a UUID before the first browser-side write. |
 | 2.2.1 | 2026-03-08 | Development Team | Added StorageMode-aware setup, auto-save, and goal-persistence notes so Local UUID runs and authenticated Account-mode careers are modeled consistently across the flow. |

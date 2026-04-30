@@ -1,7 +1,7 @@
 # TECH-FLOW-001: Character Management and Career State
 
-**Document Version**: 2.4.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Status**: Current controller and storage boundaries reviewed; character and career
 responsibilities separated explicitly
 
@@ -19,8 +19,7 @@ browser-backed local payloads, and snapshot handling.
 management, and session selection.
 - `StorageMode::LOCAL`: documented architecture path for browser-backed UUID-oriented creation and
 editing flows; where server-side persistence is not implemented, the flow must be described as
-client-managed and conversion-aware through [TECH-FLOW-008](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
+client-managed and conversion-aware through [TECH-FLOW-008](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
 
 ### Current Route Surface
 
@@ -127,8 +126,7 @@ character mutations remain outside this create flow.
 - Local character creation and editing should be treated as browser-backed payload operations using
 UUIDs and `LocalStorageService` conventions.
 - Request resolution should occur through `DetectStorageMode`.
-- Local payload conversion into account-backed records should follow [TECH-FLOW-008](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md) and
+- Local payload conversion into account-backed records should follow [TECH-FLOW-008](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md) and
 [SEQ-017](../01-sequences/SEQ-017_Storage_Mode_Transition.md).
 
 ---
@@ -183,5 +181,4 @@ creation and editing flows must not reject stat inputs above 1200.
 - [SEQ-001](../01-sequences/SEQ-001_Character_Creation_Sequence.md)
 - [SEQ-012](../01-sequences/SEQ-012_Run_Snapshot_and_Restore.md)
 - [SEQ-017](../01-sequences/SEQ-017_Storage_Mode_Transition.md)
-- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)

@@ -1,7 +1,7 @@
 # TECH-FLOW-004: Skill Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.4.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Status**: Directionally aligned; storage-mode, eager-loading, and route-surface guidance added
 
 Historical implementation-task sections below are retained for design history only. Where any task
@@ -9,6 +9,7 @@ list, API endpoint, class name, migration, or code block below conflicts with Se
 current flow and sequence documents, treat the lower section as archived and non-authoritative.
 
 > **Reader note:** Sections below "System Architecture" may contain historical implementation-task examples retained for traceability. Unless a lower section explicitly states that it matches the current route surface and active repository classes, prefer Sections 1-2 and the linked storage-aware flow and sequence documents.
+> **Archive boundary:** Sections 3-10 are retained as historical implementation context. If any content there conflicts with Sections 1-2, treat Sections 1-2 as authoritative.
 
 **Source Specifications**:
 
@@ -101,6 +102,9 @@ flowchart TB
 
 - Current web entry is `/skills` via `SkillController`.
 - Current API-style skill operations live under the `/api/skills/*` route group.
+- Internal autocomplete routes may also exist under web middleware (for example,
+`/internal/skills/search`) and should be treated as implementation details, not public API
+contracts.
 - If an endpoint example in this document is illustrative rather than verified as a current route
 contract, it should be treated as non-authoritative.
 - Lower implementation-task examples in this document predate part of the current route surface and
@@ -314,8 +318,7 @@ local-mode persistence path is explicitly introduced.
 - If advisory or pricing guidance is available while offline, it should be treated as planning-only;
 account-backed acquisition still requires authenticated persistence.
 - When local skill plans are converted to account-backed records, they should follow the storage
-transition guidance in [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
+transition guidance in [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
 
 ---
 
@@ -323,8 +326,7 @@ FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
 
 - [TECH-FLOW-001_Character_Management_Flow.md](TECH-FLOW-001_Character_Management_Flow.md)
 - [TECH-FLOW-002_Training_Optimization_Flow.md](TECH-FLOW-002_Training_Optimization_Flow.md)
-- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
 - [SEQ-003](../01-sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
 
 ---

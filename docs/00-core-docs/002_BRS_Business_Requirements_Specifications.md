@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.1
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.4.0 and Global English server gameplay scope
+**Status**: Current - Aligned with codebase v2.4.2 and Global English server gameplay scope
 
 ---
 
@@ -528,7 +528,7 @@ flowchart TD
 - **Metric**: First Contentful Paint; **Target**: < 1.5 seconds; **Measurement Method**: Lighthouse
 - **Metric**: Accessibility score; **Target**: 100% AA; **Measurement Method**: axe-core
 - **Metric**: Error rate; **Target**: < 1%; **Measurement Method**: Error logging
-- **Metric**: AI response time; **Target**: < 3 seconds; **Measurement Method**: APM monitoring
+- **Metric**: AI response time; **Target**: < 2.5 seconds; **Measurement Method**: APM monitoring
 - **Metric**: API fallback success rate; **Target**: > 95%; **Measurement Method**: Circuit breaker metrics
 
 ### 7.3 Data Quality Metrics
@@ -635,4 +635,4 @@ integration; aligned with v2.0 architecture
 
 ---
 
-### This BRS describes the current business scope as implemented in version 2.4.0
+### This BRS describes the current business scope as implemented in version 2.4.2

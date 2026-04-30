@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.1
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.4.0 and Global English server gameplay scope
+**Status**: Current - Aligned with codebase v2.4.2 and Global English server gameplay scope
 
 ---
 
@@ -1333,5 +1333,5 @@ diagrams, expanded content
 
 ---
 
-### This manual reflects the current implementation of Umamusume Career Planner v2.4.0. For the
+### This manual reflects the current implementation of Umamusume Career Planner v2.4.2. For the
 latest updates, please refer to the online documentation

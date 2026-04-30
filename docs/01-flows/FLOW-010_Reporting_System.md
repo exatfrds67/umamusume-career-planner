@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.1.0
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Repository aligned with `CareerReportController` and `CareerReportingService`
@@ -185,6 +185,7 @@ administrators or users to refresh stale summaries after major updates.
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved verified reporting flow behavior. |
 | 1.1.0 | 2026-03-10 | Development Team | Added section description to Reports Index Flow; added PDF export status note clarifying browser print-to-PDF approach vs server-side generation. |
 | 1.0.0 | 2026-03-08 | Development Team | Initial repository-aligned reporting flow covering index, summary generation, character reports, exports, comparison, and cache invalidation. |
 

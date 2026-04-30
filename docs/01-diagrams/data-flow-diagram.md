@@ -1,8 +1,8 @@
-# Umamusume Career Planner - Data Flow Diagram
+# Umamusume Pretty Derby Career Planner - Data Flow Diagram
 
-**Document Version**: 2.4.1
-**Date**: March 10, 2026
-**Project**: UmamusumeCareerPlanner
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
+**Project**: Umamusume Pretty Derby Career Planner
 **Author**: Development Team
 **Status**: Current - repository-aligned diagrams using implemented routes, services, and storage patterns
 

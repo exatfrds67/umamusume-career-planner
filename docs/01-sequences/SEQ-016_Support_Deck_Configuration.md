@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [TECH-FLOW-005], [SEQ-005]
 
 ---
@@ -61,6 +61,7 @@ not the primary persistence path exercised by the current builder UI.
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant Page as SupportCardController
     participant View as Deck Builder View
@@ -90,6 +91,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant API as SupportDeckController
     participant Slots as DeckManagementController
@@ -148,3 +150,39 @@ available active cards, and optional analysis helpers.
 - [FLOW-005](../01-flows/FLOW-005_Support_Card_Management_System.md)
 - [SEQ-005](SEQ-005_Support_Card_Upgrade.md)
 - [SEQ-017](SEQ-017_Storage_Mode_Transition.md)
+---
+
+## Document Control
+
+### Version History
+
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Standardized version and formatting across sequence documentation suite |
+| 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation baseline |
+| 1.0.0 | 2026-01-14 | Development Team | Initial draft |
+
+### Approval
+
+| Role | Name | Signature | Date |
+| --- | --- | --- | --- |
+| Technical Lead | | | |
+| QA Lead | | | |
+
+### Review Schedule
+
+- Next Review: 2026-07-07
+- Review Frequency: Quarterly or on major feature changes
+
+---
+
+**Related Standards:**
+
+- Laravel 12 Best Practices
+- PSR-12 Coding Standards
+- Mermaid Diagram Standards
+- KRISA Documentation Format
+
+---
+
+*This sequence diagram reflects the current implementation as of v2.4.2. For the most up-to-date information, refer to the source code and related documentation.*

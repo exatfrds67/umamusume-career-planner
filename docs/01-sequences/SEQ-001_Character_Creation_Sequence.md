@@ -2,9 +2,9 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: March 8, 2026
-**Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [FLOW-009], [TECH-FLOW-001]
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
+**Related Documents**: [PRD-001](../02-prds/PRD-001_Character_Management.md), [SPEC-001](../02-specs/SPEC-001_Character_Management_Technical.md), [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md), [FLOW-009](../01-flows/FLOW-009_Storage_Migration_System.md), [TECH-FLOW-001](../01-tech-flows/TECH-FLOW-001_Character_Management_Technical.md)
 
 ---
 
@@ -64,6 +64,7 @@ from `StorageMode::ACCOUNT`, where `CharacterController::store()` creates databa
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant View as Create View
     participant Mode as DetectStorageMode
@@ -197,3 +198,41 @@ current `CharacterController::store()` path.
 - [FLOW-009](../01-flows/FLOW-009_Storage_Migration_System.md)
 - [SEQ-016](SEQ-016_Support_Deck_Configuration.md)
 - [SEQ-017](SEQ-017_Storage_Mode_Transition.md)
+
+---
+
+## Document Control
+
+### Version History
+
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Standardized version and formatting across sequence documentation suite |
+| 2.3.0 | 2026-03-08 | Development Team | Updated storage-aware creation flow, local mode boundaries |
+| 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation |
+| 1.0.0 | 2026-01-14 | Development Team | Initial draft |
+
+### Approval
+
+| Role | Name | Signature | Date |
+| --- | --- | --- | --- |
+| Technical Lead | | | |
+| QA Lead | | | |
+
+### Review Schedule
+
+- Next Review: 2026-07-07
+- Review Frequency: Quarterly or on major feature changes
+
+---
+
+**Related Standards:**
+
+- Laravel 12 Best Practices
+- PSR-12 Coding Standards
+- Mermaid Diagram Standards
+- KRISA Documentation Format
+
+---
+
+*This sequence diagram reflects the current implementation of the character creation workflow as of v2.4.2. For the most up-to-date information, refer to the source code in `app/Http/Controllers/CharacterController.php`, `app/Services/LocalStorageService.php`, and related files.*

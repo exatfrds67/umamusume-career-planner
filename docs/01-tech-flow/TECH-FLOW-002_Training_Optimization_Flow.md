@@ -1,7 +1,7 @@
 # TECH-FLOW-002: Training Optimization and Execution
 
-**Document Version**: 2.4.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Status**: Current controller and service boundaries reviewed; prediction endpoints remain
 character-centric in signature while the documented decision surface stays run-context aware
 
@@ -51,6 +51,20 @@ Prediction endpoints currently accept account-backed `Character` context, but th
 depends on active run state such as turn, phase, energy, mood, deck, and upcoming races.
 Documentation should therefore distinguish current controller signatures from the broader run
 context the feature logically requires.
+
+### Advisory Context Payload Requirements
+
+When advisory callers provide a normalized training context, the minimum field set should include:
+
+- `storage_mode`
+- `turn`
+- `phase`
+- `energy`
+- `mood`
+- active support-deck context
+- upcoming race context
+
+Payload extensions are allowed, but these core fields are the minimum for consistent recommendation output.
 
 ---
 
@@ -162,6 +176,15 @@ should be documented explicitly:
 
 Lazy loading in loops should be treated as prohibited when rendering history, comparisons, or recommendation summaries.
 
+### Cache and Invalidation Expectations
+
+- Prediction and recommendation caches should be treated as short-lived and tied to the current
+character or run context.
+- Cache invalidation should occur whenever a change can affect recommendation quality, including at
+least: training execution, turn progression, mood/energy updates, support-deck mutation, and
+snapshot restore.
+- Cache behavior belongs in services; controllers should remain orchestration-focused.
+
 ---
 
 ## 7. Validation and Stat Semantics
@@ -180,6 +203,8 @@ training resolution sequence.
 - Hint acquisition is a 5-level system (10%/20%/30%/35%/40% cumulative discount). Hints are gained
 during training via support card Hint Lv Up events and the temporary Fast Learner condition. The
 hint discount for a skill is consumed when the skill is purchased and cannot be reused.
+- Wit should be documented as affecting both skill activation and race stability behavior
+(including kakari avoidance), not as a skill-activation-only stat.
 
 ---
 
@@ -188,5 +213,4 @@ hint discount for a skill is consumed when the skill is purchased and cannot be 
 - [SEQ-002](../01-sequences/SEQ-002_Training_Block_Resolution.md)
 - [SEQ-017](../01-sequences/SEQ-017_Storage_Mode_Transition.md)
 - [TECH-FLOW-006_AI_Advisory_Flow.md](TECH-FLOW-006_AI_Advisory_Flow.md)
-- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)

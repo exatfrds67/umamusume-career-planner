@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Related Documents**: [PRD-003], [SPEC-003], [FLOW-003], [FLOW-008], [TECH-FLOW-003]
 
 ---
@@ -59,6 +59,7 @@ entry service for account-mode race execution.
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant View as Race Views
     participant Advisory as AdvisoryController
@@ -174,3 +175,39 @@ and analysis support.
 - [FLOW-003](../01-flows/FLOW-003_Race_Strategy_System.md)
 - [FLOW-008](../01-flows/FLOW-008_Race_Entry_and_Result_System.md)
 - [SEQ-017](SEQ-017_Storage_Mode_Transition.md)
+---
+
+## Document Control
+
+### Version History
+
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Standardized version and formatting across sequence documentation suite |
+| 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation baseline |
+| 1.0.0 | 2026-01-14 | Development Team | Initial draft |
+
+### Approval
+
+| Role | Name | Signature | Date |
+| --- | --- | --- | --- |
+| Technical Lead | | | |
+| QA Lead | | | |
+
+### Review Schedule
+
+- Next Review: 2026-07-07
+- Review Frequency: Quarterly or on major feature changes
+
+---
+
+**Related Standards:**
+
+- Laravel 12 Best Practices
+- PSR-12 Coding Standards
+- Mermaid Diagram Standards
+- KRISA Documentation Format
+
+---
+
+*This sequence diagram reflects the current implementation as of v2.4.2. For the most up-to-date information, refer to the source code and related documentation.*

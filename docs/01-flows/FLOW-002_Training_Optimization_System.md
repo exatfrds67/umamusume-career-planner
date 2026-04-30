@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Updated with verified game mechanics from Global English Server
@@ -307,6 +307,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved verified flow mechanics and references. |
 | 2.3.0 | 2026-03-10 | Development Team | Corrected MoodModifier values to game-accurate ±4%/±2% range and renamed from MoodMultiplier; simplified formula by removing redundant MoodEffect term; clarified TrainingEffect with scenario examples. |
 | 2.2.1 | 2026-03-08 | Development Team | Added StorageMode-aware context loading and training execution branches so Local UUID runs and Account-mode DB writes are modeled separately. |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Added complete training formula, stat cap rules (1200 base, +100/+50 per-training caps, half value above 1200), hint levels max at 5, added hint discount table, added Summer Training Camp flow (4 turns, all facilities Level 5) |

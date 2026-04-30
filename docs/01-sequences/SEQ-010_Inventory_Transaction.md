@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001]
 
 ---
@@ -81,7 +81,7 @@ Inventory management is critical for:
 
 ### 2.2 Component Locations
 
-```text
+```
 
 app/
 ├── Livewire/
@@ -110,6 +110,7 @@ app/
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant UI as Livewire Component
     participant Controller as InventoryController
@@ -172,7 +173,7 @@ sequenceDiagram
             UI-->>User: Display success message
         end
     end
-```text
+```
 
 ### 3.2 Timeline Breakdown
 
@@ -211,7 +212,7 @@ sequenceDiagram
 
 ```
 User → Livewire Component → InventoryController → InventoryService
-```text
+```
 
 **Service Implementation:**
 
@@ -443,7 +444,7 @@ class TransactionValidator
         ];
     }
 }
-```text
+```
 
 ### 4.4 Audit Logging
 
@@ -489,7 +490,7 @@ class AuditLogger
   "user_agent": "Mozilla/5.0...",
   "created_at": "2026-01-24T10:30:00Z"
 }
-```text
+```
 
 ---
 
@@ -527,7 +528,7 @@ class AuditLogger
   "items": [],
   "amount": -120
 }
-```text
+```
 
 ### 5.3 Transaction Response
 
@@ -566,7 +567,7 @@ class AuditLogger
   "items": ["support_card_duplicate_mejiro_dober"],
   "amount": -1
 }
-```text
+```
 
 ---
 
@@ -588,6 +589,7 @@ class AuditLogger
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant User
     participant UI as Livewire Component
     participant Service as InventoryService
@@ -657,7 +659,7 @@ sequenceDiagram
 $inventory = Inventory::where('career_id', $careerId)
     ->lockForUpdate()
     ->firstOrFail();
-```text
+```
 
 ### 7.3 Database Query Analysis
 
@@ -703,7 +705,7 @@ DB::transaction(function () use ($career) {
         ->lockForUpdate()
         ->first();
 });
-```text
+```
 
 ---
 

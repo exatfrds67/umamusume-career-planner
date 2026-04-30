@@ -1,10 +1,8 @@
-# User Workflow Diagrams
+# Umamusume Pretty Derby Career Planner - User Workflow Diagrams
 
-## Umamusume Pretty Derby Career Planner
-
-**Document Version**: 2.4.1
-**Date**: March 10, 2026
-**Project**: UmamusumeCareerPlanner
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
+**Project**: Umamusume Pretty Derby Career Planner
 **Author**: Development Team
 **Status**: Current - user-facing workflows aligned to current routes, storage modes, and authorization boundaries
 

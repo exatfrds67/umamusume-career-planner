@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Updated with verified game mechanics from Global English Server
@@ -331,6 +331,7 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodModifier) × (1 +
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved verified flow mechanics and references. |
 | 2.3.0 | 2026-03-10 | Development Team | Updated cost-tracking diagram to use config-aligned model IDs (claude-3-5-sonnet, claude-3-5-haiku, claude-opus-4-5); converted track condition table to percentage approximations; simplified training formula; added Ollama free-cost note. |
 | 2.2.1 | 2026-03-08 | Development Team | Added StorageMode-aware advisory context persistence, corrected the current Alpine chat UI naming, and updated provider labels to current configured defaults. |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: AI recommendations now use correct hint discount rates (10%/20%/30%/35%/40%), aptitude calculations use S as max grade, training formula integration, track condition modifiers (Firm/Good/Soft/Heavy) |

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.1
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.4.0 and Global English server gameplay scope
+**Status**: Current - Aligned to codebase v2.4.2 and Global English server gameplay scope
 
 ---
 
@@ -1082,7 +1082,7 @@ flowchart LR
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
 | 2.4.1 | 2026-03-10 | Development Team | Clarified the conceptual AptitudeGrade design to reflect the Global English server scale of S through G only |
-| 2.4.0 | 2026-02-22 | Development Team | Updated directory structure to match codebase (166 services, 40 models, 67 migrations, 585 routes); corrected Livewire to single AdvisoryPanel component; expanded service architecture with Neuron (5), MCP (42), Training (3), Admin (3) breakdowns; updated admin controllers to actual 5 (Database, Log, Queue, SystemSettings, User); added Neuron agent inventory; updated tech stack with test metrics (3,316+ tests) |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata while preserving repository-aligned design references and service architecture breakdowns |
 | 2.3.0 | 2026-02-21 | Development Team | Prior version aligned to v2.3.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current implementation including AI, MCP, OCR, and data management systems |
 | 2.0.0 | 2026-01-14 | Development Team | Prior comprehensive revision |

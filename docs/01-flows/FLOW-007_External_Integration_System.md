@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Updated with verified game mechanics from Global English Server
@@ -247,6 +247,7 @@ stateDiagram-v2
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved verified flow mechanics and references. |
 | 2.3.0 | 2026-03-10 | Development Team | Added explicit ShowResults node in OCR diagram to surface the review page step; added cache tags note to Cache Management section; added JSON response note for sync status endpoint. |
 | 2.2.3 | 2026-03-08 | Development Team | Clarified the polling-friendly sync refresh path to reference the current `/api/sync/status` endpoint. |
 | 2.2.2 | 2026-03-08 | Development Team | Clarified that OCR review currently occurs on the dedicated results page rendered by `OCRUploadController::showResults()`. |

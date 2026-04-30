@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.1.0
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Repository aligned with LocalStorageService and migration interfaces
@@ -175,6 +175,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved verified storage migration flow behavior. |
 | 1.1.0 | 2026-03-10 | Development Team | Clarified duplicate detection criteria (name + scenario type + existing local_uuid check); added /local-data UI path reference to Section 2. |
 | 1.0.0 | 2026-03-08 | Development Team | Initial repository-aligned storage migration flow covering LocalStorageService conversion, duplicate detection, transaction boundaries, and the separate legacy batch migration path. |
 

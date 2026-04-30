@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [FLOW-009]
 
 ---
@@ -56,6 +56,7 @@ narrative is not implemented in this service.
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant UI as Snapshot UI
     participant Service as SnapshotService
@@ -142,3 +143,39 @@ value.
 - [FLOW-001](../01-flows/FLOW-001_Character_Management_System.md)
 - [FLOW-009](../01-flows/FLOW-009_Storage_Migration_System.md)
 - [SEQ-017](SEQ-017_Storage_Mode_Transition.md)
+---
+
+## Document Control
+
+### Version History
+
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Standardized version and formatting across sequence documentation suite |
+| 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation baseline |
+| 1.0.0 | 2026-01-14 | Development Team | Initial draft |
+
+### Approval
+
+| Role | Name | Signature | Date |
+| --- | --- | --- | --- |
+| Technical Lead | | | |
+| QA Lead | | | |
+
+### Review Schedule
+
+- Next Review: 2026-07-07
+- Review Frequency: Quarterly or on major feature changes
+
+---
+
+**Related Standards:**
+
+- Laravel 12 Best Practices
+- PSR-12 Coding Standards
+- Mermaid Diagram Standards
+- KRISA Documentation Format
+
+---
+
+*This sequence diagram reflects the current implementation as of v2.4.2. For the most up-to-date information, refer to the source code and related documentation.*

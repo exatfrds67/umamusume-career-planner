@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.1
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.4.0 with Global English server gameplay scope
+**Status**: Current - Aligned to codebase v2.4.2 with Global English server gameplay scope
 
 ---
 
@@ -144,7 +144,7 @@ prediction_type, predicted_value, actual_value, accuracy
 - **Table**: `ucp_run_snapshots`; **Purpose**: Career run snapshots; **Key Columns**: career_id,
 turn_number, snapshot_data, created_at
 
-### 2.2 Models (30 Total)
+### 2.2 Models (30 Core Domain Models of 40 Total)
 
 The following Eloquent models map to the domain tables:
 

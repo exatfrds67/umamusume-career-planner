@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Updated with verified game mechanics from Global English Server
@@ -334,6 +334,7 @@ Support cards now track external data sources:
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved verified flow mechanics and references. |
 | 2.3.0 | 2026-03-10 | Development Team | Added borrowed-card limit-break note; clarified Charming as temporary condition; added approximation disclaimer to SSR friendship bonus table. |
 | 2.2.2 | 2026-03-08 | Development Team | Added StorageMode-aware deck persistence guidance so Local run composition and Account-mode collection records are documented separately. |
 | 2.2.1 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Bond gain corrected (+7 base, +9 with Charming condition), friendship threshold confirmed at 80%, friendship bonus table by card rarity (10-35%), skill hint mechanics alignment |

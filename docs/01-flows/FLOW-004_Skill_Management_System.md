@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Updated with verified game mechanics from Global English Server
@@ -276,6 +276,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved verified flow mechanics and references. |
 | 2.3.0 | 2026-03-10 | Development Team | Clarified Fast Learner as a temporary condition granted by support card events, not a permanent stat. |
 | 2.2.1 | 2026-03-08 | Development Team | Added StorageMode-aware skill-acquisition and hint-persistence branches so Local runs are no longer documented as DB-only flows. |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Hint levels now 0-5 (max), discount percentages corrected (10%/20%/30%/35%/40%), added additional hint sources (Fast Learner condition +10%, Skill Sparks, Hint Books), inheritance hint levels updated |

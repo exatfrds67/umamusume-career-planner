@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Updated with verified game mechanics from Global English Server
@@ -306,6 +306,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved verified flow mechanics and references. |
 | 2.3.0 | 2026-03-10 | Development Team | Inserted missing Section 5 (Race Schedule Confirmation Flow); converted track condition table from raw stat values to percentage approximations with community-data note; added aptitude column-to-stat footnote in Section 6.3. |
 | 2.2.2 | 2026-03-08 | Development Team | Synchronized the race-entry branch with FLOW-008 by documenting the UUID-oriented Local path and the concrete account-mode POST entry route. |
 | 2.2.1 | 2026-03-08 | Development Team | Added StorageMode-aware race entry, result, and schedule persistence branches plus explicit authorization context for Account-mode updates. |

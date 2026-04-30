@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -96,7 +96,7 @@ Telemetry enables:
 
 ### 2.2 Component Locations
 
-```text
+```
 app/
 ├── Services/
 │   ├── Telemetry/
@@ -130,6 +130,7 @@ app/
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant Frontend as Alpine.js
     participant Controller
@@ -188,7 +189,7 @@ sequenceDiagram
     Controller->>Audit: Log security event
     Audit->>DB: INSERT INTO audit_log
     Audit->>APM: Update security metrics
-```text
+```
 
 ### 3.2 Timeline Breakdown
 
@@ -215,7 +216,7 @@ sequenceDiagram
 
 ```
 User Action → Alpine.js Event Listener → Event Buffer → Batch API
-```text
+```
 
 **Frontend Implementation:**
 
@@ -320,7 +321,7 @@ class TelemetryService
         ProcessTelemetryBatch::dispatch($validated->toArray());
     }
 }
-```text
+```
 
 **Event Validator:**
 
@@ -424,7 +425,7 @@ class ProcessTelemetryBatch implements ShouldQueue
         ]);
     }
 }
-```text
+```
 
 ### 4.4 AI Cost Tracking
 
@@ -552,7 +553,7 @@ class MCPMonitoringService
             ->toArray();
     }
 }
-```text
+```
 
 ### 4.6 Security Audit Logging
 
@@ -659,7 +660,7 @@ class GameEventTracker
         return $hasExclamation ? $base + 5 : $base;
     }
 }
-```text
+```
 
 ### 5.2 Race Events (Game-Accurate)
 
@@ -812,7 +813,7 @@ class GameEventTracker
         ProcessGameEventBatch::dispatch([$event]);
     }
 }
-```text
+```
 
 ### 5.4 Career Milestone Events (Game-Accurate)
 
@@ -976,6 +977,7 @@ class GameEventTracker
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant UI as Livewire Component
     participant GameTracker as GameEventTracker
@@ -1029,7 +1031,7 @@ sequenceDiagram
     Worker->>DB: INSERT INTO game_events
     Worker->>DB: UPDATE career_analytics
     Worker-->>Queue: Acknowledged
-```text
+```
 
 ---
 
@@ -1083,7 +1085,7 @@ sequenceDiagram
   "career_id": 157,
   "created_at": "2026-01-28T10:30:00Z"
 }
-```text
+```
 
 **Race Event:**
 
@@ -1132,7 +1134,7 @@ sequenceDiagram
   "career_id": 157,
   "created_at": "2026-01-28T11:30:00Z"
 }
-```text
+```
 
 **Career Milestone Event:**
 
@@ -1168,7 +1170,7 @@ sequenceDiagram
   "context_id": 157,
   "created_at": "2026-01-28T10:30:00Z"
 }
-```text
+```
 
 ### 6.4 MCP Tool Usage
 
@@ -1202,7 +1204,7 @@ sequenceDiagram
   "user_agent": "Mozilla/5.0...",
   "created_at": "2026-01-28T10:30:00Z"
 }
-```text
+```
 
 ---
 
@@ -1227,6 +1229,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Frontend
     participant Controller
     participant Queue
@@ -1300,7 +1303,7 @@ TelemetryEvent::insert($records->toArray());
 // foreach ($records as $record) {
 //     TelemetryEvent::create($record);
 // }
-```text
+```
 
 ### 8.3 Data Retention
 

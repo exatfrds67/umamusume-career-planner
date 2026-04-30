@@ -1,12 +1,15 @@
 # TECH-FLOW-007: External Integration - Technical Flow & Task Breakdown
 
-**Document Version**: 2.4.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Status**: Mostly usable; storage-mode, eager-loading, and OCR validation wording tightened
 
 Historical implementation tasks and code blocks later in this document should be read as archived
 design snapshots unless they match the current route surface and active repository classes described
 in Sections 1 and 2.
+
+Sections 3-10 are retained for historical implementation traceability. If any item there conflicts
+with Sections 1-2 or current flow/sequence documents, treat Sections 1-2 as authoritative.
 
 **Source Specifications**:
 
@@ -123,6 +126,9 @@ flowchart TB
 - Account-backed import paths currently route through controllers such as `ImportController`,
 `MigrationController`, `OCRUploadController`, and `Api\CareerExportController` depending on the data
 source.
+- Related user-facing routes include `/ocr/upload`, `/import`, `/export`, and `/backup`; API and job
+entry points should be validated against the active route surface before being treated as contract
+documentation.
 - Public route and controller examples in this document should be treated as authoritative only when
 they map to the registered Laravel route surface.
 - Lower implementation-task examples in this document predate parts of the current OCR and import
@@ -413,15 +419,13 @@ Lazy loading in loops should be treated as prohibited for report and planner ren
 active local session context.
 - Stored artifacts should be retained only as long as operationally necessary.
 - When imported data crosses from local-mode planning into account-backed records, the conversion
-boundary should follow [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
+boundary should follow [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
 
 ---
 
 ## 2.6 Related Documents
 
-- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
 - [TECH-FLOW-010_Career_Reporting_Flow.md](TECH-FLOW-010_Career_Reporting_Flow.md)
 - [SEQ-007](../01-sequences/SEQ-007_External_Data_Sync.md)
 - [SEQ-015](../01-sequences/SEQ-015_Data_Migration_Snapshot_to_Live.md)

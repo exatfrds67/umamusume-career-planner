@@ -1,7 +1,7 @@
 # TECH-FLOW DOCUMENTS: Quick Reference Index
 
-**Status**: Broadly aligned at the architecture and mid-implementation layers; remaining work is
-mainly template consistency and legacy-example cleanup.
+**Status**: Aligned to April 7 baseline; current-state guidance and storage-mode boundaries reviewed
+across all technical flows.
 
 ## Overview
 
@@ -13,8 +13,8 @@ service names.
 All technical flows should explicitly identify whether they support `StorageMode::LOCAL`,
 `StorageMode::ACCOUNT`, or both.
 
-**Document Version**: 2.3.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Status**: Broadly aligned; template consistency pass in progress
 
@@ -112,6 +112,8 @@ planning, execution, conversion, and reporting without relying on the index alon
 - AI provider endpoints, model identifiers, and pricing are configuration-driven and environment-
 dependent. Documentation examples are illustrative only.
 - Route references should favor the currently registered Laravel route surface over speculative REST endpoints.
+- Historical implementation sections in `TECH-FLOW-004`, `TECH-FLOW-005`, and `TECH-FLOW-007` are
+retained for traceability but must not override current-state guidance in their top sections.
 - When any technical flow is substantially rewritten, update the corresponding status line in this
 index in the same change set.
 

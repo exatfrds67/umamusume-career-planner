@@ -1,7 +1,7 @@
 # TECH-FLOW-005: Support Card Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.4.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Status**: Directionally aligned; active deck-management naming and storage-mode guidance added
 
 Historical implementation-task sections below are retained for design history only. Where any task
@@ -9,6 +9,7 @@ list, API endpoint, class name, migration, or code block below conflicts with Se
 current flow and sequence documents, treat the lower section as archived and non-authoritative.
 
 > **Reader note:** Sections below "System Architecture" may contain historical implementation-task examples retained for traceability. Unless a lower section explicitly states that it matches the current route surface and active repository classes, prefer Sections 1-2 and the linked storage-aware flow and sequence documents.
+> **Archive boundary:** Sections 3-10 are retained as historical implementation context. If any content there conflicts with Sections 1-2, treat Sections 1-2 as authoritative.
 
 **Source Specifications**:
 
@@ -57,6 +58,9 @@ must be described as client-managed and conversion-aware.
 
 Support-card technical flows should state whether a behavior is collection browsing, browser-local
 composition, or account-persistent deck mutation.
+
+Current deck validation should enforce exactly six support cards in the active deck and should
+reject persistence attempts that do not satisfy this constraint.
 
 ### 1.1 Layered Architecture
 
@@ -292,9 +296,7 @@ Lazy loading in loops should be treated as prohibited for deck rendering, recomm
 - Collection browsing can inform both local and account-backed planning.
 - Local mode supports browser-backed deck composition and analysis inside the local run payload.
 - Account mode persists deck mutations through current character-linked services and database-backed deck rows.
-- Local-to-account promotion of deck state should follow [TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
+- Local-to-account promotion of deck state should follow [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
 
 ---
 
@@ -302,8 +304,7 @@ FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
 
 - [TECH-FLOW-001_Character_Management_Flow.md](TECH-FLOW-001_Character_Management_Flow.md)
 - [TECH-FLOW-002_Training_Optimization_Flow.md](TECH-FLOW-002_Training_Optimization_Flow.md)
-- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
 - [SEQ-005](../01-sequences/SEQ-005_Support_Card_Upgrade.md)
 - [SEQ-016](../01-sequences/SEQ-016_Support_Deck_Configuration.md)
 

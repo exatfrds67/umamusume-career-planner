@@ -1,7 +1,7 @@
 # TECH-FLOW-009: Target Race Planning
 
-**Document Version**: 1.1.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Status**: Added to decompose target-race planning from general race strategy and execution
 
 ---
@@ -17,6 +17,9 @@ lookup, and storage-mode-aware persistence expectations for `/races/targets`.
 - `StorageMode::ACCOUNT`: implemented for authenticated race-target browsing and character-linked planning views.
 - `StorageMode::LOCAL`: target planning should be treated as browser-local or advisory until a
 verified local persistence path is introduced.
+
+Target selection, replacement, and removal should be documented as advisory or browser-state
+mutation unless and until an account-backed target persistence contract is explicitly implemented.
 
 ---
 
@@ -94,8 +97,7 @@ persistence contract exists.
 ## 7. Related Documents
 
 - [TECH-FLOW-003_Race_Strategy_Flow.md](TECH-FLOW-003_Race_Strategy_Flow.md)
-- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
 - [TECH-FLOW-010_Career_Reporting_Flow.md](TECH-FLOW-010_Career_Reporting_Flow.md)
 - [SEQ-004](../01-sequences/SEQ-004_Race_Registration_and_Outcome.md)
 - [SEQ-017](../01-sequences/SEQ-017_Storage_Mode_Transition.md)

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 3.4.1
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current – Aligned with v2.2.0 and Global English Server Mechanics (March 2026)
+**Status**: Current – Aligned with v2.4.2 and Global English Server Mechanics (April 2026)
 
 ---
 
@@ -27,7 +27,7 @@
 ## 1. Purpose
 
 This glossary defines all core terminology used in the Umamusume Pretty Derby Career Planner
-project, aligned with the v2.2.0 codebase (40 models, 8 enums, 70+ services, 571 routes, 3,316+
+project, aligned with the v2.4.2 codebase (40 models, 8 enums, 191 services, 585 routes, 3,316+
 tests) and the **Global English server** gameplay and translations (as of March 2026). Use this
 glossary as the authoritative reference for all documentation, code, and user interface.
 
@@ -615,7 +615,7 @@ architecture components with Repository, Enum, ValueObject, Collection, Event/Li
 Notification entries; updated Neuron Agents section with actual codebase classes (BaseAgent,
 McpDemoAgent, response types, support classes, service layer); added GameTora to external API
 sources; added StorageMode enum reference; added Laravel MCP and MCP Monitoring terms; updated
-codebase stats (40 models, 8 enums, 70+ services, 571 routes, 3,316+ tests)
+codebase stats (40 models, 8 enums, 191 services, 585 routes, 3,316+ tests)
 - **Version**: 3.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated to
 February 2026; updated technology stack (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, Chart.js
 4, Larastan v3, Laravel Pint v1, Sanctum v4, Horizon v5, Telescope, Boost v1.8, pest-plugin-browser

@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -92,7 +92,7 @@ External data synchronization enables the application to:
 
 ### 2.2 Component Locations
 
-```text
+```
 
 app/
 ├── Console/
@@ -122,6 +122,7 @@ app/
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Admin
     participant Scheduler as Laravel Scheduler
     participant Controller as SyncController
@@ -207,7 +208,7 @@ sequenceDiagram
     Service->>Circuit: Execute sync flow
     Service-->>Controller: Sync result
     Controller-->>Admin: Display result + stats
-```text
+```
 
 ### 3.2 Timeline Breakdown
 
@@ -235,7 +236,7 @@ sequenceDiagram
 
 ```
 Scheduler/Manual Trigger → ExternalAPIService → CircuitBreaker → API Client
-```text
+```
 
 **Service Implementation:**
 
@@ -443,7 +444,7 @@ class CircuitBreaker
         $this->cache->put('circuit_breaker:recovery_timeout', $timeout, 3600);
     }
 }
-```text
+```
 
 ### 4.3 API Client Implementations
 
@@ -549,7 +550,7 @@ class UmamusumeDBApiClient
         };
     }
 }
-```text
+```
 
 ### 4.4 Data Validation and Transformation
 
@@ -638,7 +639,7 @@ class ExternalDataSynced implements ShouldBroadcast
         ];
     }
 }
-```text
+```
 
 ---
 
@@ -721,7 +722,7 @@ class ExternalDataSynced implements ShouldBroadcast
     "last_updated": "2026-01-24T00:00:00Z"
   }
 }
-```text
+```
 
 ### 5.3 Sync Result Object
 
@@ -748,7 +749,7 @@ class ExternalDataSynced implements ShouldBroadcast
   "recovery_timeout_at": null,
   "last_state_change": "2026-01-24T08:00:00Z"
 }
-```text
+```
 
 ---
 
@@ -769,6 +770,7 @@ class ExternalDataSynced implements ShouldBroadcast
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Service as ExternalAPIService
     participant Primary as Primary API
     participant Fallback as Fallback API
@@ -831,7 +833,7 @@ private function fetchWithRetry(callable $fetcher, int $maxRetries = 3): array
 
     throw new ApiException("Max retries exceeded");
 }
-```text
+```
 
 ---
 
@@ -884,7 +886,7 @@ $this->cache->forget("external_api:{$resource}");
 
 // Or update with fresh data
 $this->cache->put("external_api:{$resource}", $data, 86400);
-```text
+```
 
 ### 7.4 Database Query Analysis
 

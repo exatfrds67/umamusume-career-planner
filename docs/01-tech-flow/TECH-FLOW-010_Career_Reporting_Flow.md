@@ -1,7 +1,7 @@
 # TECH-FLOW-010: Career Reporting and Export
 
-**Document Version**: 1.1.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Status**: Added to decompose reporting, aggregation, caching, and export behavior from general
 race and character flows
 
@@ -95,6 +95,9 @@ Lazy loading in loops should be treated as prohibited for report rendering, comp
 - Export flows should use the same owner-scoped authorization as on-screen reporting.
 - Exported artifacts should be treated as owner-scoped outputs and should not bypass reporting authorization checks.
 
+Cache invalidation should occur when dependent report data changes, including at least training
+session updates, race outcome changes, skill-acquisition changes, and career-level metadata edits.
+
 ---
 
 ## 7. Storage-Aware Guidance
@@ -102,17 +105,14 @@ Lazy loading in loops should be treated as prohibited for report rendering, comp
 - Current reporting is account-backed and DB-driven.
 - If local-mode reporting is later introduced, it should be documented as a separate normalization
 and aggregation path rather than assumed to reuse account report queries directly.
-- Any local-to-account reporting continuity should follow the storage transition guidance in [TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
+- Any local-to-account reporting continuity should follow the storage transition guidance in [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md).
 
 ---
 
 ## 8. Related Documents
 
 - [TECH-FLOW-003_Race_Strategy_Flow.md](TECH-FLOW-003_Race_Strategy_Flow.md)
-- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
 - [TECH-FLOW-009_Target_Race_Planning_Flow.md](TECH-FLOW-009_Target_Race_Planning_Flow.md)
 - [TECH-FLOW-001_Character_Management_Flow.md](TECH-FLOW-001_Character_Management_Flow.md)
 - [SEQ-004](../01-sequences/SEQ-004_Race_Registration_and_Outcome.md)

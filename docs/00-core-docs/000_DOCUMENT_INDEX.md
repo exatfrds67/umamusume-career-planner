@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 5.4.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.4.0
+**Status**: Current - Aligned to codebase v2.4.2
 
 ---
 
@@ -24,7 +24,7 @@
 ## 1. Document Overview
 
 This index provides a current reference to core documentation in `docs/00-core-docs`, aligned with
-the current Laravel 12 codebase and the v2.4.0 architecture snapshot.
+the current Laravel 12 codebase and the v2.4.2 architecture snapshot.
 
 ### 1.1 Documentation Structure
 
@@ -249,7 +249,7 @@ flowchart TD
 - API reference and endpoint catalog
 - Coding standards (PSR-12, naming conventions)
 - Testing strategy (Pest v4, PHPUnit v12, pest-plugin-browser 4.0, Playwright 1.58)
-- Current stats: 3,316+ tests, 11,563+ assertions, 571 routes
+- Current stats: 3,316+ tests, 11,563+ assertions, 585 routes
 
 **Related Documents**: 004_SDS, 009_DBD, 007_SIP
 
@@ -648,10 +648,10 @@ included in this documentation pass.
 | --- | --- | --- | --- | --- |
 | 000 | DOCUMENT_INDEX | 5.4.0 | Current | 2026-03-08 |
 | 000 | MASTER_GLOSSARY | 3.4.0 | Current | 2026-02-22 |
-| 001 | SDP | 2.4.0 | Current | 2026-02-22 |
-| 002 | BRS | 2.4.0 | Current | 2026-02-22 |
+| 001 | SDP | 2.4.2 | Current | 2026-04-07 |
+| 002 | BRS | 2.4.2 | Current | 2026-04-07 |
 | 003 | SRS | Verify in source document | Current | Verify source |
-| 004 | SDS | 2.4.0 | Current | 2026-02-22 |
+| 004 | SDS | 2.4.2 | Current | 2026-04-07 |
 | 005 | DMP | Verify in source document | Current | Verify source |
 | 006 | DMS | Verify in source document | Current | Verify source |
 | 007 | SIP | Verify in source document | Current | Verify source |
@@ -716,7 +716,7 @@ included in this documentation pass.
 **Status**: ✅ COMPLETE (All questions researched & verified)
 
 **Key Findings**:
-- ✅ 15 core documents present and current (v2.4.0-v2.4.1, dated 2026-03-10)
+- ✅ 15 core documents present and current (v2.4.2, dated 2026-04-07)
 - ✅ 97% requirements traceability (3,674+/3,804 items traced) — **Exceeds 80% industry baseline by 17%**
 - ✅ Framework versions aligned: Laravel 12, Livewire 4, Tailwind CSS v4, PHP 8.4.11, Pest 4
 - ✅ Standards compliance verified across 8 authoritative sources

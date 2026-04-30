@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -96,7 +96,7 @@ Error reporting and retry mechanisms ensure:
 
 ### 2.2 Component Locations
 
-```text
+```
 app/
 ├── Exceptions/
 │   ├── Handler.php
@@ -136,6 +136,7 @@ app/
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant App as Application
     participant GameVal as Game Validator
@@ -231,7 +232,7 @@ sequenceDiagram
             Worker->>Notify: Alert admin
         end
     end
-```text
+```
 
 ### 3.2 Timeline Breakdown
 
@@ -258,7 +259,7 @@ sequenceDiagram
 
 ```
 Exception → Handler → Logger → APM → User Response
-```text
+```
 
 **Handler Implementation:**
 
@@ -490,7 +491,7 @@ class AIProviderException extends Exception
         ];
     }
 }
-```text
+```
 
 ---
 
@@ -832,7 +833,7 @@ flowchart TD
 
     CollectErrors --> ReturnErrors[Return Validation Result]
     Success --> ReturnSuccess[Return Success + Warnings]
-```text
+```
 
 ### 5.4 Calculation Error Handling
 
@@ -980,7 +981,7 @@ class CalculationValidator
   "ip": "192.168.1.100",
   "user_agent": "Mozilla/5.0..."
 }
-```text
+```
 
 ### 6.2 Validation Result Structure
 
@@ -1036,7 +1037,7 @@ class CalculationValidator
   "exception": "App\\Exceptions\\ExternalAPIException: API timeout\n...",
   "failed_at": "2026-01-28T10:35:00Z"
 }
-```text
+```
 
 ### 6.4 APM Error Report
 
@@ -1085,7 +1086,7 @@ class CalculationValidator
   "environment": "production",
   "recommendation": "Consider adding UI hint about valid aptitude grades (G-S only)"
 }
-```text
+```
 
 ---
 
@@ -1296,7 +1297,7 @@ class GameDataRecoveryService
         return $careerRun;
     }
 }
-```text
+```
 
 ### 8.3 User Prompt Strategy
 
@@ -1426,7 +1427,7 @@ class ErrorLoggingService
         Cache::put($key, $invalidValues, now()->addDays(7));
     }
 }
-```text
+```
 
 ---
 
@@ -1499,7 +1500,7 @@ CREATE INDEX idx_failed_jobs_queue ON failed_jobs(queue, failed_at);
 CREATE INDEX idx_failed_jobs_failed_at ON failed_jobs(failed_at DESC);
 CREATE INDEX idx_jobs_queue ON jobs(queue, available_at);
 CREATE INDEX idx_snapshots_career_run ON career_run_snapshots(career_run_id, is_valid, created_at DESC);
-```text
+```
 
 ### 9.4 Log Retention
 

@@ -1,7 +1,7 @@
 # TECH-FLOW-003: Race Strategy and Planning
 
-**Document Version**: 2.4.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Status**: Current route surface and service boundaries reviewed; local-mode planning support
 remains a documented architecture requirement
 
@@ -146,8 +146,7 @@ before any advisory or conversion step.
 - Local mode planning remains browser-backed and UUID-oriented until the user explicitly converts
 that run through the storage transition flow.
 - Any transition from local planned races to account-backed persistence should be documented through
-[TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md) and
+[TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md) and
 [SEQ-017](../01-sequences/SEQ-017_Storage_Mode_Transition.md).
 - Technical flows must state explicitly whether a race-planning step is advisory-only, browser-
 local, or account-persistent.
@@ -183,6 +182,33 @@ where the service provides them.
 readiness checks must include fan count thresholds as part of the prerequisite evaluation, not only
 stat and aptitude requirements.
 
+### Readiness Determinants
+
+Deterministic readiness should evaluate at least these inputs before optional AI explanation is applied:
+
+- race prerequisites from `GameRace` and requirement services
+- fan count eligibility thresholds
+- current stat readiness against race demands
+- aptitude grade impact
+- track and weather conditions when available
+
+### Aptitude Modifier Reference
+
+Use the game-accurate baseline below for readiness weighting:
+
+| Aptitude Grade | Typical Readiness Modifier |
+| --- | --- |
+| S | Positive modifier |
+| A | Baseline |
+| B | Mild penalty |
+| C | Moderate penalty |
+| D | Strong penalty |
+| E | Large penalty |
+| F | Severe penalty |
+| G | Extreme penalty |
+
+For exact values and category-specific differences, follow the authoritative flow and glossary references.
+
 ---
 
 ## 7. Related Documents
@@ -190,7 +216,6 @@ stat and aptitude requirements.
 - [FLOW-003](../01-flows/FLOW-003_Race_Strategy_System.md)
 - [SEQ-004](../01-sequences/SEQ-004_Race_Registration_and_Outcome.md)
 - [SEQ-017](../01-sequences/SEQ-017_Storage_Mode_Transition.md)
-- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-
-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
+- [TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md](TECH-FLOW-008_Storage_Mode_and_Local_Account_Conversion.md)
 - [TECH-FLOW-009_Target_Race_Planning_Flow.md](TECH-FLOW-009_Target_Race_Planning_Flow.md)
 - [TECH-FLOW-010_Career_Reporting_Flow.md](TECH-FLOW-010_Career_Reporting_Flow.md)

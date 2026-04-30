@@ -1,7 +1,7 @@
 # TECH-FLOW-008: Storage Mode and Local-Account Conversion
 
-**Document Version**: 1.0.0
-**Date**: March 8, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Status**: Added to document the dual-storage architecture and the current local-to-account conversion path
 
 ---
@@ -22,6 +22,16 @@ conversion into account-backed records, duplicate handling, and local cleanup po
 - Current server-side conversion persists local character payload wrappers into `Character` rows.
 - The current conversion page also reads local careers and skill builds for user awareness, but
 `LocalStorageService::batchConvertToAccount()` currently converts character payloads only.
+
+### Current Non-Converted Scope
+
+The following local artifacts are currently out of scope for server-side conversion and should be
+documented as non-converted until implementation exists:
+
+- local career progression history
+- skill-build planning payloads
+- support-deck planning payloads
+- race-target planning payloads
 
 ---
 
@@ -134,6 +144,8 @@ incoming payload includes one.
 current conversion service.
 - Careers, skill builds, support decks, snapshots, and race-planning state need separate storage-
 aware flows when they gain server-side conversion support.
+- Careers, skill builds, support decks, snapshots, and race-planning state need separate
+storage-aware flows when they gain server-side conversion support.
 
 ---
 

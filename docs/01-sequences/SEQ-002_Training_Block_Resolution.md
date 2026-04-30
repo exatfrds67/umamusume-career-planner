@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: January 28, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Related Documents**: [PRD-002], [SPEC-002], [FLOW-002], [TECH-FLOW-002]
 
 ---
@@ -92,7 +92,7 @@ Training resolution is the core gameplay loop that:
 
 The official training stat gain formula from Umamusume Pretty Derby (Global English Server):
 
-```text
+```
 Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodModifier)
             × (1 + FacilityLevelBonus) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
 ```
@@ -141,7 +141,7 @@ Stats have a soft cap at **1200** with diminishing returns:
 
 **Implementation:**
 
-```text
+```
 if (current_stat >= 1200):
     actual_gain = min(calculated_gain × 0.5, 50)
 else if (current_stat + calculated_gain > 1200):
@@ -227,7 +227,7 @@ Each training type affects multiple stats:
 
 ### 3.2 Component Locations
 
-```text
+```
 app/
 ├── Livewire/
 │   └── Training/
@@ -261,6 +261,7 @@ app/
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant UI as Training UI
     participant Controller as TrainingController
@@ -287,12 +288,13 @@ sequenceDiagram
         UI->>Local: Persist updated local run payload
         UI-->>User: Updated local result without DB write
     end
-```text
+```
 
 ### 4.2 Training Formula Calculation Flow
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Caller
     participant StatCalc as StatCalculator
     participant FacilityCalc as FacilityCalculator
@@ -355,6 +357,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Caller
     participant BondCalc as BondCalculator
     participant ConditionChecker as ConditionChecker
@@ -395,7 +398,7 @@ sequenceDiagram
     end
 
     FriendshipCalc-->>Caller: totalFriendshipMultiplier
-```text
+```
 
 ### 4.4 Timeline Breakdown
 
@@ -426,7 +429,7 @@ sequenceDiagram
 
 ```
 User → Livewire Component → TrainingController → TrainingPredictionService
-```text
+```
 
 **Service Implementation (Game-Accurate):**
 
@@ -669,7 +672,7 @@ class StatCalculator
         return $multiplier;
     }
 }
-```text
+```
 
 ### 5.3 Soft Cap Calculator
 
@@ -812,7 +815,7 @@ class BondCalculator
         };
     }
 }
-```text
+```
 
 ### 5.5 Risk Assessment
 
@@ -968,7 +971,7 @@ class TrainingExecutionService
         return $career->mood;
     }
 }
-```text
+```
 
 ---
 
@@ -1082,7 +1085,7 @@ class TrainingExecutionService
   "career_id": 157,
   "facility": "speed"
 }
-```text
+```
 
 ### 6.3 Training Execution Response (Game-Accurate)
 
@@ -1171,6 +1174,7 @@ class TrainingExecutionService
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant User
     participant UI as Livewire Component
     participant Controller
@@ -1202,7 +1206,7 @@ sequenceDiagram
         Controller-->>UI: 200 OK
         UI-->>User: Display success + animation
     end
-```text
+```
 
 ### 7.3 Transaction Rollback Scenarios
 
@@ -1273,7 +1277,7 @@ CREATE INDEX idx_training_sessions_career_turn ON ucp_training_sessions(career_i
 CREATE INDEX idx_stat_progress_career_turn ON ucp_stat_progress(career_id, turn_number);
 CREATE INDEX idx_skill_hints_career ON ucp_skill_hints(career_id, is_used);
 CREATE INDEX idx_support_cards_bond ON ucp_support_cards(deck_id, bond_level);
-```text
+```
 
 ### 8.4 Cache Strategy
 

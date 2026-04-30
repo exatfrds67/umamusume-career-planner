@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 3.3.0
-**Date**: February 22, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.2 and game-accurate mechanics
 
 ---
 
@@ -807,7 +807,7 @@ Coverage**: 90%; **Status**: ✅ Exceeds Target
 - **Test Type**: **Total**; **Count**: **3,316+**; **Coverage Target**: **80%+ overall**; **Actual
 Coverage**: **90%**; **Status**: **✅ Exceeds Target**
 
-> **Note**: Test suite produces 11,563+ assertions across 571 registered routes (396+ API routes).
+> **Note**: Test suite produces 11,563+ assertions across 585 registered routes (396+ API routes).
 
 ---
 
@@ -817,7 +817,7 @@ Coverage**: **90%**; **Status**: **✅ Exceeds Target**
 
 - **Version**: 3.3.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated to
 February 22, 2026; updated test counts to 3,316+ tests with 11,563+ assertions; updated
-implementation artifact count to 280 (40 models, 70+ services, 571 routes); updated test
+implementation artifact count to 280 (40 models, 191 services, 585 routes); updated test
 distribution breakdown; updated implementation traceability map with Neuron services and Admin
 controllers; added Browser/E2E test category; added route count statistics
 - **Version**: 3.2.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated

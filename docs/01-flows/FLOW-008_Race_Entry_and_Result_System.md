@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.1.0
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Repository aligned with race entry route, policy checks, and dual storage expectations
@@ -169,6 +169,7 @@ explicitly migrates that run into an account-backed record.
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved verified race entry and result flow behavior. |
 | 1.1.0 | 2026-03-10 | Development Team | Added simulation vs actual clarification note; added Section 3.1 documenting Race model fields (finish_position, won_race). |
 | 1.0.0 | 2026-03-08 | Development Team | Initial repository-aligned race entry and result flow covering route-level authorization, StorageMode-aware persistence, and post-race reporting behavior. |
 

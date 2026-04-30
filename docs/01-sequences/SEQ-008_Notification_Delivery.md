@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: January 28, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -84,7 +84,7 @@ The notification system enables users to:
 
 ### 2.2 Component Locations
 
-```text
+```
 app/
 ├── Http/Controllers/Api/
 │   └── NotificationController.php
@@ -108,6 +108,7 @@ app/
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor User
     participant Trigger as Domain Trigger
     participant NotifSvc as NotificationService
@@ -153,7 +154,7 @@ sequenceDiagram
 
 **Request Flow:**
 
-```text
+```
 Browser/API → NotificationController → NotificationService → Database notifications
 ```
 
@@ -343,6 +344,7 @@ class PushNotificationService
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant API as NotificationController
     participant Service as NotificationService
     participant DB as Database

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.1
-**Date**: March 10, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.4.0 and Global English server gameplay scope
+**Status**: Current - Aligned with codebase v2.4.2 and Global English server gameplay scope
 
 ---
 
@@ -872,7 +872,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.4.1 | 2026-03-10 | Development Team | Clarified FR-02.5 to match the current Global English server scenario scope (URA Finals and Unity Cup); added note that future scenario additions will be documented when they release globally |
+| 2.4.2 | 2026-04-07 | Development Team | Synchronized suite-wide documentation metadata and preserved FR-02.5 scenario scope wording for the currently supported Global English server scenarios |
 | 2.4.0 | 2026-02-22 | Development Team | Updated metrics (3,316+ tests, 11,563+ assertions, 585 routes, 166 services, 67 migrations); added admin panel and MCP monitoring observability requirements; added AI/MCP test data requirements; added MCP to tech stack |
 | 2.3.0 | 2026-02-21 | Development Team | Updated tech stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI, Playwright, Larastan, Pint, Laravel Boost references |
 | 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 |

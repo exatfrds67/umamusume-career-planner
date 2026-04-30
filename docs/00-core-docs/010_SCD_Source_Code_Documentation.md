@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.0
-**Date**: February 22, 2026
+**Document Version**: 2.4.2
+**Date**: April 7, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.2 and game-accurate mechanics
 
 ---
 
@@ -143,7 +143,7 @@ RaceDistance, RecommendationType, RunningStyle, StorageMode)
 │   ├── Notifications/      # Notification Classes
 │   ├── Policies/           # Authorization Policies
 │   ├── Repositories/       # Data Access Layer
-│   ├── Services/           # Business Logic Layer — 160+ service classes
+│   ├── Services/           # Business Logic Layer — 191 service classes
 │   │   ├── Admin/          # Admin Panel Services (3)
 │   │   ├── Agents/         # Agent Services (1)
 │   │   ├── AI/             # AI Provider Services (20: Hybrid, Bedrock, Ollama, Agents, Cost, Conversation, Dashboard)
@@ -172,7 +172,7 @@ RaceDistance, RecommendationType, RunningStyle, StorageMode)
 │   └── views/              # Blade Templates
 ├── routes/
 │   ├── api.php             # API Routes
-│   └── web.php             # Web Routes (571 total routes)
+│   └── web.php             # Web Routes (585 total routes)
 └── tests/
     ├── Feature/            # Feature Tests
     └── Unit/               # Unit Tests
@@ -1179,7 +1179,7 @@ mindmap
 - **pest-plugin-browser v4.0** for browser testing via Playwright 1.58
 - Browser tests live in `tests/Browser/`
 - **364 test files** across unit, feature, browser, API, and integration coverage
-- **571 total routes** covered by feature and integration tests
+- **585 total routes** covered by feature and integration tests
 
 ### 9.2 Test Distribution
 
@@ -1270,4 +1270,4 @@ test('ranks predictions by recommendation score', function () {
 
 ---
 
-*This documentation reflects the current implementation of the Umamusume Pretty Derby Career Planner codebase (v2.4.0).*
+*This documentation reflects the current implementation of the Umamusume Pretty Derby Career Planner codebase (v2.4.2).*
