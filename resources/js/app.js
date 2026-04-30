@@ -1,5 +1,8 @@
 import "./bootstrap";
-import { Livewire, Alpine } from "../../vendor/livewire/livewire/dist/livewire.esm";
+import {
+    Livewire,
+    Alpine,
+} from "../../vendor/livewire/livewire/dist/livewire.esm";
 import axios from "axios";
 import connectivityMonitor from "./core/connectivity-monitor.js";
 import planWizard from "./components/plan-wizard.js";
@@ -63,7 +66,9 @@ document.addEventListener("alpine:init", () => {
         add(type, message) {
             const id = Date.now() + Math.random();
             this.items = [...this.items, { id, type, message }];
-            setTimeout(() => { this.remove(id); }, 5000);
+            setTimeout(() => {
+                this.remove(id);
+            }, 5000);
         },
 
         remove(id) {
@@ -79,7 +84,9 @@ document.addEventListener("alpine:init", () => {
             const message = event.detail?.message || "";
             const id = Date.now() + Math.random();
             this.items = [...this.items, { id, type, message }];
-            setTimeout(() => { this.remove(id); }, 5000);
+            setTimeout(() => {
+                this.remove(id);
+            }, 5000);
         },
 
         remove(id) {
@@ -101,7 +108,7 @@ window.addEventListener("toast", (event) => {
 // --- Sidebar Store (Sidebar Minimize Feature) ---
 document.addEventListener("alpine:init", () => {
     Alpine.store("sidebar", {
-        // Initialize from localStorage
+        // Initialize from localStorage — default to expanded (false)
         minimized: localStorage.getItem("sidebar-minimized") === "true",
 
         // Toggle between states
@@ -802,10 +809,12 @@ if ("serviceWorker" in navigator) {
             registration.update();
 
             // Use app-update module for update detection and auto-update
-            import("./app-update.js").then(({ setupUpdateDetection, scheduleAutoUpdateCheck }) => {
-                setupUpdateDetection(registration);
-                scheduleAutoUpdateCheck();
-            });
+            import("./app-update.js").then(
+                ({ setupUpdateDetection, scheduleAutoUpdateCheck }) => {
+                    setupUpdateDetection(registration);
+                    scheduleAutoUpdateCheck();
+                },
+            );
 
             // Initialize install prompt tracking
             initInstallPrompt();
