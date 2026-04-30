@@ -30,6 +30,38 @@ test('dashboard loads successfully with character', function () {
     $response->assertViewHas('selectedCharacter');
 });
 
+test('dashboard renders the phase 2 command panels', function () {
+    $character = Character::factory()->create([
+        'user_id' => $this->user->id,
+        'current_turn' => 18,
+        'energy_level' => 72,
+        'available_sp' => 240,
+        'current_stats' => [
+            'speed' => 520,
+            'stamina' => 430,
+            'power' => 410,
+            'guts' => 310,
+            'wit' => 295,
+        ],
+        'goals' => [
+            ['label' => 'Speed 700', 'current' => 520, 'target' => 700, 'status' => 'on_track'],
+            ['label' => 'Win the next race', 'current' => 2, 'target' => 5, 'status' => 'on_track'],
+        ],
+        'race_schedule' => [
+            ['name' => 'Nikkei Cup', 'turn' => 22, 'grade' => 'G2', 'readiness' => 86],
+        ],
+    ]);
+
+    $response = $this->get(route('dashboard', ['character' => $character->id]));
+
+    $response->assertSuccessful();
+    $response->assertSee('Command Grid');
+    $response->assertSee('Training');
+    $response->assertSee('Support Deck');
+    $response->assertSee('AI Advisor');
+    $response->assertSee('Ask follow-up');
+});
+
 test('dashboard handles character with string race_schedule', function () {
     $character = Character::factory()->create([
         'user_id' => $this->user->id,
@@ -288,4 +320,43 @@ test('recent activity includes skill and milestone events from career_metadata',
     $types = array_column($activity, 'type');
     expect($types)->toContain('skill')
         ->and($types)->toContain('milestone');
+});
+
+// Phase 1 Shell Stabilization: Shell Chrome & Accessibility Tests
+
+test('dashboard renders with header role banner', function () {
+    $response = $this->get(route('dashboard'));
+
+    $response->assertSuccessful()
+        ->assertSeeHtml('role="banner"');
+});
+
+test('dashboard renders with sidebar navigation role and attributes', function () {
+    $response = $this->get(route('dashboard'));
+
+    $response->assertSuccessful()
+        ->assertSeeHtml('role="navigation"')
+        ->assertSeeHtml('aria-label="Main navigation"');
+});
+
+test('dashboard renders all shell interactive elements with data-testid attributes', function () {
+    $response = $this->get(route('dashboard'));
+
+    $response->assertSuccessful()
+        ->assertSeeHtml('data-testid="sidebar-toggle"')
+        ->assertSeeHtml('data-testid="sidebar-collapse-toggle"')
+        ->assertSeeHtml('data-testid="mobile-sidebar"')
+        ->assertSeeHtml('data-testid="sidebar-backdrop"');
+});
+
+test('dashboard renders mobile bottom navigation with proper attributes', function () {
+    $response = $this->get(route('dashboard'));
+
+    $response->assertSuccessful()
+        ->assertSeeHtml('data-testid="mobile-bottom-nav"')
+        ->assertSeeHtml('data-testid="mobile-nav-characters"')
+        ->assertSeeHtml('data-testid="mobile-nav-training"')
+        ->assertSeeHtml('data-testid="mobile-nav-skills"')
+        ->assertSeeHtml('data-testid="mobile-nav-races"')
+        ->assertSeeHtml('data-testid="mobile-nav-support"');
 });

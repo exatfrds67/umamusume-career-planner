@@ -57,6 +57,65 @@ describe('TrainingController@index', function () {
         }
     });
 
+    it('passes recommended facility and reason to the view', function () {
+        $response = $this->actingAs($this->user)
+            ->get(route('training.index', $this->character));
+
+        $response->assertSuccessful()
+            ->assertViewHas('recommendedFacility')
+            ->assertViewHas('recommendedReason');
+    });
+
+    it('renders training cards for all five stat types', function () {
+        $response = $this->actingAs($this->user)
+            ->get(route('training.index', $this->character));
+
+        $response->assertSuccessful()
+            ->assertSee('data-testid="training-card-speed"', false)
+            ->assertSee('data-testid="training-card-stamina"', false)
+            ->assertSee('data-testid="training-card-power"', false)
+            ->assertSee('data-testid="training-card-guts"', false)
+            ->assertSee('data-testid="training-card-wit"', false);
+    });
+
+    it('renders the execute training button', function () {
+        $response = $this->actingAs($this->user)
+            ->get(route('training.index', $this->character));
+
+        $response->assertSuccessful()
+            ->assertSee('data-testid="training-execute-btn"', false);
+    });
+
+    it('renders the current stats snapshot section', function () {
+        $response = $this->actingAs($this->user)
+            ->get(route('training.index', $this->character));
+
+        $response->assertSuccessful()
+            ->assertSee('Current Stats');
+    });
+
+    it('shows career complete message when turn limit reached', function () {
+        $this->character->update(['current_turn' => 78]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('training.index', $this->character));
+
+        $response->assertSuccessful()
+            ->assertSee('Career Complete!');
+    });
+
+    it('renders the ai recommendation banner when facility is recommended', function () {
+        $response = $this->actingAs($this->user)
+            ->get(route('training.index', $this->character));
+
+        $response->assertSuccessful();
+
+        $recommendedFacility = $response->viewData('recommendedFacility');
+        if ($recommendedFacility) {
+            $response->assertSee('AI BEST');
+        }
+    });
+
     it('denies access to another user character', function () {
         $otherUser = User::factory()->create();
 

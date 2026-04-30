@@ -55,9 +55,9 @@ it('completes full character management workflow from creation to deck building'
     // ============================================================================
     $response = get('/characters/create');
     $response->assertOk()
-        ->assertSee('Create New Character')
-        ->assertSee('Scenario Type')
-        ->assertSee('Stats');
+        ->assertSee('Creation Wizard')
+        ->assertSee('Choose Scenario')
+        ->assertSee('Choose Your Trainee');
 
     // ============================================================================
     // STEP 3: Submit Character Creation
