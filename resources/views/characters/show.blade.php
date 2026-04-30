@@ -5,779 +5,620 @@
 @section('content')
     @php
         /** @var \App\Models\Character $character */
+        $statColors = [
+            'speed' => '#E879A0',
+            'stamina' => '#10B981',
+            'power' => '#F59E0B',
+            'guts' => '#EF4444',
+            'wit' => '#3B82F6',
+        ];
+        $statIcons = [
+            'speed' => '⚡',
+            'stamina' => '🌿',
+            'power' => '🔥',
+            'guts' => '❤️',
+            'wit' => '💙',
+        ];
+        $statGrade = function (int $v): string {
+            if ($v >= 1000) {
+                return 'S';
+            }
+            if ($v >= 800) {
+                return 'A';
+            }
+            if ($v >= 600) {
+                return 'B';
+            }
+            if ($v >= 400) {
+                return 'C';
+            }
+            if ($v >= 200) {
+                return 'D';
+            }
+            if ($v >= 100) {
+                return 'E';
+            }
+            return 'F';
+        };
+        $gradeColors = [
+            'S' => '#F59E0B',
+            'A' => '#E879A0',
+            'B' => '#7C3AED',
+            'C' => '#3B82F6',
+            'D' => '#6B7280',
+            'E' => '#9CA3AF',
+            'F' => '#D1D5DB',
+        ];
+        $tabs = ['Stats', 'Aptitudes', 'Factors', 'Goals', 'History', 'Snapshots'];
     @endphp
-    <div class="max-w-7xl mx-auto space-y-6">
-        <!-- Breadcrumb Navigation -->
-        <x-breadcrumb :items="[['label' => 'Characters', 'url' => route('characters.index')], ['label' => $character->name]]" />
 
-        <!-- Header / Action Buttons -->
-        <div class="flex items-center justify-end">
-            <div class="flex space-x-3">
+    <div class="max-w-5xl mx-auto space-y-6 pb-10" x-data="{ activeTab: 'Stats' }">
+
+        {{-- Back + header --}}
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div class="flex items-center gap-3">
+                <a href="{{ route('characters.index') }}"
+                    class="flex items-center gap-1.5 rounded-xl border border-[#EDE9FE] bg-[#EDE9FE] px-3 py-2 text-sm font-bold text-[#7C3AED] transition hover:bg-[#DDD6FE]"
+                    aria-label="Back to characters list">
+                    ← Back
+                </a>
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 class="text-[22px] font-black text-[#1E1033] leading-tight">{{ $character->name }}</h1>
+                        <span class="rounded-lg px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white"
+                            style="background: linear-gradient(135deg,#F59E0B,#F97316)">SSR</span>
+                    </div>
+                    <p class="mt-0.5 text-sm text-[#7C6FAB]">
+                        {{ ucwords(str_replace('_', ' ', $character->scenario_type ?? '')) }}
+                        · Turn {{ $character->current_turn }}/{{ $character->getMaxTurns() }}
+                        · <span
+                            class="{{ match ($character->career_stage) {'junior' => 'text-[#3B82F6]','classic' => 'text-[#7C3AED]','senior' => 'text-[#E879A0]',default => 'text-[#7C6FAB]'} }} font-semibold">{{ ucfirst($character->career_stage) }}</span>
+                    </p>
+                </div>
+            </div>
+
+            {{-- Quick actions --}}
+            <div class="flex flex-wrap items-center gap-2">
                 <form action="{{ route('characters.toggle-pin', $character) }}" method="POST" class="inline">
                     @csrf
                     <button type="submit"
-                        class="btn {{ $character->isPinnedBy(Auth::id()) ? 'btn-primary' : 'btn-secondary' }}"
-                        aria-label="{{ $character->isPinnedBy(Auth::id()) ? 'Unpin ' . $character->name : 'Pin ' . $character->name . ' for quick access' }}">
-                        @if ($character->isPinnedBy(Auth::id()))
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z" />
-                            </svg>
-                            Pinned
-                        @else
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                            </svg>
-                            Pin
-                        @endif
+                        class="rounded-xl border border-[#EDE9FE] px-3 py-2 text-sm font-bold transition {{ $character->isPinnedBy(Auth::id()) ? 'bg-[#E879A0] text-white' : 'bg-white text-[#7C6FAB] hover:bg-[#F9F5FF]' }}"
+                        aria-label="{{ $character->isPinnedBy(Auth::id()) ? 'Unpin' : 'Pin' }} {{ $character->name }}">
+                        {{ $character->isPinnedBy(Auth::id()) ? '📌 Pinned' : '📌 Pin' }}
                     </button>
                 </form>
-
-                <form action="{{ route('characters.rest', $character) }}" method="POST" class="inline"
-                    onsubmit="return confirm('Rest this turn? This action will advance the game state.')">
-                    @csrf
-                    <button type="submit" class="btn btn-secondary text-green-700 dark:text-green-400"
-                        aria-label="Perform rest action for {{ $character->name }}">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                        </svg>
-                        Rest
-                    </button>
-                </form>
-
-                <form action="{{ route('characters.next-turn', $character) }}" method="POST" class="inline"
-                    onsubmit="return confirm('Advance to the next turn? This action cannot be undone.')">
-                    @csrf
-                    <button type="submit" class="btn btn-secondary text-blue-700 dark:text-blue-400"
-                        aria-label="Advance to next training turn for {{ $character->name }}">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                        </svg>
-                        Next Turn
-                    </button>
-                </form>
-
-                <a href="{{ route('characters.edit', $character) }}" class="btn btn-primary">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Edit Character
+                <a href="{{ route('characters.edit', $character) }}"
+                    class="rounded-xl bg-linear-to-r from-[#E879A0] to-[#7C3AED] px-4 py-2 text-sm font-bold text-white shadow-[0_4px_12px_rgba(232,121,160,.35)] transition hover:brightness-105"
+                    aria-label="Edit {{ $character->name }}">
+                    Edit
                 </a>
             </div>
         </div>
 
-        <!-- Character Overview Card -->
-        <section class="card overflow-visible rounded-xl" role="region" aria-labelledby="character-overview-heading">
-            <div class="p-6 md:p-8 relative overflow-hidden">
-                <!-- Background Decoration -->
-                <div class="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-primary-100 dark:bg-primary-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"
-                    aria-hidden="true">
+        {{-- Character overview card --}}
+        <div
+            class="relative overflow-hidden rounded-[20px] bg-linear-to-r from-[#1E1033] via-[#3B1F6E] to-[#4C1060] p-6 text-white shadow-[0_8px_40px_rgba(124,58,237,0.18)]">
+            {{-- Decorative orbs --}}
+            <div class="pointer-events-none absolute -right-8 -top-8 h-48 w-48 rounded-full bg-[#E879A0]/12"
+                aria-hidden="true"></div>
+            <div class="pointer-events-none absolute -bottom-8 -left-8 h-36 w-36 rounded-full bg-[#7C3AED]/10"
+                aria-hidden="true"></div>
+
+            <div class="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                {{-- Character avatar --}}
+                @if ($character->avatar_url)
+                    <img src="{{ $character->avatar_url }}" alt="{{ $character->name }}"
+                        class="hidden sm:block h-28 w-20 rounded-xl object-cover shrink-0 shadow-lg" loading="lazy"
+                        onerror="this.style.display='none'" />
+                @endif
+
+                <div class="space-y-2">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-white/50">🏇 Active Career Run</p>
+                    <p class="text-2xl font-black tracking-tight">{{ $character->name }}</p>
+                    @php
+                        $moodStyles = [
+                            'great' => ['bg' => '#D1FAE5', 'color' => '#065F46', 'icon' => '✨'],
+                            'good' => ['bg' => '#EDE9FE', 'color' => '#5B21B6', 'icon' => '😊'],
+                            'normal' => ['bg' => '#F3F4F6', 'color' => '#374151', 'icon' => '😐'],
+                            'bad' => ['bg' => '#FEE2E2', 'color' => '#991B1B', 'icon' => '😟'],
+                            'awful' => ['bg' => '#FEE2E2', 'color' => '#7F1D1D', 'icon' => '😫'],
+                        ];
+                        $moodStyle = $moodStyles[$character->mood_status ?? 'normal'] ?? $moodStyles['normal'];
+                    @endphp
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold"
+                            style="background: {{ $moodStyle['bg'] }}; color: {{ $moodStyle['color'] }}">
+                            {{ $moodStyle['icon'] }} {{ ucfirst($character->mood_status ?? 'normal') }}
+                        </span>
+                        <span class="rounded-lg bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/80">
+                            ⚡ Energy {{ $character->energy_level }}%
+                        </span>
+                    </div>
                 </div>
 
-                <div class="flex flex-col md:flex-row gap-8 items-start relative">
-                    <!-- Avatar -->
-                    <div class="shrink-0 relative">
-                        <x-character-portrait :image="$character->avatar_url" :alt="$character->name" size="xl" />
+                <div class="text-right">
+                    <p class="text-[11px] font-bold uppercase tracking-widest text-white/45">Career Progress</p>
+                    <p class="text-5xl font-black text-[#F9A8D4]">{{ $character->current_turn }}</p>
+                    <p class="text-xs text-white/50">of {{ $character->getMaxTurns() }} turns</p>
+                    @php $pct = round(($character->current_turn / max(1, $character->getMaxTurns())) * 100); @endphp
+                    <div class="mt-2 h-1.5 w-40 rounded-full bg-white/10">
+                        <div class="h-full rounded-full bg-linear-to-r from-[#E879A0] to-[#7C3AED] transition-all"
+                            style="width: {{ $pct }}%"></div>
                     </div>
-
-                    <!-- Details -->
-                    <div class="flex-1 space-y-4 w-full">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="flex items-center gap-3 mb-1">
-                                    <h1 id="character-overview-heading"
-                                        class="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                                        {{ $character->name }}</h1>
-                                    <x-ui.grade-badge :grade="$character->getStatGrade($character->current_stats['speed'] ?? 0)" size="sm" />
-                                    @if ($character->isPinnedBy(Auth::id()))
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300"
-                                            title="Pinned character">
-                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z" />
-                                            </svg>
-                                            Pinned
-                                        </span>
-                                    @endif
-                                </div>
-                                <div
-                                    class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-neutral-600 dark:text-neutral-400 font-medium">
-                                    <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1.5 text-primary-500" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                        </svg>
-                                        {{ $character->scenario_type === 'ura_finale' ? 'URA Finale' : 'Unity Cup' }}
-                                    </span>
-                                    <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1.5 text-secondary-500" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Turn {{ $character->current_turn }} ({{ ucfirst($character->career_stage) }})
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- AI Advisor (Desktop Position) -->
-                            <div class="hidden lg:block w-80">
-                                <x-dashboard.ai-advisor-card class="shadow-xs border-0" :lastTip="$aiTip" />
-                            </div>
-                        </div>
-
-                        <!-- Quick Progress Bars -->
-                        <div
-                            class="max-w-2xl bg-white/50 dark:bg-neutral-800/50 rounded-xl p-4 border border-neutral-100 dark:border-neutral-700/50 backdrop-blur-xs"
-                            aria-label="Character status indicators">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-xs font-semibold uppercase tracking-wider">
-                                        <span class="text-neutral-500 dark:text-neutral-400">Energy Level</span>
-                                        <span
-                                            class="{{ $character->energy_level < 30 ? 'text-red-500' : 'text-green-500' }}"
-                                            aria-label="Energy level: {{ $character->energy_level }}%">{{ $character->energy_level }}%</span>
-                                    </div>
-                                    <x-ui.progress-bar :value="$character->energy_level" :max="100"
-                                        color="{{ $character->energy_level < 30 ? 'bg-red-500' : 'bg-green-500' }}"
-                                        size="sm" :show-text="false"
-                                        aria-label="Energy level {{ $character->energy_level }} percent" />
-                                </div>
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-xs font-semibold uppercase tracking-wider">
-                                        <span class="text-neutral-500 dark:text-neutral-400">Goal Progress</span>
-                                        <span class="text-primary-500"
-                                            aria-label="Goal progress: {{ $character->getProgressPercentage() }}%">{{ $character->getProgressPercentage() }}%</span>
-                                    </div>
-                                    <x-ui.progress-bar :value="$character->getProgressPercentage()" :max="100" color="bg-primary-500"
-                                        size="sm" :show-text="false"
-                                        aria-label="Goal progress {{ $character->getProgressPercentage() }} percent" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- AI Advisor (Mobile Position) -->
-                        <div class="lg:hidden mt-4">
-                            <x-dashboard.ai-advisor-card :lastTip="$aiTip" />
-                        </div>
-                    </div>
+                    <p class="mt-1 text-[10px] text-white/40">{{ $pct }}% complete</p>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <!-- Left Column: Stats (Takes 2 columns) -->
-            <div class="xl:col-span-2 space-y-6">
-                <!-- Detailed Stats Card -->
-                <section class="card rounded-lg" role="region" aria-labelledby="stats-heading">
-                    <header
-                        class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
-                        <h2 id="stats-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Current Statistics
-                        </h2>
-                        <span
-                            class="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded">Updated
-                            {{ $character->updated_at->diffForHumans() }}</span>
-                    </header>
-                    <div class="card-body">
-                        <div class="space-y-4">
-                            @foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
-                                @php
-                                    $val = $character->getStat($stat);
-                                    $target = $character->goals['target_stats'][$stat] ?? 0;
-                                @endphp
-                                <x-stat-bar :stat="$stat" :current="$val" :target="$target" />
-                            @endforeach
+        {{-- Support Deck summary --}}
+        <div class="rounded-[20px] border border-[#EDE9FE] bg-white p-5 shadow-[0_2px_12px_rgba(124,58,237,0.07)]">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-[15px] font-extrabold text-[#1E1033]">Support Deck</h2>
+                    <p class="mt-0.5 text-xs text-[#7C6FAB]">
+                        {{ $character->supportCards->count() }} / 6 cards assigned
+                    </p>
+                </div>
+                <a href="{{ route('characters.deck-builder', $character) }}"
+                    class="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-[#E879A0] to-[#7C3AED] px-4 py-2 text-sm font-bold text-white shadow-[0_4px_12px_rgba(232,121,160,.35)] transition hover:brightness-105">
+                    Manage Deck
+                </a>
+            </div>
+
+            @if ($character->supportCards->isNotEmpty())
+                <div class="mt-4 grid grid-cols-6 gap-2">
+                    @foreach (range(1, 6) as $slot)
+                        @php $card = $character->supportCards->firstWhere('position_slot', $slot); @endphp
+                        <div
+                            class="rounded-xl border {{ $card ? 'border-[#7C3AED]/30 bg-[#F9F5FF]' : 'border-dashed border-[#C4B5FD] bg-[#FAFBFF]' }} p-2 text-center">
+                            @if ($card)
+                                <p class="text-[10px] font-bold text-[#7C3AED] truncate">
+                                    {{ $card->supportCard->name ?? 'Card' }}</p>
+                                <p class="text-[9px] text-[#7C6FAB]">Slot {{ $slot }}</p>
+                            @else
+                                <p class="text-[10px] text-[#C4B5FD]">—</p>
+                                <p class="text-[9px] text-[#C4B5FD]">Slot {{ $slot }}</p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div
+                    class="mt-4 rounded-xl border border-dashed border-[#C4B5FD] bg-[#F9F5FF] px-4 py-3 text-center text-xs text-[#7C6FAB]">
+                    No cards assigned yet. Build your support deck to optimize training.
+                </div>
+            @endif
+        </div>
+
+        {{-- Tab bar --}}
+        <nav class="flex rounded-xl bg-[#EDE9FE] p-1 gap-1" role="tablist" aria-label="Character detail sections">
+            @foreach ($tabs as $tab)
+                <button type="button" @click="activeTab = '{{ $tab }}'" role="tab"
+                    :aria-selected="activeTab === '{{ $tab }}'" data-testid="tab-{{ strtolower($tab) }}"
+                    class="flex-1 rounded-[9px] px-3 py-2 text-xs font-bold transition whitespace-nowrap"
+                    :class="activeTab === '{{ $tab }}'
+                        ?
+                        'bg-white text-[#7C3AED] shadow-[0_1px_6px_rgba(124,58,237,0.15)]' :
+                        'text-[#7C6FAB] hover:text-[#1E1033]'">
+                    {{ $tab }}
+                </button>
+            @endforeach
+        </nav>
+
+        {{-- ── TAB: Stats ────────────────────────────────────────────── --}}
+        <div x-show="activeTab === 'Stats'" x-transition role="tabpanel" aria-label="Stats">
+            <div class="grid gap-5 lg:grid-cols-2">
+                {{-- Stats overview --}}
+                <x-card>
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-[15px] font-extrabold text-[#1E1033]">Stats Overview</h2>
+                        <span class="text-xs text-[#7C6FAB]">Updated {{ $character->updated_at->diffForHumans() }}</span>
+                    </div>
+                    <div class="space-y-4">
+                        @foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
+                            @php
+                                $val = $character->getStat($stat);
+                                $color = $statColors[$stat];
+                                $icon = $statIcons[$stat];
+                                $grade = $statGrade($val);
+                                $pctBar = min(100, round($val / 12));
+                            @endphp
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="flex items-center gap-1.5 font-bold text-[#4A3570]">
+                                        {{ $icon }} {{ ucfirst($stat) }}
+                                    </span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="rounded-md px-2 py-0.5 text-[10px] font-extrabold uppercase text-white"
+                                            style="background: {{ $gradeColors[$grade] ?? '#9CA3AF' }}">{{ $grade }}</span>
+                                        <span class="font-extrabold"
+                                            style="color: {{ $color }}">{{ $val }}</span>
+                                    </div>
+                                </div>
+                                <div class="relative h-2 overflow-hidden rounded-full bg-[#EDE9FE]" role="progressbar"
+                                    aria-valuenow="{{ $val }}" aria-valuemin="0" aria-valuemax="1200"
+                                    aria-label="{{ ucfirst($stat) }}: {{ $val }}">
+                                    <div class="h-full rounded-full transition-all duration-[0.6s]"
+                                        style="width: {{ $pctBar }}%; background: linear-gradient(90deg, {{ $color }}99, {{ $color }})">
+                                    </div>
+                                    {{-- Soft cap marker at 1000 --}}
+                                    <div class="absolute top-0 bottom-0 w-px"
+                                        style="left: 83.33%; background: rgba(124,58,237,0.25)"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <p class="mt-4 rounded-xl bg-[#F9F5FF] px-3 py-2 text-[11px] text-[#7C6FAB]">
+                        <strong class="text-[#7C3AED]">Soft cap</strong> at 1000 · gains above 1000 are at 50% rate · max
+                        stored 1200
+                    </p>
+                </x-card>
+
+                {{-- Condition --}}
+                <x-card>
+                    <h2 class="mb-4 text-[15px] font-extrabold text-[#1E1033]">Condition</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        @foreach ([['⚡', 'Energy', $character->energy_level . '%', '#7C3AED'], ['😊', 'Mood', ucfirst($character->mood_status ?? 'normal'), '#E879A0'], ['💚', 'Status', ucfirst($character->status ?? 'active'), '#10B981'], ['✨', 'SP', (string) ($character->available_sp ?? 0), '#F59E0B']] as [$icon, $label, $value, $color])
+                            <div class="rounded-xl bg-[#F9F5FF] p-3 text-center">
+                                <div class="text-xl">{{ $icon }}</div>
+                                <p class="mt-1 text-[10px] font-semibold uppercase tracking-wider text-[#7C6FAB]">
+                                    {{ $label }}</p>
+                                <p class="text-base font-extrabold" style="color: {{ $color }}">
+                                    {{ $value }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- SP budget bar --}}
+                    @php
+                        $sp = (int) ($character->available_sp ?? 0);
+                        $spMax = 500;
+                        $spPct = min(100, round(($sp / max(1, $spMax)) * 100));
+                    @endphp
+                    <div class="mt-4 space-y-1">
+                        <div class="flex items-center justify-between text-xs text-[#7C6FAB]">
+                            <span class="font-bold">SP Budget</span>
+                            <span>{{ $sp }} / {{ $spMax }}</span>
+                        </div>
+                        <div class="h-2 overflow-hidden rounded-full bg-[#EDE9FE]">
+                            <div class="h-full rounded-full transition-all"
+                                style="width: {{ $spPct }}%; background: linear-gradient(90deg,#F59E0B,#F97316)">
+                            </div>
                         </div>
                     </div>
-                </section>
 
-                <section id="career-plan-visualizer" class="card rounded-lg" role="region" aria-labelledby="career-plan-heading">
-                    <header class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
+                    <a href="{{ route('training.index', $character) }}"
+                        class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#E879A0] to-[#7C3AED] py-2.5 text-sm font-bold text-white shadow-[0_4px_12px_rgba(232,121,160,.35)] transition hover:brightness-105">
+                        ⚡ Go to Training
+                    </a>
+                </x-card>
+            </div>
+        </div>
+
+        {{-- ── TAB: Aptitudes ────────────────────────────────────────── --}}
+        <div x-show="activeTab === 'Aptitudes'" x-transition role="tabpanel" aria-label="Aptitudes">
+            <x-card>
+                <h2 class="mb-5 text-[15px] font-extrabold text-[#1E1033]">Aptitudes</h2>
+
+                @php
+                    $aptitudeGroups = [
+                        'Distance' => $character->aptitudes->filter(fn($a) => !is_null($a->distance_type)),
+                        'Surface' => $character->aptitudes->filter(fn($a) => !is_null($a->surface_type)),
+                        'Running Style' => $character->aptitudes->filter(fn($a) => !is_null($a->running_style)),
+                    ];
+                    $styleLabels = [
+                        'nige' => 'Front Runner 逃げ',
+                        'senkou' => 'Pace Chaser 先行',
+                        'sashi' => 'Late Surger 差し',
+                        'oikomi' => 'End Closer 追込',
+                        'front_runner' => 'Front Runner 逃げ',
+                        'pace_chaser' => 'Pace Chaser 先行',
+                        'late_surger' => 'Late Surger 差し',
+                        'end_closer' => 'End Closer 追込',
+                    ];
+                @endphp
+
+                <div class="space-y-6">
+                    @foreach ($aptitudeGroups as $groupName => $aptitudes)
                         <div>
-                            <h2 id="career-plan-heading" class="text-lg font-bold text-neutral-900 dark:text-white">AI Career Plan</h2>
-                            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Generate a game-aware turn timeline using the current character state, skills, and races.</p>
-                        </div>
-                        <a href="{{ route('ai.chat') }}" class="btn btn-sm btn-secondary" aria-label="Open AI chat for career planning follow-up">
-                            Open AI Chat
-                        </a>
-                    </header>
-                    <div class="card-body">
-                        <x-training-timeline
-                            :character-id="$character->id"
-                            :total-turns="$character->scenario_type === 'unity_cup' ? 78 : 72"
-                            :current-turn="$latestCareerPlan?->current_turn ?? $character->current_turn"
-                            :initial-plan="$latestCareerPlan?->plan"
-                            :initial-plan-meta="$latestCareerPlan ? [
-                                'id' => $latestCareerPlan->id,
-                                'goal' => $latestCareerPlan->goal,
-                                'is_locked' => $latestCareerPlan->is_locked,
-                                'current_turn' => $latestCareerPlan->current_turn,
-                            ] : null"
-                        />
-                    </div>
-                </section>
-
-                <!-- Support Deck -->
-                <section class="card rounded-lg" role="region" aria-labelledby="support-deck-heading">
-                    <header
-                        class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
-                        <h2 id="support-deck-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Support Deck
-                        </h2>
-                        <a href="{{ route('characters.deck-builder', $character) }}" class="btn btn-sm btn-primary"
-                            aria-label="Manage Support Deck">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
-                            Manage Deck
-                        </a>
-                    </header>
-                    <div class="card-body">
-                        @if ($character->supportCards->count() > 0)
-                            <div class="space-y-2">
-                                @foreach ($character->supportCards as $supportCard)
-                                    @php
-                                        $card = $supportCard->supportCard;
-                                        $bondLevel = $supportCard->friendship_level ?? 0;
-                                        $bondMax = 100;
-                                        $bondPercentage = ($bondLevel / $bondMax) * 100;
-                                    @endphp
-                                    <div
-                                        class="flex items-center gap-3 p-2 rounded-lg bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700">
+                            <p class="mb-2 text-[11px] font-extrabold uppercase tracking-widest text-[#7C6FAB]">
+                                {{ $groupName }}</p>
+                            @if ($aptitudes->count() > 0)
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach ($aptitudes as $aptitude)
+                                        @php
+                                            $raw =
+                                                $aptitude->distance_type ??
+                                                ($aptitude->surface_type ?? ($aptitude->running_style ?? '?'));
+                                            $label = $styleLabels[$raw] ?? ucwords(str_replace('_', ' ', $raw));
+                                            $grade = strtoupper($aptitude->grade ?? 'F');
+                                            // Clamp to S (never SS)
+                                            if (
+                                                $grade === 'SS' ||
+                                                !in_array($grade, ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G'])
+                                            ) {
+                                                $grade = 'S';
+                                            }
+                                        @endphp
                                         <div
-                                            class="shrink-0 w-10 h-10 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
-                                            {{ strtoupper(substr($card->card_type ?? 'S', 0, 1)) }}
+                                            class="flex items-center gap-2 rounded-xl bg-[#F9F5FF] border border-[#EDE9FE] px-3 py-2">
+                                            <span class="text-sm font-bold text-[#4A3570]">{{ $label }}</span>
+                                            <span class="rounded-md px-2 py-0.5 text-[10px] font-extrabold text-white"
+                                                style="background: {{ $gradeColors[$grade] ?? '#9CA3AF' }}">{{ $grade }}</span>
                                         </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="text-sm font-medium text-neutral-900 dark:text-white truncate">
-                                                {{ $card->name ?? 'Unknown Card' }}</div>
-                                            <div class="flex items-center gap-2 mt-1">
-                                                <div
-                                                    class="flex-1 h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden"
-                                                    role="progressbar"
-                                                    aria-valuenow="{{ $bondLevel }}"
-                                                    aria-valuemin="0"
-                                                    aria-valuemax="{{ $bondMax }}"
-                                                    aria-label="Bond with {{ $card->name ?? 'support card' }}: {{ $bondLevel }} of {{ $bondMax }}">
-                                                    <div class="h-full bg-primary-500 rounded-full transition-all"
-                                                        @style(['width' => $bondPercentage . '%'])></div>
-                                                </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="text-sm text-[#7C6FAB]">No {{ strtolower($groupName) }} aptitude data.</p>
+                            @endif
+                        </div>
+                    @endforeach
+
+                    @if ($character->aptitudes->isEmpty())
+                        <div class="py-8 text-center text-sm text-[#7C6FAB]">No aptitude data available yet.</div>
+                    @endif
+                </div>
+            </x-card>
+        </div>
+
+        {{-- ── TAB: Factors ──────────────────────────────────────────── --}}
+        <div x-show="activeTab === 'Factors'" x-transition role="tabpanel" aria-label="Factors">
+            <x-card>
+                <div class="mb-5 flex items-center justify-between">
+                    <h2 class="text-[15px] font-extrabold text-[#1E1033]">Inherited Factors</h2>
+                    @can('update', $character)
+                        <a href="{{ route('characters.factors.manage', $character) }}"
+                            class="rounded-xl bg-[#EDE9FE] px-3 py-1.5 text-xs font-bold text-[#7C3AED] transition hover:bg-[#DDD6FE]">
+                            Manage
+                        </a>
+                    @endcan
+                </div>
+
+                @if ($character->factors->count() > 0)
+                    @php
+                        $factorsByType = $character->factors->groupBy('factor_type');
+                        $factorTypeLabels = [
+                            'blue_stats' => ['label' => 'Stat Bonuses', 'color' => '#3B82F6'],
+                            'red_aptitudes' => ['label' => 'Aptitude Upgrades', 'color' => '#EF4444'],
+                            'green_unique_skills' => ['label' => 'Unique Skills', 'color' => '#10B981'],
+                            'white_normal_skills' => ['label' => 'Normal Skills', 'color' => '#9CA3AF'],
+                        ];
+                    @endphp
+
+                    <div class="space-y-5">
+                        @foreach ($factorsByType as $type => $factors)
+                            @php $meta = $factorTypeLabels[$type] ?? ['label' => ucwords(str_replace('_', ' ', $type)), 'color' => '#7C6FAB']; @endphp
+                            <div>
+                                <p class="mb-2 text-[11px] font-extrabold uppercase tracking-widest"
+                                    style="color: {{ $meta['color'] }}">
+                                    {{ $meta['label'] }}
+                                </p>
+                                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                    @foreach ($factors as $factor)
+                                        @php
+                                            $stars = (int) str_replace('_star', '', $factor->star_level ?? '1');
+                                            $bonus = $factor->getStatBonus();
+                                        @endphp
+                                        <div
+                                            class="rounded-2xl border border-[#C4B5FD] bg-linear-to-br from-[#F9F5FF] to-[#EDE9FE] p-3 {{ $factor->is_active ? '' : 'opacity-50' }}">
+                                            <p class="text-sm font-extrabold text-[#1E1033]">{{ $factor->factor_name }}
+                                            </p>
+                                            <div class="mt-1 flex items-center gap-1"
+                                                aria-label="{{ $stars }} stars">
+                                                @for ($i = 1; $i <= 3; $i++)
+                                                    <span
+                                                        class="text-sm {{ $i <= $stars ? 'text-[#F59E0B]' : 'text-[#D1D5DB]' }}"
+                                                        aria-hidden="true">★</span>
+                                                @endfor
+                                            </div>
+                                            @if ($type === 'blue_stats' && $bonus > 0)
                                                 <span
-                                                    class="text-xs text-neutral-500 dark:text-neutral-400 tabular-nums"
-                                                    aria-hidden="true">{{ $bondLevel }}</span>
+                                                    class="mt-1 inline-block rounded-lg bg-white px-2 py-0.5 text-xs font-bold text-[#3B82F6]">+{{ $bonus }}
+                                                    {{ ucfirst($factor->stat_type ?? '') }}</span>
+                                            @elseif ($type === 'red_aptitudes')
+                                                <span
+                                                    class="mt-1 inline-block rounded-lg bg-white px-2 py-0.5 text-xs font-bold text-[#EF4444]">+{{ $stars }}
+                                                    grade{{ $stars > 1 ? 's' : '' }}</span>
+                                            @endif
+                                            @if (!$factor->is_active)
+                                                <span class="mt-1 block text-[10px] text-[#9CA3AF]">Inactive</span>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="py-10 text-center text-sm text-[#7C6FAB]">
+                        <p class="text-2xl mb-2">🧬</p>
+                        No inherited factors yet.
+                        @can('update', $character)
+                            <a href="{{ route('characters.factors.manage', $character) }}"
+                                class="block mt-2 font-bold text-[#7C3AED] hover:underline">Add Factors →</a>
+                        @endcan
+                    </div>
+                @endif
+            </x-card>
+        </div>
+
+        {{-- ── TAB: Goals ────────────────────────────────────────────── --}}
+        <div x-show="activeTab === 'Goals'" x-transition role="tabpanel" aria-label="Goals">
+            <x-card>
+                <h2 class="mb-5 text-[15px] font-extrabold text-[#1E1033]">Active Goals</h2>
+
+                @php
+                    $goals = is_array($character->goals) ? $character->goals : [];
+                    $goalList = $goals['list'] ?? [];
+                    $targetStats = $goals['target_stats'] ?? [];
+                @endphp
+
+                @if (count($goalList) > 0)
+                    <div class="space-y-3">
+                        @foreach ($goalList as $goal)
+                            @php
+                                $status = $goal['status'] ?? 'in_progress';
+                                $current = (int) ($goal['current'] ?? 0);
+                                $target = (int) ($goal['target'] ?? 1);
+                                $pct = $target > 0 ? min(100, round(($current / $target) * 100)) : 0;
+                                $statusStyles = [
+                                    'completed' => ['bg' => '#EDE9FE', 'text' => '#5B21B6', 'icon' => '✨'],
+                                    'on_track' => ['bg' => '#D1FAE5', 'text' => '#065F46', 'icon' => '✅'],
+                                    'at_risk' => ['bg' => '#FEE2E2', 'text' => '#991B1B', 'icon' => '🔴'],
+                                    'in_progress' => ['bg' => '#EDE9FE', 'text' => '#5B21B6', 'icon' => '○'],
+                                ];
+                                $s = $statusStyles[$status] ?? $statusStyles['in_progress'];
+                                $barColor =
+                                    $status === 'at_risk'
+                                        ? 'linear-gradient(90deg,#EF4444,#DC2626)'
+                                        : 'linear-gradient(90deg,#E879A0,#7C3AED)';
+                            @endphp
+                            <div class="rounded-xl border border-[#EDE9FE] bg-[#F9F5FF] p-4">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-sm font-extrabold text-[#1E1033]">{{ $goal['label'] ?? 'Goal' }}</p>
+                                    <span class="rounded-lg px-2 py-0.5 text-[10px] font-extrabold"
+                                        style="background: {{ $s['bg'] }}; color: {{ $s['text'] }}">
+                                        {{ $s['icon'] }} {{ ucfirst(str_replace('_', ' ', $status)) }}
+                                    </span>
+                                </div>
+                                @if ($target > 1)
+                                    <div class="mt-2">
+                                        <div class="flex items-center justify-between text-[11px] text-[#7C6FAB] mb-1">
+                                            <span>{{ $current }} / {{ $target }}</span>
+                                            <span>{{ $pct }}%</span>
+                                        </div>
+                                        <div class="h-1.5 overflow-hidden rounded-full bg-[#EDE9FE]">
+                                            <div class="h-full rounded-full transition-all"
+                                                style="width: {{ $pct }}%; background: {{ $barColor }}">
                                             </div>
                                         </div>
                                     </div>
-                                @endforeach
+                                @endif
                             </div>
-                        @else
-                            <div class="text-center text-sm text-neutral-500 py-6">
-                                <svg class="mx-auto h-10 w-10 text-neutral-400 mb-2" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                </svg>
-                                <p class="mb-3">No support cards equipped.</p>
-                                <a href="{{ route('characters.deck-builder', $character) }}"
-                                    class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
-                                    aria-label="Add support cards for {{ $character->name }}">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Add Support Cards
-                                </a>
-                            </div>
-                        @endif
+                        @endforeach
                     </div>
-                </section>
-
-                @if ($character->gameCharacter && $character->gameCharacter->goalRaces->isNotEmpty())
-                    <!-- Goal Races -->
-                    <section class="card rounded-lg" role="region" aria-labelledby="goal-races-heading">
-                        <div class="p-4 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
-                            <h2 id="goal-races-heading" class="text-lg font-bold text-neutral-900 dark:text-white">
-                                Goal Races
-                            </h2>
-                            <span
-                                class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
-                                {{ $character->gameCharacter->goalRaces->count() }}
-                                {{ Str::plural('race', $character->gameCharacter->goalRaces->count()) }}
-                            </span>
-                        </div>
-                        <div class="divide-y divide-neutral-100 dark:divide-neutral-700/50">
-                            @foreach ($character->gameCharacter->goalRaces->sortBy('pivot.priority') as $race)
-                                <div class="flex items-center gap-3 px-4 py-3">
-                                    {{-- Grade Badge --}}
-                                    <span @class([
-                                        'inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold min-w-[32px]',
-                                        'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' => $race->grade === 'G1',
-                                        'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' => $race->grade === 'G2',
-                                        'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' => $race->grade === 'G3',
-                                        'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' => ! in_array($race->grade, ['G1', 'G2', 'G3']),
-                                    ])>
-                                        {{ $race->grade }}
-                                    </span>
-
-                                    {{-- Race Info --}}
-                                    <div class="min-w-0 flex-1">
-                                        <div class="font-medium text-neutral-900 dark:text-white truncate">
-                                            {{ $race->name_en }}
-                                        </div>
-                                        <div class="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-2 flex-wrap">
-                                            <span>{{ $race->distance_meters }}m</span>
-                                            <span class="text-neutral-300 dark:text-neutral-600">&middot;</span>
-                                            <span>{{ ucfirst($race->distance_category ?? 'medium') }}</span>
-                                            @if ($race->venue)
-                                                <span class="text-neutral-300 dark:text-neutral-600">&middot;</span>
-                                                <span>{{ $race->venue }}</span>
-                                            @endif
-                                            @if ($race->phase)
-                                                <span class="text-neutral-300 dark:text-neutral-600">&middot;</span>
-                                                <span>{{ ucfirst($race->phase) }}</span>
-                                            @endif
-                                        </div>
+                @elseif (count($targetStats) > 0)
+                    <div class="space-y-3">
+                        @foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
+                            @if (isset($targetStats[$stat]) && $targetStats[$stat] > 0)
+                                @php
+                                    $target = (int) $targetStats[$stat];
+                                    $current = $character->getStat($stat);
+                                    $pct = min(100, round(($current / max(1, $target)) * 100));
+                                    $status =
+                                        $current >= $target
+                                            ? 'completed'
+                                            : ($pct >= 75
+                                                ? 'on_track'
+                                                : ($pct >= 40
+                                                    ? 'in_progress'
+                                                    : 'at_risk'));
+                                    $barColor =
+                                        $status === 'at_risk'
+                                            ? 'linear-gradient(90deg,#EF4444,#DC2626)'
+                                            : 'linear-gradient(90deg,' .
+                                                $statColors[$stat] .
+                                                '99,' .
+                                                $statColors[$stat] .
+                                                ')';
+                                @endphp
+                                <div class="rounded-xl border border-[#EDE9FE] bg-[#F9F5FF] p-4">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <p class="text-sm font-extrabold text-[#1E1033]">{{ $statIcons[$stat] }}
+                                            {{ ucfirst($stat) }} Goal</p>
+                                        <span class="text-[11px] font-bold text-[#7C6FAB]">{{ $current }} /
+                                            {{ $target }}</span>
                                     </div>
-
-                                    {{-- Priority indicator --}}
-                                    @if ($race->pivot->priority)
-                                        <span
-                                            class="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-neutral-100 dark:bg-neutral-700 text-xs font-medium text-neutral-600 dark:text-neutral-300"
-                                            title="Priority {{ $race->pivot->priority }}">
-                                            {{ $race->pivot->priority }}
-                                        </span>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                        @if ($character->gameCharacter->goalRaces->whereNotNull('pivot.notes')->where('pivot.notes', '!=', '')->isNotEmpty())
-                            <div class="px-4 py-2 bg-amber-50 dark:bg-amber-900/10 border-t border-neutral-200 dark:border-neutral-700">
-                                @foreach ($character->gameCharacter->goalRaces->sortBy('pivot.priority') as $race)
-                                    @if ($race->pivot->notes)
-                                        <p class="text-xs text-amber-700 dark:text-amber-300">
-                                            <span class="font-semibold">{{ $race->name_en }}:</span>
-                                            {{ $race->pivot->notes }}
-                                        </p>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
-                    </section>
-                @endif
-
-                {{-- 
-                    Recent Careers / History Section
-                    
-                    This section is intentionally commented out as the careers tracking system
-                    is planned for a future release. The Career model and relationships exist,
-                    but the full career history UI requires additional work:
-                    - Career completion workflow
-                    - Final grade calculation
-                    - Historical statistics aggregation
-                    
-                    See: docs/future-implements/comprehensive_future_features.md
-                --}}
-                {{--
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="text-lg font-bold text-neutral-900 dark:text-white">Training Careers</h3>
-                    </div>
-                    @if ($character->careers->count() > 0)
-                        <div class="divide-y divide-neutral-200 dark:divide-neutral-700">
-                            @foreach ($character->careers as $career)
-                                <div
-                                    class="p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors flex items-center justify-between">
-                                    <div>
-                                        <div class="font-medium text-neutral-900 dark:text-white">
-                                            {{ $career->scenario_type === 'ura_finale' ? 'URA Finale' : 'Unity Cup' }}
+                                    <div class="mt-2">
+                                        <div class="h-1.5 overflow-hidden rounded-full bg-[#EDE9FE]">
+                                            <div class="h-full rounded-full transition-all"
+                                                style="width: {{ $pct }}%; background: {{ $barColor }}">
+                                            </div>
                                         </div>
-                                        <div class="text-xs text-neutral-500">{{ $career->created_at->format('M d, Y') }}
-                                        </div>
-                                    </div>
-                                    <x-ui.grade-badge :grade="$career->final_grade ?? 'E'" />
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="p-8 text-center text-neutral-500 dark:text-neutral-400">
-                            No careers completed yet. Start training to build history!
-                        </div>
-                    @endif
-                </div>
-                --}}
-            </div>
-
-            <!-- Right Column: Stats Overview & Aptitudes -->
-            <div class="space-y-6">
-                <!-- Stats Overview -->
-                <section class="card rounded-lg" role="region" aria-labelledby="stats-visualization-heading">
-                    <header class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50">
-                        <h2 id="stats-visualization-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Stats
-                            Overview</h2>
-                    </header>
-                    <div class="card-body flex justify-center items-center py-4">
-                        <x-stat-radar-chart :stats="[
-                            'speed' => $character->getStat('speed'),
-                            'stamina' => $character->getStat('stamina'),
-                            'power' => $character->getStat('power'),
-                            'guts' => $character->getStat('guts'),
-                            'wit' => $character->getStat('wit'),
-                        ]" size="sm" />
-                    </div>
-                </section>
-
-                <!-- Synergy Score -->
-                <section class="card rounded-lg" role="region" aria-labelledby="synergy-score-heading">
-                    <header class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
-                        <h2 id="synergy-score-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Synergy Score</h2>
-                        <a href="{{ route('characters.synergy', $character) }}" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
-                            View Full Analysis &rarr;
-                        </a>
-                    </header>
-                    <div class="card-body py-3">
-                        <livewire:synergy-build-planner :characterId="$character->id" :isCompact="true" />
-                    </div>
-                </section>
-
-                <!-- Aptitudes -->
-                <section class="card rounded-lg" role="region" aria-labelledby="aptitudes-heading">
-                    <header class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50">
-                        <h2 id="aptitudes-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Aptitudes</h2>
-                    </header>
-                    <div class="card-body space-y-6">
-                        @php
-                            $aptitudeGroups = [
-                                'Distance' => $character->aptitudes->whereNotNull('distance_type'),
-                                'Surface' => $character->aptitudes->whereNotNull('surface_type'),
-                                'Running Style' => $character->aptitudes->whereNotNull('running_style'),
-                            ];
-                        @endphp
-
-                        @foreach ($aptitudeGroups as $groupName => $aptitudes)
-                            @if ($aptitudes->count() > 0)
-                                <div>
-                                    <h4 class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">
-                                        {{ $groupName }}</h4>
-                                    <div class="space-y-2">
-                                        @foreach ($aptitudes as $aptitude)
-                                            @php
-                                                $name =
-                                                    $aptitude->distance_type ??
-                                                    ($aptitude->surface_type ?? $aptitude->running_style);
-                                                $name = ucfirst(str_replace('_', ' ', $name));
-                                            @endphp
-                                            <x-aptitude-display :type="$name" :grade="$aptitude->grade" />
-                                        @endforeach
+                                        <p class="mt-1 text-right text-[10px] text-[#7C6FAB]">{{ $pct }}%</p>
                                     </div>
                                 </div>
                             @endif
                         @endforeach
-
-                        @if ($character->aptitudes->isEmpty())
-                            <div class="text-center text-sm text-neutral-500 py-4">No aptitude data available.</div>
-                        @endif
                     </div>
-                </section>
-            </div>
+                @else
+                    <div class="py-10 text-center text-sm text-[#7C6FAB]">
+                        <p class="text-2xl mb-2">🎯</p>
+                        No goals set yet. Edit this character to add stat targets.
+                    </div>
+                @endif
+            </x-card>
         </div>
 
-        <!-- Skills, Race Schedule, and Inherited Factors Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Skills -->
-            <section class="card rounded-lg" role="region" aria-labelledby="skills-heading">
-                <header
-                    class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
-                    <h2 id="skills-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Skills</h2>
-                    <a href="{{ route('skills.index', ['character' => $character->id]) }}" class="btn btn-sm btn-primary"
-                        aria-label="Manage Skills">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Manage Skills
-                    </a>
-                </header>
-                <div class="p-2">
-                    @if ($character->skills->count() > 0)
-                        <div class="space-y-1">
-                            @foreach ($character->skills->take(10) as $skill)
-                                <div
-                                    class="flex items-center justify-between p-2 rounded hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-yellow-400" aria-hidden="true"></div>
-                                        <span
-                                            class="text-sm font-medium text-neutral-700 dark:text-neutral-200">{{ $skill->name }}</span>
-                                    </div>
-                                    @if ($skill->pivot && $skill->pivot->final_sp_cost)
-                                        <span
-                                            class="text-xs font-mono text-neutral-500">{{ $skill->pivot->final_sp_cost }}pt</span>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center text-sm text-neutral-500 py-6">
-                            <svg class="mx-auto h-10 w-10 text-neutral-400 mb-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                            </svg>
-                            <p class="mb-3">No skills acquired yet.</p>
-                            <a href="{{ route('skills.index', ['character' => $character->id]) }}"
-                                class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
-                                aria-label="Browse skills for {{ $character->name }}">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4" />
-                                </svg>
-                                Browse Skills
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </section>
+        {{-- ── TAB: History ──────────────────────────────────────────── --}}
+        <div x-show="activeTab === 'History'" x-transition role="tabpanel" aria-label="History">
+            <x-card>
+                <h2 class="mb-5 text-[15px] font-extrabold text-[#1E1033]">Training History</h2>
 
-            <!-- Race Schedule -->
-            <section class="card rounded-lg" role="region" aria-labelledby="race-schedule-heading-bottom">
-                <header
-                    class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
-                    <h2 id="race-schedule-heading-bottom" class="text-lg font-bold text-neutral-900 dark:text-white">Race
-                        Schedule</h2>
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400">Upcoming</span>
-                </header>
-                @php
-                    $raceSchedule = $character->race_schedule ?? [];
-                    $upcomingRaces = is_array($raceSchedule) ? array_slice($raceSchedule, 0, 5) : [];
-                @endphp
-                <div class="card-body">
-                    @if (count($upcomingRaces) > 0)
+                {{-- Career history requires final_grade column — planned for Phase 5 --}}
+                <div class="py-8 text-center text-sm text-[#7C6FAB]">
+                    <p class="text-2xl mb-2">📜</p>
+                    Career run history will be available after the race system is complete.
+                </div>
+
+                {{-- Goal races --}}
+                @if ($character->gameCharacter && $character->gameCharacter->goalRaces->isNotEmpty())
+                    <div class="mt-6">
+                        <p class="mb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#7C6FAB]">Goal Races</p>
                         <div class="space-y-2">
-                            @foreach ($upcomingRaces as $race)
-                                @php
-                                    $raceName = $race['name'] ?? 'Unknown Race';
-                                    $raceGrade = $race['grade'] ?? 'G1';
-                                    $raceTurn = $race['turn'] ?? 0;
-                                    $readiness = $race['readiness'] ?? 'unknown';
-                                    $readinessColors = [
-                                        'excellent' =>
-                                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                        'good' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-                                        'fair' =>
-                                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                                        'poor' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                                        'unknown' => 'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-400',
-                                    ];
-                                    $readinessColor = $readinessColors[$readiness] ?? $readinessColors['unknown'];
-                                @endphp
+                            @foreach ($character->gameCharacter->goalRaces->sortBy('pivot.priority') as $race)
                                 <div
-                                    class="flex items-center justify-between p-2 rounded bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700">
-                                    <div class="flex-1 min-w-0">
-                                        <div class="text-sm font-medium text-neutral-900 dark:text-white truncate">
-                                            {{ $raceName }}</div>
-                                        <div class="text-xs text-neutral-500 dark:text-neutral-400">{{ $raceGrade }} • Turn
-                                            {{ $raceTurn }}</div>
-                                    </div>
-                                    <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $readinessColor }} ml-2">
-                                        {{ ucfirst($readiness) }}
+                                    class="flex items-center gap-3 rounded-xl bg-[#F9F5FF] border border-[#EDE9FE] px-3 py-2.5">
+                                    <span class="rounded-md px-2 py-0.5 text-[10px] font-extrabold text-white"
+                                        style="background: {{ $race->grade === 'G1' ? 'linear-gradient(135deg,#F59E0B,#F97316)' : '#EDE9FE' }}; color: {{ $race->grade === 'G1' ? '#fff' : '#7C3AED' }}">
+                                        {{ $race->grade }}
                                     </span>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center text-sm text-neutral-500 py-6">
-                            <svg class="mx-auto h-10 w-10 text-neutral-400 mb-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <p class="mt-2">No races scheduled yet.</p>
-                        </div>
-                    @endif
-                </div>
-            </section>
-
-            <!-- Inherited Factors -->
-            <section class="card rounded-lg" role="region" aria-labelledby="inherited-factors-heading">
-                <header
-                    class="card-header bg-transparent border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between">
-                    <h2 id="inherited-factors-heading" class="text-lg font-bold text-neutral-900 dark:text-white">Inherited
-                        Factors</h2>
-                    @can('update', $character)
-                        <a href="{{ route('characters.factors.manage', $character) }}" class="btn btn-sm btn-primary"
-                            aria-label="Manage Inherited Factors">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Manage
-                        </a>
-                    @endcan
-                </header>
-                <div class="card-body">
-                    @if ($character->factors->count() > 0)
-                        @php
-                            $factorsByType = $character->factors->groupBy('factor_type');
-                            $factorTypeLabels = [
-                                'blue_stats' => 'Stat Bonuses',
-                                'red_aptitudes' => 'Aptitude Upgrades',
-                                'green_unique_skills' => 'Unique Skills',
-                                'white_normal_skills' => 'Normal Skills',
-                            ];
-                            $factorTypeColors = [
-                                'blue_stats' => 'text-blue-600 dark:text-blue-400',
-                                'red_aptitudes' => 'text-red-600 dark:text-red-400',
-                                'green_unique_skills' => 'text-green-600 dark:text-green-400',
-                                'white_normal_skills' => 'text-neutral-600 dark:text-neutral-400',
-                            ];
-                        @endphp
-
-                        <div class="space-y-4">
-                            @foreach ($factorsByType as $type => $factors)
-                                <div>
-                                    <h4
-                                        class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-                                        <div
-                                            class="w-2 h-2 rounded-full bg-{{ str_replace('_stats', '', str_replace('_aptitudes', '', str_replace('_unique_skills', '', str_replace('_normal_skills', '', $type)))) }}-500"
-                                            aria-hidden="true">
-                                        </div>
-                                        {{ $factorTypeLabels[$type] ?? ucfirst($type) }}
-                                        <span class="text-neutral-500">({{ $factors->count() }})</span>
-                                    </h4>
-                                    <div class="space-y-2">
-                                        @foreach ($factors as $factor)
-                                            <div
-                                                class="flex items-center justify-between p-2.5 rounded-lg bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700 {{ !$factor->is_active ? 'opacity-50' : '' }}">
-                                                <div class="flex items-center gap-2">
-                                                    <!-- Star Level -->
-                                                    <div class="flex items-center" aria-hidden="true">
-                                                        @for ($i = 1; $i <= 3; $i++)
-                                                            <svg class="w-3 h-3 {{ $i <= (int) str_replace('_star', '', $factor->star_level) ? 'text-yellow-400' : 'text-neutral-300 dark:text-neutral-600' }}"
-                                                                fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                                                <path
-                                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                            </svg>
-                                                        @endfor
-                                                    </div>
-                                                    <span class="sr-only">{{ (int) str_replace('_star', '', $factor->star_level) }} star{{ (int) str_replace('_star', '', $factor->star_level) !== 1 ? 's' : '' }}</span>
-
-                                                    <!-- Factor Name -->
-                                                    <span class="text-sm font-medium text-neutral-900 dark:text-white">
-                                                        {{ $factor->factor_name }}
-                                                    </span>
-                                                </div>
-
-                                                <div class="flex items-center gap-2">
-                                                    <!-- Factor Value/Bonus -->
-                                                    @if ($factor->factor_type === 'blue_stats')
-                                                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400">
-                                                            +{{ $factor->getStatBonus() }}
-                                                        </span>
-                                                    @elseif ($factor->factor_type === 'red_aptitudes')
-                                                        <span class="text-xs font-bold text-red-600 dark:text-red-400">
-                                                            +{{ (int) str_replace('_star', '', $factor->star_level) }}
-                                                            grade{{ (int) str_replace('_star', '', $factor->star_level) > 1 ? 's' : '' }}
-                                                        </span>
-                                                    @else
-                                                        <span
-                                                            class="text-xs font-bold {{ $factorTypeColors[$factor->factor_type] ?? 'text-neutral-600 dark:text-neutral-400' }}">
-                                                            {{ (int) str_replace('_star', '', $factor->star_level) }}★
-                                                        </span>
-                                                    @endif
-
-                                                    <!-- Active Status -->
-                                                    @if (!$factor->is_active)
-                                                        <span
-                                                            class="text-xs text-neutral-500 bg-neutral-200 dark:bg-neutral-700 px-1.5 py-0.5 rounded">
-                                                            Inactive
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        @endforeach
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-bold text-[#1E1033] truncate">{{ $race->name_en }}</p>
+                                        <p class="text-[11px] text-[#7C6FAB]">
+                                            {{ $race['distance_meters'] }}m · {{ ucfirst($race['distance_category']) }}
+                                            @if (!empty($race['venue']))
+                                                · {{ $race['venue'] }}
+                                            @endif
+                                            @if (!empty($race['pivot']['notes']))
+                                                · {{ $race['pivot']['notes'] }}
+                                            @endif
+                                        </p>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
-
-                        <!-- Factor Summary -->
-                        @php
-                            $activeFactors = $character->factors->where('is_active', true);
-                            $totalStatBonuses = $activeFactors
-                                ->where('factor_type', 'blue_stats')
-                                ->reduce(function ($carry, $factor) {
-                                    return $carry + $factor->getStatBonus();
-                                }, 0);
-                            $totalAptitudeUpgrades = $activeFactors
-                                ->where('factor_type', 'red_aptitudes')
-                                ->reduce(function ($carry, $factor) {
-                                    return $carry + (int) str_replace('_star', '', $factor->star_level);
-                                }, 0);
-                            $uniqueSkills = $activeFactors->where('factor_type', 'green_unique_skills')->count();
-                            $normalSkills = $activeFactors->where('factor_type', 'white_normal_skills')->count();
-                        @endphp
-
-                        @if ($activeFactors->count() > 0)
-                            <div class="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
-                                <h4 class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Active
-                                    Bonuses</h4>
-                                <div class="grid grid-cols-2 gap-2 text-xs">
-                                    @if ($totalStatBonuses > 0)
-                                        <div class="flex justify-between p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
-                                            <span class="text-blue-700 dark:text-blue-300">Total Stat Bonus</span>
-                                            <span
-                                                class="font-bold text-blue-800 dark:text-blue-200">+{{ $totalStatBonuses }}</span>
-                                        </div>
-                                    @endif
-                                    @if ($totalAptitudeUpgrades > 0)
-                                        <div class="flex justify-between p-2 bg-red-50 dark:bg-red-900/20 rounded">
-                                            <span class="text-red-700 dark:text-red-300">Aptitude Upgrades</span>
-                                            <span
-                                                class="font-bold text-red-800 dark:text-red-200">+{{ $totalAptitudeUpgrades }}</span>
-                                        </div>
-                                    @endif
-                                    @if ($uniqueSkills > 0)
-                                        <div class="flex justify-between p-2 bg-green-50 dark:bg-green-900/20 rounded">
-                                            <span class="text-green-700 dark:text-green-300">Unique Skills</span>
-                                            <span
-                                                class="font-bold text-green-800 dark:text-green-200">{{ $uniqueSkills }}</span>
-                                        </div>
-                                    @endif
-                                    @if ($normalSkills > 0)
-                                        <div class="flex justify-between p-2 bg-neutral-50 dark:bg-neutral-800 rounded">
-                                            <span class="text-neutral-700 dark:text-neutral-300">Normal Skills</span>
-                                            <span
-                                                class="font-bold text-neutral-800 dark:text-neutral-200">{{ $normalSkills }}</span>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        @endif
-                    @else
-                        <div class="text-center text-sm text-neutral-500 py-8">
-                            <svg class="mx-auto h-10 w-10 text-neutral-400 mb-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
-                            <p class="mb-2">No inherited factors.</p>
-                            @can('update', $character)
-                                <a href="{{ route('characters.factors.manage', $character) }}"
-                                    class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium">
-                                    Add Factors
-                                </a>
-                            @endcan
-                        </div>
-                    @endif
-                </div>
-            </section>
+                    </div>
+                @endif
+            </x-card>
         </div>
+
+        {{-- ── TAB: Snapshots ────────────────────────────────────────── --}}
+        <div x-show="activeTab === 'Snapshots'" x-transition role="tabpanel" aria-label="Snapshots">
+            <x-card>
+                @livewire('snapshots.snapshot-manager', ['characterId' => $character->id], key('snapshot-manager-' . $character->id))
+            </x-card>
+        </div>
+
     </div>
+
+    {{-- ── AI Career Plan Visualizer ───────────────────────────────────────── --}}
+    <div id="career-plan-visualizer" class="mt-8">
+        <div class="mb-4">
+            <div class="flex items-center gap-3 mb-1">
+                <h2 class="text-[15px] font-extrabold text-[#1E1033]">AI Career Plan</h2>
+                <span class="text-[11px] font-extrabold uppercase tracking-widest text-[#7C6FAB]">Beta</span>
+            </div>
+            <p class="text-[13px] text-[#7C6FAB]">Generate a game-aware turn timeline using the current character state,
+                skills, and races.</p>
+        </div>
+        <x-training-timeline :character-id="$character->id" :total-turns="78" :current-turn="$character->current_turn" :initial-plan="$latestCareerPlan?->plan ?? null" :initial-plan-meta="$latestCareerPlan
+            ? [
+                'id' => $latestCareerPlan->id,
+                'goal' => $latestCareerPlan->goal,
+                'locked' => (bool) $latestCareerPlan->is_locked,
+            ]
+            : null" />
+    </div>
+
 @endsection
