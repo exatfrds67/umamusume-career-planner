@@ -15,6 +15,11 @@
         'primary' => 'btn-primary',
         'secondary' => 'btn-secondary',
         'outline' => 'btn-outline',
+        'ghost' => 'btn-ghost',
+        'danger' => 'btn-danger',
+        'gold' => 'btn-gold',
+        'success' => 'btn-success',
+        'warning' => 'btn-warning',
         default => 'btn-primary',
     };
 

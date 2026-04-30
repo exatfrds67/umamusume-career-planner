@@ -1,22 +1,38 @@
-@props(['grade', 'size', 'showLabel', 'label'])
+@props(['grade', 'size' => 'md', 'showLabel' => false, 'label' => null])
 
-<div {{ $attributes->merge(['class' => 'inline-flex items-center gap-2']) }}>
-    {{-- Grade Badge Circle --}}
-    <div class="grade-badge {{ $getSizeClasses() }} {{ $getGradeColor() }} flex items-center justify-center rounded-full font-bold text-white shadow-md transition-transform hover:scale-110"
-        title="{{ $getGradeDescription() }}">
-        {{ $grade }}
-    </div>
+@php
+    $gradeColors = [
+        'S' => ['bg' => 'linear-gradient(135deg, #FCD34D, #F59E0B)', 'color' => '#fff'],
+        'A' => ['bg' => 'linear-gradient(135deg, #F9A8D4, #E879A0)', 'color' => '#fff'],
+        'B' => ['bg' => 'linear-gradient(135deg, #A78BFA, #7C3AED)', 'color' => '#fff'],
+        'C' => ['bg' => 'linear-gradient(135deg, #60A5FA, #3B82F6)', 'color' => '#fff'],
+        'D' => ['bg' => '#6B7280', 'color' => '#fff'],
+        'E' => ['bg' => '#9CA3AF', 'color' => '#fff'],
+        'F' => ['bg' => '#D1D5DB', 'color' => '#374151'],
+        'G' => ['bg' => '#E5E7EB', 'color' => '#6B7280'],
+    ];
 
-    {{-- Optional Label --}}
+    $cfg = $gradeColors[strtoupper((string) $grade)] ?? $gradeColors['G'];
+
+    $padding = match ($size) {
+        'xs', 'sm' => '3px 9px',
+        'lg', 'xl' => '10px 16px',
+        default => '3px 9px',
+    };
+    $fontSize = match ($size) {
+        'xs' => '10px',
+        'sm' => '11px',
+        'lg', 'xl' => '14px',
+        default => '11px',
+    };
+@endphp
+
+<span {{ $attributes }}
+    style="display: inline-flex; align-items: center; justify-content: center; background: {{ $cfg['bg'] }}; color: {{ $cfg['color'] }}; font-weight: 800; border-radius: 6px; padding: {{ $padding }}; font-size: {{ $fontSize }}; letter-spacing: 1px; font-family: 'Nunito', sans-serif; white-space: nowrap;"
+    title="{{ $getGradeDescription() }}">
+    {{ strtoupper((string) $grade) }}
     @if ($showLabel)
-        <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-            {{ $label ?? $getGradeDescription() }}
-        </span>
+        <span
+            style="margin-left: 4px; font-weight: 600; font-size: {{ $fontSize }};">{{ $label ?? $getGradeDescription() }}</span>
     @endif
-</div>
-
-@once
-    @push('styles')
-        @vite(['resources/css/components/grade-badge.css'])
-    @endpush
-@endonce
+</span>

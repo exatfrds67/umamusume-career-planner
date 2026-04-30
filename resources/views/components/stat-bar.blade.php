@@ -11,32 +11,60 @@
     'size',
 ])
 
+@php
+    $statIcons = [
+        'speed' => '⚡',
+        'stamina' => '🌿',
+        'power' => '🔥',
+        'guts' => '❤️',
+        'wit' => '💙',
+        'wisdom' => '💙',
+    ];
+    $statColors = [
+        'speed' => '#E879A0',
+        'stamina' => '#10B981',
+        'power' => '#F59E0B',
+        'guts' => '#EF4444',
+        'wit' => '#3B82F6',
+        'wisdom' => '#3B82F6',
+    ];
+    $icon = $statIcons[strtolower($stat)] ?? '⭐';
+    $color = $statColors[strtolower($stat)] ?? '#7C3AED';
+
+    // Determine grade from value
+    $val = (int) $current;
+    $grade = match (true) {
+        $val >= 1000 => 'S',
+        $val >= 800 => 'A',
+        $val >= 600 => 'B',
+        $val >= 400 => 'C',
+        $val >= 200 => 'D',
+        $val >= 100 => 'E',
+        default => 'F',
+    };
+@endphp
+
 <div {{ $attributes->merge(['class' => 'stat-bar-container']) }} style="{{ $getStatStyle() }}">
     {{-- Label and Value --}}
     @if ($showLabel)
-        <div class="mb-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
-            <div class="flex min-w-0 items-center gap-2">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
                 @if ($showIcon)
-                    <div class="stat-bar-icon w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                        {{ strtoupper(substr($getStatLabel(), 0, 1)) }}
-                    </div>
+                    <span style="font-size: 14px; line-height: 1;" aria-hidden="true">{{ $icon }}</span>
                 @endif
-                <span class="truncate text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                <span style="font-size: 13px; font-weight: 700; color: #4A3570; font-family: 'Nunito', sans-serif;">
                     {{ $getStatLabel() }}
                 </span>
             </div>
-            <div class="flex shrink-0 items-center justify-end gap-2 whitespace-nowrap text-right">
-                <span class="text-sm font-bold text-neutral-900 dark:text-neutral-100 tabular-nums">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <x-grade-badge :grade="$grade" size="xs" />
+                <span
+                    style="font-size: 14px; font-weight: 800; color: {{ $color }}; font-family: 'Nunito', sans-serif; font-variant-numeric: tabular-nums;">
                     {{ number_format($current) }}
                 </span>
                 @if ($isAboveSoftCap())
-                    <span class="text-xs text-neutral-500 dark:text-neutral-400 tabular-nums">
+                    <span style="font-size: 11px; color: #7C6FAB;">
                         ({{ number_format($getEffectiveValue()) }} eff.)
-                    </span>
-                @endif
-                @if ($showPercentage)
-                    <span class="min-w-[3.75rem] text-xs text-neutral-500 dark:text-neutral-400 tabular-nums">
-                        {{ number_format($getPercentage(), 1) }}%
                     </span>
                 @endif
             </div>
@@ -44,47 +72,36 @@
     @endif
 
     {{-- Progress Bar --}}
-    <div
-        class="relative w-full {{ $size === 'sm' ? 'h-2' : ($size === 'lg' ? 'h-4' : 'h-3') }} bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-visible">
+    <div class="relative w-full rounded-full overflow-visible"
+        style="height: 8px; background: #EDE9FE; border-radius: 99px;">
+
         {{-- Soft Cap Indicator --}}
         @if ($showSoftCap && $getSoftCapPercentage() < 100)
-            <div class="absolute top-0 bottom-0 w-0.5 bg-neutral-400 dark:bg-neutral-500 z-10"
-                style="left: {{ $getSoftCapPercentage() }}%" title="Soft cap at 1200 (diminishing returns above this)">
-                <div
-                    class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-neutral-400 dark:bg-neutral-500 rounded-full">
-                </div>
+            <div class="absolute top-0 bottom-0 z-10"
+                style="left: {{ $getSoftCapPercentage() }}%; width: 1px; background: rgba(124,58,237,0.25);"
+                title="Soft cap at 1200 (diminishing returns above this)">
             </div>
         @endif
 
         {{-- Target Indicator --}}
         @if ($getTargetPercentage() !== null)
-            <div class="stat-bar-target-indicator absolute top-0 bottom-0 w-0.5 z-10 opacity-50"
-                style="left: {{ $getTargetPercentage() }}%" title="Target: {{ number_format($target) }}">
-                <div class="stat-bar-target-dot absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full opacity-50">
-                </div>
+            <div class="absolute top-0 bottom-0 z-10"
+                style="left: {{ $getTargetPercentage() }}%; width: 1px; background: {{ $color }}; opacity: 0.5;"
+                title="Target: {{ number_format($target) }}">
             </div>
         @endif
 
         {{-- Progress Fill --}}
-        <div class="stat-bar-fill h-full rounded-full transition-all duration-300 ease-out relative overflow-hidden"
-            style="width: {{ min(100, $getPercentage()) }}%">
-            {{-- Shine effect --}}
-            <div class="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent animate-shimmer">
-            </div>
-
-            {{-- Above soft cap indicator (different color) --}}
-            @if ($isAboveSoftCap())
-                <div class="stat-bar-overcap absolute top-0 right-0 bottom-0"
-                    style="width: {{ (($current - 1200) / $current) * 100 }}%"
-                    title="Diminishing returns (50% effectiveness)"></div>
-            @endif
+        <div class="h-full relative overflow-hidden"
+            style="width: {{ min(100, $getPercentage()) }}%; background: linear-gradient(90deg, {{ $color }}99, {{ $color }}); border-radius: 99px; transition: width 0.6s cubic-bezier(.4,0,.2,1);">
         </div>
     </div>
 
     {{-- Factor Bonus Indicator --}}
     @if ($factorBonus && $factorBonus > 0)
-        <div class="stat-factor-bonus mt-1 flex items-center gap-1 text-xs">
-            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+        <div
+            style="margin-top: 4px; display: flex; align-items: center; gap: 4px; font-size: 11px; color: {{ $color }};">
+            <svg style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
                 <path
                     d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
             </svg>
@@ -92,7 +109,3 @@
         </div>
     @endif
 </div>
-
-@once
-    {{-- Styles are imported globally via resources/css/app.css --}}
-@endonce

@@ -12,10 +12,10 @@
     }
 
     if ($hover) {
-        $classes .= ' transition duration-200 hover:-translate-y-0.5 hover:shadow-lg';
+        $classes .= ' transition-all duration-150 hover:-translate-y-0.5';
     }
 @endphp
 
 <{{ $as }} {{ $attributes->merge(['class' => $classes]) }}>
     {{ $slot }}
-</{{ $as }}>
+    </{{ $as }}>

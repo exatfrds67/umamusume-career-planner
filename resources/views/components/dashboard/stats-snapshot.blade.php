@@ -23,20 +23,14 @@
     // Helper function to get grade from stat value
     $getGrade = function ($value) {
         return match (true) {
-            $value >= 1200 => 'SS',
-            $value >= 1100 => 'S',
-            $value >= 1000 => 'A+',
-            $value >= 900 => 'A',
-            $value >= 800 => 'B+',
-            $value >= 700 => 'B',
-            $value >= 600 => 'C+',
-            $value >= 500 => 'C',
-            $value >= 400 => 'D+',
-            $value >= 300 => 'D',
-            $value >= 200 => 'E+',
+            $value >= 1000 => 'S',
+            $value >= 800 => 'A',
+            $value >= 600 => 'B',
+            $value >= 400 => 'C',
+            $value >= 200 => 'D',
             $value >= 100 => 'E',
-            $value >= 50 => 'F',
-            default => 'G+',
+            $value > 0 => 'F',
+            default => 'G',
         };
     };
 @endphp
