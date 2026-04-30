@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Uma Musume Career Planner — Design Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { height: 100%; font-family: 'Nunito', sans-serif; }
+    body { background: #F9F5FF; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #C4B5FD; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #7C3AED; }
+    @keyframes pulse {
+      from { opacity: .4; transform: scale(.85); }
+      to   { opacity: 1;  transform: scale(1);   }
+    }
+    @keyframes slide {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(24px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    button:hover { filter: brightness(1.06); }
+    textarea, input { font-family: 'Nunito', sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Claude AI shim — routes through the app's /api/ai/chat endpoint if available,
+       falls back to a canned response so the prototype still works offline -->
+  <script>
+    window.claude = {
+      complete: async function(opts) {
+        try {
+          const resp = await fetch('/api/ai/advisor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ messages: opts.messages, max_tokens: 512 }),
+          });
+          if (!resp.ok) throw new Error('api_error');
+          const data = await resp.json();
+          return data.content || data.response || data.message || 'No response received.';
+        } catch (_) {
+          // Offline / no-backend fallback — returns a canned advisor response
+          const userMsg = opts.messages?.slice(-1)[0]?.content || '';
+          const tips = [
+            "**Speed training** is optimal this turn. With Good mood (+2%) and Lv.3 facility (1.5×), you'll gain ~52 Speed and have a 60% chance to trigger a skill hint.",
+            "**Race recommendation:** Enter the Mile Cup now. Your 85% readiness gives ~48% win probability — best current odds. A win earns +3,200 fans and closes your Classic Year fan target.",
+            "**SP allocation:** With 450 SP, prioritise *Late Surger+* (120 SP) for the Kanto Okami Cup, then bank the rest for the final-turn unique skill window.",
+            "**Stamina watch:** You're 120 behind the Kanto Okami Cup target. Do 2× Stamina training before Turn 55 to stay on track without sacrificing speed gains.",
+            "**Support deck:** Gold Ship at 92% bond gives a 1.35× Friendship Training multiplier on Guts turns — consider 1 Guts training to bank the SP.",
+          ];
+          await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
+          return tips[Math.floor(Math.random() * tips.length)];
+        }
+      }
+    };
+  </script>
+
+  <script type="text/babel" src="components/data.jsx"></script>
+  <script type="text/babel" src="components/icons.jsx"></script>
+  <script type="text/babel" src="components/Layout.jsx"></script>
+  <script type="text/babel" src="components/Dashboard.jsx"></script>
+  <script type="text/babel" src="components/Characters.jsx"></script>
+  <script type="text/babel" src="components/CharacterWizard.jsx"></script>
+  <script type="text/babel" src="components/Training.jsx"></script>
+  <script type="text/babel" src="components/Races.jsx"></script>
+  <script type="text/babel" src="components/Skills.jsx"></script>
+  <script type="text/babel" src="components/SupportCards.jsx"></script>
+  <script type="text/babel" src="components/AIAdvisor.jsx"></script>
+  <script type="text/babel" src="components/Achievements.jsx"></script>
+  <script type="text/babel" src="components/OtherScreens.jsx"></script>
+  <script type="text/babel" src="components/App.jsx"></script>
+</body>
+</html>
